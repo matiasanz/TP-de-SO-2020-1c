@@ -14,8 +14,8 @@ int main(void) {
 
 	inicializar();
 
-	iniciar_servidor(config_get_string_value(config, "IP"),
-			config_get_string_value(config, "PUERTO"));
+	iniciar_servidor(config_get_string_value(config, "IP_BROKER"),
+			config_get_string_value(config, "PUERTO_BROKER"));
 
 	return EXIT_SUCCESS;
 }
