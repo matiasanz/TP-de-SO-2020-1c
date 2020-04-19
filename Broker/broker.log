@@ -1,0 +1,38 @@
+[INFO] 14:01:06:577 BROKER/(12358:12358): server levantado exitosamente
+[INFO] 14:02:27:687 BROKER/(6160:6160): server levantado exitosamente
+[INFO] 14:06:22:901 BROKER/(19280:19280): server levantado exitosamente
+[INFO] 14:12:22:47 BROKER/(10040:10040): server levantado exitosamente
+[INFO] 14:14:29:827 BROKER/(10053:10053): server levantado exitosamente
+[INFO] 14:16:28:62 BROKER/(10102:10102): server levantado exitosamente
+[INFO] 14:16:35:181 BROKER/(10111:10111): server levantado exitosamente
+[INFO] 14:16:48:487 BROKER/(10102:21265): GAMEBOY
+[INFO] 14:16:48:488 BROKER/(10102:21265): mensaje devuelto con exito!
+[INFO] 14:17:55:197 BROKER/(25858:25858): server levantado exitosamente
+[INFO] 14:18:04:313 BROKER/(25858:32615): mensaje recibido por GAMEBOY
+[INFO] 14:18:04:315 BROKER/(25858:32615): mensaje devuelto con exito!
+[INFO] 14:18:07:65 BROKER/(25858:26650): mensaje recibido por GAMEBOY
+[INFO] 14:18:07:65 BROKER/(25858:26650): mensaje devuelto con exito!
+[INFO] 14:18:37:350 BROKER/(25858:396): mensaje recibido por GAMEBOY
+[INFO] 14:18:37:350 BROKER/(25858:396): mensaje devuelto con exito!
+[INFO] 14:18:50:787 BROKER/(25858:17476): mensaje recibido por GAMEBOY
+[INFO] 14:18:50:788 BROKER/(25858:17476): mensaje devuelto con exito!
+[INFO] 14:21:44:374 BROKER/(18185:18185): server levantado exitosamente
+[INFO] 14:21:55:227 BROKER/(18185:18197): mensaje recibido por GAMEBOY
+[INFO] 14:21:55:227 BROKER/(18185:18197): mensaje recibido con codigo de operacion: 2
+[INFO] 14:22:50:873 BROKER/(18217:18217): server levantado exitosamente
+[INFO] 14:24:33:706 BROKER/(19078:19078): server levantado exitosamente
+[INFO] 14:24:42:415 BROKER/(19087:19087): server levantado exitosamente
+[INFO] 14:25:25:718 BROKER/(24502:24502): server levantado exitosamente
+[INFO] 14:25:30:906 BROKER/(6755:6755): server levantado exitosamente
+[INFO] 14:25:39:301 BROKER/(16329:16329): server levantado exitosamente
+[INFO] 14:26:05:672 BROKER/(1355:1355): server levantado exitosamente
+[INFO] 14:26:16:144 BROKER/(1355:30440): mensaje recibido por GAMEBOY
+[INFO] 14:26:16:144 BROKER/(1355:30440): mensaje recibido: hola soy Emi 
+[INFO] 14:26:16:144 BROKER/(1355:30440): mensaje devuelto con exito!
+[INFO] 14:27:37:636 BROKER/(19122:19122): server levantado exitosamente
+[INFO] 14:27:50:768 BROKER/(19122:15924): mensaje recibido por: GAMEBOY
+[INFO] 14:27:50:769 BROKER/(19122:15924): contenido del mensaje: hola soy Emi 
+[INFO] 14:27:50:769 BROKER/(19122:15924): mensaje devuelto con exito!
+[INFO] 14:28:09:906 BROKER/(19122:1090): mensaje recibido por: GAMEBOY
+[INFO] 14:28:09:907 BROKER/(19122:1090): contenido del mensaje: hola soy Emi 
+[INFO] 14:28:09:911 BROKER/(19122:1090): mensaje devuelto con exito!
