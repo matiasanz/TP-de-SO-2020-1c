@@ -53,3 +53,16 @@ dkms.conf
 
 #Logs
 *.log
+
+# Eclipse
+.Debug/
+.Release/
+*.cproject
+*.project
+.settings/
+
+# Binarios
+Broker
+GameBoy
+GameCard
+Team
