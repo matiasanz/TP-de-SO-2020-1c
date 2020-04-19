@@ -1,1 +1,10 @@
 /Debug/
+/Release/
+*.cproject
+*.project
+/.settings/
+
+# Binarios
+GameCard
+
+
