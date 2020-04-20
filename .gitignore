@@ -60,9 +60,3 @@ dkms.conf
 *.cproject
 *.project
 .settings/
-
-# Binarios
-Broker
-GameBoy
-GameCard
-Team
