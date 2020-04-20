@@ -1,10 +1,13 @@
-TARGET = ../Broker
+TARGET = ../bin/Broker
 LIBS = -lpthread -lcommons 
 CC = gcc 
 CFLAGS = -g -Wall
 
 .PHONY: default all clean
 
+create-dir:
+	mkdir -p ../bin
+	
 default: $(TARGET) 
 all: default 
 
@@ -16,7 +19,7 @@ HEADERS = $(wildcard *.h)
 
 .PRECIOUS: $(TARGET) $(OBJECTS) 
 
-$(TARGET): $(OBJECTS)
+$(TARGET): create-dir $(OBJECTS)
 	$(CC) $(OBJECTS) $(CFLAGS) $(LIBS) -o $@ 
 
 clean: 
