@@ -31,5 +31,5 @@ t_log* iniciar_logger(void) {
 }
 
 t_config* leer_config(void) {
-	return config_create("../config/broker.config");
+	return config_create("./broker.config");
 }

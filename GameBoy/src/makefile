@@ -1,13 +1,10 @@
-TARGET = ../bin/GameBoy
+TARGET = ../GameBoy
 LIBS = -lpthread -lcommons 
 CC = gcc 
 CFLAGS = -g -Wall
 
 .PHONY: default all clean
 
-create-dir:
-	mkdir -p ../bin
-	
 default: $(TARGET) 
 all: default 
 
@@ -19,7 +16,7 @@ HEADERS = $(wildcard *.h)
 
 .PRECIOUS: $(TARGET) $(OBJECTS) 
 
-$(TARGET): create-dir $(OBJECTS)
+$(TARGET): $(OBJECTS)
 	$(CC) $(OBJECTS) $(CFLAGS) $(LIBS) -o $@ 
 
 clean: 
