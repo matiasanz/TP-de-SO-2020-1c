@@ -52,7 +52,7 @@ Mkfile.old
 dkms.conf
 
 #Logs
-*.log
+#*.log
 
 # Eclipse
 .Debug/
