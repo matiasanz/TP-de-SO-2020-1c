@@ -1,5 +1,6 @@
 all: 
 	-cd src && $(MAKE) all
+#-cd src && $(MAKE) debug
 
 clean:
 	-cd src && $(MAKE) clean
@@ -14,3 +15,6 @@ install:
 
 uninstall:
 	-cd src && $(MAKE) uninstall
+	
+test: all
+	-cd tests && $(MAKE) test

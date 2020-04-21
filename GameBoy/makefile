@@ -1,5 +1,4 @@
 all: 
-	#echo $(LD_LIBRARY_PATH)
 	-cd src && $(MAKE) all
 
 clean:

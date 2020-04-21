@@ -5,6 +5,7 @@ C_SRCS=$(shell find . -iname "*.c" | tr '\n' ' ')
 H_SRCS=$(shell find . -iname "*.h" | tr '\n' ' ')
 OBJS=$(C_SRCS:./%.c=build/%.o)
 
+
 # Clean and compile .so
 all: build/libCrenitoCommons.so
 

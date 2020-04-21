@@ -1,5 +1,9 @@
 TARGET = ../Team
-LIBS = -lpthread -lcommons -lCrenitoCommons 
+
+CRENITO-COMMONS-DIR = ../../CrenitoCommons
+CRENITO-COMMONS-BIN = $(CRENITO-COMMONS-DIR)/src/build
+
+LIBS = -lpthread -lcommons 
 CC = gcc 
 CFLAGS = -g -Wall
 
@@ -17,7 +21,8 @@ HEADERS = $(wildcard *.h)
 .PRECIOUS: $(TARGET) $(OBJECTS) 
 
 $(TARGET): $(OBJECTS)
-	$(CC) $(OBJECTS) $(CFLAGS) $(LIBS) -o $@ 
+	$(CC)  $(OBJECTS) $(CFLAGS) -L"$(CRENITO-COMMONS-BIN)" -lCrenitoCommons $(LIBS) -o $@ 
+
 
 clean: 
 	-rm -f *.o
