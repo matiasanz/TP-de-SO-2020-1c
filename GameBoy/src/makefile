@@ -1,6 +1,8 @@
 TARGET = ../GameBoy
-LIBS = -lpthread -lcommons 
-CC = gcc 
+
+LIBS = -lpthread -lcommons -lCrenitoCommons
+
+CC =  gcc 
 CFLAGS = -g -Wall
 
 .PHONY: default all clean
@@ -17,7 +19,7 @@ HEADERS = $(wildcard *.h)
 .PRECIOUS: $(TARGET) $(OBJECTS) 
 
 $(TARGET): $(OBJECTS)
-	$(CC) $(OBJECTS) $(CFLAGS) $(LIBS) -o $@ 
+	$(CC)  $(OBJECTS) $(CFLAGS) $(LIBS) -o $@ 
 
 clean: 
 	-rm -f *.o

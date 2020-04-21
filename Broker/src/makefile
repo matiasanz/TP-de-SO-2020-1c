@@ -1,5 +1,5 @@
 TARGET = ../Broker
-LIBS = -lpthread -lcommons 
+LIBS = -lpthread -lcommons -lCrenitoCommons
 CC = gcc 
 CFLAGS = -g -Wall
 

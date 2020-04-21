@@ -1,5 +1,5 @@
 TARGET = ../GameCard
-LIBS = -lpthread -lcommons 
+LIBS = -lpthread -lcommons -lCrenitoCommons
 CC = gcc 
 CFLAGS = -g -Wall
 
