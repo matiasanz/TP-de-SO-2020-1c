@@ -15,7 +15,7 @@
 #include <crenito-commons/test_prueba_cspecs.h>
 //#include <tests/test_prueba_cspecs.h>
 
-//Tests se ejecutan antes del mainf
+//Tests se ejecutan antes del main
 int main(void) {
 	cr_saludar();
 	char* string = string_new();

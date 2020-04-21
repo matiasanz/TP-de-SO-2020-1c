@@ -12,6 +12,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include "utilidades-broker.h"
+#include <crenito-commons/constants.h>
 
 
 t_config* config;

@@ -26,10 +26,9 @@ void inicializar(void) {
 }
 
 t_log* iniciar_logger(void) {
-
-	return log_create("./broker.log", "BROKER", 1, LOG_LEVEL_INFO);
+	return log_create("./log/broker.log", "BROKER", 1, LOG_LEVEL_INFO);
 }
 
 t_config* leer_config(void) {
-	return config_create("./broker.config");
+	return config_create("./config/broker.config");
 }
