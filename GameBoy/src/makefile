@@ -1,6 +1,6 @@
 TARGET = ../GameBoy
 
-LIBS = -lpthread -lcommons -lCrenitoCommons
+LIBS = -lpthread -lcommons -lCrenitoCommons -lcspecs
 
 CC =  gcc 
 CFLAGS = -g -Wall
