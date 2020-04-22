@@ -60,3 +60,7 @@ dkms.conf
 *.cproject
 *.project
 .settings/
+
+.vscode/
+
+*.json
