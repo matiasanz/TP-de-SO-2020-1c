@@ -3,7 +3,7 @@ TARGET = ../GameBoy
 CRENITO-COMMONS-DIR = ../../CrenitoCommons
 CRENITO-COMMONS-BIN = $(CRENITO-COMMONS-DIR)/src/build
 
-LIBS = -lpthread -lcommons -lcspecs
+LIBS = -lpthread -lcommons
 CC =  gcc 
 CFLAGS = -g -Wall
 
