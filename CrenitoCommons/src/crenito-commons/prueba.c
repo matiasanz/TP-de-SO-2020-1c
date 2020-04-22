@@ -6,7 +6,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-
+#include "prueba.h"
 // anteponer cr_ en el nombre para que
 // al leeer el codigo sepamos que es una funcion de nuestras commons
 void cr_saludar() {
@@ -15,4 +15,8 @@ void cr_saludar() {
 
 int cr_get_uno() {
 	return 1;
+}
+
+int cr_get_cero() {
+	return 0;
 }

@@ -4,17 +4,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <crenito-commons/prueba.h>
+#include "../src/crenito-commons/prueba.h"
 #include <cspecs/cspec.h>
 
 void test() {
 
 	context (test_de_prueba) {
 
-		describe("Tests de una funcion de las commons.") {	//Agrupa tests
-			it("llamo a las commons y soy feliz.") { //test individual
+		describe("Tests de una funcion de las commons") {	//Agrupa tests
+			it("llamo a las commons y soy feliz") { //test individual
 				should_int(cr_get_uno()) be equal to(1);
 			}end //dentro del context t-o-d-o termina con end
+
+			it("llamo a las commons y soy feliz 2.") { //test individual
+				should_int(cr_get_cero()) be equal to(0);
+			}end
 
 			it("2+2 no es pez") {
 				should_int(2+2) not be equal to(5);

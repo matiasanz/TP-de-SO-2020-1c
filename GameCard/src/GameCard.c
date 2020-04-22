@@ -19,5 +19,5 @@ int main(void) {
 	string_append(&string, "!!!!Hello World GameCard!!!");
 
 	puts(string); /* prints !!!Hello World!!! */
-	return EXIT_SUCCESS;
+	return cr_get_cero();
 }
