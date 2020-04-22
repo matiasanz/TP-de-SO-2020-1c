@@ -4,3 +4,4 @@
 *.cproject
 *.project
 /.settings/
+/tests/unit-tests
