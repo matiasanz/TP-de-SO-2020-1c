@@ -12,6 +12,9 @@ CFLAGS = -g -Wall
 default: $(TARGET) 
 all: default 
 
+create-dirs:
+	mkdir -p ../log
+	
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c)) 
 HEADERS = $(wildcard *.h)
 
@@ -20,7 +23,7 @@ HEADERS = $(wildcard *.h)
 
 .PRECIOUS: $(TARGET) $(OBJECTS) 
 
-$(TARGET): $(OBJECTS)
+$(TARGET): create-dirs $(OBJECTS)
 	$(CC)  $(OBJECTS) $(CFLAGS) -L"$(CRENITO-COMMONS-BIN)" -lCrenitoCommons $(LIBS) -o $@ 
 
 clean: 
