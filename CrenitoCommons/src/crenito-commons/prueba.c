@@ -10,5 +10,9 @@
 // anteponer cr_ en el nombre para que
 // al leeer el codigo sepamos que es una funcion de nuestras commons
 void cr_saludar() {
-	printf("hola desde cerenito-commons copado! \n");
+	printf("hola desde cerenito-commons copado \n");
+}
+
+int cr_get_uno() {
+	return 1;
 }

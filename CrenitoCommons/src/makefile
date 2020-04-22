@@ -6,11 +6,13 @@ H_SRCS=$(shell find . -iname "*.h" | tr '\n' ' ')
 OBJS=$(C_SRCS:./%.c=build/%.o)
 
 
+
 # Clean and compile .so
 all: build/libCrenitoCommons.so
 
 create-dirs:
 	mkdir -p build/crenito-commons/
+	mkdir -p ../log
 
 build/libCrenitoCommons.so: create-dirs $(OBJS)
 	$(CC) -shared -o "build/libCrenitoCommons.so" $(OBJS)

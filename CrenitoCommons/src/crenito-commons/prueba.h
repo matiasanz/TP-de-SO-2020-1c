@@ -7,6 +7,8 @@
 
 #ifndef CERENITOCOMMONS_H_
 void cr_saludar();
+int cr_get_uno();
+
 #define CERENITOCOMMONS_H_
 
 
