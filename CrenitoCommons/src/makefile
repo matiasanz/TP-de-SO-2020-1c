@@ -34,6 +34,6 @@ install: all
 
 uninstall:
 	rm -f /usr/lib/libCrenitoCommons.so
-	rm -rf /usr/include/CrenitoCommons
+	rm -rf /usr/include/crenito-commons
 
 .PHONY: all create-dirs clean install uninstall

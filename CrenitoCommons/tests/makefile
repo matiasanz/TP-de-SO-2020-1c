@@ -15,7 +15,7 @@ OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
 HEADERS = $(wildcard *.h)
 
 %.o: %.c $(HEADERS) 
-	$(CC) $(CFLAGS) -c $< -o $@ 
+	$(CC) -I"../src" $(CFLAGS) -c $< -o $@
 
 .PRECIOUS: $(TARGET) $(OBJECTS) 
 

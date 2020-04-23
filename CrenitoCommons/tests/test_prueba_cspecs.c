@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../src/crenito-commons/prueba.h"
+#include <crenito-commons/prueba.h>
 #include <cspecs/cspec.h>
 
 void test() {
