@@ -33,6 +33,12 @@ int socket_create(struct addrinfo* info) {
 		manejar_error_socket(unSocket, "create");
 	}
 
+	int yes = 1;
+	if (setsockopt(unSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) < 0) {
+			manejar_error_socket(unSocket, "setsockopt");
+		}
+
+
 	return unSocket;
 }
 
