@@ -7,11 +7,38 @@
 
 #include "socket.h"
 
-void static _error_bind_connect(int socket, char* operacion);
+void static manejar_error_socket(int socket, char* operacion);
 
-int cr_crear_socket(char* ip, char* puerto, socket_type tipo) {
+void socket_bind(int unSocket, struct addrinfo* info) {
+
+	if (bind(unSocket, info->ai_addr, info->ai_addrlen) < 0) {
+		manejar_error_socket(unSocket, "bind");
+
+	}
+}
+
+void socket_connect(int unSocket, struct addrinfo* info) {
+
+	if (connect(unSocket, info->ai_addr, info->ai_addrlen) < 0) {
+		manejar_error_socket(unSocket, "connect");
+	}
+}
+
+int socket_create(struct addrinfo* info) {
+
 	int unSocket;
-	struct addrinfo hints, *servinfo, *info;
+
+	if ((unSocket = socket(info->ai_family, info->ai_socktype,
+			info->ai_protocol)) == -1) {
+		manejar_error_socket(unSocket, "create");
+	}
+
+	return unSocket;
+}
+
+void socket_configurar(char* ip, char* puerto, socket_type tipo,
+		struct addrinfo **servinfo) {
+	struct addrinfo hints;
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
@@ -20,32 +47,18 @@ int cr_crear_socket(char* ip, char* puerto, socket_type tipo) {
 	if (tipo == SERVIDOR)
 		hints.ai_flags = AI_PASSIVE;
 
-	getaddrinfo(ip, puerto, &hints, &servinfo);
+	getaddrinfo(ip, puerto, &hints, servinfo);
+}
 
-	for (info = servinfo; info != NULL; info = info->ai_next) {
+int socket_crear_listener(char* ip, char* puerto) {
 
-		if ((unSocket = socket(info->ai_family, info->ai_socktype,
-				info->ai_protocol)) == -1) {
-			log_error(get_crnito_logger(), "Error al crear el socket");
-			exit(-1);
-			continue;
-		}
-		if (tipo == SERVIDOR) {
-			if (bind(unSocket, info->ai_addr, info->ai_addrlen) < 0) {
-				_error_bind_connect(unSocket, "bind");
-				continue;
-			}
-		} else {
-			if (connect(unSocket, info->ai_addr, info->ai_addrlen) < 0) {
-				_error_bind_connect(unSocket, "connect");
-				continue;
-			}
-		}
-		break;
-	}
+	int unSocket;
+	struct addrinfo *servinfo;
+	socket_configurar(ip, puerto, SERVIDOR, &servinfo);
+	unSocket = socket_create(servinfo);
+	socket_bind(unSocket, servinfo);
 
-	if (tipo == SERVIDOR)
-		listen(unSocket, SOMAXCONN);
+	listen(unSocket, SOMAXCONN);
 
 	freeaddrinfo(servinfo);
 
@@ -53,24 +66,35 @@ int cr_crear_socket(char* ip, char* puerto, socket_type tipo) {
 
 }
 
-int cr_aceptar_conexion(int socket_servidor) {
+t_cliente* socket_aceptar_conexion(int socket_servidor) {
+
+	t_cliente* cliente = malloc(sizeof(t_cliente));
+	cliente->addrlen = sizeof(struct sockaddr_in);
+
 	struct sockaddr_in dir_cliente;
 
 	int tam_direccion = sizeof(struct sockaddr_in);
-	int socket_cliente;
 
-	if ((socket_cliente = accept(socket_servidor, (void*) &dir_cliente,
-			&tam_direccion)) < 0) {
+	struct sockaddr_in direccion;
+	socklen_t addrlen;
+
+	if ((cliente->socket = accept(socket_servidor,
+			(struct sockaddr *) &cliente->addr, (socklen_t*) &cliente->addrlen))
+			< 0) {
 		log_error(get_crnito_logger(),
 				"Error al realizar el accept, socket_cliente: %d, socket_servidor: %d",
-				socket_cliente, socket_servidor);
+				cliente->socket, socket_servidor);
 
 	}
 
-	return socket_cliente;
+	printf("Nueva conexión , socket %d , ip is : %s , puerto : %d \n",
+			cliente->socket, inet_ntoa(cliente->addr.sin_addr),
+			ntohs(cliente->addr.sin_port));
+
+	return cliente;
 }
 
-int cr_recibir_cod_operacion(int socket_cliente) {
+int socket_recibir_cod_operacion(int socket_cliente) {
 
 	int cod_op;
 	if (recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL) == -1) {
@@ -80,8 +104,9 @@ int cr_recibir_cod_operacion(int socket_cliente) {
 	return cod_op;
 }
 
-void* cr_recibir_mensaje(int socket_cliente, int *size) {
-	void * buffer;
+void* socket_recibir_mensaje(int socket_cliente, int *size) {
+
+	void * bytes;
 
 	if (recv(socket_cliente, size, sizeof(int), MSG_WAITALL) < 0) {
 		log_error(get_crnito_logger(),
@@ -89,21 +114,22 @@ void* cr_recibir_mensaje(int socket_cliente, int *size) {
 				socket_cliente);
 	}
 
-	buffer = malloc(*size);
+	bytes = malloc(*size);
 
-	if (recv(socket_cliente, buffer, *size, MSG_WAITALL) < 0) {
+	if (recv(socket_cliente, bytes, *size, MSG_WAITALL) < 0) {
 		log_error(get_crnito_logger(),
 				"Error al realizar el recv del mensaje, socket_cliente: %d",
 				socket_cliente);
 	}
 
-	return buffer;
+	return bytes;
 }
 
-void static _error_bind_connect(int socket, char* operacion) {
+void static manejar_error_socket(int socket, char* operacion) {
 
 	log_error(get_crnito_logger(),
 			"Error al realizar la operación %s, socket: %d", operacion, socket);
 	close(socket);
+	abort();
 
 }

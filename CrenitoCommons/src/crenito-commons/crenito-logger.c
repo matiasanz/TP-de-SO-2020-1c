@@ -1,8 +1,10 @@
 #include"crenito-logger.h"
 
+// Singleton mentiroso --> este sería el método "getInscance()"
+// Revisar esto con los ayudantes!
 
-//Singleton mentiroso
 t_log* get_crnito_logger() {
+
 	if (crenito_logger != NULL)
 		return crenito_logger;
 

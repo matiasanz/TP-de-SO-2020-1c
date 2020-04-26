@@ -8,6 +8,7 @@
 #ifndef SRC_CRENITO_COMMONS_SOCKET_H_
 #define SRC_CRENITO_COMMONS_SOCKET_H_
 
+#include <arpa/inet.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<sys/socket.h>
@@ -22,11 +23,24 @@ typedef enum {
 	CLIENTE, SERVIDOR
 } socket_type;
 
-int cr_crear_socket(char* ip, char* puerto, socket_type tipo);
-int cr_aceptar_conexion(int socket_servidor);
+typedef struct {
+	struct sockaddr_in addr; //IP &PUERTO
+	socklen_t addrlen;
+	int socket;
+} t_cliente;
+
+void socket_bind(int unSocket, struct addrinfo* info);
+void socket_connect(int unSocket, struct addrinfo* info);
+int socket_create(struct addrinfo* info);
+void socket_configurar(char* ip, char* puerto, socket_type tipo, struct addrinfo **servinfo);
+
+//Crea un socket de escucha, los demás procesos deberian llamar a esta función unicamente
+int socket_crear_listener(char* ip, char* puerto);
+
+t_cliente* socket_aceptar_conexion(int socket_servidor);
 
 //recv
-int cr_recibir_cod_operacion(int socket_cliente);
-void* cr_recibir_mensaje(int socket_cliente, int *size);
+int socket_recibir_cod_operacion(int socket_cliente);
+void* socket_recibir_mensaje(int socket_cliente, int *size);
 
 #endif /* SRC_CRENITO_COMMONS_SOCKET_H_ */

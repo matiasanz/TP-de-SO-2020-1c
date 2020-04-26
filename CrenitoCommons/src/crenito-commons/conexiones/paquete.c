@@ -18,11 +18,13 @@ t_buffer* cr_crear_buffer(int size) {
 }
 
 void cr_destruir_buffer(t_buffer* buffer) {
+
 	free(buffer->stream);
 	free(buffer);
 }
 
 t_paquete* cr_crear_paquete(int cod_op, t_buffer* buffer) {
+
 	t_paquete* paquete = malloc(sizeof(t_paquete));
 
 	paquete->codigo_operacion = cod_op;
@@ -32,6 +34,7 @@ t_paquete* cr_crear_paquete(int cod_op, t_buffer* buffer) {
 }
 
 void cr_destruir_paquete(t_paquete* paquete) {
+
 	cr_destruir_buffer(paquete->buffer);
 	free(paquete);
 }

@@ -2,7 +2,7 @@
 
 void serve_client(int* socket_cliente) {
 
-	int cod_op = cr_recibir_cod_operacion(*socket_cliente);
+	int cod_op = socket_recibir_cod_operacion(*socket_cliente);
 
 	if (cod_op < 0)
 		pthread_exit(NULL);
@@ -37,7 +37,7 @@ void handover(int cod_op, int socket_cliente) {
 	int size;
 	char * msg;
 
-	msg = cr_recibir_mensaje(socket_cliente, &size);
+	msg = socket_recibir_mensaje(socket_cliente, &size);
 	log_info(logger, "contenido del mensaje: %s ", msg);
 
 	t_buffer* buffer = cr_crear_buffer(size);
