@@ -7,8 +7,8 @@
 
 #include "socket.h"
 
+// función auxilizar para loggear errores
 void static manejar_error_socket(int socket, char* operacion);
-
 void socket_bind(int unSocket, struct addrinfo* info) {
 
 	if (bind(unSocket, info->ai_addr, info->ai_addrlen) < 0) {
@@ -29,7 +29,7 @@ int socket_create(struct addrinfo* info) {
 	int unSocket;
 
 	if ((unSocket = socket(info->ai_family, info->ai_socktype,
-			info->ai_protocol)) == -1) {
+			info->ai_protocol)) < 0) {
 		manejar_error_socket(unSocket, "create");
 	}
 
@@ -38,6 +38,7 @@ int socket_create(struct addrinfo* info) {
 
 void socket_configurar(char* ip, char* puerto, socket_type tipo,
 		struct addrinfo **servinfo) {
+
 	struct addrinfo hints;
 
 	memset(&hints, 0, sizeof(hints));
@@ -50,15 +51,21 @@ void socket_configurar(char* ip, char* puerto, socket_type tipo,
 	getaddrinfo(ip, puerto, &hints, servinfo);
 }
 
+void socket_listen(int unSocket) {
+
+	if (listen(unSocket, SOMAXCONN) < 0) {
+		manejar_error_socket(unSocket, "listen");
+	}
+
+}
+
 int socket_crear_listener(char* ip, char* puerto) {
 
-	int unSocket;
 	struct addrinfo *servinfo;
 	socket_configurar(ip, puerto, SERVIDOR, &servinfo);
-	unSocket = socket_create(servinfo);
+	int unSocket = socket_create(servinfo);
 	socket_bind(unSocket, servinfo);
-
-	listen(unSocket, SOMAXCONN);
+	socket_listen(unSocket);
 
 	freeaddrinfo(servinfo);
 

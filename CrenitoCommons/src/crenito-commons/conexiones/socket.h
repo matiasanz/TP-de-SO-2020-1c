@@ -29,12 +29,17 @@ typedef struct {
 	int socket;
 } t_cliente;
 
+
+// Funciones de construcción de sockets
+void socket_listen(int unSocket);
 void socket_bind(int unSocket, struct addrinfo* info);
 void socket_connect(int unSocket, struct addrinfo* info);
 int socket_create(struct addrinfo* info);
 void socket_configurar(char* ip, char* puerto, socket_type tipo, struct addrinfo **servinfo);
 
-//Crea un socket de escucha, los demás procesos deberian llamar a esta función unicamente
+
+/*Crea un socket de escucha,usando las funciones de construcción de sockets
+ Esta debería ser la función llamada por fuera de las crenito-commons */
 int socket_crear_listener(char* ip, char* puerto);
 
 t_cliente* socket_aceptar_conexion(int socket_servidor);
