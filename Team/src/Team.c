@@ -13,61 +13,78 @@
  *TODO ver que archivos pasar a commons
  */
 
-#include "mapa.h"
+#include "pokemon.h"
 #include "pendiente_de_respuesta.h"
 #include "mensajes.h"
 
 int main(void) {
 	//Pantalla inicial
-	cr_saludar();
+//	cr_saludar();
 	puts("¡¡Hello World Team!!!");
 
 	//Inicializo colas
 	entrenadores equipo = entrenadores_create();
 	mapa unMapa = mapa_create();
-	mensajes_pendientes mensajesPendientes = mensajes_pendientes_create();
+	pendientes mensajesPendientes = pendientes_create();
 
 
 	//recibo mesaje
-	mensaje mensajeRecibido = recibir_mensaje();
+	bool indefinidamente=true;
+	while(indefinidamente){
+			mensaje mensajeRecibido = recibir_mensaje();
 
-	switch(mensajeRecibido.opcode){
+			switch(mensajeRecibido.opcode){
 
-		case NUEVO_ENTRENADOR: {
-			entrenador* unEntrenador = desempaquetar_entrenador(mensajeRecibido.serializado);
-			list_iterate(unEntrenador->objetivos, &get);//Le pregunto al gamecard si cada objetivo esta en alguna posicion
-			list_add(equipo, unEntrenador);				//agrego el entrenador al equipo
-			break;
-		}
+				case NUEVO_ENTRENADOR: {
+					puts("Se recibio un nuevo entrenador");
 
-		case LOCALIZED_POKEMON: {
-			pokemon* unPokemon = desempaquetar_pokemon(mensajeRecibido.serializado);
+					entrenador* unEntrenador = desempaquetar_entrenador(mensajeRecibido.serializado);
+					list_iterate(unEntrenador->objetivos, &get);//Le pregunto al gamecard si cada objetivo esta en alguna posicion
+					list_add(equipo, unEntrenador);				//agrego el entrenador al equipo
+						puts("Se agrego un nuevo entrenador");
+					break;
+				}
 
-			if( es_objetivo_de_alguien(*unPokemon, equipo ) ){
-				mapear_objetivo(unMapa, unPokemon);
+				case LOCALIZED_POKEMON: {
+					puts("Se recibio pokemon localizado");
 
-				entrenador* cazador = entrenador_mas_cerca_de(equipo, unPokemon->posicion);
-				ir_a(*cazador, unPokemon->posicion);
-				t_id id_mensaje_pendiente = catch(unPokemon->especie);
+					pokemon* unPokemon = desempaquetar_pokemon(mensajeRecibido.serializado);
 
-				agregar_mensaje_pendiente(mensajesPendientes, id_mensaje_pendiente, cazador, unPokemon);
+					if( es_objetivo_de_alguien(*unPokemon, equipo ) ){
+						mapear_objetivo(unMapa, unPokemon);
 
-				bloquear(cazador);
-			}
+						entrenador* cazador = entrenador_mas_cerca_de(equipo, unPokemon->posicion);
+						ir_a(*cazador, unPokemon->posicion);
+						t_id id_mensaje_pendiente = catch(unPokemon->especie);
 
-			else{
-				free(unPokemon); //"descartar al pokemon"
-			}
+						agregar_pendiente(mensajesPendientes, id_mensaje_pendiente, cazador, unPokemon);
 
-			break;
-		}
+						bloquear(cazador);
+					}
 
-		case CAUGHT_POKEMON:{
-			//TODO
+					else{
+						puts("pokemon que no es objetivo de nadie, es cartera");
+						free(unPokemon); //"descartar al pokemon"
+					}
+
+					break;
+				}
+
+				case CAUGHT_POKEMON:{
+					puts("Se recibio pokemon atrapado. Proximamente");
+					//TODO
+					break;
+				}
+
+				default:
+					error_show("Codigo de operacion desconocido");
+					exit(1);
 		}
 	}
 
-	//FALTAN LOS DESTROOOOOY
+	entrenadores_destroy(equipo); //duda implementacion
+	mapa_destroy(unMapa);
+    pendientes_destroy(mensajesPendientes); //Terminar
 
 	return EXIT_SUCCESS;
 }

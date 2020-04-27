@@ -5,6 +5,7 @@
 mensaje recibir_mensaje(){ //hacer que devuelva un mensaje generico de cada tipo
 
 	mensaje unMensaje;	//TODO
+
 	puts("ingresar tipo de mensaje manualmente");
 	scanf("%u", &unMensaje.opcode);
 
@@ -39,9 +40,11 @@ pokemon*desempaquetar_pokemon(void*empaquetado) {
 
 void get(void* especiePokemon){
 	//Envia mensaje al broker para ser replicado al gamecard
+	printf("get(%s)\n", (especie_pokemon)especiePokemon);
 }
 
 t_id catch(especie_pokemon especie){
 	//Envia mensaje al broker para ser replicado al gamecard, devuelve el id del mensaje pendiente por recibir
+	printf("catch(%s)\n", especie);
 	return 1; //TODO
 }

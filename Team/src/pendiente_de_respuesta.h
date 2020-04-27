@@ -4,14 +4,31 @@
 #include "pokemon.h"
 #include "mensajes.h"
 
-//TAD
-typedef t_list* mensajes_pendientes;
+//TAD Pendiente
+typedef struct Mensaje_pendiente{
+	t_id id;
+	entrenador*cazador;
+	pokemon*pokemonCazado;
+}pendiente;
 
-//Constructor
-mensajes_pendientes mensajes_pendientes_create();
+//	Constructor
+	pendiente pendiente_create(t_id, entrenador*, pokemon*);
 
-//Agregar
-void agregar_mensaje_pendiente(mensajes_pendientes, t_id id, entrenador*, pokemon*);
+//	Destructor
+	void pendiente_destroy(pendiente*);
 
+//****************************************************************************
+
+//TAD Pendientes
+typedef t_list* pendientes;
+
+//	Constructor
+	pendientes pendientes_create();
+
+//	Agregar
+	void agregar_pendiente(pendientes, t_id id, entrenador*, pokemon*);
+
+//	Destructor
+	void pendientes_destroy(pendientes);
 
 #endif

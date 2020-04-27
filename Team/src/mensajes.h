@@ -29,11 +29,12 @@ typedef struct T_mensaje_new_entrenador{ //Obs: esta acoplado al anterior, ver s
 	coordenadas posicion;
 }t_mensaje_new_entrenador;
 
+//funciones de desempaquetado
+entrenador*desempaquetar_entrenador(void*serializado);
+pokemon*desempaquetar_pokemon(void*serializado);
 
 //mensajes entre modulos
 mensaje recibir_mensaje();
-entrenador*desempaquetar_entrenador(void*serializado);
-pokemon*desempaquetar_pokemon(void*serializado);
 void get(void* especiePokemon);
 t_id catch(especie_pokemon); //retorna el id del mensaje pendiente que crea;
 //no se que quise decir con lo siguiente pero VER: ver si no seria la posicion
