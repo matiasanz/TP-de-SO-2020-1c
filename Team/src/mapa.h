@@ -11,7 +11,7 @@ typedef t_list* mapa;
 mapa mapa_create();
 
 //me guardo la posicion y la especie, solo si es la 1era vez que aparece
-void mapear_objetivo(mapa unMapa, pokemon unPokemon);
+void mapear_objetivo(mapa, pokemon*);
 
 
 # endif

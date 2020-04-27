@@ -8,39 +8,30 @@
  ============================================================================
  */
 
+/*TODO implementar las funciones no definidas
+ *TODO pasar los archivos que no tienen que ver con programa principal a carpeta "biblioteca", lo cual implica modificar makefile
+ *TODO ver que archivos pasar a commons
+ */
+
 #include "mapa.h"
 #include "pendiente_de_respuesta.h"
-typedef int mensaje;
+#include "mensajes.h"
 
-//mensajes que recibe de otros modulos
-#define NUEVO_ENTRENADOR  0
-#define LOCALIZED_POKEMON 1
-#define CAUGHT 			  2
-
-//mensajes entre modulos
-mensaje recibir_mensaje();
-void*desempaquetar_mensaje(mensaje);
-void get(void* especiePokemon);
-int catch(especie_pokemon); //ver si no seria la posicion
-
-//Programa principal
 int main(void) {
-//	cr_saludar();
+	//Pantalla inicial
+	cr_saludar();
+	puts("¡¡Hello World Team!!!");
 
-	char* string = string_new();
-	string_append(&string, "!!Hello World Team!!!");
-	puts(string); //Pantalla inicial
-
-	//**************************************************
-
-	//Inicializo programa
+	//Inicializo colas
 	entrenadores equipo = entrenadores_create();
 	mapa unMapa = mapa_create();
 	mensajes_pendientes mensajesPendientes = mensajes_pendientes_create();
 
+
+	//recibo mesajes
 	mensaje mensajeRecibido = recibir_mensaje();
 
-	switch(mensajeRecibido){
+	switch(mensajeRecibido.opcode){
 
 		case NUEVO_ENTRENADOR: {
 			entrenador* unEntrenador = desempaquetar_mensaje(mensajeRecibido);
@@ -52,7 +43,7 @@ int main(void) {
 		case LOCALIZED_POKEMON: {
 			pokemon* unPokemon = desempaquetar_mensaje(mensajeRecibido);
 			if( es_objetivo_de_alguien(*unPokemon, equipo) ){
-				mapear_objetivo(unMapa, *unPokemon);
+				mapear_objetivo(unMapa, unPokemon);
 
 				entrenador* unEntrenador = entrenador_mas_cerca_de(equipo, unPokemon->posicion);
 				ir_a(*unEntrenador, unPokemon->posicion);
@@ -62,71 +53,22 @@ int main(void) {
 
 				bloquear(unEntrenador);
 			}
-	//
+
 	//		else{
-	//			//descartar(mensaje);
+	//			//descartar(mensaje); //free entrenador
 	//			//descartar(pokemon); //free pokemon
 	//		}
 
 			break;
+		}
 
+		case CAUGHT:{
+			//TODO
 		}
 	}
+
+	//FALTAN LOS DESTROOOOOY
+
 	return EXIT_SUCCESS;
-}
-
-//****************************************************************** fin main
-
-//mensajes entre modulos
-mensaje recibir_mensaje(){
-	int mensajeRecibido;
-	puts("ingresar mensaje manualmente");
-	scanf("%d", &mensajeRecibido);
-	return mensajeRecibido;
-}
-
-void*desempaquetar_mensaje(mensaje mensaje){
-	int opcode = mensaje;
-
-	switch(opcode){
-		case NUEVO_ENTRENADOR: {
-			//datos del entrenador
-			t_list*objetivos = list_create();
-			especie_pokemon especie = "pucho";
-			list_add(objetivos, especie);
-			coordenada posX = 1;
-			coordenada posY = 2;
-			//me los va a dar el mensaje cuando desserialice
-
-			entrenador*nuevoEntrenador = malloc(sizeof(entrenador));
-					  *nuevoEntrenador = entrenadorCreate(objetivos, posX, posY);
-			return nuevoEntrenador;
-		}
-
-		case LOCALIZED_POKEMON: {
-			//datos del pokemon
-			especie_pokemon especie = "pucho";
-			coordenada posX = 3;
-			coordenada posY = 4;
-			//me los va a dar el mensaje cuando desserialice
-
-			pokemon *nuevoPokemon = malloc(sizeof(pokemon));
-					*nuevoPokemon = pokemon_create(especie, posX, posY);
-			return nuevoPokemon;
-		}
-	}
-
-	error_show("id mensaje desconocido");
-
-	return NULL;
-}
-
-void get(void* especiePokemon){
-	//Envia mensaje al broker para ser replicado al gamecard
-}
-
-int catch(especie_pokemon especie){
-	//Envia mensaje al broker para ser replicado al gamecard, devuelve el id del mensaje pendiente por recibir
-	return 1; //TODO
 }
 

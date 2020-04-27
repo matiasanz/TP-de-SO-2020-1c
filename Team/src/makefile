@@ -1,15 +1,14 @@
-# Definimos la tarea que va a ejecutar make por defecto Y el nombre del binario final
 TARGET = ../Team 
 
 CRENITO-COMMONS-DIR = ../../CrenitoCommons
 CRENITO-COMMONS-BIN = $(CRENITO-COMMONS-DIR)/src/build
 
 LIBS = -lpthread -lcommons # bibliotecas incluidas
-CC = gcc 				   # se define compilador
-CFLAGS = -g -Wall          # Compilar con flags -g (debug) y -Wall (muestra los warnings)
+CC = gcc 				   # compilador
+CFLAGS = -g -Wall          # -g (debug) y -Wall (muestra los warnings)
 
-# Crear tareas del makefile:
-#{make sin argumentos ejecuta la tarea por default; make unaTarea ejecita "unaTarea"} ejemplo: make all o make clean
+# Crear tareas del makefile: {make sin argumentos -> ejecuta la tarea por default;
+							# make unaTarea       -> ejecuta "unaTarea"} ejs: make all, make clean
 
 .PHONY: default all clean
 # .PHONY dice a make: si(nombre(archivo) == nombre(regla)) ejecutar la regla; sino por defecto trata de tomar archivo
@@ -20,13 +19,10 @@ all: default # Si ejecutan all, que ejecute la default
 create-dirs:
 	mkdir -p ../log
 
-# Definamos un par de constantes mas, OBJECTS (que vamos a usar para generar los .o)
-# y HEADERS, para incluir los headers que definamos.
-
-OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
+OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c)) #genera los .o
 HEADERS = $(wildcard *.h) # wildcard implica todos los .h
 
-%.o: %.c $(HEADERS) # Las variables que le pasamos a la tarea, le decimos que use todos los .c y todos los .h
+%.o: %.c $(HEADERS) # usar todos los .c y todos los .h
 	$(CC) -I"../../CrenitoCommons/src" $(CFLAGS) -c $< -o $@
 
 .PRECIOUS: $(TARGET) $(OBJECTS)
