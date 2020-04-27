@@ -1,3 +1,4 @@
+#include "auxiliares.h"
 #include "entrenador.h"
 
 //Constructor Entrenador

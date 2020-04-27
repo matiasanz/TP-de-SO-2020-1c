@@ -1,5 +1,5 @@
 # ifndef _TAD_ENTRENADOR_
-# define _TAD_ENTRENADOR_
+# define _TAD_ENTRENADOR_ //PASAR A COMMONS
 
 #include "auxiliares.h"
 
@@ -19,7 +19,8 @@ entrenador entrenadorCreate(t_list* especiesObjetivos, coordenada X, coordenada 
 //Desplaza un entrenador de una posicion a otra
 void ir_a(entrenador unEntrenador, coordenadas);
 
-
+//Pasa entrenador a estado locked
+void bloquear(entrenador*);
 
 
 //Cola de entrenadores
