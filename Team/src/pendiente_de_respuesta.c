@@ -6,6 +6,6 @@ mensajes_pendientes mensajes_pendientes_create(){
 }
 
 //Agregar
-void agregar_mensaje_pendiente(mensajes_pendientes mensajesPendientes, int id_mensaje_pendiente, entrenador* unEntrenador, pokemon* unPokemon){
+void agregar_mensaje_pendiente(mensajes_pendientes mensajesPendientes, t_id id_mensaje_pendiente, entrenador* unEntrenador, pokemon* unPokemon){
 	//TODO
 }

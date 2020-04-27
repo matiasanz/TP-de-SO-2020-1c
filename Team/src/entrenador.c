@@ -2,7 +2,7 @@
 #include "entrenador.h"
 
 //Constructor Entrenador
-entrenador entrenadorCreate(t_list* especiesDePokemones, int coordenadaX, int coordenadaY){ //Va en gameBoy y crea al empaquetado
+entrenador entrenadorCreate(t_list* especiesDePokemones, coordenada coordenadaX, coordenada coordenadaY){ //Va en gameBoy y crea al empaquetado
 	entrenador nuevo;
 		nuevo.objetivos = especiesDePokemones;
 		posicion_create(&nuevo.posicion, coordenadaX, coordenadaY);
@@ -15,7 +15,7 @@ entrenador* entrenador_mas_cerca_de(entrenadores equipo, coordenadas posicion){
 	return equipo->head->data;
 }
 
-void ir_a(entrenador unEntrenador, int*posicion){
+void ir_a(entrenador unEntrenador, coordenadas posicion){
 	int i;
 
 	for(i=0; i<DIMENSION_MAPA; i++){

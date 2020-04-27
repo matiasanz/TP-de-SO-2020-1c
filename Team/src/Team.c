@@ -28,41 +28,41 @@ int main(void) {
 	mensajes_pendientes mensajesPendientes = mensajes_pendientes_create();
 
 
-	//recibo mesajes
+	//recibo mesaje
 	mensaje mensajeRecibido = recibir_mensaje();
 
 	switch(mensajeRecibido.opcode){
 
 		case NUEVO_ENTRENADOR: {
-			entrenador* unEntrenador = desempaquetar_mensaje(mensajeRecibido);
+			entrenador* unEntrenador = desempaquetar_entrenador(mensajeRecibido.serializado);
 			list_iterate(unEntrenador->objetivos, &get);//Le pregunto al gamecard si cada objetivo esta en alguna posicion
-			list_add(equipo, unEntrenador);				//si no funca, cambiar por while(objetivo!=null) get(objetivo); ...;
+			list_add(equipo, unEntrenador);				//agrego el entrenador al equipo
 			break;
 		}
 
 		case LOCALIZED_POKEMON: {
-			pokemon* unPokemon = desempaquetar_mensaje(mensajeRecibido);
-			if( es_objetivo_de_alguien(*unPokemon, equipo) ){
+			pokemon* unPokemon = desempaquetar_pokemon(mensajeRecibido.serializado);
+
+			if( es_objetivo_de_alguien(*unPokemon, equipo ) ){
 				mapear_objetivo(unMapa, unPokemon);
 
-				entrenador* unEntrenador = entrenador_mas_cerca_de(equipo, unPokemon->posicion);
-				ir_a(*unEntrenador, unPokemon->posicion);
-				int id_mensaje_pendiente = catch(unPokemon->especie);
+				entrenador* cazador = entrenador_mas_cerca_de(equipo, unPokemon->posicion);
+				ir_a(*cazador, unPokemon->posicion);
+				t_id id_mensaje_pendiente = catch(unPokemon->especie);
 
-				agregar_mensaje_pendiente(mensajesPendientes, id_mensaje_pendiente, unEntrenador, unPokemon);
+				agregar_mensaje_pendiente(mensajesPendientes, id_mensaje_pendiente, cazador, unPokemon);
 
-				bloquear(unEntrenador);
+				bloquear(cazador);
 			}
 
-	//		else{
-	//			//descartar(mensaje); //free entrenador
-	//			//descartar(pokemon); //free pokemon
-	//		}
+			else{
+				free(unPokemon); //"descartar al pokemon"
+			}
 
 			break;
 		}
 
-		case CAUGHT:{
+		case CAUGHT_POKEMON:{
 			//TODO
 		}
 	}

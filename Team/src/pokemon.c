@@ -1,6 +1,6 @@
 #include "pokemon.h"
 
-pokemon pokemon_create(especie_pokemon especie, int coordenadaX, int coordenadaY){
+pokemon pokemon_create(especie_pokemon especie, coordenada coordenadaX, coordenada coordenadaY){
 	pokemon nuevo;
 	nuevo.especie = especie;
 	posicion_create(&nuevo.posicion, coordenadaX, coordenadaY);

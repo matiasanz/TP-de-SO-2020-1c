@@ -2,6 +2,7 @@
 # define _PENDIENTE_DE_RESPUESTA_
 
 #include "pokemon.h"
+#include "mensajes.h"
 
 //TAD
 typedef t_list* mensajes_pendientes;
@@ -10,7 +11,7 @@ typedef t_list* mensajes_pendientes;
 mensajes_pendientes mensajes_pendientes_create();
 
 //Agregar
-void agregar_mensaje_pendiente(mensajes_pendientes, int id, entrenador*, pokemon*);
+void agregar_mensaje_pendiente(mensajes_pendientes, t_id id, entrenador*, pokemon*);
 
 
 #endif
