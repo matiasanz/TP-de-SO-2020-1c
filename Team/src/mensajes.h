@@ -22,10 +22,12 @@ typedef struct Mensaje{
 typedef struct T_mensaje_new_pokemon{
 	especie_pokemon especie;
 	uint32_t especieLength;
+	coordenada posX;
+	coordenada posY;
 }t_mensaje_new_pokemon;
 
-typedef struct T_mensaje_new_entrenador{ //Obs: esta acoplado al anterior, ver si es conveniente
-	t_mensaje_new_pokemon*objetivos;
+typedef struct T_mensaje_new_entrenador{ //Obs: esta acoplado al anterior
+	t_mensaje_new_pokemon*objetivos; //cada vez que lo desempaquete voy a necesitar desempaquetar pokemones
 	coordenadas posicion;
 }t_mensaje_new_entrenador;
 

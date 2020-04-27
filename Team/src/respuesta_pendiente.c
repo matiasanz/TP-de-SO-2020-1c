@@ -1,4 +1,4 @@
-#include "pendiente_de_respuesta.h"
+#include "respuesta_pendiente.h"
 
 //Constructor
 pendiente pendiente_create(t_id idMensaje, entrenador* unEntrenador, pokemon* unPokemon){

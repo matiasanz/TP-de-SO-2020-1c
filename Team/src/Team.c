@@ -14,8 +14,8 @@
  */
 
 #include "pokemon.h"
-#include "pendiente_de_respuesta.h"
 #include "mensajes.h"
+#include "respuesta_pendiente.h"
 
 int main(void) {
 	//Pantalla inicial
@@ -34,7 +34,6 @@ int main(void) {
 			mensaje mensajeRecibido = recibir_mensaje();
 
 			switch(mensajeRecibido.opcode){
-
 				case NUEVO_ENTRENADOR: {
 					puts("Se recibio un nuevo entrenador");
 
