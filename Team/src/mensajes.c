@@ -51,5 +51,5 @@ void get(void* especiePokemon){
 t_id catch(especie_pokemon especie){
 	//Envia mensaje al broker para ser replicado al gamecard, devuelve el id del mensaje pendiente por recibir
 	printf(" catch(%s)\n", especie);
-	return 1; //TODO
+	return (t_id)1; //TODO
 }
