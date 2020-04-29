@@ -27,63 +27,86 @@ int main(void) {
 	mapa unMapa = mapa_create();
 	pendientes mensajesPendientes = pendientes_create();
 
-
+int haya_mas_mensajes=4;
+while(haya_mas_mensajes--){
 	//recibo mesaje
-	bool indefinidamente=true;
-	while(indefinidamente){
-			mensaje mensajeRecibido = recibir_mensaje();
+		mensaje mensajeRecibido = recibir_mensaje();
 
-			switch(mensajeRecibido.opcode){
-				case NUEVO_ENTRENADOR: {
-					puts("Se recibio un nuevo entrenador");
+		switch(mensajeRecibido.opcode){
+			case NUEVO_ENTRENADOR: {
+				puts("Se recibio un nuevo entrenador");
 
-					entrenador* unEntrenador = desempaquetar_entrenador(mensajeRecibido.serializado);
-					list_iterate(unEntrenador->objetivos, &get);//Le pregunto al gamecard si cada objetivo esta en alguna posicion
-					list_add(equipo, unEntrenador);				//agrego el entrenador al equipo
-						puts("Se agrego un nuevo entrenador");
-					break;
+				entrenador* unEntrenador = desempaquetar_entrenador(mensajeRecibido.serializado);
+				list_iterate(unEntrenador->objetivos, &get);//Le pregunto al gamecard si cada objetivo esta en alguna posicion
+				list_add(equipo, unEntrenador);				//agrego el entrenador al equipo
+					puts("Se agrego un nuevo entrenador");
+				break;
+			}
+
+			case LOCALIZED_POKEMON: {
+				puts("Se recibio pokemon localizado");
+
+				pokemon* unPokemon = desempaquetar_pokemon(mensajeRecibido.serializado);
+
+				if( es_objetivo_de_alguien(*unPokemon, equipo ) ){
+					mapear_objetivo(unMapa, unPokemon); //ver por que se mapea mas de una vez
+
+					entrenador* cazador = entrenadores_mas_cercano(equipo, unPokemon->posicion);
+					entrenador_ir_a(cazador, unPokemon->posicion);
+					t_id id_mensaje_pendiente = catch(unPokemon->especie);
+
+					agregar_pendiente(mensajesPendientes, id_mensaje_pendiente, cazador, unPokemon);
+
+					entrenador_bloquear(cazador);//TODO
 				}
 
-				case LOCALIZED_POKEMON: {
-					puts("Se recibio pokemon localizado");
-
-					pokemon* unPokemon = desempaquetar_pokemon(mensajeRecibido.serializado);
-
-					if( es_objetivo_de_alguien(*unPokemon, equipo ) ){
-						mapear_objetivo(unMapa, unPokemon);
-
-						entrenador* cazador = entrenador_mas_cerca_de(equipo, unPokemon->posicion);
-						ir_a(*cazador, unPokemon->posicion);
-						t_id id_mensaje_pendiente = catch(unPokemon->especie);
-
-						agregar_pendiente(mensajesPendientes, id_mensaje_pendiente, cazador, unPokemon);
-
-						bloquear(cazador);
-					}
-
-					else{
-						puts("pokemon que no es objetivo de nadie, es cartera");
-						free(unPokemon); //"descartar al pokemon"
-					}
-
-					break;
+				else{
+					puts("pokemon que no es objetivo de nadie, es cartera");
+					pokemon_destroy(unPokemon); //"descartar al pokemon"
 				}
 
-				case CAUGHT_POKEMON:{
-					puts("Se recibio pokemon atrapado. Proximamente");
-					//TODO
-					break;
+				break;
+			}
+
+			case CAUGHT_POKEMON:{ //TODO corregir
+				puts("Se recibio pokemon atrapado. Proximamente");
+				t_id* idRespuesta = desempaquetar_id(mensajeRecibido.serializado);
+				pendiente* mensajePendiente;
+
+				//MOVER AL ARCHIVO TODO
+
+				mensajePendiente = pendiente_get(mensajesPendientes, *idRespuesta);
+
+				if(mensajePendiente){
+					entrenador* cazador = mensajePendiente->cazador;
+					pokemon*    victima = mensajePendiente->pokemonCazado;
+
+					mapa_desmapear(unMapa, victima);
+					entrenador_capturar(cazador, victima); //TODO
+
+//					if(entrenador_puede_cazar_mas_pokemones(*cazador)){
+//						//TODO Ver si quedan muchos if anidados
+//					}
+
+					pendiente_destroy(mensajePendiente);
 				}
 
-				default:
-					error_show("Codigo de operacion desconocido");
-					exit(1);
-		}
+				else{
+					free(idRespuesta); //Se descarta el idf
+				}
+
+				break;
+			}
+
+			default:
+				error_show("Codigo de operacion desconocido");
+				exit(1);
 	}
+}
 
-	entrenadores_destroy(equipo); //duda implementacion
+	entrenadores_destroy(equipo);
 	mapa_destroy(unMapa);
-    pendientes_destroy(mensajesPendientes); //Terminar
+    pendientes_destroy(mensajesPendientes);
 
 	return EXIT_SUCCESS;
 }

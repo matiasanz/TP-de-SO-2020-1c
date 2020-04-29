@@ -7,7 +7,7 @@ pendiente pendiente_create(t_id idMensaje, entrenador* unEntrenador, pokemon* un
 
 //Destructor
 void pendiente_destroy(pendiente* mensajePendiente){
-//	pokemon_destroy(mensajePendiente->pokemonCazado); //Duda
+	pokemon_destroy(mensajePendiente->pokemonCazado); //Duda
 	free (mensajePendiente);
 }
 
@@ -24,6 +24,22 @@ void agregar_pendiente(pendientes mensajesPendientes, t_id idMensaje, entrenador
 	pendiente*nuevoMensaje = malloc(sizeof(pendiente));
 			 *nuevoMensaje = pendiente_create(idMensaje, unEntrenador, unPokemon);
 	list_add(mensajesPendientes, nuevoMensaje);
+}
+
+//Obtener
+pendiente* pendiente_get(pendientes mensajesPendientes, t_id idRespuesta){
+	bool cmp_pendiente_id(pendiente* unPendiente, t_id id){
+		return unPendiente->id == id;
+	}
+
+	pendiente*mensaje = list_find(mensajesPendientes, (bool(*)(void*)) &cmp_pendiente_id);
+
+	if(!mensaje){
+		error_show("El id no corresponde a ningun mensaje pendiente");
+		exit(1);
+	}
+
+	return mensaje;
 }
 
 //Destructor

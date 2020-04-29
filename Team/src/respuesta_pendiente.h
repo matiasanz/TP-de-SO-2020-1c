@@ -28,6 +28,9 @@ typedef t_list* pendientes;
 //	Agregar
 	void agregar_pendiente(pendientes, t_id id, entrenador*, pokemon*);
 
+// 	Obtener
+	pendiente* pendiente_get(pendientes mensajesPendientes, t_id idRespuesta);
+
 //	Destructor
 	void pendientes_destroy(pendientes);
 
