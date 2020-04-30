@@ -14,7 +14,7 @@ typedef struct Pokemon{
 pokemon pokemon_create(especie_pokemon, coordenada X, coordenada Y);
 
 //Me dice si algun miembro del equipo tiene por objetivo un pokemon de esa especie
-bool es_objetivo_de_alguien(pokemon, entrenadores);
+bool es_objetivo_de_alguien(pokemon, equipo);
 
 //Destructor
 void pokemon_destroy(pokemon*);

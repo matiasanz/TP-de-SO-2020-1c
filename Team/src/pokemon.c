@@ -9,18 +9,26 @@ pokemon pokemon_create(especie_pokemon especie, coordenada coordenadaX, coordena
 
 //cmp
 bool pokemon_misma_especie(pokemon unPokemon, pokemon otroPokemon){
-	return !strcmp(unPokemon.especie, otroPokemon.especie); //string_equals_ignore_case(objetivo->especie, deLista->especie);
+	return string_equals_ignore_case(unPokemon.especie, otroPokemon.especie); //string_equals_ignore_case(objetivo->especie, deLista->especie);
 }
 
-bool es_objetivo_de_alguien(pokemon unPokemon, entrenadores equipo){
-	return true; //TODO, usar cmp
+bool pokemon_es_objetivo_de(pokemon unPokemon, entrenador unEntrenador){
+	return list_any_satisfy(unEntrenador.objetivos, (bool(*)(void*))&pokemon_misma_especie);
 }
+
+bool es_objetivo_de_alguien(pokemon unPokemon, equipo entrenadores){
+//	bool es_su_objetivo(entrenador*unEntrenador){
+//		return pokemon_es_objetivo_de(unPokemon, *unEntrenador);
+//	}
+//
+	return !list_is_empty(entrenadores);//list_any_satisfy(entrenadores, (bool(*)(void*)) &es_su_objetivo);
+} //TODO
 
 void entrenador_capturar(entrenador*entrenador, pokemon*victima){
 	/*Ver si conviene en caso de que sea un objetivo directamente eliminarlo de la lista.
 	*Seria mas facil pero no se si respeta la consigna y aparte si no complica los test...*/
 	list_add(entrenador->pokemonesCazados, victima->especie);
-	printf("Se ha capturado a %s", victima->especie);
+	printf("Se ha capturado a %s\n", victima->especie);
 }
 
 //Destructor

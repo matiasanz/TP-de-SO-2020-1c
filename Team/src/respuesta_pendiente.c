@@ -28,8 +28,8 @@ void agregar_pendiente(pendientes mensajesPendientes, t_id idMensaje, entrenador
 
 //Obtener
 pendiente* pendiente_get(pendientes mensajesPendientes, t_id idRespuesta){
-	bool cmp_pendiente_id(pendiente* unPendiente, t_id id){
-		return unPendiente->id == id;
+	bool cmp_pendiente_id(pendiente* unPendiente){
+		return unPendiente->id == idRespuesta;
 	}
 
 	pendiente*mensaje = list_find(mensajesPendientes, (bool(*)(void*)) &cmp_pendiente_id);

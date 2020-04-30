@@ -12,15 +12,6 @@ entrenador entrenadorCreate(t_list* especiesDePokemones, coordenada coordenadaX,
 	return nuevo;
 }
 
-entrenador* entrenadores_mas_cercano(entrenadores equipo, coordenadas posicion){
-	//agregar validaciones;
-	if(list_is_empty(equipo)){
-		error_show("El equipo esta vacio");
-		exit(1);
-	}
-	return equipo->head->data;
-}
-
 void entrenador_ir_a(entrenador* unEntrenador, coordenadas posicion){
 	int i;
 
@@ -50,12 +41,17 @@ void entrenador_destroy(entrenador* destruido){
 
 //***************************************************************************
 //Constructor de equipo
-entrenadores entrenadores_create(){
+equipo equipo_create(){
 	return list_create();
 }
 
+//Ver si vale la pena poner CRITERIO, con enum
+entrenador* equipo_proximo_a_planificar(equipo entrenadores){
+	return list_remove(entrenadores, 0); //FIFO
+}
+
 //Destructor de equipo
-void entrenadores_destroy(entrenadores equipo){
-	list_destroy_and_destroy_elements(equipo, (void(*)(void*)) &entrenador_destroy);
+void equipo_destroy(equipo entrenadores){
+	list_destroy_and_destroy_elements(entrenadores, (void(*)(void*)) &entrenador_destroy);
 }
 

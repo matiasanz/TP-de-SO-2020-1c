@@ -38,7 +38,7 @@ pokemon*desempaquetar_pokemon(void*empaquetado) {
 }
 
 t_id* desempaquetar_id(void*empaquetado){
-	t_id *i = malloc(sizeof(int));
+	t_id *i = malloc(sizeof(t_id));
 		*i = 1;
 	return i; //TODO
 }
@@ -51,5 +51,5 @@ void get(void* especiePokemon){
 t_id catch(especie_pokemon especie){
 	//Envia mensaje al broker para ser replicado al gamecard, devuelve el id del mensaje pendiente por recibir
 	printf(" catch(%s)\n", especie);
-	return (t_id)1; //TODO
+	return 1; //TODO
 }

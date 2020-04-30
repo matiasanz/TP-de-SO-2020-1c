@@ -1,6 +1,6 @@
 all: 
 	-cd src && $(MAKE) all
-	-cd tests && $(MAKE) all
+#	-cd tests && $(MAKE) all
 	
 #descomentar esto para poder debuggear localmente
 #-cd src && $(MAKE) debug
@@ -23,6 +23,6 @@ uninstall:
 	-cd src && $(MAKE) uninstall
 	
 #compila y corre los tests
-test: all
-	-cd tests && $(MAKE) all
-	-./tests/unit-tests
+#test: all
+#	-cd tests && $(MAKE) all
+#	-./tests/unit-tests

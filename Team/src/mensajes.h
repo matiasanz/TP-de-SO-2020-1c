@@ -7,7 +7,8 @@
 typedef enum{
 	NUEVO_ENTRENADOR = 0,
  	LOCALIZED_POKEMON = 1,
-	CAUGHT_POKEMON = 2
+	CAUGHT_POKEMON = 2,
+	MISSED = 3
 }t_opcode;
 
 typedef uint32_t t_id;

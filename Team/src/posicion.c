@@ -1,5 +1,6 @@
 #include "posicion.h"
 
+
 //implementacion funciones auxiliares
 
 void posicion_create(coordenadas* nuevaPosicion, coordenada x, coordenada y){

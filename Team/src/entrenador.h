@@ -27,15 +27,15 @@ typedef struct Entrenador{
 
 //****************************************************************************************
 //Cola de entrenadores
-typedef t_list* entrenadores;
+typedef t_list* equipo;
 
 //	Constructor
-	entrenadores entrenadores_create();
+	equipo equipo_create();
 
-//	Dice que entrenador esta mas cerca de una posicion
-	entrenador* entrenadores_mas_cercano(entrenadores, coordenadas);
+//  Retorna el proximo entrenador a ser planificado
+	entrenador* equipo_proximo_a_planificar(equipo);
 
 //	Destructor
-	void entrenadores_destroy(entrenadores);
+	void equipo_destroy(equipo);
 
 # endif
