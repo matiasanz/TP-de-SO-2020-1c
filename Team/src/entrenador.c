@@ -1,6 +1,8 @@
 #include "entrenador.h"
 #include "posicion.h"
 #include <commons/string.h>
+#include "mensajes.h"
+#include <math.h>
 
 //Constructor Entrenador
 entrenador entrenadorCreate(t_list* especiesDePokemones, coordenada coordenadaX, coordenada coordenadaY){ //Va en gameBoy y crea al empaquetado
@@ -42,7 +44,38 @@ void entrenador_destroy(entrenador* destruido){
 //***************************************************************************
 //Constructor de equipo
 equipo equipo_create(){
-	return list_create();
+	equipo unEquipo = list_create();
+
+	puts("Se leyo un nuevo entrenador");
+
+	entrenador* unEntrenador = entrenador_de_prueba();
+	list_iterate(unEntrenador->objetivos, &get);//Le pregunto al gamecard si cada objetivo esta en alguna posicion
+	list_add(unEquipo, unEntrenador);				//agrego el entrenador al equipo
+
+	puts("Se agrego un nuevo entrenador");
+
+	return unEquipo;
+}
+
+double posicion_distancia(coordenadas unaPosicion, coordenadas otraPosicion){
+	int i; double sumaDeCuadrados=0;
+	for(i=0; i<DIMENSION_MAPA; i++){
+		sumaDeCuadrados+= (double) unaPosicion[i]*unaPosicion[i] + otraPosicion[i]*otraPosicion[i];
+	}
+	return 5;//sqrt(sumaDeCuadrados);//TODO
+}
+
+entrenador* equipo_mas_cercano(equipo unEquipo, coordenadas unaPosicion){
+
+	entrenador*entrenador_mas_cercano(entrenador*uno, entrenador*otro){
+		if(!uno){
+			return otro;
+		}
+
+		return posicion_distancia(uno->posicion, unaPosicion)>=posicion_distancia(otro->posicion, unaPosicion)? uno : otro;
+	}
+
+	return list_fold(unEquipo, NULL, (void*(*)(void*, void*))&entrenador_mas_cercano);
 }
 
 //Ver si vale la pena poner CRITERIO, con enum

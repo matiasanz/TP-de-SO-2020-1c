@@ -3,12 +3,14 @@
 
 #include "pokemon.h"
 
+//Prueba
+entrenador*entrenador_de_prueba();
+
 //mensajes que recibe de otros modulos
 typedef enum{
-	NUEVO_ENTRENADOR = 0,
- 	LOCALIZED_POKEMON = 1,
-	CAUGHT_POKEMON = 2,
-	MISSED = 3
+ 	LOCALIZED_POKEMON,
+	CAUGHT_POKEMON,
+	MISSED
 }t_opcode;
 
 typedef uint32_t t_id;
@@ -20,11 +22,6 @@ typedef struct Mensaje{
 } mensaje;
 
 //estructuras empaquetadas:
-typedef struct T_mensaje_new_entrenador{
-	especie_pokemon*objetivos;
-	coordenadas posicion;
-}t_mensaje_new_entrenador;
-
 typedef struct T_mensaje_new_pokemon{
 	especie_pokemon especie;
 	uint32_t especieLength;
@@ -32,8 +29,8 @@ typedef struct T_mensaje_new_pokemon{
 	coordenada posY;
 }t_mensaje_new_pokemon;
 
+
 //funciones de desempaquetado
-entrenador*desempaquetar_entrenador(void*serializado);
 pokemon*desempaquetar_pokemon(void*serializado);
 t_id* desempaquetar_id(void*empaquetado);
 

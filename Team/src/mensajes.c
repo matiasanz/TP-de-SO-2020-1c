@@ -12,7 +12,7 @@ mensaje recibir_mensaje(){ //hacer que devuelva un mensaje generico de cada tipo
 	return unMensaje;
 }
 
-entrenador*desempaquetar_entrenador(void*empaquetado){
+entrenador*entrenador_de_prueba(){
 	//datos del entrenador hardcodeado TODO
 		t_list*objetivos = list_create();
 		especie_pokemon especie = "pucho";

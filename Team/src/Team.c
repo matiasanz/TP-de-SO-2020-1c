@@ -33,17 +33,6 @@ while(haya_mas_mensajes--){
 	mensaje mensajeRecibido = recibir_mensaje();
 
 	switch(mensajeRecibido.opcode){
-		case NUEVO_ENTRENADOR: {
-			puts("Se recibio un nuevo entrenador");
-
-			entrenador* unEntrenador = desempaquetar_entrenador(mensajeRecibido.serializado);
-			list_iterate(unEntrenador->objetivos, &get);//Le pregunto al gamecard si cada objetivo esta en alguna posicion
-			list_add(entrenadores_ready, unEntrenador);				//agrego el entrenador al equipo
-
-			puts("Se agrego un nuevo entrenador");
-
-			break;
-		}
 
 		case LOCALIZED_POKEMON: {
 			puts("Se recibio pokemon localizado");
@@ -55,9 +44,9 @@ while(haya_mas_mensajes--){
 
 				mapear_objetivo(unMapa, unPokemon);
 
-				//(...) Ver TODO, no pasa inmediatamente
+				//(...) Ver TODO, esto se hace durante planificacion de entrenador
 
-				entrenador* cazador = equipo_proximo_a_planificar(entrenadores_ready); //(lista, CRITERIO)? ver si vale la pena, con enum
+				entrenador* cazador = equipo_mas_cercano(entrenadores_ready, unPokemon->posicion); //(lista, CRITERIO)? ver si vale la pena, con enum
 				entrenador_ir_a(cazador, unPokemon->posicion);
 				t_id id_mensaje_pendiente = catch(unPokemon->especie);
 
@@ -109,7 +98,7 @@ while(haya_mas_mensajes--){
 			puts("Se recibio pokemon perdido. PROXIMAMENTE");
 			//TODO LEER enunciado
 
-			//Calcuuulo que eliminara el pendiente (),  tener en cuenta que se repite codigo del anterior
+			//eliminar el pendiente? (tener en cuenta que se repitiria codigo del anterior)
 
 			break;
 		}
