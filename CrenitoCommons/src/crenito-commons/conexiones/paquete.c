@@ -7,7 +7,7 @@
 
 #include "paquete.h"
 
-t_buffer* cr_crear_buffer(int size) {
+t_buffer* buffer_crear(int size) {
 
 	t_buffer* buffer = malloc(sizeof(t_buffer));
 	buffer->size = size;
@@ -17,29 +17,30 @@ t_buffer* cr_crear_buffer(int size) {
 	return buffer;
 }
 
-void cr_destruir_buffer(t_buffer* buffer) {
+void buffer_destruir(t_buffer* buffer) {
 
 	free(buffer->stream);
 	free(buffer);
 }
 
-t_paquete* cr_crear_paquete(int cod_op, t_buffer* buffer) {
+t_paquete* paquete_crear(int cod_op, t_id_proceso id_proceso, t_buffer* buffer) {
 
 	t_paquete* paquete = malloc(sizeof(t_paquete));
 
 	paquete->codigo_operacion = cod_op;
+	paquete->codigo_operacion = id_proceso;
 	paquete->buffer = buffer;
 
 	return paquete;
 }
 
-void cr_destruir_paquete(t_paquete* paquete) {
+void paquete_destruir(t_paquete* paquete) {
 
-	cr_destruir_buffer(paquete->buffer);
+	buffer_destruir(paquete->buffer);
 	free(paquete);
 }
 
-void* cr_serializar_paquete(t_paquete* paquete, int *bytes) {
+void* paquete_serializar(t_paquete* paquete, int *bytes) {
 
 	*bytes = paquete->buffer->size + 2 * sizeof(int);
 	void * stream = malloc(*bytes);
@@ -57,4 +58,21 @@ void* cr_serializar_paquete(t_paquete* paquete, int *bytes) {
 	desplazamiento += paquete->buffer->size;
 
 	return stream;
+}
+
+t_mensaje_subscripcion* mensaje_subscripcion_crear(
+		t_id_proceso id_proceso, t_tipo_cola_mensaje nombre_cola) {
+
+	t_mensaje_subscripcion* msj = malloc(sizeof(t_mensaje_subscripcion));
+
+	msj->codigo_operacion = SUBSCRIPCION;
+	msj->nombre_cola = nombre_cola;
+	msj->id_proceso = id_proceso;
+
+	return msj;
+}
+
+void mensaje_subscripcion_destruir(t_mensaje_subscripcion* msj){
+
+	free(msj);
 }

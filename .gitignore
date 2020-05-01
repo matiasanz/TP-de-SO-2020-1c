@@ -61,6 +61,7 @@ dkms.conf
 *.project
 .settings/
 
+# VS Code
 .vscode/
-
 *.json
+*.clang-format

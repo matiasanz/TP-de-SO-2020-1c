@@ -9,9 +9,10 @@
 
 // función auxilizar para loggear errores
 void static manejar_error_socket(int socket, char* operacion);
+
 void socket_bind(int unSocket, struct addrinfo* info) {
 
-	if (bind(unSocket, info->ai_addr, info->ai_addrlen) < 0) {
+	if (bind(unSocket, info->ai_addr, info->ai_addrlen) == ERROR_SOCKET) {
 		manejar_error_socket(unSocket, "bind");
 
 	}
@@ -19,7 +20,7 @@ void socket_bind(int unSocket, struct addrinfo* info) {
 
 void socket_connect(int unSocket, struct addrinfo* info) {
 
-	if (connect(unSocket, info->ai_addr, info->ai_addrlen) < 0) {
+	if (connect(unSocket, info->ai_addr, info->ai_addrlen) == ERROR_SOCKET) {
 		manejar_error_socket(unSocket, "connect");
 	}
 }
@@ -29,15 +30,15 @@ int socket_create(struct addrinfo* info) {
 	int unSocket;
 
 	if ((unSocket = socket(info->ai_family, info->ai_socktype,
-			info->ai_protocol)) < 0) {
+			info->ai_protocol)) == ERROR_SOCKET) {
 		manejar_error_socket(unSocket, "create");
 	}
 
+	//Validar esto con ayudantes. Hay que confirgurarlo bloqueante o no?
 	int yes = 1;
-	if (setsockopt(unSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) < 0) {
-			manejar_error_socket(unSocket, "setsockopt");
-		}
-
+	if (setsockopt(unSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == ERROR_SOCKET) {
+		manejar_error_socket(unSocket, "setsockopt");
+	}
 
 	return unSocket;
 }
@@ -59,10 +60,9 @@ void socket_configurar(char* ip, char* puerto, socket_type tipo,
 
 void socket_listen(int unSocket) {
 
-	if (listen(unSocket, SOMAXCONN) < 0) {
+	if (listen(unSocket, SOMAXCONN) == ERROR_SOCKET) {
 		manejar_error_socket(unSocket, "listen");
 	}
-
 }
 
 int socket_crear_listener(char* ip, char* puerto) {
@@ -76,12 +76,37 @@ int socket_crear_listener(char* ip, char* puerto) {
 	freeaddrinfo(servinfo);
 
 	return unSocket;
-
 }
 
-t_cliente* socket_aceptar_conexion(int socket_servidor) {
+void socket_send(int unSocket, void* mensaje, int bytes) {
+	
+	if (send(unSocket, mensaje, bytes, MSG_WAITALL) == ERROR_SOCKET) {
+		manejar_error_socket(unSocket, "send");
+	}
+}
 
-	t_cliente* cliente = malloc(sizeof(t_cliente));
+void socket_cerrar(int unSocket) {
+	
+	if (close(unSocket) == ERROR_SOCKET) {
+		manejar_error_socket(unSocket, "close");
+	}
+}
+
+int socket_crear_client(char* ip, char* puerto) {
+
+	struct addrinfo *servinfo;
+	socket_configurar(ip, puerto, CLIENTE, &servinfo);
+	int unSocket = socket_create(servinfo);
+	socket_connect(unSocket, servinfo);
+
+	freeaddrinfo(servinfo);
+
+	return unSocket;
+}
+
+t_conexion* socket_aceptar_conexion(int socket_servidor) {
+
+	t_conexion* cliente = malloc(sizeof(t_conexion));
 	cliente->addrlen = sizeof(struct sockaddr_in);
 
 	struct sockaddr_in dir_cliente;
@@ -93,46 +118,40 @@ t_cliente* socket_aceptar_conexion(int socket_servidor) {
 
 	if ((cliente->socket = accept(socket_servidor,
 			(struct sockaddr *) &cliente->addr, (socklen_t*) &cliente->addrlen))
-			< 0) {
-		log_error(get_crnito_logger(),
-				"Error al realizar el accept, socket_cliente: %d, socket_servidor: %d",
-				cliente->socket, socket_servidor);
-
+			== ERROR_SOCKET) {
+		manejar_error_socket(cliente -> socket, "accept");
 	}
 
-	printf("Nueva conexión , socket %d , ip is : %s , puerto : %d \n",
+	log_info(get_crnito_logger(), "\n Nueva conexión aceptada, socket: %d , ip: %s , puerto : %d",
 			cliente->socket, inet_ntoa(cliente->addr.sin_addr),
 			ntohs(cliente->addr.sin_port));
 
 	return cliente;
 }
 
-int socket_recibir_cod_operacion(int socket_cliente) {
+int socket_recibir_int(int socket_cliente) {
 
-	int cod_op;
-	if (recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL) == -1) {
-		cod_op = -1;
+	int entero;
+	
+	if (recv(socket_cliente, &entero, sizeof(int), MSG_WAITALL) == ERROR_SOCKET) {
+		manejar_error_socket(socket_cliente, "recv");
 	}
 
-	return cod_op;
+	return entero;
 }
 
 void* socket_recibir_mensaje(int socket_cliente, int *size) {
 
 	void * bytes;
 
-	if (recv(socket_cliente, size, sizeof(int), MSG_WAITALL) < 0) {
-		log_error(get_crnito_logger(),
-				"Error al realizar el recv del size, socket_cliente: %d",
-				socket_cliente);
+	if (recv(socket_cliente, size, sizeof(int), MSG_WAITALL) == ERROR_SOCKET) {
+		manejar_error_socket(socket_cliente, "recv");
 	}
 
 	bytes = malloc(*size);
 
-	if (recv(socket_cliente, bytes, *size, MSG_WAITALL) < 0) {
-		log_error(get_crnito_logger(),
-				"Error al realizar el recv del mensaje, socket_cliente: %d",
-				socket_cliente);
+	if (recv(socket_cliente, bytes, *size, MSG_WAITALL) == ERROR_SOCKET) {
+		manejar_error_socket(socket_cliente, "recv");
 	}
 
 	return bytes;
