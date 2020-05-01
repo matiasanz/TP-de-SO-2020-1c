@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <math.h>
 #include <commons/string.h>
 #include <commons/error.h>
 #include <commons/collections/list.h>

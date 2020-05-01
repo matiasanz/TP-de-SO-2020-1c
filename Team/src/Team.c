@@ -14,8 +14,8 @@
  */
 
 #include "pokemon.h"
-#include "pendiente_de_respuesta.h"
 #include "mensajes.h"
+#include "respuesta_pendiente.h"
 
 int main(void) {
 	//Pantalla inicial
@@ -23,68 +23,106 @@ int main(void) {
 	puts("¡¡Hello World Team!!!");
 
 	//Inicializo colas
-	entrenadores equipo = entrenadores_create();
+	equipo entrenadores_ready = equipo_create();
 	mapa unMapa = mapa_create();
 	pendientes mensajesPendientes = pendientes_create();
 
-
+int haya_mas_mensajes=4;
+while(haya_mas_mensajes--){
 	//recibo mesaje
-	bool indefinidamente=true;
-	while(indefinidamente){
-			mensaje mensajeRecibido = recibir_mensaje();
+	mensaje mensajeRecibido = recibir_mensaje();
 
-			switch(mensajeRecibido.opcode){
+	switch(mensajeRecibido.opcode){
+		case NUEVO_ENTRENADOR: {
+			puts("Se recibio un nuevo entrenador");
 
-				case NUEVO_ENTRENADOR: {
-					puts("Se recibio un nuevo entrenador");
+			entrenador* unEntrenador = desempaquetar_entrenador(mensajeRecibido.serializado);
+			list_iterate(unEntrenador->objetivos, &get);//Le pregunto al gamecard si cada objetivo esta en alguna posicion
+			list_add(entrenadores_ready, unEntrenador);				//agrego el entrenador al equipo
 
-					entrenador* unEntrenador = desempaquetar_entrenador(mensajeRecibido.serializado);
-					list_iterate(unEntrenador->objetivos, &get);//Le pregunto al gamecard si cada objetivo esta en alguna posicion
-					list_add(equipo, unEntrenador);				//agrego el entrenador al equipo
-						puts("Se agrego un nuevo entrenador");
-					break;
-				}
+			puts("Se agrego un nuevo entrenador");
 
-				case LOCALIZED_POKEMON: {
-					puts("Se recibio pokemon localizado");
-
-					pokemon* unPokemon = desempaquetar_pokemon(mensajeRecibido.serializado);
-
-					if( es_objetivo_de_alguien(*unPokemon, equipo ) ){
-						mapear_objetivo(unMapa, unPokemon);
-
-						entrenador* cazador = entrenador_mas_cerca_de(equipo, unPokemon->posicion);
-						ir_a(*cazador, unPokemon->posicion);
-						t_id id_mensaje_pendiente = catch(unPokemon->especie);
-
-						agregar_pendiente(mensajesPendientes, id_mensaje_pendiente, cazador, unPokemon);
-
-						bloquear(cazador);
-					}
-
-					else{
-						puts("pokemon que no es objetivo de nadie, es cartera");
-						free(unPokemon); //"descartar al pokemon"
-					}
-
-					break;
-				}
-
-				case CAUGHT_POKEMON:{
-					puts("Se recibio pokemon atrapado. Proximamente");
-					//TODO
-					break;
-				}
-
-				default:
-					error_show("Codigo de operacion desconocido");
-					exit(1);
+			break;
 		}
-	}
 
-	entrenadores_destroy(equipo); //duda implementacion
+		case LOCALIZED_POKEMON: {
+			puts("Se recibio pokemon localizado");
+
+			pokemon* unPokemon = desempaquetar_pokemon(mensajeRecibido.serializado);
+
+			if( es_objetivo_de_alguien(*unPokemon, entrenadores_ready ) ){
+				//TODO definir bien esObjDeAlguien
+
+				mapear_objetivo(unMapa, unPokemon);
+
+				//(...) Ver TODO, no pasa inmediatamente
+
+				entrenador* cazador = equipo_proximo_a_planificar(entrenadores_ready); //(lista, CRITERIO)? ver si vale la pena, con enum
+				entrenador_ir_a(cazador, unPokemon->posicion);
+				t_id id_mensaje_pendiente = catch(unPokemon->especie);
+
+				agregar_pendiente(mensajesPendientes, id_mensaje_pendiente, cazador, unPokemon);
+
+				entrenador_bloquear(cazador);//TODO
+			}
+
+			else{
+				puts("pokemon que no es objetivo de nadie, es cartera");
+				pokemon_destroy(unPokemon); //"descartar al pokemon"
+			}
+
+			break;
+		}
+
+		case CAUGHT_POKEMON:{
+			puts("Se recibio pokemon atrapado");
+			t_id* idRespuesta = desempaquetar_id(mensajeRecibido.serializado);
+
+			pendiente* mensajePendiente = pendiente_get(mensajesPendientes, *idRespuesta);
+
+			if(!mensajePendiente){
+				error_show("Se recibio un id mensaje desconocido");
+				exit(1);
+			}
+
+			entrenador* cazador = mensajePendiente->cazador;
+			pokemon*    victima = mensajePendiente->pokemonCazado;
+
+			mapa_desmapear(unMapa, victima);
+			entrenador_capturar(cazador, victima); //TODO
+
+			if(entrenador_puede_cazar_mas_pokemones(*cazador)){
+				list_add(entrenadores_ready, cazador);
+			}
+
+//			else if(){
+//				//TODO Ver diagrama si quedan muchos if
+//			}
+
+			pendiente_destroy(mensajePendiente);
+			free(idRespuesta); //Se descarta el id
+
+			break;
+		}
+
+		case MISSED: {
+			puts("Se recibio pokemon perdido. PROXIMAMENTE");
+			//TODO LEER enunciado
+
+			//Calcuuulo que eliminara el pendiente (),  tener en cuenta que se repite codigo del anterior
+
+			break;
+		}
+
+		default:
+			error_show("Se recibio un codigo de operacion desconocido");
+			exit(1);
+	}
+}
+
+	equipo_destroy(entrenadores_ready);
 	mapa_destroy(unMapa);
-    pendientes_destroy(mensajesPendientes); //Terminar
+    pendientes_destroy(mensajesPendientes);
 
 	return EXIT_SUCCESS;
 }

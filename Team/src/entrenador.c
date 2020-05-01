@@ -6,29 +6,25 @@
 entrenador entrenadorCreate(t_list* especiesDePokemones, coordenada coordenadaX, coordenada coordenadaY){ //Va en gameBoy y crea al empaquetado
 	entrenador nuevo;
 		nuevo.objetivos = especiesDePokemones;
+		nuevo.pokemonesCazados = list_create();
 		posicion_create(&nuevo.posicion, coordenadaX, coordenadaY);
 
 	return nuevo;
 }
 
-entrenador* entrenador_mas_cerca_de(entrenadores equipo, coordenadas posicion){
-	//agregar validaciones;
-	if(list_is_empty(equipo)){
-		error_show("El equipo esta vacio");
-		exit(1);
-	}
-	return equipo->head->data;
-}
-
-void ir_a(entrenador unEntrenador, coordenadas posicion){
+void entrenador_ir_a(entrenador* unEntrenador, coordenadas posicion){
 	int i;
 
 	for(i=0; i<DIMENSION_MAPA; i++){
-		unEntrenador.posicion[i] = posicion[i];
+		unEntrenador->posicion[i] = posicion[i];
 	}
 }
 
-void bloquear(entrenador* unEntrenador){
+bool entrenador_puede_cazar_mas_pokemones(entrenador unEntrenador){
+	return list_size(unEntrenador.objetivos) == list_size(unEntrenador.pokemonesCazados);
+}
+
+void entrenador_bloquear(entrenador* unEntrenador){
 	puts("Se ha bloqueado al entrenador");
 	//TODO; ver si vale la pena definir o si lo puedo detectar por condicion de atributos
 }
@@ -45,12 +41,17 @@ void entrenador_destroy(entrenador* destruido){
 
 //***************************************************************************
 //Constructor de equipo
-entrenadores entrenadores_create(){
+equipo equipo_create(){
 	return list_create();
 }
 
+//Ver si vale la pena poner CRITERIO, con enum
+entrenador* equipo_proximo_a_planificar(equipo entrenadores){
+	return list_remove(entrenadores, 0); //FIFO
+}
+
 //Destructor de equipo
-void entrenadores_destroy(entrenadores equipo){
-	list_destroy_and_destroy_elements(equipo, (void(*)(void*)) &entrenador_destroy);
+void equipo_destroy(equipo entrenadores){
+	list_destroy_and_destroy_elements(entrenadores, (void(*)(void*)) &entrenador_destroy);
 }
 

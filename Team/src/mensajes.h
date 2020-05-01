@@ -7,7 +7,8 @@
 typedef enum{
 	NUEVO_ENTRENADOR = 0,
  	LOCALIZED_POKEMON = 1,
-	CAUGHT_POKEMON = 2
+	CAUGHT_POKEMON = 2,
+	MISSED = 3
 }t_opcode;
 
 typedef uint32_t t_id;
@@ -19,19 +20,22 @@ typedef struct Mensaje{
 } mensaje;
 
 //estructuras empaquetadas:
+typedef struct T_mensaje_new_entrenador{
+	especie_pokemon*objetivos;
+	coordenadas posicion;
+}t_mensaje_new_entrenador;
+
 typedef struct T_mensaje_new_pokemon{
 	especie_pokemon especie;
 	uint32_t especieLength;
+	coordenada posX;
+	coordenada posY;
 }t_mensaje_new_pokemon;
-
-typedef struct T_mensaje_new_entrenador{ //Obs: esta acoplado al anterior, ver si es conveniente
-	t_mensaje_new_pokemon*objetivos;
-	coordenadas posicion;
-}t_mensaje_new_entrenador;
 
 //funciones de desempaquetado
 entrenador*desempaquetar_entrenador(void*serializado);
 pokemon*desempaquetar_pokemon(void*serializado);
+t_id* desempaquetar_id(void*empaquetado);
 
 //mensajes entre modulos
 mensaje recibir_mensaje();
