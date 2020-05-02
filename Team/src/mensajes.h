@@ -2,15 +2,16 @@
 # define _MENSAJES_TEAM_
 
 #include "pokemon.h"
+#include <crenito-commons/mensajes/mensaje_new_pokemon.h>
 
 //Prueba
 entrenador*entrenador_de_prueba();
 
 //mensajes que recibe de otros modulos
 typedef enum{
- 	LOCALIZED_POKEMON,
-	CAUGHT_POKEMON,
-	MISSED
+ 	LOCALIZED_POKEMON_,
+	CAUGHT_POKEMON_,
+	MISSED //Ver, no existe este mensaje
 }t_opcode;
 
 typedef uint32_t t_id;
@@ -22,16 +23,9 @@ typedef struct Mensaje{
 } mensaje;
 
 //estructuras empaquetadas:
-typedef struct T_mensaje_new_pokemon{
-	especie_pokemon especie;
-	uint32_t especieLength;
-	coordenada posX;
-	coordenada posY;
-}t_mensaje_new_pokemon;
-
 
 //funciones de desempaquetado
-pokemon*desempaquetar_pokemon(void*serializado);
+pokemon*desempaquetar_pokemon(void*empaquetado);
 t_id* desempaquetar_id(void*empaquetado);
 
 //mensajes entre modulos

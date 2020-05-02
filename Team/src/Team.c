@@ -34,7 +34,7 @@ while(haya_mas_mensajes--){
 
 	switch(mensajeRecibido.opcode){
 
-		case LOCALIZED_POKEMON: {
+		case LOCALIZED_POKEMON_: {
 			puts("Se recibio pokemon localizado");
 
 			pokemon* unPokemon = desempaquetar_pokemon(mensajeRecibido.serializado);
@@ -63,7 +63,7 @@ while(haya_mas_mensajes--){
 			break;
 		}
 
-		case CAUGHT_POKEMON:{
+		case CAUGHT_POKEMON_:{
 			puts("Se recibio pokemon atrapado");
 			t_id* idRespuesta = desempaquetar_id(mensajeRecibido.serializado);
 

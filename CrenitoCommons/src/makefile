@@ -12,6 +12,7 @@ all: build/libCrenitoCommons.so
 
 create-dirs:
 	mkdir -p build/crenito-commons/conexiones
+	mkdir -p build/crenito-commons/mensajes
 	mkdir -p ../log
 
 build/libCrenitoCommons.so: create-dirs $(OBJS)
@@ -23,6 +24,10 @@ build/crenito-commons/%.o: crenito-commons/%.c
 
 #Compila la carpeta conexiones
 build/crenito-commons/conexiones/%.o: crenito-commons/conexiones%.c
+	$(CC) -c -fmessage-length=0 -fPIC -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	
+#Compila la carpeta mensajes
+build/crenito-commons/mensajes/%.o: crenito-commons/mensajes%.c
 	$(CC) -c -fmessage-length=0 -fPIC -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
 
 # Add debug parameters and compile
