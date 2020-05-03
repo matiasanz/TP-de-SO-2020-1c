@@ -22,11 +22,18 @@ void serve_client(t_conexion* conexion) {
 				"El codigo de operacion %d recibido desde el socket: %d por el proceso %s es incorrecto",
 				codigo_operacion, conexion->socket, nombre_proceso);
 		pthread_exit(NULL);
+		abort();
 	}
 }
 
 void procesar_mensaje(t_conexion* conexion, char* nombre_proceso) {
 
+	// Simula que recibió el mensaje y devuelve siempre un id = 1
+	int id_mensaje = 1;
+
+	log_info(event_logger, "mensaje recibido, enviando id mensaje: %d", id_mensaje);
+
+	send(conexion ->socket, &id_mensaje, sizeof(int), 0);
 }
 
 void procesar_subscripcion(t_conexion* conexion, char* nombre_proceso) {

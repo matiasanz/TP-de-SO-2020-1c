@@ -35,6 +35,7 @@ char* get_nombre_proceso(t_id_proceso id_proceso) {
 		return TEAM_STRING;
 	default:
 		log_error(get_crnito_logger(), "Id de proceso incorrecto: %d", id_proceso);
+		abort();
 		return NULL;
 	}
 }
@@ -57,6 +58,7 @@ char* get_nombre_cola_mensaje(t_tipo_cola_mensaje tipo_cola_mensaje) {
 	default:
 		log_error(get_crnito_logger(), "No existe el tipo de cola: %d",
 				tipo_cola_mensaje);
+		abort();
 		return NULL;
 	}
 }

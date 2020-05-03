@@ -12,7 +12,7 @@
 
 // TAD dinamico para manejar el contenido y tamaño de mensajes
 typedef struct {
-	int size;
+	uint32_t size;
 	void* stream;
 } t_buffer;
 
