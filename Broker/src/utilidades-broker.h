@@ -52,8 +52,6 @@ t_cola_container* cola_get_pokemon;
 t_cola_container* cola_localized_pokemon;
 
 void serve_client(t_conexion* conexion);
-void devolver_mensaje(int cod_op, t_buffer* buffer, int socket_cliente);
-void handover(int cod_op, int socket_cliente);
 
 // Punto de entrada para cuando se detecta que un proceso se quiere subscribir a una cola
 void procesar_subscripcion(t_conexion* conexion, char* nombre_proceso);

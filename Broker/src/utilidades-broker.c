@@ -112,29 +112,3 @@ t_cola_container* inicializar_cola_container() {
 
 	return cola;
 }
-
-void handover(int cod_op, int socket_cliente) {
-	int size;
-	char * msg;
-
-	msg = socket_recibir_mensaje(socket_cliente, &size);
-	log_info(event_logger, "contenido del mensaje: %s ", msg);
-
-	t_buffer* buffer = buffer_crear(size);
-	memcpy(buffer->stream, msg, size);
-
-	devolver_mensaje(cod_op, buffer, socket_cliente);
-	log_info(event_logger, "mensaje devuelto con exito!");
-	free(msg);
-}
-
-void devolver_mensaje(int cod_op, t_buffer* buffer, int socket_cliente) {
-	t_paquete* paquete = paquete_crear(cod_op, BROKER, buffer);
-
-	int bytes = 0;
-	void* a_enviar = paquete_serializar(paquete, &bytes);
-
-	send(socket_cliente, a_enviar, bytes, 0);
-
-	free(a_enviar);
-}
