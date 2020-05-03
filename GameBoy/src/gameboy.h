@@ -10,6 +10,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <crenito-commons/utils.h>
+#include <crenito-commons/mensajes/mensaje_new_pokemon.h>
+#include <crenito-commons/conexiones/socket.h>
+#include <commons/log.h>
+#include <commons/config.h>
+
 
 
 #endif /* SRC_GAMEBOY_H_ */
