@@ -8,9 +8,7 @@
 #ifndef SRC_CRENITO_COMMONS_MODELO_POKEMON_H_
 #define SRC_CRENITO_COMMONS_MODELO_POKEMON_H_
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
+#include "../utils.h"
 #include "posicion.h"
 #include "pokemon.h"
 

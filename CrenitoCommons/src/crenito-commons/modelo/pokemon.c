@@ -9,6 +9,7 @@
 t_pokemon pokemon_crear(char* especie, uint32_t pos_x, uint32_t pos_y) {
 	{
 		t_pokemon pkm;
+
 		pkm.especie_lenght = strlen(especie) + 1;
 		pkm.especie = malloc(pkm.especie_lenght);
 		strcpy(pkm.especie, especie);

@@ -7,22 +7,6 @@
 
 #include "paquete.h"
 
-t_buffer* buffer_crear(int size) {
-
-	t_buffer* buffer = malloc(sizeof(t_buffer));
-	buffer->size = size;
-
-	buffer->stream = malloc(size);
-
-	return buffer;
-}
-
-void buffer_destruir(t_buffer* buffer) {
-
-	free(buffer->stream);
-	free(buffer);
-}
-
 t_paquete* paquete_crear(int cod_op, t_id_proceso id_proceso, t_buffer* buffer) {
 
 	t_paquete* paquete = malloc(sizeof(t_paquete));
@@ -60,10 +44,10 @@ void* paquete_serializar(t_paquete* paquete, int *bytes) {
 	return stream;
 }
 
-t_mensaje_subscripcion* mensaje_subscripcion_crear(
+t_paquete_subscripcion* paquete_subscripcion_crear(
 		t_id_proceso id_proceso, t_tipo_cola_mensaje nombre_cola) {
 
-	t_mensaje_subscripcion* msj = malloc(sizeof(t_mensaje_subscripcion));
+	t_paquete_subscripcion* msj = malloc(sizeof(t_paquete_subscripcion));
 
 	msj->codigo_operacion = SUBSCRIPCION;
 	msj->nombre_cola = nombre_cola;
@@ -72,7 +56,7 @@ t_mensaje_subscripcion* mensaje_subscripcion_crear(
 	return msj;
 }
 
-void mensaje_subscripcion_destruir(t_mensaje_subscripcion* msj){
+void paquete_subscripcion_destruir(t_paquete_subscripcion* msj){
 
 	free(msj);
 }

@@ -58,8 +58,7 @@ void handover(int cod_op, int socket_cliente);
 // Punto de entrada para cuando se detecta que un proceso se quiere subscribir a una cola
 void procesar_subscripcion(t_conexion* conexion, char* nombre_proceso);
 // Realiza la subscripcion propiamente dicha
-int subscribir_proceso_a_cola(t_conexion* conexion,
-		t_tipo_cola_mensaje cola_a_subscribir);
+int subscribir_proceso_a_cola(t_conexion* conexion, t_tipo_cola_mensaje cola_a_subscribir);
 
 // Punto de entrada para cuando se detecta que un proceso envia un mensaje
 void procesar_mensaje(t_conexion* conexion, char* nombre_proceso);

@@ -8,7 +8,7 @@
 #ifndef SRC_CRENITO_COMMONS_MODELO_POSICION_H_
 #define SRC_CRENITO_COMMONS_MODELO_POSICION_H_
 
-#include <stdint.h>
+#include "../utils.h"
 
 typedef struct {
 	uint32_t pos_x;

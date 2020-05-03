@@ -11,6 +11,7 @@ t_mensaje_new_pokemon* mensaje_new_pokemon_crear(char* especie, uint32_t pos_x,
 
 	t_mensaje_new_pokemon* new_pokemon = malloc(sizeof(t_mensaje_new_pokemon));
 
+	mensaje_id_inicializar(&new_pokemon->ids);
 	new_pokemon->pokemon = pokemon_crear(especie, pos_x, pos_y);
 	new_pokemon->cantidad = cantidad;
 

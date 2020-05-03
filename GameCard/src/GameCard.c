@@ -22,7 +22,7 @@ void inicializar(void) {
 	event_logger = log_create("./log/gamecard_event.log", "GAME_CARD_EVENT", 1, LOG_LEVEL_INFO);
 	config = config_create("./config/gamecard.config");
 
-	//subscribpcion_colas();
+	subscribpcion_colas();
 
 }
 

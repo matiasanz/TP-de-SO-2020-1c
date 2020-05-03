@@ -9,14 +9,10 @@
 #define SRC_CRENITO_COMMONS_SOCKET_H_
 
 #include <arpa/inet.h>
-#include<stdio.h>
-#include<stdlib.h>
 #include<sys/socket.h>
 #include<unistd.h>
 #include<netdb.h>
-#include<commons/log.h>
-#include<string.h>
-#include "../crenito-logger.h"
+#include "../utils.h"
 #include "paquete.h"
 
 #define ERROR_SOCKET -1
