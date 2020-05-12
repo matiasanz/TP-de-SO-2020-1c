@@ -1,40 +1,33 @@
-/*
- * team.h
- *
- *  Created on: 2 may. 2020
- *      Author: utnso
- */
+# ifndef _TEAM_
+# define _TEAM_
 
-#ifndef SRC_TEAM_H_
-#define SRC_TEAM_H_
+#include "dominio/estructuras principales/pokemon.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "dominio/estructuras auxiliares/lector_config.h"
+#include "dominio/estructuras auxiliares/captura_pendiente.h"
+#include "dominio/estructuras auxiliares/mensajes.h"
 
-#include <commons/config.h>
-#include <commons/log.h>
+#include "dominio/header_global_team.h"
 
-#include <crenito-commons/conexiones/conexiones.h>
-#include <crenito-commons/utils.h>
+#include <pthread.h>
 
+//#include <crenito-commons/conexiones/conexiones.h>
+//#include <crenito-commons/utils.h>
 
-/*Constantes*/
-#define CONFIG_PATH "config/team.config"
+//funciones del team
+void team_inicializar();
+int team_exit();
 
+//funciones auxiliares
+void inicializar_listas();
+void listas_destroy();
+void subscribpcion_colas();
 
-/*Variables Globales*/
-
-t_config* config;
-
-t_log* logger;
+/*Mis Listas (son variables globales, para que puedan acceder todos los hilos)*/
+	entrenadores equipo;
+	mapa_pokemones pokemonesRequeridos;
+	pendientes mensajesPendientes;
+	especies_pokemones historialDePokemones;
 /*--------------*/
 
-
-int inicializar();
-int subscribpcion_colas();
-
-void exit_team();
-
-
-
-#endif /* SRC_TEAM_H_ */
+# endif
