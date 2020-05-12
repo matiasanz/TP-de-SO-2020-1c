@@ -1,5 +1,5 @@
 ### TP 1er cuatrimestre 2020 Grupo C-renito Casero
- - Link al enunciado: http://faq.utnso.com.ar/enunciado
+ Link al enunciado: http://faq.utnso.com.ar/enunciado
 
 **Integrantes:**
  - _Matías Anzorandía_
