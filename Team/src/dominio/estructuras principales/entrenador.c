@@ -6,7 +6,8 @@
 //Constructor Entrenador
 entrenador entrenador_create(t_list* pokemonesEnInventario, t_list*objetivos, t_posicion unaPos){
 	entrenador nuevo = (entrenador) {objetivos, pokemonesEnInventario, unaPos, NEW};
-//	sem_init(nuevo.SEMAFORO_IDENTIFICADOR, 0, 0);
+	nuevo.SEMAFORO_IDENTIFICADOR = malloc(sizeof(sem_t));
+	sem_init(nuevo.SEMAFORO_IDENTIFICADOR, 0, 0);
 	return nuevo;
 }
 
@@ -66,7 +67,7 @@ void entrenador_desbloquear(entrenador*unEntrenador){
 void entrenador_destroy(entrenador* destruido){
 	list_destroy(destruido->objetivos);
 	list_destroy(destruido->pokemonesCazados);
-//	sem_destroy(destruido->SEMAFORO_IDENTIFICADOR);
+	sem_destroy(destruido->SEMAFORO_IDENTIFICADOR);
 	free(destruido);
 }
 

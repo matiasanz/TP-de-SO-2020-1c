@@ -9,8 +9,9 @@
 
 void team_planificar(){
 
-	int i, muchasVeces=10;
-	for(i=0; muchasVeces--; i = (i+1)%list_size(equipo)){
+	puts("se va a planificar");
+	int muchasVeces=10;
+	while(muchasVeces--){
 
 		especies_pokemones objetivosGlobales = entrenadores_objetivos_globales(equipo);
 		list_iterate(objetivosGlobales, get);
@@ -27,7 +28,7 @@ void team_planificar(){
 			abort();
 		}
 
-//		sem_post(idProximoEntrenador); //signal(id);
+		sem_post(idProximoEntrenador); //signal(id);
 	}
 }
 

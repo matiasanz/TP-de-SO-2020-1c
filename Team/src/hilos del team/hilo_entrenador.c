@@ -2,10 +2,10 @@
 #include "../team.h"
 
 void team_hilo_entrenador(entrenador*unEntrenador){
-
+	puts("en espera");
 	int muchasVeces = 10;
 	while(muchasVeces--){
-		//sem_wait(unEntrenador->SEMAFORO_IDENTIFICADOR);
+		sem_wait(unEntrenador->SEMAFORO_IDENTIFICADOR);
 		pokemon*unPokemon = mapa_desmapear(pokemonesRequeridos);
 
 		entrenador_ir_a(unEntrenador, unPokemon->posicion);
@@ -23,13 +23,14 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 	}
 }
 
-//pthread_t* inicializar_hilos_entrenadores(){
-//	int i, cantidadEntrenadores = list_size(equipo);
-//	pthread_t* hilosEntrenadores = malloc(sizeof(pthread_t)*cantidadEntrenadores);
-//
-//	for(i=0; i<cantidadEntrenadores; i++){
-//		pthread_create(&hilosEntrenadores[i], NULL, (void*) team_hilo_entrenador, list_get(equipo, i));
-//	}
-//
-//	return hilosEntrenadores;
-//}
+pthread_t* inicializar_hilos_entrenadores(int*cantidadDeHilos){
+	int i, cantidadEntrenadores = list_size(equipo);
+	pthread_t* hilosEntrenadores = malloc(sizeof(pthread_t)*cantidadEntrenadores);
+
+	for(i=0; i<cantidadEntrenadores; i++){
+		pthread_create(&hilosEntrenadores[i], NULL, (void*) team_hilo_entrenador, list_get(equipo, i));
+	}
+
+	*cantidadDeHilos = cantidadEntrenadores;
+	return hilosEntrenadores;
+}

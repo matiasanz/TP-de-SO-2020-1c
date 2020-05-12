@@ -9,10 +9,10 @@
  */
 #include "team.h"
 #include "hilos del team/hilos_team.h"
-//#include "tests/tests_team.o" //comentar si se va a usar string.h
+//#include "tests/tests_team.o"
 
 int main(void) { //Programa principal para pruebas puntuales
- 	puts("!!!Hello World!!!"); /* prints !!!Hello World!!! */
+ 	puts("!!!Hello World Team!!!"); /* prints !!!Hello World!!! */
 
 	team_inicializar();
 
@@ -22,7 +22,18 @@ int main(void) { //Programa principal para pruebas puntuales
 //	team_planificar();
 //	team_hilo_entrenador();
 
-	log_info(event_logger, "hola team");
+	int cantidadDeHilos=0;
+	pthread_t* hilosEntrenadores = inicializar_hilos_entrenadores(&cantidadDeHilos);
+	pthread_t hiloPlanificador;
+	pthread_create(&hiloPlanificador, NULL, (void*) team_planificar, NULL);
+
+	int i;
+	for(i=0; i<cantidadDeHilos; i++){
+		pthread_join(hilosEntrenadores[i], NULL);
+	}
+
+	pthread_join(hiloPlanificador, NULL);
+	log_info(event_logger, "chau team");
 
 	return team_exit(); //Destruye listas, cierra config, cierra log
 }

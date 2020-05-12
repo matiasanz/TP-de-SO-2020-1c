@@ -21,3 +21,6 @@ void team_planificar(); //nueva implementacion
 
 //Hilo que se encarga de reaccionar a cada mensaje recibido
 void team_procesar_mensajes();
+
+//inicializar
+pthread_t* inicializar_hilos_entrenadores(int*cantidad);
