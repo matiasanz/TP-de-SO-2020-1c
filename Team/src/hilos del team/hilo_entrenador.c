@@ -5,7 +5,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 	puts("en espera");
 //	int muchasVeces = 10;
 	while(1){
-		sem_wait(unEntrenador->SEMAFORO_IDENTIFICADOR);
+		sem_wait(&sem_Entrenador[unEntrenador->id]); //sem_wait(unEntrenador->SEMAFORO_IDENTIFICADOR);
 		unEntrenador->estado = EXECUTE;
 		pokemon*unPokemon = mapa_desmapear(pokemonesRequeridos);
 		sem_post(&sem_PokemonRemovido);
@@ -15,9 +15,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 		if(entrenador_llego_a(*unEntrenador, unPokemon->posicion)){
 			t_id id_mensaje_pendiente = catch(unPokemon->especie);
 			agregar_pendiente(mensajesPendientes, id_mensaje_pendiente, unEntrenador, unPokemon);
-			entrenador_bloquear_hasta_CAUGHT(unEntrenador);// pasa a LOCKED
-			log_info(logger, "Se paso entrenador a Locked, ya que tiene una captura pendiente");
-
+			entrenador_pasar_a(unEntrenador, LOCKED_HASTA_CAUGHT, "Tiene una captura pendiente");
 //			exit(0);
 		}
 
@@ -28,14 +26,20 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 	}
 }
 
-pthread_t* inicializar_hilos_entrenadores(int*cantidadDeHilos){
-	int i, cantidadEntrenadores = list_size(equipo);
-	pthread_t* hilosEntrenadores = malloc(sizeof(pthread_t)*cantidadEntrenadores);
+pthread_t* inicializar_hilos_entrenadores(int*cantidadEntrenadores){
 
-	for(i=0; i<cantidadEntrenadores; i++){
-		pthread_create(&hilosEntrenadores[i], NULL, (void*) team_hilo_entrenador, list_get(equipo, i));
+	int i, cantidadDeHilos = list_size(equipo);
+	pthread_t* hilosEntrenadores = malloc(sizeof(pthread_t)*cantidadDeHilos);
+
+	sem_Entrenador = malloc(sizeof(sem_t)*cantidadDeHilos);
+
+	for(i=0; i<cantidadDeHilos; i++){
+		entrenador*unEntrenador = list_get(equipo, i);
+		unEntrenador->id = i;
+		sem_init(&sem_Entrenador[i], 0, 0);
+		pthread_create(&hilosEntrenadores[i], NULL, (void*) team_hilo_entrenador, unEntrenador);
 	}
 
-	*cantidadDeHilos = cantidadEntrenadores;
+	*cantidadEntrenadores = cantidadDeHilos;
 	return hilosEntrenadores;
 }

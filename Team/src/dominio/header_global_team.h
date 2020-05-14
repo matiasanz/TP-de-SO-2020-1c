@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <math.h>
 #include <pthread.h>
+#include <unistd.h>
 
 //#include <commons/string.h> //no deja correr tests en cspec (palabra reservada end)
 #include <commons/error.h>

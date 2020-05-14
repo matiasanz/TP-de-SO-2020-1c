@@ -35,7 +35,7 @@ pendiente* pendiente_get(pendientes mensajesPendientes, t_id idRespuesta){
 
 	if(!mensaje){
 		error_show("El id %d no corresponde a ningun mensaje pendiente", idRespuesta);
-		exit(1);
+//		exit(1);
 	}
 
 	return mensaje;

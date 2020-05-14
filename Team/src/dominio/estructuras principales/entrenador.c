@@ -6,8 +6,8 @@
 //Constructor Entrenador
 entrenador entrenador_create(t_list* pokemonesEnInventario, t_list*objetivos, t_posicion unaPos){
 	entrenador nuevo = (entrenador) {objetivos, pokemonesEnInventario, unaPos, NEW};
-	nuevo.SEMAFORO_IDENTIFICADOR = malloc(sizeof(sem_t));
-	sem_init(nuevo.SEMAFORO_IDENTIFICADOR, 0, 0);
+//	nuevo.SEMAFORO_IDENTIFICADOR = malloc(sizeof(sem_t));
+//	sem_init(nuevo.SEMAFORO_IDENTIFICADOR, 0, 0);
 	return nuevo;
 }
 
@@ -30,7 +30,7 @@ void entrenador_ir_a(entrenador* unEntrenador, t_posicion posicionFinal){
 //	sleep(distancia*tiempoPorDistancia);// VER alternativas para sleep
 
 	unEntrenador->posicion = posicionFinal;
-//	log_info(logger, "El entrenador llego a la posicion (%u, %u)", unEntrenador->posicion.x, unEntrenador->posicion.y);
+	log_info(logger, "El entrenador llego a la posicion (%u, %u)", unEntrenador->posicion.x, unEntrenador->posicion.y);
 }
 
 bool entrenador_llego_a(entrenador unEntrenador, t_posicion posicion){
@@ -45,20 +45,22 @@ bool entrenador_puede_cazar_mas_pokemones(entrenador unEntrenador){
 	return list_size(unEntrenador.objetivos) > list_size(unEntrenador.pokemonesCazados);
 }
 
-void entrenador_pasar_a(entrenador*unEntrenador, t_estado estado, const char*motivo){
+char*estadoFromEnum(t_estado unEstado){
+	switch(unEstado){
+		case NEW:       {return "NEW";}
+		case READY:	    {return "Ready";}
+		case EXIT:	    {return "Exit";}
+		case EXECUTE:	{return "Execute";}
+		default:		{return "LOCKED";}
+	}
+}
 
-	unEntrenador->estado = estado;
 
-//	char*estadoFromEnum(){
-//		switch(estado)
-//		case NEW:       {return "NEW";}
-//		case READY:	    {return "Ready";}
-//		case EXIT:	    {return "Exit";}
-//		default:		{return "LOCKED";}
-//	}
-//
-//	char*unEstado = estado_from_enum(estado);
-//	log_info(logger, "Se paso el entrenador (id) a estado %s. Motivo: %s", estado, motivo);
+void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const char*motivo){
+	char*estadoActual = estadoFromEnum(unEntrenador->estado);
+	unEntrenador->estado = estadoFinal;
+	log_info(logger, "Se paso al Entrenador N°%u de la cola de %s a %s\n"
+	">>>>>>>>>>>>>>>>>>>>>>>>>> Motivo: %s", unEntrenador->id, estadoActual, estadoFromEnum(estadoFinal), motivo);
 }
 
 void entrenador_bloquear_hasta_APPEARD(entrenador* unEntrenador){
@@ -85,7 +87,7 @@ void entrenador_desbloquear(entrenador*unEntrenador){
 void entrenador_destroy(entrenador* destruido){
 	list_destroy(destruido->objetivos);
 	list_destroy(destruido->pokemonesCazados);
-	sem_destroy(destruido->SEMAFORO_IDENTIFICADOR);
+//	sem_destroy(destruido->SEMAFORO_IDENTIFICADOR);
 	free(destruido);
 }
 
@@ -148,14 +150,15 @@ entrenador* entrenadores_proximo_a_planificar(entrenadores equipo){ //, pokemon)
 //			return NULL;
 }
 
-sem_t* entrenadores_id_proximo_a_planificar(entrenadores equipo){
+t_id* entrenadores_id_proximo_a_planificar(entrenadores equipo){
 	entrenador*proximo = entrenadores_proximo_a_planificar(equipo);
 	if(!proximo){
 		printf("no encontre mas\n");
 		return NULL; //quiere decir que no hay entrenadores disponibles. Deadlock?
 	}
 
-	return proximo->SEMAFORO_IDENTIFICADOR;
+	return &proximo->id;
+//	return proximo->SEMAFORO_IDENTIFICADOR;
 }
 
 //

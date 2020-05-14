@@ -8,6 +8,7 @@
 //pthread_mutex =
 sem_t sem_HayMasPokemonesEnMapa;
 sem_t sem_PokemonRemovido;
+sem_t* sem_Entrenador;
 
 //TODO definir aqui...
 

@@ -71,21 +71,22 @@ while(1){
 				//VER TODO muchos if anidados
 
 				if(entrenador_puede_cazar_mas_pokemones(*unEntrenador)){
-					entrenador_bloquear_hasta_APPEARD(unEntrenador);
+					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARD, "Tuvo exito en la captura y todavia puede cazar mas pokemones");
 				}
 
 				else if(list_is_empty(unEntrenador->objetivos)){ //abstraer a mensaje objetivos cumplidos
+						entrenador_pasar_a(unEntrenador, EXIT, "Ya logro cumplir sus objetivos");
 						entrenador_destroy(unEntrenador);//	entrenador_pasar_a_estado(EXIT);
 				}
 
 				else{
-					entrenador_bloquear_hasta_DEADLOCK(unEntrenador);
+					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_DEADLOCK, "Su inventario esta lleno y no cumplio sus objetivos");
 				}
 			}
 
 			else{
 				pokemon_destroy(pokemonCatcheado);
-				entrenador_bloquear_hasta_APPEARD(unEntrenador);
+				entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARD, "Fallo en capturar al pokemon pero puede seguir cazando mas");
 			}
 
 			free(resultado); //Se descarta el id

@@ -18,32 +18,32 @@ void team_planificar(){
 		especies_pokemones objetivosGlobales = entrenadores_objetivos_globales(equipo);
 		get_pokemones(objetivosGlobales);
 
-		puts(">>> wait(hayMASPKM)");
+		puts(">>> wait(hay mas pokemones)");
 		sem_wait(&sem_HayMasPokemonesEnMapa);
 
 		sem_wait(&sem_PokemonRemovido);
 		pokemon*unPokemon = mapa_first(pokemonesRequeridos);
 
 		if(!unPokemon){
-			error_show("no hay mas pokemones");
+			error_show("no hay mas pokemones\n");
 			break;
 		}
 
 
 		entrenadores_despertar_APPEARD(equipo, unPokemon);
-		sem_t* idProximoEntrenador = entrenadores_id_proximo_a_planificar(equipo); //TODO
+		t_id* idProximoEntrenador = entrenadores_id_proximo_a_planificar(equipo); //TODO
 
 		if(!idProximoEntrenador){
-			error_show("no hay entrenadores en ready");
+			error_show("no hay entrenadores en ready\n");
 			abort();
 		}
 
-		puts("\nsignal(id)");
+		printf("signal(%u)\n", *idProximoEntrenador);
 
-		sem_post(idProximoEntrenador); //signal(id);
+		sem_post(&sem_Entrenador[*idProximoEntrenador]); //signal(id);
 	}
 
-	puts("Se termino de planificar");
+	log_info(event_logger, "Se termino de planificar");
 }
 
 
@@ -51,7 +51,7 @@ void entrenadores_despertar_APPEARD(entrenadores equipo, pokemon* unPokemon){
 
 	void entrenador_despertar_appeard(entrenador*unEntrenador){
 		if(entrenador_en_estado(unEntrenador, NEW) || entrenador_en_estado(unEntrenador, LOCKED_HASTA_APPEARD)){
-			entrenador_desbloquear(unEntrenador);
+			entrenador_pasar_a(unEntrenador, READY, "Acaba de llegar un pokemon que puede cazar");
 		}
 	}
 

@@ -16,7 +16,8 @@ typedef struct Entrenador{
 	especies_pokemones pokemonesCazados;
 	t_posicion posicion; //(x,y)
 	t_estado estado;
-	sem_t* SEMAFORO_IDENTIFICADOR;
+	t_id id;
+//	sem_t* SEMAFORO_IDENTIFICADOR;
 } entrenador;
 
 //	Constructor; agregar lista infinita de objetivos
@@ -35,6 +36,9 @@ typedef struct Entrenador{
 
 // Retorna true si el entrenador se encuentra actualmente en dicho estado
 	bool entrenador_en_estado(entrenador* unEntrenador, t_estado ESTADO);
+
+//	Pasa entrenador a un estado y loggea el pasaje con el motivo
+	void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const char*motivo);
 
 //	Pasa entrenador a estado locked hasta que llegue un pokemon
 	void entrenador_bloquear_hasta_APPEARD(entrenador*);
@@ -68,7 +72,7 @@ typedef t_list* entrenadores;
 	entrenador* entrenadores_proximo_a_planificar(entrenadores); //, criterio); Hacer con enum
 
 //Retorna el id del proximo entrenador a ser planificado
-	sem_t* entrenadores_id_proximo_a_planificar(entrenadores equipo);
+	t_id* entrenadores_id_proximo_a_planificar(entrenadores equipo);
 //Retorna los entrenadores que se encuentran en un estado
 	entrenadores entrenadores_en_estado(entrenadores, t_estado estado);
 
