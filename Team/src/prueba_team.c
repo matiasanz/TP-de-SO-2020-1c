@@ -12,28 +12,67 @@
 //#include "tests/tests_team.o"
 
 int main(void) { //Programa principal para pruebas puntuales
- 	puts("!!!Hello World Team!!!"); /* prints !!!Hello World!!! */
 
 	team_inicializar();
+	log_info(event_logger, "****************************************\n!!!Hello World Team!!!"); /* prints !!!Hello World!!! */
 
-//	team_procesar_mensajes();
-//	team_planificar();
+	t_list* mensajes = list_create();
+
+		mensaje* unMensaje = malloc(sizeof(mensaje));
+		*unMensaje = (mensaje) {APPEARD_POKEMON_, pokemon_ptr_create("Charmander", 2, 9)};
+		list_add(mensajes, unMensaje);
+		unMensaje = malloc(sizeof(mensaje));
+		*unMensaje = (mensaje) {APPEARD_POKEMON_, pokemon_ptr_create("Squirtle", 7, 4)};
+		list_add(mensajes, unMensaje);
+		unMensaje = malloc(sizeof(mensaje));
+		*unMensaje = (mensaje) {APPEARD_POKEMON_, pokemon_ptr_create("Pikachu", 7, 4)};
+		list_add(mensajes, unMensaje);//
+
 //	mapa_mapear_objetivo(pokemonesRequeridos, pokemon_ptr_create("Squartle", 9, 2));
 //	team_planificar();
 //	team_hilo_entrenador();
 
+//	mapa_mapear_objetivo(pokemonesRequeridos, pokemon_ptr_create("Pichu", 1, 2));
+//	mapa_mapear_objetivo(pokemonesRequeridos, pokemon_ptr_create("Pikachu", 6, 7));
+//	mapa_mapear_objetivo(pokemonesRequeridos, pokemon_ptr_create("Bulbasaur", 1, 0));
+//	mapa_mapear_objetivo(pokemonesRequeridos, pokemon_ptr_create("Squartle", 9, 2));
+
+
+	puts("se inicio haymaspkm");
+	sem_init(&sem_HayMasPokemonesEnMapa, 0, 0);
+	puts("se inicio pokemonRemovido");
+	sem_init(&sem_PokemonRemovido, 0, 1);
+
+//	team_procesar_mensajes(mensajes);
+//	sem_post(&sem_HayMasPokemonesEnMapa);
+//	sem_post(&sem_HayMasPokemonesEnMapa);
+//	sem_post(&sem_HayMasPokemonesEnMapa);
+//	sem_post(&sem_HayMasPokemonesEnMapa);
+//	team_planificar();
+
+	pthread_t hiloProcesadorDeMensajes;
+	pthread_create(&hiloProcesadorDeMensajes, NULL, (void*)team_procesar_mensajes, mensajes);
+
 	int cantidadDeHilos=0;
 	pthread_t* hilosEntrenadores = inicializar_hilos_entrenadores(&cantidadDeHilos);
+
 	pthread_t hiloPlanificador;
 	pthread_create(&hiloPlanificador, NULL, (void*) team_planificar, NULL);
 
-	int i;
+	int i=0;
 	for(i=0; i<cantidadDeHilos; i++){
 		pthread_join(hilosEntrenadores[i], NULL);
 	}
 
 	pthread_join(hiloPlanificador, NULL);
-	log_info(event_logger, "chau team");
+//
+	pthread_join(hiloProcesadorDeMensajes, NULL);
+
+	sem_destroy(&sem_HayMasPokemonesEnMapa);
+
+	log_info(event_logger, "chau team\n****************************************");
+
+//	list_destroy(mensajes);
 
 	return team_exit(); //Destruye listas, cierra config, cierra log
 }

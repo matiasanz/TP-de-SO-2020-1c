@@ -14,9 +14,14 @@ mensaje recibir_mensaje() { //hacer que devuelva un mensaje generico de cada tip
 
 pokemon*desempaquetar_pokemon(void*empaquetado) {
 	//datos del pokemon hardcodeado TODO
-	pokemon* pkm = (pokemon*)malloc(sizeof(pokemon));
-	*pkm= pokemon_create("Pikachu", 3, 4);
-	return pkm;
+
+
+	return empaquetado? (pokemon*) empaquetado: NULL; //A ver si asi anda
+
+
+//	pokemon* pkm = (pokemon*)malloc(sizeof(pokemon));
+//	*pkm= pokemon_create("Pikachu", 3, 4);
+//	return pkm;
 }
 
 resultado_captura* desempaquetar_resultado(void*empaquetado) {
@@ -27,11 +32,34 @@ resultado_captura* desempaquetar_resultado(void*empaquetado) {
 
 void get(void* especiePokemon) {
 	//Envia mensaje al broker para ser replicado al gamecard
-	log_info(logger, ">> get(%s)\n", (especie_pokemon) especiePokemon);
+	printf("%s, ", (especie_pokemon) especiePokemon);
+//	log_info(event_logger, ">> get(%s)\n", (especie_pokemon) especiePokemon);
+}
+
+void get_pokemones(especies_pokemones pokemones){
+
+//	especies_pokemones getted = list_create();
+//
+//	bool is_getted(especie_pokemon unaEspecie){
+//
+//		bool repetido(especie_pokemon*otra){
+//			return especie_cmp(unaEspecie, otra);
+//		}
+//
+//		return list_any_satisfy(getted, (bool*) repetido);
+//	}
+//
+//	void getSinRepetidos(especie_pokemon unaEspecie){
+//		if(!is_getted(unaEspecie))
+//			get(unaEspecie);
+//	}
+
+	list_iterate(pokemones, get); puts("");
+	list_destroy(pokemones);
 }
 
 t_id catch(especie_pokemon especie) {
 	//Envia mensaje al broker para ser replicado al gamecard, devuelve el id del mensaje pendiente por recibir
-	log_info(logger, ">> catch(%s)\n", especie);
+	log_info(event_logger, ">> catch(%s)\n", especie);
 	return 1; //TODO
 }

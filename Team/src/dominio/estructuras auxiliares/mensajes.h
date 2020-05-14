@@ -29,6 +29,7 @@ resultado_captura* desempaquetar_resultado(void*empaquetado);
 //mensajes entre modulos
 mensaje recibir_mensaje();
 void get(void* especiePokemon);
+void get_pokemones(especies_pokemones);
 t_id catch(especie_pokemon); //momentaneamente (TODO) retorna el id del mensaje pendiente que crea
 							 //sin embargo, retorna tambien un booleano por medio del cual me avisa si se concreto la captura o no
 

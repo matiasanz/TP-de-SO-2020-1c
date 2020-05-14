@@ -34,6 +34,9 @@ mapa_pokemones mapa_create();
 //me guardo la posicion y la especie, solo si es la 1era vez que aparece
 void mapa_mapear_objetivo(mapa_pokemones, pokemon*);
 
+//Retorna true si la especie esta contenida en el mapa
+bool mapa_especie_mapeada(mapa_pokemones, especie_pokemon);
+
 //Retorna un puntero al 1er pokemon de la lista
 pokemon* mapa_first(mapa_pokemones);
 

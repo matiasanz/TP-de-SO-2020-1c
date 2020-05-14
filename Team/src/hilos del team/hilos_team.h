@@ -6,7 +6,8 @@
 //Semaforos
 
 //pthread_mutex =
-//sem_t unContador =
+sem_t sem_HayMasPokemonesEnMapa;
+sem_t sem_PokemonRemovido;
 
 //TODO definir aqui...
 

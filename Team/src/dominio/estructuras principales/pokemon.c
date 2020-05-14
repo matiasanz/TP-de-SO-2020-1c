@@ -48,13 +48,13 @@ bool pokemon_es_objetivo_de(pokemon unPokemon, entrenador unEntrenador){
 }
 
 bool es_objetivo_de_alguien(pokemon unPokemon, entrenadores unEquipo){
-	t_list* objetivos = entrenadores_objetivos_globales(unEquipo);
+	especies_pokemones objetivos = entrenadores_objetivos_globales(unEquipo);
 
 	bool esElMismo(void* unaEspecie){
 		return especie_cmp((especie_pokemon) unaEspecie, unPokemon.especie);
 	}
 
-	bool esObjetivo = list_any_satisfy(objetivos, (bool(*)(void*))&esElMismo);
+	bool esObjetivo = list_any_satisfy(objetivos, esElMismo);
 
 	list_destroy(objetivos);
 
@@ -83,19 +83,19 @@ mapa_pokemones mapa_create(){
 }
 
 void mapa_mapear_objetivo(mapa_pokemones unMapa, pokemon* objetivo){
-
-	bool distintaEspecieQue(pokemon* deLista){
-		return !pokemon_misma_especie(*objetivo, *deLista);
-	}
-
-	if(list_all_satisfy(unMapa, (bool(*)(void*))&distintaEspecieQue)){
-		list_add(unMapa, objetivo);
-		printf(" Se mapeo %s en la posicion (%d, %d)\n", objetivo->especie, objetivo->posicion.x, objetivo->posicion.y);
-	}
+	list_add(unMapa, objetivo);
 }
 
 pokemon*mapa_first(mapa_pokemones unMapa){
 	return list_get(unMapa, 0);
+}
+
+bool mapa_especie_mapeada(mapa_pokemones unMapa, especie_pokemon unaEspecie){
+	bool mismaEspecieQue(pokemon* deLista){
+		return especie_cmp(deLista->especie, unaEspecie);
+	}
+
+	return list_any_satisfy(unMapa, (bool(*)(void*))&mismaEspecieQue);
 }
 
 pokemon* mapa_desmapear(mapa_pokemones unMapa){

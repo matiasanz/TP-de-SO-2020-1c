@@ -9,17 +9,27 @@
 
 void team_planificar(){
 
+//	sem_init(&sem_HayMasPokemonesEnMapa, 0, 0); //por ahora esta en procesar mensajes
+
 	puts("se va a planificar");
-	int muchasVeces=10;
-	while(muchasVeces--){
-
+	int muchasVeces=1;
+	while(muchasVeces){
+		//A futuro, al capturar un pokemon se lo eliminara de los objs del entrenador, con lo cual pasaria a region critica
 		especies_pokemones objetivosGlobales = entrenadores_objetivos_globales(equipo);
-		list_iterate(objetivosGlobales, get);
-		list_destroy(objetivosGlobales);
+		get_pokemones(objetivosGlobales);
 
-		// wait(hayMasPokemonesEnMapa);
+		puts(">>> wait(hayMASPKM)");
+		sem_wait(&sem_HayMasPokemonesEnMapa);
 
+		sem_wait(&sem_PokemonRemovido);
 		pokemon*unPokemon = mapa_first(pokemonesRequeridos);
+
+		if(!unPokemon){
+			error_show("no hay mas pokemones");
+			break;
+		}
+
+
 		entrenadores_despertar_APPEARD(equipo, unPokemon);
 		sem_t* idProximoEntrenador = entrenadores_id_proximo_a_planificar(equipo); //TODO
 
@@ -28,8 +38,12 @@ void team_planificar(){
 			abort();
 		}
 
+		puts("\nsignal(id)");
+
 		sem_post(idProximoEntrenador); //signal(id);
 	}
+
+	puts("Se termino de planificar");
 }
 
 

@@ -30,6 +30,7 @@ void entrenador_ir_a(entrenador* unEntrenador, t_posicion posicionFinal){
 //	sleep(distancia*tiempoPorDistancia);// VER alternativas para sleep
 
 	unEntrenador->posicion = posicionFinal;
+//	log_info(logger, "El entrenador llego a la posicion (%u, %u)", unEntrenador->posicion.x, unEntrenador->posicion.y);
 }
 
 bool entrenador_llego_a(entrenador unEntrenador, t_posicion posicion){
@@ -42,6 +43,22 @@ bool entrenador_en_estado(entrenador* unEntrenador, t_estado ESTADO){
 
 bool entrenador_puede_cazar_mas_pokemones(entrenador unEntrenador){
 	return list_size(unEntrenador.objetivos) > list_size(unEntrenador.pokemonesCazados);
+}
+
+void entrenador_pasar_a(entrenador*unEntrenador, t_estado estado, const char*motivo){
+
+	unEntrenador->estado = estado;
+
+//	char*estadoFromEnum(){
+//		switch(estado)
+//		case NEW:       {return "NEW";}
+//		case READY:	    {return "Ready";}
+//		case EXIT:	    {return "Exit";}
+//		default:		{return "LOCKED";}
+//	}
+//
+//	char*unEstado = estado_from_enum(estado);
+//	log_info(logger, "Se paso el entrenador (id) a estado %s. Motivo: %s", estado, motivo);
 }
 
 void entrenador_bloquear_hasta_APPEARD(entrenador* unEntrenador){
@@ -62,6 +79,7 @@ void entrenador_bloquear_hasta_DEADLOCK(entrenador*unEntrenador){
 
 void entrenador_desbloquear(entrenador*unEntrenador){
 	unEntrenador->estado = READY;
+	puts("entrenador en ready");
 }
 
 void entrenador_destroy(entrenador* destruido){
@@ -77,19 +95,30 @@ entrenadores entrenadores_create(){
 	return list_create();
 }
 
-especies_pokemones entrenadores_objetivos_globales(entrenadores equipo){
+especies_pokemones entrenadores_objetivos_globales(entrenadores unEquipo){
 
 	especies_pokemones objetivosGlobales = list_create();
 
-	especies_pokemones objetivosPorEntrenador = list_map(equipo, (void*(*)(void*))&entrenador_objetivos);
+//	void agregarObjetivosSinRepetidos(especies_pokemones especies){
+//
+//		void agregarObjetivoSinRepetidos(especie_pokemon unaEspecie){
+//
+//			bool especieRepetida(especie_pokemon otraEspecie){
+//				return especie_cmp(unaEspecie,  otraEspecie);
+//			}
+//
+//			if(!list_find(objetivosGlobales, (bool*) especieRepetida))
+//				especies_agregar(objetivosGlobales, unaEspecie);
+//		}
+//
+//		list_iterate(especies, (void*) agregarObjetivoSinRepetidos);
+//	}
 
-	void agregarObjetivos(t_list*objetivosParticulares){
-		list_add_all(objetivosGlobales, objetivosParticulares);
+	void agregarObjetivos(entrenador*unEntrenador){
+		list_add_all(objetivosGlobales, entrenador_objetivos(unEntrenador));
 	}
 
-	list_iterate(objetivosPorEntrenador, (void(*)(void*))&agregarObjetivos);
-
-	list_destroy(objetivosPorEntrenador);
+	list_iterate(unEquipo, (void(*)(void*))&agregarObjetivos);
 
 	return objetivosGlobales;
 }
@@ -122,6 +151,7 @@ entrenador* entrenadores_proximo_a_planificar(entrenadores equipo){ //, pokemon)
 sem_t* entrenadores_id_proximo_a_planificar(entrenadores equipo){
 	entrenador*proximo = entrenadores_proximo_a_planificar(equipo);
 	if(!proximo){
+		printf("no encontre mas\n");
 		return NULL; //quiere decir que no hay entrenadores disponibles. Deadlock?
 	}
 
