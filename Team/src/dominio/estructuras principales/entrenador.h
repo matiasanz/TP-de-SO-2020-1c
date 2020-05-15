@@ -21,9 +21,9 @@ typedef struct Entrenador{
 } entrenador;
 
 //	Constructor; agregar lista infinita de objetivos
-	entrenador entrenador_create(especies_pokemones pokemonesEnInventario, especies_pokemones objetivos, t_posicion unaPos);
+	entrenador entrenador_create(t_id, especies_pokemones pokemonesEnInventario, especies_pokemones objetivos, t_posicion unaPos);
 
-	entrenador*entrenador_ptr_create(especies_pokemones pokemonesEnInventario, especies_pokemones objetivos, t_posicion);
+	entrenador*entrenador_ptr_create(t_id, especies_pokemones pokemonesEnInventario, especies_pokemones objetivos, t_posicion);
 
 //	Desplaza un entrenador de una posicion a otra
 	void entrenador_ir_a(entrenador*, t_posicion);
@@ -61,6 +61,9 @@ typedef t_list* entrenadores;
 
 //Constructor
 	entrenadores entrenadores_create();
+
+// Remueve al entrenador con ese id y retorna un puntero al mismo
+entrenador* entrenadores_remover_del_equipo_a(entrenadores, t_id);
 
 //retorna los objetivos de todos los entrenadores
 	especies_pokemones entrenadores_objetivos_globales(entrenadores);

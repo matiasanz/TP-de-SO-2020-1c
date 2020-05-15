@@ -16,7 +16,7 @@ pokemon*desempaquetar_pokemon(void*empaquetado) {
 	//datos del pokemon hardcodeado TODO
 
 
-	return empaquetado? (pokemon*) empaquetado: NULL; //A ver si asi anda
+	return (pokemon*) empaquetado; //A ver si asi anda
 
 
 //	pokemon* pkm = (pokemon*)malloc(sizeof(pokemon));
@@ -25,18 +25,20 @@ pokemon*desempaquetar_pokemon(void*empaquetado) {
 }
 
 resultado_captura* desempaquetar_resultado(void*empaquetado) {
-	resultado_captura* resultado_HARDCODEADO = (resultado_captura*)malloc(sizeof(resultado_captura));
-					 * resultado_HARDCODEADO = (resultado_captura) {1, true};
-	return resultado_HARDCODEADO; //TODO
+//		resultado_captura* resultado_HARDCODEADO = (resultado_captura*)malloc(sizeof(resultado_captura));
+//						 * resultado_HARDCODEADO = (resultado_captura) {1, true};
+//		return resultado_HARDCODEADO; //TODO
+
+	return (resultado_captura*) empaquetado;
 }
 
-void get(void* especiePokemon) {
+void Get(void* especiePokemon) {
 	//Envia mensaje al broker para ser replicado al gamecard
 	printf("get(%s), ", (especie_pokemon) especiePokemon);
 //	log_info(event_logger, ">> get(%s)\n", (especie_pokemon) especiePokemon);
 }
 
-void get_pokemones(especies_pokemones pokemones){
+void Get_pokemones(especies_pokemones pokemones){
 
 //	especies_pokemones getted = list_create();
 //
@@ -54,14 +56,14 @@ void get_pokemones(especies_pokemones pokemones){
 //			get(unaEspecie);
 //	}
 
-	list_iterate(pokemones, get); puts("");
+	list_iterate(pokemones, Get); puts("");
 	list_destroy(pokemones);
 }
 
 t_id unIDhardcodeado=0;
 
-t_id catch(especie_pokemon especie) {
+t_id Catch(especie_pokemon especie) {
 	//Envia mensaje al broker para ser replicado al gamecard, devuelve el id del mensaje pendiente por recibir
 	log_info(event_logger, ">> catch(%s)\n", especie);
-	return unIDhardcodeado++; //TODO
+	return ++unIDhardcodeado; //TODO
 }

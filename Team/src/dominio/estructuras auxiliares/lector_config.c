@@ -18,7 +18,7 @@ void entrenadores_cargar(entrenadores miEquipo){
 
 		t_posicion* posicion = list_remove(posiciones, 0);
 
-		entrenador* unEntrenador = entrenador_ptr_create(pokemonesEnInventario, objetivos, *posicion);
+		entrenador* unEntrenador = entrenador_ptr_create(i, pokemonesEnInventario, objetivos, *posicion);
 
 		list_add(miEquipo, unEntrenador);
 //		list_iterate(unEntrenador->objetivos, &get); //Ver TODO

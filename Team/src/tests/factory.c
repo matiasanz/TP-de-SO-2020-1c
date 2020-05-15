@@ -1,11 +1,11 @@
 #include "factory.h"
 #include <commons/string.h>
 
-entrenador entrenador_CREATE(t_list* especiesDePokemones, coordenada X, coordenada Y){
-	return entrenador_create(list_create(), especiesDePokemones, posicion_create(X,Y));
+entrenador entrenador_CREATE(t_list* objetivos, coordenada X, coordenada Y){
+	return entrenador_create(1, list_create(), objetivos, posicion_create(X,Y));
 }
 
-//unico objetivo "pucho", pos (1,2)
+//id = 1, unico objetivo "pucho", pos (1,2)
 entrenador*factory_entrenador_de_prueba() {
 	//datos del entrenador hardcodeado TODO
 	t_list*objetivos = list_create();

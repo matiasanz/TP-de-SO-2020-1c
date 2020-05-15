@@ -7,7 +7,7 @@
 //constructor simplificado de entrenador
 entrenador entrenador_CREATE(t_list* especiesObjetivos, coordenada X, coordenada Y);
 
-//entrenador con 1 objetivo "pucho"
+//entrenador id 1 con 1 objetivo "pucho"
 entrenador*factory_entrenador_de_prueba();
 
 //hacer entrenador con n objetivos, que reciba las especies

@@ -16,19 +16,22 @@ void procesar_APPEARD(pokemon*);
 void team_procesar_mensajes(t_list* mensajesRecibidos) {
 
 while(1){
+	puts("Se espera mensaje");
+	sem_wait(&sem_HayMensajesRecibidos);
 	//recibo mesaje
 	mensaje* mensajeRecibido = list_remove(mensajesRecibidos, 0);//recibir_mensaje();
-
+	puts("Se recibio mensaje");
 	if(!mensajeRecibido){
-		puts("No hay mas mensajes");
-		break; //		exit(0);
+		error_show("Se intento leer un mensaje inexistente");
+		exit(1);
 	}
 
 	switch(mensajeRecibido->opcode){
 
 		case LOCALIZED_POKEMON_: ; //VER TODO por que no le gusta
-			log_info(logger, "Se recibio pokemon localizado");
 			pokemon* unPokemon = desempaquetar_pokemon(mensajeRecibido->serializado);
+
+			log_info(logger, "Se recibio LOCALIZED");
 
 			if(especie_recibida_con_anterioridad(unPokemon->especie, historialDePokemones)){
 				printf("%s: figurita repetida se descarta\n", unPokemon->especie);
@@ -42,24 +45,24 @@ while(1){
 			/*no break*/
 
 		case APPEARD_POKEMON_: {
-//			log_info(logger, "Se recibio pokemon localizado"); //Ver TODO si pokemon localized hace esto. Ver como saltear esta parte.
-
 			pokemon* unPokemon = desempaquetar_pokemon(mensajeRecibido->serializado);
 
-			procesar_APPEARD(unPokemon);
+			log_info(logger, "Se recibio APPEARD %s [%u] [%u]", unPokemon->especie, unPokemon->posicion.x, unPokemon->posicion.y); //Ver TODO si pokemon localized hace esto. Ver como saltear esta parte.
+
+			procesar_APPEARD(unPokemon); //Ver si pasar a localized
 
 			break;
 		}
 
 		case CAUGHT_POKEMON_:{
-			log_info(logger, "Se recibio pokemon atrapado");
+			log_info(logger, "Se recibio mensaje CAUGHT");
 			resultado_captura* resultado = desempaquetar_resultado(mensajeRecibido->serializado);
 
 			pendiente* mensajePendiente = pendiente_get(mensajesPendientes, resultado->idCaptura);
 
 			if(!mensajePendiente){
-				error_show("Se recibio un resultado con id desconocido");
-				exit(1);
+				error_show("Se recibio un resultado con id %u desconocido\n", resultado->idCaptura);
+				break; //exit(1);
 			}
 
 			entrenador* unEntrenador = mensajePendiente->cazador;
@@ -76,7 +79,6 @@ while(1){
 
 				else if(list_is_empty(unEntrenador->objetivos)){ //abstraer a mensaje objetivos cumplidos
 						entrenador_pasar_a(unEntrenador, EXIT, "Ya logro cumplir sus objetivos");
-						entrenador_destroy(unEntrenador);//	entrenador_pasar_a_estado(EXIT);
 				}
 
 				else{
@@ -99,6 +101,7 @@ while(1){
 			exit(1);
 	}
 
+	free(mensajeRecibido);
 }
 
 }

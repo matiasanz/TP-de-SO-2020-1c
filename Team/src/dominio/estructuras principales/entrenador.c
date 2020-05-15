@@ -4,16 +4,16 @@
 
 
 //Constructor Entrenador
-entrenador entrenador_create(t_list* pokemonesEnInventario, t_list*objetivos, t_posicion unaPos){
-	entrenador nuevo = (entrenador) {objetivos, pokemonesEnInventario, unaPos, NEW};
+entrenador entrenador_create(t_id id, t_list* pokemonesEnInventario, t_list*objetivos, t_posicion unaPos){
+	entrenador nuevo = (entrenador) {objetivos, pokemonesEnInventario, unaPos, NEW, id};
 //	nuevo.SEMAFORO_IDENTIFICADOR = malloc(sizeof(sem_t));
 //	sem_init(nuevo.SEMAFORO_IDENTIFICADOR, 0, 0);
 	return nuevo;
 }
 
-entrenador*entrenador_ptr_create(t_list* pokemonesEnInventario, t_list*objetivos, t_posicion unaPos){
+entrenador*entrenador_ptr_create(t_id id, t_list* pokemonesEnInventario, t_list*objetivos, t_posicion unaPos){
 	entrenador*nuevo = malloc(sizeof(entrenador));
-	*nuevo = entrenador_create(pokemonesEnInventario, objetivos, unaPos);
+	*nuevo = entrenador_create(id, pokemonesEnInventario, objetivos, unaPos);
 	return nuevo;
 }
 
@@ -27,10 +27,12 @@ void entrenador_ir_a(entrenador* unEntrenador, t_posicion posicionFinal){
 
 //	numero distancia = posicion_distancia(unEntrenador->posicion, posicionFinal);
 
-//	sleep(distancia*tiempoPorDistancia);// VER alternativas para sleep
+//	pthread_mutex_t bloqueado;
+//	pthread_mutex_init(&bloqueado, ...); //Duda, vale la pena?
+//	sleep(distancia*tiempoPorDistancia);// VER alternativas para sleep... o un mutex?
 
 	unEntrenador->posicion = posicionFinal;
-	log_info(logger, "El entrenador llego a la posicion (%u, %u)", unEntrenador->posicion.x, unEntrenador->posicion.y);
+	log_info(logger, "El Entrenador N°%u se desplazo hasta [%u] [%u]", unEntrenador->id, unEntrenador->posicion.x, unEntrenador->posicion.y);
 }
 
 bool entrenador_llego_a(entrenador unEntrenador, t_posicion posicion){
@@ -48,9 +50,9 @@ bool entrenador_puede_cazar_mas_pokemones(entrenador unEntrenador){
 char*estadoFromEnum(t_estado unEstado){
 	switch(unEstado){
 		case NEW:       {return "NEW";}
-		case READY:	    {return "Ready";}
-		case EXIT:	    {return "Exit";}
-		case EXECUTE:	{return "Execute";}
+		case READY:	    {return "READY";}
+		case EXIT:	    {return "EXIT";}
+		case EXECUTE:	{return "EXECUTE";}
 		default:		{return "LOCKED";}
 	}
 }
@@ -59,8 +61,9 @@ char*estadoFromEnum(t_estado unEstado){
 void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const char*motivo){
 	char*estadoActual = estadoFromEnum(unEntrenador->estado);
 	unEntrenador->estado = estadoFinal;
-	log_info(logger, "Se paso al Entrenador N°%u de la cola de %s a %s\n"
-	">>>>>>>>>>>>>>>>>>>>>>>>>> Motivo: %s", unEntrenador->id, estadoActual, estadoFromEnum(estadoFinal), motivo);
+	log_info(logger, "El Entrenador N°%u se paso de la cola de %s a %s, Motivo: %s", unEntrenador->id, estadoActual, estadoFromEnum(estadoFinal), motivo);
+
+	if(estadoFinal==EXIT) entrenador_destroy(unEntrenador);
 }
 
 void entrenador_bloquear_hasta_APPEARD(entrenador* unEntrenador){
@@ -95,6 +98,13 @@ void entrenador_destroy(entrenador* destruido){
 //Constructor de equipo
 entrenadores entrenadores_create(){
 	return list_create();
+}
+
+entrenador* entrenadores_remover_del_equipo_a(entrenadores unEquipo, t_id id){
+	bool entrenador_cmpId(void*unEntrenador){
+		return id == ((entrenador*)unEntrenador)->id;
+	}
+	return list_remove_by_condition(unEquipo, &entrenador_cmpId);
 }
 
 especies_pokemones entrenadores_objetivos_globales(entrenadores unEquipo){

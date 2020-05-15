@@ -11,36 +11,38 @@ void team_planificar(){
 
 //	sem_init(&sem_HayMasPokemonesEnMapa, 0, 0); //por ahora esta en procesar mensajes
 
-	puts("se va a planificar");
+	puts("**********************************************\nSe va a planificar");
 	int muchasVeces=1;
 	while(muchasVeces){
 		//A futuro, al capturar un pokemon se lo eliminara de los objs del entrenador, con lo cual pasaria a region critica
 		especies_pokemones objetivosGlobales = entrenadores_objetivos_globales(equipo);
-		get_pokemones(objetivosGlobales);
+		Get_pokemones(objetivosGlobales);
 
-		puts(">>> wait(hay mas pokemones)");
+		puts(">>>Planificar: wait(hay mas pokemones)");
 		sem_wait(&sem_HayMasPokemonesEnMapa);
 
+		puts(">>>Planificar: wait(pokemon removido)");
 		sem_wait(&sem_PokemonRemovido);
 		pokemon*unPokemon = mapa_first(pokemonesRequeridos);
 
 		if(!unPokemon){
-			error_show("no hay mas pokemones\n");
-			break;
+			error_show("Se intento remover un pokemon inexistente\n");
+			exit(1);
 		}
-
 
 		entrenadores_despertar_APPEARD(equipo, unPokemon);
 		t_id* idProximoEntrenador = entrenadores_id_proximo_a_planificar(equipo); //TODO
 
-		if(!idProximoEntrenador){
-			error_show("no hay entrenadores en ready\n");
-			abort();
+		if(idProximoEntrenador){
+			printf(">>>signal(Entrenador N°%u)\n", *idProximoEntrenador);
+			sem_post(&sem_Entrenador[*idProximoEntrenador]); //signal(id);
 		}
 
-		printf("signal(%u)\n", *idProximoEntrenador);
+		else if(list_is_empty(equipo)){
+			puts("Todos los entrenadores en EXIT");
+			break;
+		}
 
-		sem_post(&sem_Entrenador[*idProximoEntrenador]); //signal(id);
 	}
 
 	log_info(event_logger, "Se termino de planificar");
@@ -87,7 +89,7 @@ void MODELO_PLANIFICAR(){
 		}
 
 	entrenador_ir_a(unEntrenador, unPokemon->posicion);
-	t_id id_mensaje_pendiente = catch(unPokemon->especie);
+	t_id id_mensaje_pendiente = Catch(unPokemon->especie);
 
 	agregar_pendiente(mensajesPendientes, id_mensaje_pendiente, unEntrenador, unPokemon);
 
