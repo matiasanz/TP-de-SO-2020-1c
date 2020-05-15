@@ -40,6 +40,8 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 			}
 		}
 	}
+
+	log_info(event_logger, "Finalizo un hilo entrenador");
 }
 
 pthread_t* inicializar_hilos_entrenadores(int*cantidadEntrenadores){

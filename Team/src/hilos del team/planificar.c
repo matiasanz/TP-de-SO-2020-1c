@@ -7,6 +7,10 @@
 
 //*******************************************************************
 
+/*TODO
+ * No frena nunca
+ */
+
 void team_planificar(){
 
 //	sem_init(&sem_HayMasPokemonesEnMapa, 0, 0); //por ahora esta en procesar mensajes
@@ -26,7 +30,7 @@ void team_planificar(){
 		pokemon*unPokemon = mapa_first(pokemonesRequeridos);
 
 		if(!unPokemon){
-			error_show("Se intento remover un pokemon inexistente\n");
+			error_show("Se intento leer un pokemon inexistente\n");
 			exit(1);
 		}
 
@@ -34,7 +38,7 @@ void team_planificar(){
 		t_id* idProximoEntrenador = entrenadores_id_proximo_a_planificar(equipo); //TODO
 
 		if(idProximoEntrenador){
-			printf(">>>signal(Entrenador N°%u)\n", *idProximoEntrenador);
+			printf(">>>Planificar: signal(Entrenador N°%u)\n", *idProximoEntrenador);
 			sem_post(&sem_Entrenador[*idProximoEntrenador]); //signal(id);
 		}
 
@@ -45,7 +49,7 @@ void team_planificar(){
 
 	}
 
-	log_info(event_logger, "Se termino de planificar");
+	log_info(event_logger, "Se finalizo hilo de planificacion");
 }
 
 

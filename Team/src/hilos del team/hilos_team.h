@@ -15,6 +15,9 @@ sem_t* sem_Entrenador;
 
 //TODO definir aqui...
 
+//Variables globales (?)
+bool estoyLeyendo;
+
 /*----------------*/
 
 //Hilo correspondiente a un entrenador

@@ -12,15 +12,18 @@
 
 void procesar_APPEARD(pokemon*);
 
+bool entrenadores_dan_seniales_de_vida(entrenadores unEquipo){
+	return !list_is_empty(unEquipo);
+}
 
 void team_procesar_mensajes(t_list* mensajesRecibidos) {
 
-while(1){
-	puts("Se espera mensaje");
+while(entrenadores_dan_seniales_de_vida(equipo)){
+	puts("Casilla: espera mensajes");
 	sem_wait(&sem_HayMensajesRecibidos);
 	//recibo mesaje
 	mensaje* mensajeRecibido = list_remove(mensajesRecibidos, 0);//recibir_mensaje();
-	puts("Se recibio mensaje");
+
 	if(!mensajeRecibido){
 		error_show("Se intento leer un mensaje inexistente");
 		exit(1);
@@ -31,7 +34,7 @@ while(1){
 		case LOCALIZED_POKEMON_: ; //VER TODO por que no le gusta
 			pokemon* unPokemon = desempaquetar_pokemon(mensajeRecibido->serializado);
 
-			log_info(logger, "Se recibio LOCALIZED");
+			log_info(logger, "LOCALIZED %s", unPokemon->especie); //Agregar lista infinita de posiciones
 
 			if(especie_recibida_con_anterioridad(unPokemon->especie, historialDePokemones)){
 				printf("%s: figurita repetida se descarta\n", unPokemon->especie);
@@ -47,7 +50,7 @@ while(1){
 		case APPEARD_POKEMON_: {
 			pokemon* unPokemon = desempaquetar_pokemon(mensajeRecibido->serializado);
 
-			log_info(logger, "Se recibio APPEARD %s [%u] [%u]", unPokemon->especie, unPokemon->posicion.x, unPokemon->posicion.y); //Ver TODO si pokemon localized hace esto. Ver como saltear esta parte.
+			log_info(logger, "APPEARD %s [%u] [%u]", unPokemon->especie, unPokemon->posicion.x, unPokemon->posicion.y); //Ver TODO si pokemon localized hace esto. Ver como saltear esta parte.
 
 			procesar_APPEARD(unPokemon); //Ver si pasar a localized
 
@@ -104,7 +107,12 @@ while(1){
 	free(mensajeRecibido);
 }
 
+	log_info(event_logger, "Finalizo el procesamiento de mensajes");
+	estoyLeyendo=false; //Provisorio
+
 }
+
+//**********************************************************************************************
 
 void procesar_APPEARD(pokemon*unPokemon){
 
