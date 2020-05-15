@@ -1,5 +1,6 @@
 #include <commons/string.h>
 #include "entrenador.h"
+#include "pokemon.h"
 #include "../estructuras auxiliares/mensajes.h" //si en header rompe
 
 
@@ -19,6 +20,20 @@ entrenador*entrenador_ptr_create(t_id id, t_list* pokemonesEnInventario, t_list*
 
 t_list*entrenador_objetivos(entrenador*unEntrenador){
 	return unEntrenador->objetivos;
+}
+
+bool entrenador_objetivos_cumplidos(entrenador*unEntrenador){
+
+	bool seCumplio(void* unaEspecie){
+
+		bool mismaEspecie(void* deLista){
+			return especie_cmp((especie_pokemon)unaEspecie, (especie_pokemon)deLista);
+		}
+
+		return list_any_satisfy(unEntrenador->pokemonesCazados, &mismaEspecie);
+	}
+
+	return list_all_satisfy(unEntrenador->objetivos, &seCumplio);
 }
 
 void entrenador_ir_a(entrenador* unEntrenador, t_posicion posicionFinal){
@@ -180,6 +195,14 @@ entrenadores entrenadores_en_estado(entrenadores equipo, t_estado unEstado){
 	return list_filter(equipo, &esta_en_estado);
 }
 
+void entrenadores_bloquear_por_captura(entrenadores unEquipo){
+
+	void sacar_de_execute(entrenador*unEntrenador){
+		if(entrenador_en_estado(unEntrenador, EXECUTE)) entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARD, "Se ejecutara a otro entrenador");
+	}
+
+	list_iterate(unEquipo, (void(*)(void*)) &sacar_de_execute);
+}
 
 //Destructor de equipo
 void entrenadores_destroy(entrenadores equipo){

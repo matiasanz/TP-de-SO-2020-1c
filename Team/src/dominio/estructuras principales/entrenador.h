@@ -34,6 +34,9 @@ typedef struct Entrenador{
 // Retorna true si la cantidad de pokemones cazados no supera la cantidad permitida para ese entrenador
 	bool entrenador_puede_cazar_mas_pokemones(entrenador);
 
+// Retorna true si todos los objetivos fueron cazados
+	bool entrenador_objetivos_cumplidos(entrenador*);
+
 // Retorna true si el entrenador se encuentra actualmente en dicho estado
 	bool entrenador_en_estado(entrenador* unEntrenador, t_estado ESTADO);
 
@@ -78,6 +81,9 @@ entrenador* entrenadores_remover_del_equipo_a(entrenadores, t_id);
 	t_id* entrenadores_id_proximo_a_planificar(entrenadores equipo);
 //Retorna los entrenadores que se encuentran en un estado
 	entrenadores entrenadores_en_estado(entrenadores, t_estado estado);
+
+//Pasa al entrenador que se este ejecutando a LOCKED hasta APPEARD
+	void entrenadores_bloquear_por_captura(entrenadores);
 
 //Destructor
 	void entrenadores_destroy(entrenadores);

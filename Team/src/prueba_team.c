@@ -45,6 +45,10 @@ int main(void) {
 		pthread_join(hilosEntrenadores[i], NULL);
 	}
 
+	FinDelProceso = true;
+
+	//Matar planificador
+
 	pthread_join(hiloPlanificador, NULL);
 
 	pthread_join(hiloProcesadorDeMensajes, NULL);
@@ -87,6 +91,8 @@ void team_inicializar(){
 		error_show("algo malio sal en el inicio :(");
 		exit(1);
 	}
+
+	FinDelProceso = false; //flag para hilos
 }
 
 

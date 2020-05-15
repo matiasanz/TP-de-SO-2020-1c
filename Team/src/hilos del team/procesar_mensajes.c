@@ -18,7 +18,7 @@ bool entrenadores_dan_seniales_de_vida(entrenadores unEquipo){
 
 void team_procesar_mensajes(t_list* mensajesRecibidos) {
 
-while(entrenadores_dan_seniales_de_vida(equipo)){
+while(!FinDelProceso){
 	puts("Casilla: espera mensajes");
 	sem_wait(&sem_HayMensajesRecibidos);
 	//recibo mesaje
@@ -31,21 +31,24 @@ while(entrenadores_dan_seniales_de_vida(equipo)){
 
 	switch(mensajeRecibido->opcode){
 
-		case LOCALIZED_POKEMON_: ; //VER TODO por que no le gusta
-			pokemon* unPokemon = desempaquetar_pokemon(mensajeRecibido->serializado);
+//		case LOCALIZED_POKEMON_: ; //TODO funcion tal que yo pueda iterar lista de posiciones creando pokemones y repitiendo procedimiento APPEARD
+//			pokemon* unPokemon = desempaquetar_pokemon(mensajeRecibido->serializado);
+//
+//			log_info(logger, "LOCALIZED %s", unPokemon->especie); //Agregar lista infinita de posiciones
+//
+//			if(especie_recibida_con_anterioridad(unPokemon->especie, historialDePokemones)){
+//				printf("%s: figurita repetida se descarta\n", unPokemon->especie);
+//				pokemon_destroy(unPokemon);
+//			}
 
-			log_info(logger, "LOCALIZED %s", unPokemon->especie); //Agregar lista infinita de posiciones
-
-			if(especie_recibida_con_anterioridad(unPokemon->especie, historialDePokemones)){
-				printf("%s: figurita repetida se descarta\n", unPokemon->especie);
-				pokemon_destroy(unPokemon);
-				break;
-			}
-
-			mensajeRecibido->opcode = APPEARD_POKEMON_;
-			list_add_in_index(mensajesRecibidos, 0, mensajeRecibido);
-
-			/*no break*/
+//			else{
+//
+//
+//				mensajeRecibido->opcode = APPEARD_POKEMON_;
+//				list_add_in_index(mensajesRecibidos, 0, mensajeRecibido);
+//			}
+//
+//			break;
 
 		case APPEARD_POKEMON_: {
 			pokemon* unPokemon = desempaquetar_pokemon(mensajeRecibido->serializado);
@@ -58,7 +61,6 @@ while(entrenadores_dan_seniales_de_vida(equipo)){
 		}
 
 		case CAUGHT_POKEMON_:{
-			log_info(logger, "Se recibio mensaje CAUGHT");
 			resultado_captura* resultado = desempaquetar_resultado(mensajeRecibido->serializado);
 
 			pendiente* mensajePendiente = pendiente_get(mensajesPendientes, resultado->idCaptura);
@@ -71,7 +73,13 @@ while(entrenadores_dan_seniales_de_vida(equipo)){
 			entrenador* unEntrenador = mensajePendiente->cazador;
 			pokemon*pokemonCatcheado = mensajePendiente->pokemonCatcheado;
 
+			log_info(logger, "CAUGHT %s: %s", pokemonCatcheado->especie, (resultado->tuvoExito? "Exitoso": "Fallido"));
+
 			if(resultado->tuvoExito){
+				//Ver si mutex
+				entrenadores_bloquear_por_captura(equipo);//TODO solamente cambia un atributo. Eventualmente podrian ejecutarse simultaneamente 2 entrenadores. Tendria que guardarme al ultimo en execute y despues devolverlo
+				entrenador_pasar_a(unEntrenador, EXECUTE, "Se confirmo la captura del pokemon");
+
 				entrenador_capturar(unEntrenador, pokemonCatcheado); //TODO
 
 				//VER TODO muchos if anidados
@@ -80,7 +88,7 @@ while(entrenadores_dan_seniales_de_vida(equipo)){
 					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARD, "Tuvo exito en la captura y todavia puede cazar mas pokemones");
 				}
 
-				else if(list_is_empty(unEntrenador->objetivos)){ //abstraer a mensaje objetivos cumplidos
+				else if(entrenador_objetivos_cumplidos(unEntrenador)){ //abstraer a mensaje objetivos cumplidos
 						entrenador_pasar_a(unEntrenador, EXIT, "Ya logro cumplir sus objetivos");
 				}
 
@@ -108,8 +116,6 @@ while(entrenadores_dan_seniales_de_vida(equipo)){
 }
 
 	log_info(event_logger, "Finalizo el procesamiento de mensajes");
-	estoyLeyendo=false; //Provisorio
-
 }
 
 //**********************************************************************************************

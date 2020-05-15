@@ -5,9 +5,8 @@ void team_recibir_mensajes(t_list* mensajes){
 	puts("Simulacro de recepcion de mensajes");
 
 	int i;
-	estoyLeyendo=true;
 
-	for(i=0; estoyLeyendo; i= (i+1)%6){
+	for(i=0; !FinDelProceso; i= (i+1)%6){
 
 		mensaje* unMensaje = malloc(sizeof(mensaje));
 

@@ -42,7 +42,7 @@ void team_planificar(){
 			sem_post(&sem_Entrenador[*idProximoEntrenador]); //signal(id);
 		}
 
-		else if(list_is_empty(equipo)){
+		else if(FinDelProceso){
 			puts("Todos los entrenadores en EXIT");
 			break;
 		}
