@@ -9,7 +9,11 @@
 #include <commons/log.h>
 #include <commons/config.h>
 
+t_config* config;
+t_log* logger;
+t_log* event_logger;
 
+void inicializar(void);
 
 
 #endif
