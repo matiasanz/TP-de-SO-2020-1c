@@ -34,7 +34,7 @@ void team_planificar(){
 			exit(1);
 		}
 
-		entrenadores_despertar_APPEARD(equipo, unPokemon);
+		/*equipoReady =*/entrenadores_despertar_APPEARD(equipo, unPokemon);
 		t_id* idProximoEntrenador = entrenadores_id_proximo_a_planificar(equipo); //TODO
 
 		if(idProximoEntrenador){
@@ -95,7 +95,7 @@ void MODELO_PLANIFICAR(){
 	entrenador_ir_a(unEntrenador, unPokemon->posicion);
 	t_id id_mensaje_pendiente = Catch(unPokemon->especie);
 
-	agregar_pendiente(mensajesPendientes, id_mensaje_pendiente, unEntrenador, unPokemon);
+	agregar_pendiente(capturasPendientes, id_mensaje_pendiente, unEntrenador, unPokemon);
 
 	entrenador_bloquear_hasta_APPEARD(unEntrenador);// pasa a LOCKED
 }

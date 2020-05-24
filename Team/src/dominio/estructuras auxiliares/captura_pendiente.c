@@ -48,7 +48,7 @@ pendiente* pendiente_get(pendientes mensajesPendientes, t_id idRespuesta){
 	return mensaje;
 }
 
-t_id DAME_UN_IDEEEEEEEEEEiEEEEEEEEEEEEEEEEEEEiEEEEEEEEEEEEEEEiEEEEEEEEEEEEEE(){
+t_id idProximoPendienteHARDCODEADO(){
 	return ME_TENGO_QUE_ACORDAR_DE_BORRAR_ESTO;
 }
 

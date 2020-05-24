@@ -6,18 +6,19 @@
 
 typedef char* especie_pokemon;
 typedef t_list* especies_pokemones;
-
+typedef t_dictionary recursos;
 
 typedef enum{NEW,READY,	EXECUTE, LOCKED_HASTA_APPEARD, LOCKED_HASTA_DEADLOCK, LOCKED_HASTA_CAUGHT,	EXIT} t_estado; //VER cuales vale la pena conservar
+typedef enum{CATCHEAR, CAPTURAR, DEADLOCK} t_objetivo;
 
 //TAD Entrenador
-typedef struct Entrenador{
+typedef struct pcb_Entrenador{
 	especies_pokemones objetivos; //especie de los pokemones
 	especies_pokemones pokemonesCazados;
 	t_posicion posicion; //(x,y)
 	t_estado estado;
 	t_id id;
-//	sem_t* SEMAFORO_IDENTIFICADOR;
+	t_objetivo objetivoActual;
 } entrenador;
 
 //	Constructor; agregar lista infinita de objetivos

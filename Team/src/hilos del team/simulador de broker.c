@@ -27,15 +27,18 @@ void team_recibir_mensajes(t_list* mensajes){
 			}
 
 			case 3:{
-				if(!list_is_empty(mensajesPendientes)){
+//				pthread_mutex_lock(&mutexCapturasPendientes);
+				if(!list_is_empty(capturasPendientes)){
+//					pthread_mutex_unlock(&mutexCapturasPendientes);
 
-					t_id unid = DAME_UN_IDEEEEEEEEEEiEEEEEEEEEEEEEEEEEEEiEEEEEEEEEEEEEEEiEEEEEEEEEEEEEE();
+					t_id unid = idProximoPendienteHARDCODEADO();
 
 					resultado_captura*unResultado = malloc(sizeof(resultado_captura));
 					*unResultado = (resultado_captura){unid, true};
 					*unMensaje = (mensaje) {CAUGHT_POKEMON_, unResultado};
 				}
 				else{
+//					pthread_mutex_unlock(&mutexCapturasPendientes);
 					*unMensaje = (mensaje) {APPEARD_POKEMON_, pokemon_ptr_create("Bulbasaur", 3, 1)};
 				}
 
@@ -53,7 +56,12 @@ void team_recibir_mensajes(t_list* mensajes){
 			}
 		}
 
+		puts("W(mutexMensaje)");
+	pthread_mutex_lock(&mutexMensaje);
 		list_add(mensajes, unMensaje);
+	pthread_mutex_unlock(&mutexMensaje);
+		puts("Signal(mutexMensaje)");
+
 		sem_post(&sem_HayMensajesRecibidos);
 		puts("Signal(mensaje hay mas mensajes)");
 		sleep(1);
@@ -62,3 +70,8 @@ void team_recibir_mensajes(t_list* mensajes){
 
 	log_info(event_logger, "Finalizo hilo receptor de mensajes");
 }
+
+//void reconexion_con_broker(){ //Gustavo
+//	log_info(logger,"Inicio de proceso de reintento de comunicacion con Broker");
+//	//TODO
+//}

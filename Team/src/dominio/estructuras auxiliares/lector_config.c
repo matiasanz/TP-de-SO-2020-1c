@@ -23,7 +23,7 @@ void entrenadores_cargar(entrenadores miEquipo){
 		list_add(miEquipo, unEntrenador);
 //		list_iterate(unEntrenador->objetivos, &get); //Ver TODO
 
-		printf("Se agrego un entrenador en (%u, %u) con objetivos:", unEntrenador->posicion.x, unEntrenador->posicion.y);
+		printf("Se agrego un entrenador en (%u, %u) con objetivos:", unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
 
 		list_iterate(unEntrenador->objetivos, (void(*)(void*))&printf);
 
@@ -94,6 +94,7 @@ especies_pokemones especies_from_string(char*cadena){
 //    }
 
     free(tokens);
+//    string_array_destroy(tokens);
 
     return especies;
 }
@@ -121,6 +122,10 @@ especies_pokemones especies_from_string(char*cadena){
 //***************************************************************
 
 void string_array_destroy(char**stringArray){
+//	int i;
+//	for(i=0; stringArray[i]!=NULL; i++){
+//		free(stringArray[i]);
+//	}
 
 	void string_destroy(char*cadena_en_heap){ //solo para elementos de un arr de string
 		free(cadena_en_heap);

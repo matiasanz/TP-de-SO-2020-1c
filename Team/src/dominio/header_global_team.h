@@ -13,6 +13,7 @@
 //#include <commons/string.h> //no deja correr tests en cspec (palabra reservada end)
 #include <commons/error.h>
 #include <commons/collections/list.h>
+#include <commons/collections/dictionary.h>
 #include <commons/log.h>
 #include <commons/config.h>
 

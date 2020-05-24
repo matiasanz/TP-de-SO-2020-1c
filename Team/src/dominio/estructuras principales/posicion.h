@@ -6,8 +6,8 @@
 typedef numero coordenada;
 
 typedef struct T_posicion{
-	coordenada x;
-	coordenada y;
+	coordenada pos_x;
+	coordenada pos_y;
 } t_posicion;
 
 //crea en nueva posicion un array de coordenadas {x,y}

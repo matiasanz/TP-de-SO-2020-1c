@@ -26,7 +26,8 @@ void subscribpcion_colas();
 /*Mis Listas (son variables globales, para que puedan acceder todos los hilos)*/
 	entrenadores equipo;
 	mapa_pokemones pokemonesRequeridos;
-	pendientes mensajesPendientes;
+	recursos objetivosGlobales; //Para deadlock TODO (VER a futuro)
+	pendientes capturasPendientes;
 	especies_pokemones historialDePokemones;
 /*--------------*/
 

@@ -5,13 +5,25 @@
 
 #include <commons/collections/list.h>
 
+//Hilos
+pthread_t hiloReceptorDeMensajes;
+pthread_t hiloProcesadorDeMensajes;
+
+pthread_t hiloPlanificador;
+
+
 //Semaforos
 
-//pthread_mutex =
 sem_t sem_HayMensajesRecibidos;
 sem_t sem_HayMasPokemonesEnMapa;
 sem_t sem_PokemonRemovido;
 sem_t* sem_Entrenador;
+
+pthread_mutex_t mutexMensaje;
+pthread_mutex_t mutexMapaPokemones;
+pthread_mutex_t mutexCapturasPendientes;
+pthread_mutex_t mutexFinDeProceso;
+pthread_mutex_t*mutexEntrenador;
 
 //TODO definir aqui...
 

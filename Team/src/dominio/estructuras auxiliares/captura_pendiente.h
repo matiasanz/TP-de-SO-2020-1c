@@ -36,7 +36,7 @@ typedef t_list* pendientes;
 
 //	Si alguien lee esto... no digan como vivo
 //	Retorna el id de una captura pendiente si encuentra y sino -1
-	t_id DAME_UN_IDEEEEEEEEEEiEEEEEEEEEEEEEEEEEEEiEEEEEEEEEEEEEEEiEEEEEEEEEEEEEE();
+	t_id idProximoPendienteHARDCODEADO();
 
 
 #endif

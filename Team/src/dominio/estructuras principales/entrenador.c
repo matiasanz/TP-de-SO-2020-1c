@@ -6,9 +6,8 @@
 
 //Constructor Entrenador
 entrenador entrenador_create(t_id id, t_list* pokemonesEnInventario, t_list*objetivos, t_posicion unaPos){
-	entrenador nuevo = (entrenador) {objetivos, pokemonesEnInventario, unaPos, NEW, id};
-//	nuevo.SEMAFORO_IDENTIFICADOR = malloc(sizeof(sem_t));
-//	sem_init(nuevo.SEMAFORO_IDENTIFICADOR, 0, 0);
+	entrenador nuevo = (entrenador) {objetivos, pokemonesEnInventario, unaPos, NEW, id, CATCHEAR};
+	nuevo.objetivoActual = CATCHEAR; //determinarSiguienteObjetivo(entrenador);
 	return nuevo;
 }
 
@@ -47,7 +46,7 @@ void entrenador_ir_a(entrenador* unEntrenador, t_posicion posicionFinal){
 //	sleep(distancia*tiempoPorDistancia);// VER alternativas para sleep... o un mutex?
 
 	unEntrenador->posicion = posicionFinal;
-	log_info(logger, "El Entrenador N°%u se desplazo hasta [%u] [%u]", unEntrenador->id, unEntrenador->posicion.x, unEntrenador->posicion.y);
+	log_info(logger, "El Entrenador N°%u se desplazo hasta [%u] [%u]", unEntrenador->id, unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
 }
 
 bool entrenador_llego_a(entrenador unEntrenador, t_posicion posicion){
@@ -116,10 +115,10 @@ entrenadores entrenadores_create(){
 }
 
 entrenador* entrenadores_remover_del_equipo_a(entrenadores unEquipo, t_id id){
-	bool entrenador_cmpId(void*unEntrenador){
-		return id == ((entrenador*)unEntrenador)->id;
+	bool entrenador_cmpId(entrenador*unEntrenador){
+		return id == unEntrenador->id;
 	}
-	return list_remove_by_condition(unEquipo, &entrenador_cmpId);
+	return list_remove_by_condition(unEquipo, (bool(*)(void*)) &entrenador_cmpId);
 }
 
 especies_pokemones entrenadores_objetivos_globales(entrenadores unEquipo){
