@@ -8,7 +8,6 @@
 #ifndef SRC_CRENITO_COMMONS_MENSAJES_MENSAJE_NEW_POKEMON_H_
 #define SRC_CRENITO_COMMONS_MENSAJES_MENSAJE_NEW_POKEMON_H_
 
-#include "../modelo/posicion.h"
 #include "../modelo/pokemon.h"
 #include "../conexiones/buffer.h"
 

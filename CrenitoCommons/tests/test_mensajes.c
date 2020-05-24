@@ -1,41 +1,43 @@
 #include "../src/crenito-commons/mensajes/mensaje_new_pokemon.h"
 #include "../src/crenito-commons/mensajes/mensaje_localized_pokemon.h"
 #include "../src/crenito-commons/mensajes/mensaje_get_pokemon.h"
+#include "../src/crenito-commons/mensajes/mensaje_appeared_pokemon.h"
 #include <commons/collections/list.h>
-#include <cspecs/cspec.h>
+#include "test_utils.h"
 
 context (test_mensajes) {
 
-	void assert_mensaje_new_pokemon(t_mensaje_new_pokemon* esperado,
+	void should_ids(t_mensaje_id esperado, t_mensaje_id real) {
+
+		should_int(esperado.id) be equal to (esperado.id);
+		should_int(esperado.id_correlativo) be equal to (esperado.id_correlativo);
+	}
+
+	void assert_mensaje_new_pokemon(t_mensaje_new_pokemon* esperado, 
 			t_mensaje_new_pokemon* real) {
 
 		should_ptr(real) not be null;
-		should_int(real -> ids.id) be equal to (esperado -> ids.id);
-		should_int(real -> ids.id_correlativo) be equal to (esperado -> ids.id_correlativo);
+		should_ids(real->ids, esperado->ids);
 		should_int(real -> cantidad) be equal to (esperado -> cantidad);
-		should_int(real -> pokemon.especie_lenght) be equal to (esperado -> pokemon.especie_lenght);
-		should_string(real -> pokemon.especie) be equal to (esperado -> pokemon.especie);
-		should_int(real -> pokemon.posicion.pos_x) be equal to (esperado -> pokemon.posicion.pos_x);
-		should_int(real -> pokemon.posicion.pos_y) be equal to (esperado -> pokemon.posicion.pos_y);
-
+		should_pokemon(real->pokemon, esperado->pokemon);
 	}
 
 	void assert_mensaje_localized_pokemon(t_mensaje_localized_pokemon* esperado,
 			t_mensaje_localized_pokemon* real) {
 
 		should_ptr(real) not be null;
-		should_int(real -> ids.id) be equal to (esperado -> ids.id);
-		should_int(real -> ids.id_correlativo) be equal to (esperado -> ids.id_correlativo);
+		should_ids(real->ids, esperado->ids);
 		should_int(real -> especie_lenght) be equal to (esperado -> especie_lenght);
 		should_string(real ->especie) be equal to (esperado ->especie);
 		should_int(list_size(real -> posiciones)) be equal to (list_size(esperado -> posiciones));
 
 		int i = 0;
 		for (i = 0; i < esperado->posiciones_lenght; ++i) {
+
 			t_posicion* posicion_esperada = list_get(esperado->posiciones, i);
 			t_posicion* posicion_real = list_get(real->posiciones, i);
 
-			should_ptr(posicion_real) be equal to (posicion_esperada);
+			should_ptr(posicion_esperada) be equal to (posicion_real);
 		}
 
 	}
@@ -44,10 +46,17 @@ context (test_mensajes) {
 			t_mensaje_get_pokemon* real) {
 
 		should_ptr(real) not be null;
-		should_int(real -> ids.id) be equal to (esperado -> ids.id);
-		should_int(real -> ids.id_correlativo) be equal to (esperado -> ids.id_correlativo);
+		should_ids(real->ids, esperado->ids);
 		should_int(real -> especie_lenght) be equal to (esperado -> especie_lenght);
 		should_string(real ->especie) be equal to (esperado ->especie);
+	}
+
+	void assert_mensaje_appeared_pokemon(t_mensaje_appeared_pokemon* esperado,
+			t_mensaje_appeared_pokemon* real) {
+
+		should_ptr(real) not be null;
+		should_ids(real->ids, esperado->ids);
+		should_pokemon(esperado->pokemon, real->pokemon);
 	}
 
 	describe("serializacion de mensajes") {
@@ -113,6 +122,24 @@ context (test_mensajes) {
 			//Free
 			mensaje_get_pokemon_destruir(get_pkm_esperado);
 			mensaje_get_pokemon_destruir(get_pkm_real);
+
+		}end
+
+		it("Serializacion mensaje_appeared_pokemon") {
+
+			//Arrange
+			t_mensaje_appeared_pokemon* app_esperado = mensaje_appeared_pokemon_crear("squirtle", 7, 9);
+
+			//Action
+			t_buffer* app_serializado = mensaje_appeared_pokemon_serializar(app_esperado);
+			t_mensaje_appeared_pokemon* app_real = mensaje_appeared_pokemon_deserializar(app_serializado);
+
+			//Assert
+			assert_mensaje_appeared_pokemon(app_esperado, app_real);
+
+			//Free
+			mensaje_appeared_pokemon_destruir(app_esperado);
+			mensaje_appeared_pokemon_destruir(app_real);
 
 		}end
 
