@@ -36,7 +36,7 @@ t_paquete_header crear_paquete_header(t_codigo_operacion cod_op, t_id_proceso id
 void paquete_destruir(t_paquete* paquete);
 
 /* Recibe un paquete y un puntero donde guarda la cantidad de bytes del stream serializado
- * dichos bytes debes usarse como parametro al realizar el send */
+ * dichos bytes deben usarse como parametro al realizar el send */
 void* paquete_serializar(t_paquete* paquete, int *bytes);
 
 t_paquete_header* paquete_subscripcion_crear(t_id_proceso id_proceso,

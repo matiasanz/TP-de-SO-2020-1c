@@ -26,11 +26,14 @@ void mensaje_new_pokemon_destruir(t_mensaje_new_pokemon* new_pokemon) {
 
 t_buffer* mensaje_new_pokemon_serializar(t_mensaje_new_pokemon* new_pokemon) {
 
+	int bytes_pokemon = new_pokemon-> pokemon.especie_lenght +
+			            sizeof(new_pokemon->pokemon.especie_lenght) +
+						sizeof(new_pokemon->pokemon.posicion);
+
 	int size = sizeof(new_pokemon->ids) +
-			   new_pokemon-> pokemon.especie_lenght +
-			   sizeof(new_pokemon->pokemon.especie_lenght) +
-			   sizeof(new_pokemon->cantidad) +
-			   sizeof(new_pokemon->pokemon.posicion);
+			   bytes_pokemon +
+			   sizeof(new_pokemon->cantidad);
+
 
 	t_buffer* bfr = buffer_crear(size);
 	int desplazamiento = 0;
@@ -40,19 +43,11 @@ t_buffer* mensaje_new_pokemon_serializar(t_mensaje_new_pokemon* new_pokemon) {
 			sizeof(new_pokemon->ids));
 	desplazamiento += sizeof(new_pokemon->ids);
 
-	t_pokemon pkm = new_pokemon->pokemon;
-	//especie_lenght
-	memcpy(bfr->stream + desplazamiento, &(pkm.especie_lenght),
-			sizeof(pkm.especie_lenght));
-	desplazamiento += sizeof(pkm.especie_lenght);
-
-	//especie
-	memcpy(bfr->stream + desplazamiento, pkm.especie, pkm.especie_lenght);
-	desplazamiento += pkm.especie_lenght;
-
-	//posicion
-	memcpy(bfr->stream + desplazamiento, &(pkm.posicion), sizeof(pkm.posicion));
-	desplazamiento += sizeof(pkm.posicion);
+	// pokemon
+	void* pkm_serializado = pokemon_serializar(new_pokemon->pokemon, bytes_pokemon);
+	memcpy(bfr->stream + desplazamiento, pkm_serializado, bytes_pokemon);
+	free(pkm_serializado);
+	desplazamiento += bytes_pokemon;
 
 	//cantidad
 	memcpy(bfr->stream + desplazamiento, &(new_pokemon->cantidad),
@@ -71,28 +66,15 @@ t_mensaje_new_pokemon* mensaje_new_pokemon_deserializar(t_buffer* buffer) {
 	memcpy(&msj->ids, buffer->stream + desplazamiento, sizeof(msj->ids));
 	desplazamiento += sizeof(msj->ids);
 
-	t_pokemon pkm = msj->pokemon;
-	//especie_lenght
-	memcpy(&pkm.especie_lenght, buffer->stream + desplazamiento,
-			sizeof(pkm.especie_lenght));
-	desplazamiento += sizeof(pkm.especie_lenght);
-
-	//especie
-	char* especie = strdup(buffer->stream + desplazamiento);
-	pkm.especie = especie;
-	desplazamiento += pkm.especie_lenght;
-
-	//posicion
-	memcpy(&pkm.posicion, buffer->stream + desplazamiento,
-			sizeof(pkm.posicion));
-	desplazamiento += sizeof(pkm.posicion);
+	//pokemon
+	int bytes_pokemon = 0;
+	msj->pokemon = pokemon_deserializar(buffer -> stream + desplazamiento, &bytes_pokemon);
+	desplazamiento += bytes_pokemon;
 
 	//cantidad
 	memcpy(&msj->cantidad, buffer->stream + desplazamiento,
 			sizeof(msj->cantidad));
 	desplazamiento += sizeof(msj->cantidad);
-
-	msj->pokemon = pkm;
 	
 	buffer_destruir(buffer);
 	
