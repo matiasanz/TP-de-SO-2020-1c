@@ -1,5 +1,6 @@
 #include "../src/crenito-commons/mensajes/mensaje_new_pokemon.h"
 #include "../src/crenito-commons/mensajes/mensaje_localized_pokemon.h"
+#include "../src/crenito-commons/mensajes/mensaje_get_pokemon.h"
 #include <commons/collections/list.h>
 #include <cspecs/cspec.h>
 
@@ -37,6 +38,16 @@ context (test_mensajes) {
 			should_ptr(posicion_real) be equal to (posicion_esperada);
 		}
 
+	}
+
+	void assert_mensaje_get_pokemon(t_mensaje_get_pokemon* esperado,
+			t_mensaje_get_pokemon* real) {
+
+		should_ptr(real) not be null;
+		should_int(real -> ids.id) be equal to (esperado -> ids.id);
+		should_int(real -> ids.id_correlativo) be equal to (esperado -> ids.id_correlativo);
+		should_int(real -> especie_lenght) be equal to (esperado -> especie_lenght);
+		should_string(real ->especie) be equal to (esperado ->especie);
 	}
 
 	describe("serializacion de mensajes") {
@@ -84,6 +95,24 @@ context (test_mensajes) {
 			//Free
 			mensaje_localized_pokemon_destruir(lcd_esperado);
 			mensaje_localized_pokemon_destruir(lcd_real);
+
+		}end
+
+		it("Serializacion mensaje_get_pokemon") {
+
+			//Arrange
+			t_mensaje_get_pokemon* get_pkm_esperado = mensaje_get_pokemon_crear("charmander");
+
+			//Action
+			t_buffer* get_pkm_serializado = mensaje_get_pokemon_serializar(get_pkm_esperado);
+			t_mensaje_get_pokemon* get_pkm_real = mensaje_get_pokemon_deserializar(get_pkm_serializado);
+
+			//Assert
+			assert_mensaje_get_pokemon(get_pkm_esperado, get_pkm_real);
+
+			//Free
+			mensaje_get_pokemon_destruir(get_pkm_esperado);
+			mensaje_get_pokemon_destruir(get_pkm_real);
 
 		}end
 
