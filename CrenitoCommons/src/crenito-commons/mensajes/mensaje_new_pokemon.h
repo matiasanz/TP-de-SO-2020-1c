@@ -11,7 +11,6 @@
 #include "../modelo/posicion.h"
 #include "../modelo/pokemon.h"
 #include "../conexiones/buffer.h"
-#include "../utils.h"
 
 typedef struct {
 	t_mensaje_id ids;
