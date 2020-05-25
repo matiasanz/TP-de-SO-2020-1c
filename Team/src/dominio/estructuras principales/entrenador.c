@@ -1,8 +1,6 @@
 #include <commons/string.h>
 #include "entrenador.h"
 #include "pokemon.h"
-#include "../estructuras auxiliares/mensajes.h" //si en header rompe
-
 
 //Constructor Entrenador
 entrenador entrenador_create(t_id id, t_list* pokemonesEnInventario, t_list*objetivos, t_posicion unaPos){

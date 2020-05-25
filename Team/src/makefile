@@ -25,6 +25,13 @@ HEADERS = $(wildcard *.h) # wildcard implica todos los .h
 %.o: %.c $(HEADERS) # usar todos los .c y todos los .h
 	$(CC) -I"../../CrenitoCommons/src" $(CFLAGS) -c $< -o $@
 
+# Includes, dispuestos en orden
+#	$(CC) -I"dominio/estructuras auxiliares/listas" $(CFLAGS) -c $< -o $@ #ampliacion de las commons
+#	$(CC) -I"dominio" $(CFLAGS) -c $< -o $@	#tiene header global
+#	$(CC) -I"dominio/estructuras principales" $(CFLAGS) -c $< -o $@ #estructuras basicas tales como entrenador, pokemon, posicion. Perfectamente funcionan solas.
+#	$(CC) -I"dominio/estructuras auxiliares" $(CFLAGS) -c $< -o $@ #necesitan a las principales
+#	$(CC) -I"hilos del team" $(CFLAGS) -c $< -o $@ #ampliacion del programa principal
+
 .PRECIOUS: $(TARGET) $(OBJECTS)
 
  # Usamos compilador para linkear los objects a las bibliotecas y tener binario
