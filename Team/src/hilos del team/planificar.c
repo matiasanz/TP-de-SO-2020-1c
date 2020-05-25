@@ -12,10 +12,9 @@
  */
 void team_planificar(){
 
-//	sem_init(&sem_HayMasPokemonesEnMapa, 0, 0); //por ahora esta en procesar mensajes
-
 		especies_pokemones objetivosGlobales = entrenadores_objetivos_globales(equipo);
 		Get_pokemones(objetivosGlobales);
+		sem_post(&BORRAR_ESTO_MENSAJE_GET_ENVIADO); //hardcodeado para que me llegue localized
 
 	puts("**********************************************\nSe va a planificar");
 

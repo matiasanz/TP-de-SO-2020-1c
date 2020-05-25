@@ -1,10 +1,39 @@
 #include "mensajes.h"
 
+numero idGet=0;
+
+mensaje_localized_pokemon* localized_pokemon_crear(especie_pokemon especie){
+    mensaje_localized_pokemon* localized_pokemon = malloc(sizeof(mensaje_localized_pokemon));
+
+	localized_pokemon->especie_lenght = strlen(especie) + 1;
+	localized_pokemon->especie = especie;
+	localized_pokemon->posiciones = list_create();
+
+	t_posicion*unaPos = malloc(sizeof(t_posicion));
+	  		  *unaPos = posicion_create(2,7);
+	list_add(localized_pokemon->posiciones, unaPos);
+
+			   unaPos = malloc(sizeof(t_posicion));
+	  		  *unaPos = posicion_create(3,5);
+	list_add(localized_pokemon->posiciones, unaPos);
+
+	 	 	   unaPos = malloc(sizeof(t_posicion));
+	  		  *unaPos = posicion_create(3,6);
+	list_add(localized_pokemon->posiciones, unaPos);
+
+	localized_pokemon->posiciones_lenght = list_size(localized_pokemon->posiciones);
+	return localized_pokemon;
+}
+
 pokemon*desempaquetar_pokemon(void*empaquetado) {
 	return (pokemon*) empaquetado;
 }
 
 void* desempaquetar_resultado(void*empaquetado) {
+	return empaquetado;
+}
+
+mensaje_localized_pokemon* desempaquetar_localized(void*empaquetado){
 	return empaquetado;
 }
 

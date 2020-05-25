@@ -1,6 +1,11 @@
 #include "../hilos_team.h"
 #include "../../team.h"
 
+/*TODO
+ * en registrar_pokemon no importa que ya lo tenga en mapa (o si? REVER), pero si tengo que
+ * 							CONTROLAR QUE SE RESPETEN LOS OBJETIVOS (cambiar implementacion)
+ */
+
 void team_suscriptor_cola_APPEARD(cr_list* mensajes){
 
 	while(!FinDelProceso){

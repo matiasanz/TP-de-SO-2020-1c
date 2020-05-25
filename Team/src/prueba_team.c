@@ -23,6 +23,7 @@ int main(void) {
 
 		mensajesAPPEARD = cr_list_create(); //Para pruebas sin broker
 		mensajesCAUGHT = cr_list_create(); //Para pruebas sin broker
+		mensajesLOCALIZED = cr_list_create();
 
 	inicializar_hilos();
 
@@ -121,7 +122,7 @@ void listas_destroy(){
 
 //Colas
 void subscribpcion_colas(){
-	//TODO Gustavo//
+	//TODO Gustavo// ?????????????????
 }
 
 //Hilos
@@ -130,7 +131,7 @@ void inicializar_hilos(){
 
 	pthread_create(&hiloMensajesAppeard, NULL, (void*)team_suscriptor_cola_APPEARD, mensajesAPPEARD);
 	pthread_create(&hiloMensajesCAUGHT, NULL, (void*)team_suscriptor_cola_CAUGHT, mensajesCAUGHT);
-//	pthread_create(&hiloMensajesLOCALIZED, NULL, (void*)team_suscriptor_cola_APPEARD(), colaDeMensajesAPPEARD);
+	pthread_create(&hiloMensajesLOCALIZED, NULL, (void*)team_suscriptor_cola_LOCALIZED, mensajesLOCALIZED);
 }
 
 void finalizar_hilos(){
@@ -139,8 +140,10 @@ void finalizar_hilos(){
 	pthread_join(hiloPlanificador, NULL);
 	pthread_join(hiloMensajesAppeard, NULL);
 	pthread_join(hiloMensajesCAUGHT, NULL);
-
+	pthread_join(hiloMensajesLOCALIZED, NULL);
 }
+
+//Semaforos
 
 void inicializar_semaforos(){
 	sem_init(&EntradaSalida_o_FinDeEjecucion, 0, 1);
@@ -148,7 +151,10 @@ void inicializar_semaforos(){
 
 	pthread_mutex_init(&Mutex_AndoLoggeando, NULL);
 	pthread_mutex_init(&Mutex_AndoLoggeandoEventos, NULL);
-//	pthread_mutex_init(&mutexFinDeProceso, NULL);
+//	pthread_mutex_init(&mutexFinDeProceso, NULL); //TODO
+
+	//Hardcodeados
+	sem_init(&BORRAR_ESTO_MENSAJE_GET_ENVIADO, 0, 0);
 }
 
 void finalizar_semaforos(){

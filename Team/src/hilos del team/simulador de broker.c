@@ -4,11 +4,17 @@
 void broker_simulator(){
 	puts("Simulacro de recepcion de mensajes");
 
+	sem_wait(&BORRAR_ESTO_MENSAJE_GET_ENVIADO); //pasar al switch de forma que vaya recorriendo la lista de objetivos globales (QUE TENGO QUE CORREGIR)
+	mensaje* unMensaje = malloc(sizeof(mensaje));
+	*unMensaje = (mensaje) {LOCALIZED_POKEMON_, localized_pokemon_crear("Pikachu")}; //a futuro le pasaria la cant de instancias que necesito del recurso
+
+	cr_list_add_and_signal(mensajesLOCALIZED, unMensaje);
+
 	int i;
 
 	for(i=0; !FinDelProceso; i= (i+1)%6){
 
-		mensaje* unMensaje = malloc(sizeof(mensaje));
+		unMensaje = malloc(sizeof(mensaje));
 
 		switch(i){
 			case 0: {

@@ -42,6 +42,8 @@ void finalizar_hilos();
 //Colas de mensajes (BORRAR A FUTURO)
 	cr_list*mensajesAPPEARD;
 	cr_list*mensajesCAUGHT;
+	cr_list*mensajesLOCALIZED;
+
 /*--------------*/
 
 # endif

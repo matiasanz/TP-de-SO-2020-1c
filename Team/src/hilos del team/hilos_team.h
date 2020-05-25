@@ -21,14 +21,13 @@ sem_t EntradaSalida_o_FinDeEjecucion;
 sem_t HayTareasPendientes;
 
 pthread_mutex_t mutexMensaje;
-//pthread_mutex_t mutexMapaPokemones;
-//pthread_mutex_t mutexCapturasPendientes;
-//pthread_mutex_t mutexFinDeProceso;
-//pthread_mutex_t*mutexEntrenador;
+//pthread_mutex_t mutexFinDeProceso; TODO ver si vale la pena
+//pthread_mutex_t*mutexEntrenador; TODO ver usos de acuerdo a implementacion
 
-//TODO definir aqui...
+//Semaforos hardcodeados
+sem_t BORRAR_ESTO_MENSAJE_GET_ENVIADO;
 
-//Variables globales (?)
+//Variables globales
 bool FinDelProceso;
 
 /*----------------*/
@@ -45,6 +44,7 @@ void team_planificar(); //nueva implementacion
 void broker_simulator();
 void team_suscriptor_cola_APPEARD(cr_list* mensajes);
 void team_suscriptor_cola_CAUGHT(cr_list* mensajes);
+void team_suscriptor_cola_LOCALIZED(cr_list*mensajes);
 
 //Hilo que se encarga de reaccionar a cada mensaje recibido
 void team_procesar_mensajes();
