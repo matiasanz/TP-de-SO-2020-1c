@@ -5,26 +5,26 @@
  *      Author: utnso
  */
 
-#include "mensaje_appeared_pokemon.h"
+#include "mensaje_appeared_catch_pokemon.h"
 
-t_mensaje_appeared_pokemon* mensaje_appeared_pokemon_crear(char* especie, uint32_t pos_x, uint32_t pos_y) {
+t_mensaje_appeared_catch_pokemon* mensaje_appeared_catch_pokemon_crear(char* especie, uint32_t pos_x, uint32_t pos_y) {
 
-	t_mensaje_appeared_pokemon* appeared_pokemon = malloc(
-			sizeof(t_mensaje_appeared_pokemon));
+	t_mensaje_appeared_catch_pokemon* appeared_catch_pokemon = malloc(
+			sizeof(t_mensaje_appeared_catch_pokemon));
 
-	mensaje_id_inicializar(&appeared_pokemon->ids);
-	appeared_pokemon->pokemon = pokemon_crear(especie, pos_x, pos_y);
+	mensaje_id_inicializar(&appeared_catch_pokemon->ids);
+	appeared_catch_pokemon->pokemon = pokemon_crear(especie, pos_x, pos_y);
 
-	return appeared_pokemon;
+	return appeared_catch_pokemon;
 }
 
-void mensaje_appeared_pokemon_destruir(t_mensaje_appeared_pokemon* appeared_pokemon) {
+void mensaje_appeared_catch_pokemon_destruir(t_mensaje_appeared_catch_pokemon* appeared_pokemon) {
 
 	pokemon_destruir(appeared_pokemon->pokemon);
 	free(appeared_pokemon);
 }
 
-t_buffer* mensaje_appeared_pokemon_serializar(t_mensaje_appeared_pokemon* appeared_pokemon) {
+t_buffer* mensaje_appeared_catch_pokemon_serializar(t_mensaje_appeared_catch_pokemon* appeared_pokemon) {
 
 	int bytes_pokemon = appeared_pokemon->pokemon.especie_lenght
 			+ sizeof(appeared_pokemon->pokemon.especie_lenght)
@@ -51,9 +51,9 @@ t_buffer* mensaje_appeared_pokemon_serializar(t_mensaje_appeared_pokemon* appear
 	return bfr;
 }
 
-t_mensaje_appeared_pokemon* mensaje_appeared_pokemon_deserializar(t_buffer* buffer) {
+t_mensaje_appeared_catch_pokemon* mensaje_appeared_catch_pokemon_deserializar(t_buffer* buffer) {
 
-	t_mensaje_appeared_pokemon* msj = malloc(sizeof(t_mensaje_appeared_pokemon));
+	t_mensaje_appeared_catch_pokemon* msj = malloc(sizeof(t_mensaje_appeared_catch_pokemon));
 	int desplazamiento = 0;
 
 	// id

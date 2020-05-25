@@ -1,7 +1,7 @@
 #include "../src/crenito-commons/mensajes/mensaje_new_pokemon.h"
 #include "../src/crenito-commons/mensajes/mensaje_localized_pokemon.h"
 #include "../src/crenito-commons/mensajes/mensaje_get_pokemon.h"
-#include "../src/crenito-commons/mensajes/mensaje_appeared_pokemon.h"
+#include <crenito-commons/mensajes/mensaje_appeared_catch_pokemon.h>
 #include <commons/collections/list.h>
 #include "test_utils.h"
 
@@ -51,8 +51,8 @@ context (test_mensajes) {
 		should_string(real ->especie) be equal to (esperado ->especie);
 	}
 
-	void assert_mensaje_appeared_pokemon(t_mensaje_appeared_pokemon* esperado,
-			t_mensaje_appeared_pokemon* real) {
+	void assert_mensaje_appeared_catch_pokemon(t_mensaje_appeared_catch_pokemon* esperado,
+			t_mensaje_appeared_catch_pokemon* real) {
 
 		should_ptr(real) not be null;
 		should_ids(real->ids, esperado->ids);
@@ -125,21 +125,21 @@ context (test_mensajes) {
 
 		}end
 
-		it("Serializacion mensaje_appeared_pokemon") {
+		it("Serializacion mensaje_appeared_catch_pokemon") {
 
 			//Arrange
-			t_mensaje_appeared_pokemon* app_esperado = mensaje_appeared_pokemon_crear("squirtle", 7, 9);
+			t_mensaje_appeared_catch_pokemon* msj_esperado = mensaje_appeared_catch_pokemon_crear("squirtle", 7, 9);
 
 			//Action
-			t_buffer* app_serializado = mensaje_appeared_pokemon_serializar(app_esperado);
-			t_mensaje_appeared_pokemon* app_real = mensaje_appeared_pokemon_deserializar(app_serializado);
+			t_buffer* msj_serializado = mensaje_appeared_catch_pokemon_serializar(msj_esperado);
+			t_mensaje_appeared_catch_pokemon* msj_real = mensaje_appeared_catch_pokemon_deserializar(msj_serializado);
 
 			//Assert
-			assert_mensaje_appeared_pokemon(app_esperado, app_real);
+			assert_mensaje_appeared_catch_pokemon(msj_esperado, msj_real);
 
 			//Free
-			mensaje_appeared_pokemon_destruir(app_esperado);
-			mensaje_appeared_pokemon_destruir(app_real);
+			mensaje_appeared_catch_pokemon_destruir(msj_esperado);
+			mensaje_appeared_catch_pokemon_destruir(msj_real);
 
 		}end
 
