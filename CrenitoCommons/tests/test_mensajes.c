@@ -9,8 +9,8 @@ context (test_mensajes) {
 
 	void should_ids(t_mensaje_id esperado, t_mensaje_id real) {
 
-		should_int(esperado.id) be equal to (esperado.id);
-		should_int(esperado.id_correlativo) be equal to (esperado.id_correlativo);
+		should_int(real.id) be equal to (esperado.id);
+		should_int(real.id_correlativo) be equal to (esperado.id_correlativo);
 	}
 
 	void assert_mensaje_new_pokemon(t_mensaje_new_pokemon* esperado, 
@@ -56,7 +56,7 @@ context (test_mensajes) {
 
 		should_ptr(real) not be null;
 		should_ids(real->ids, esperado->ids);
-		should_pokemon(esperado->pokemon, real->pokemon);
+		should_pokemon(real->pokemon, esperado->pokemon);
 	}
 
 	describe("serializacion de mensajes") {
