@@ -15,44 +15,41 @@ void pendiente_destroy(pendiente* mensajePendiente){
 
 //Constructor
 pendientes pendientes_create(){
-	return list_create();
+	return cr_list_create();
 }
-
-t_id ME_TENGO_QUE_ACORDAR_DE_BORRAR_ESTO=1;
 
 //Agregar
 void agregar_pendiente(pendientes mensajesPendientes, t_id idMensaje, entrenador* unEntrenador, pokemon* unPokemon){
 	pendiente*nuevoMensaje = (pendiente*)malloc(sizeof(pendiente));
 			 *nuevoMensaje = pendiente_create(idMensaje, unEntrenador, unPokemon);
-	list_add(mensajesPendientes, nuevoMensaje);
 
-	ME_TENGO_QUE_ACORDAR_DE_BORRAR_ESTO=idMensaje;
+    cr_list_add_and_signal(mensajesPendientes, nuevoMensaje);
 }
 
 //Obtener
-pendiente* pendiente_get(pendientes mensajesPendientes, t_id idRespuesta){
-	bool cmp_pendiente_id(pendiente* unPendiente){
-		return unPendiente->id == idRespuesta;
+pendiente* pendientes_get(pendientes mensajesPendientes, t_id idRespuesta){
+	bool cmp_pendiente_id(void* unPendiente){
+		printf("ID: %u == %u?", ((pendiente*) unPendiente)->cazador->id, idRespuesta);
+
+		return ((pendiente*)unPendiente)->id == idRespuesta;
 	}
 
-	pendiente*mensaje = list_remove_by_condition(mensajesPendientes, (bool(*)(void*)) &cmp_pendiente_id);
-
-//	if(!mensaje){
-//		error_show("El id %d no corresponde a ningun mensaje pendiente", idRespuesta);
-//		exit(1);
-//	}
-
-	//TODO BORRAR
-	ME_TENGO_QUE_ACORDAR_DE_BORRAR_ESTO = !list_is_empty(mensajesPendientes)? ((pendiente*)list_get(mensajesPendientes, 0))->id: -1;
-
-	return mensaje;
+	return cr_list_get_by_condition(mensajesPendientes,  &cmp_pendiente_id);
 }
 
-t_id idProximoPendienteHARDCODEADO(){
-	return ME_TENGO_QUE_ACORDAR_DE_BORRAR_ESTO;
+//Remover segun id entrenador
+pendiente*pendientes_pendiente_del_entrenador(pendientes mensajesPendientes, t_id idEntrenador){
+
+	bool esElEntrenador(void*unPendiente){
+		printf("ID: %u == %u?", ((pendiente*) unPendiente)->cazador->id, idEntrenador);
+		return ((pendiente*) unPendiente)->cazador->id == idEntrenador;
+	}
+
+	return cr_list_remove_by_condition(mensajesPendientes, &esElEntrenador);
 }
+
 
 //Destructor
 void pendientes_destroy(pendientes pendientes){
-	list_destroy_and_destroy_elements(pendientes, (void(*)(void*))&pendiente_destroy);
+	cr_list_destroy_and_destroy_elements(pendientes, (void(*)(void*))&pendiente_destroy);
 }

@@ -27,18 +27,18 @@ void team_recibir_mensajes(t_list* mensajes){
 			}
 
 			case 3:{
-//				pthread_mutex_lock(&mutexCapturasPendientes);
-				if(!list_is_empty(capturasPendientes)){
-//					pthread_mutex_unlock(&mutexCapturasPendientes);
+				pendiente*unPendiente = cr_list_get(capturasPendientes, 0);
 
-					t_id unid = idProximoPendienteHARDCODEADO();
+				if(unPendiente){
+
+					t_id unid = unPendiente->id;
 
 					resultado_captura*unResultado = malloc(sizeof(resultado_captura));
 					*unResultado = (resultado_captura){unid, true};
 					*unMensaje = (mensaje) {CAUGHT_POKEMON_, unResultado};
 				}
 				else{
-//					pthread_mutex_unlock(&mutexCapturasPendientes);
+					puts("No hay capturas pendientes");
 					*unMensaje = (mensaje) {APPEARD_POKEMON_, pokemon_ptr_create("Bulbasaur", 3, 1)};
 				}
 
@@ -56,14 +56,27 @@ void team_recibir_mensajes(t_list* mensajes){
 			}
 		}
 
-		puts("W(mutexMensaje)");
-	pthread_mutex_lock(&mutexMensaje);
-		list_add(mensajes, unMensaje);
-	pthread_mutex_unlock(&mutexMensaje);
-		puts("Signal(mutexMensaje)");
+		switch(unMensaje->opcode){
+			case APPEARD_POKEMON_:{
+				cr_list_add_and_signal(mensajesAPPEARD, unMensaje);
+				break;
+			}
 
-		sem_post(&sem_HayMensajesRecibidos);
-		puts("Signal(mensaje hay mas mensajes)");
+			case CAUGHT_POKEMON_:{
+				cr_list_add_and_signal(mensajesCAUGHT, unMensaje);
+				break;
+			}
+
+			default: break;
+		}
+//		puts("W(mutexMensaje)");
+//	pthread_mutex_lock(&mutexMensaje);
+//		list_add(mensajes, unMensaje);
+//	pthread_mutex_unlock(&mutexMensaje);
+//		puts("Signal(mutexMensaje)");
+//
+//		sem_post(&sem_HayMensajesRecibidos);
+//		puts("Signal(mensaje hay mas mensajes)");
 		sleep(1);
 
 	}

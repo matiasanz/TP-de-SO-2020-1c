@@ -9,7 +9,7 @@ typedef t_list* especies_pokemones;
 typedef t_dictionary recursos;
 
 typedef enum{NEW,READY,	EXECUTE, LOCKED_HASTA_APPEARD, LOCKED_HASTA_DEADLOCK, LOCKED_HASTA_CAUGHT,	EXIT} t_estado; //VER cuales vale la pena conservar
-typedef enum{CATCHEAR, CAPTURAR, DEADLOCK} t_objetivo;
+typedef enum{CATCHEAR, CAPTURAR, DEADLOCK /*, FINALIZAR*/ } t_tarea;
 
 //TAD Entrenador
 typedef struct pcb_Entrenador{
@@ -18,7 +18,7 @@ typedef struct pcb_Entrenador{
 	t_posicion posicion; //(x,y)
 	t_estado estado;
 	t_id id;
-	t_objetivo objetivoActual;
+	t_tarea siguienteTarea;
 } entrenador;
 
 //	Constructor; agregar lista infinita de objetivos
@@ -43,18 +43,6 @@ typedef struct pcb_Entrenador{
 
 //	Pasa entrenador a un estado y loggea el pasaje con el motivo
 	void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const char*motivo);
-
-//	Pasa entrenador a estado locked hasta que llegue un pokemon
-	void entrenador_bloquear_hasta_APPEARD(entrenador*);
-
-//	Pasa entrenador a estado locked hasta que llegue un pokemon
-	void entrenador_bloquear_hasta_CAUGHT(entrenador*);
-
-//	Pasa entrenador a estado locked hasta que llegue un pokemon
-	void entrenador_bloquear_hasta_DEADLOCK(entrenador*);
-
-// Pasa entrenador a estado ready
-	void entrenador_desbloquear(entrenador*);
 
 //Destructor
 	void entrenador_destroy(entrenador*);

@@ -10,8 +10,6 @@
 #include "hilos_team.h"
 #include "../team.h"
 
-void registrar_pokemon(pokemon*);
-
 void team_procesar_mensajes(t_list* mensajesRecibidos) {
 
 //	pthread_mutex_lock(&mutexFinDeProceso);
@@ -34,31 +32,17 @@ pthread_mutex_unlock(&mutexMensaje);
 
 	switch(mensajeRecibido->opcode){
 
-//		case LOCALIZED_POKEMON_: ; //TODO funcion tal que yo pueda iterar lista de posiciones creando pokemones y repitiendo procedimiento APPEARD
-//			pokemon* unPokemon = desempaquetar_pokemon(mensajeRecibido->serializado);
-//
-//			log_info(logger, "LOCALIZED %s", unPokemon->especie); //Agregar lista infinita de posiciones
-//
-//			if(especie_recibida_con_anterioridad(unPokemon->especie, historialDePokemones)){
-//				printf("%s: figurita repetida se descarta\n", unPokemon->especie);
-//				pokemon_destroy(unPokemon);
-//			}
-
-//			else{
-//
-//
-//				mensajeRecibido->opcode = APPEARD_POKEMON_;
-//				list_add_in_index(mensajesRecibidos, 0, mensajeRecibido);
-//			}
-//
-//			break;
-
 		case APPEARD_POKEMON_: {
 			pokemon* unPokemon = desempaquetar_pokemon(mensajeRecibido->serializado);
 
 			log_info(logger, "APPEARD %s [%u] [%u]", unPokemon->especie, unPokemon->posicion.pos_x, unPokemon->posicion.pos_y); //Ver TODO si pokemon localized hace esto. Ver como saltear esta parte.
 
-			registrar_pokemon(unPokemon); //Ver si pasar a localized
+			registrar_pokemon(unPokemon);
+
+			t_tarea*unaTarea = malloc(sizeof(t_tarea));
+				   *unaTarea = CATCHEAR;
+
+		    cr_list_add_and_signal(tareasPendientes, unaTarea);
 
 			break;
 		}
@@ -66,12 +50,14 @@ pthread_mutex_unlock(&mutexMensaje);
 		case CAUGHT_POKEMON_:{
 			resultado_captura* resultado = desempaquetar_resultado(mensajeRecibido->serializado);
 
+			puts("Se desempaqueto resultado-------------------------------------------------");
 //			pthread_mutex_lock(&mutexCapturasPendientes);
-			pendiente* capturaPendiente = pendiente_get(capturasPendientes, resultado->idCaptura);
+			pendiente* capturaPendiente = pendientes_get(capturasPendientes, resultado->idCaptura);
 //			pthread_mutex_unlock(&mutexCapturasPendientes);
 
+			puts("Ya esta entre nosotros --------------------------------------------------------");
 			if(!capturaPendiente){
-				error_show("Se recibio un resultado con id %u desconocido\n", resultado->idCaptura);
+				log_info(event_logger, "Se recibio un resultado con id %u desconocido\n", resultado->idCaptura);
 				break; //exit(1);
 			}
 
@@ -83,6 +69,9 @@ pthread_mutex_unlock(&mutexMensaje);
 			if(resultado->tuvoExito){
 
 				entrenadores_bloquear_por_captura(equipo);//TODO solamente cambia un atributo. Eventualmente podrian ejecutarse simultaneamente 2 entrenadores. Tendria que guardarme al ultimo en execute y despues devolverlo
+
+//				entrenador_pasar_a(unEntrenador, READY, "Se confirmo la captura del pokemon");
+
 				entrenador_pasar_a(unEntrenador, EXECUTE, "Se confirmo la captura del pokemon");
 
 				entrenador_capturar(unEntrenador, pokemonCatcheado); //TODO
@@ -138,7 +127,7 @@ void registrar_pokemon(pokemon*unPokemon){
 //		pthread_mutex_lock(&mutexMapaPokemones);
 		mapa_mapear_objetivo(pokemonesRequeridos, unPokemon);
 //		pthread_mutex_unlock(&mutexMapaPokemones);
-		sem_post(&sem_HayMasPokemonesEnMapa);
+//		sem_post(&sem_HayMasPokemonesEnMapa);
 		puts(">>>Signal(hay mas pokemones)");
 
 //				puts("A continuacion se muestra es un modelo de un hilo entrenador ejecutado inmediatamente despues de recibir al pokemon");

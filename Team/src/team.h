@@ -23,12 +23,22 @@ void inicializar_listas();
 void listas_destroy();
 void subscribpcion_colas();
 
+void inicializar_semaforos();
+void finalizar_semaforos();
+void finalizar_hilos();
+
+
 /*Mis Listas (son variables globales, para que puedan acceder todos los hilos)*/
 	entrenadores equipo;
 	mapa_pokemones pokemonesRequeridos;
-	recursos objetivosGlobales; //Para deadlock TODO (VER a futuro)
+//	recursos objetivosGlobales; //Para deadlock TODO (VER a futuro)
 	pendientes capturasPendientes;
+	cr_list* tareasPendientes; //De prueba
 	especies_pokemones historialDePokemones;
+
+//Colas de mensajes (BORRAR A FUTURO)
+	cr_list*mensajesAPPEARD;
+	cr_list*mensajesCAUGHT;
 /*--------------*/
 
 # endif

@@ -79,15 +79,15 @@ void pokemon_destroy(pokemon*destruido){
 
 //Constructor
 mapa_pokemones mapa_create(){
-	return list_create();
+	return cr_list_create();
 }
 
 void mapa_mapear_objetivo(mapa_pokemones unMapa, pokemon* objetivo){
-	list_add(unMapa, objetivo);
+	cr_list_add_and_signal(unMapa, objetivo);
 }
 
 pokemon*mapa_first(mapa_pokemones unMapa){
-	return list_get(unMapa, 0);
+	return cr_list_get(unMapa, 0);
 }
 
 bool mapa_especie_mapeada(mapa_pokemones unMapa, especie_pokemon unaEspecie){
@@ -95,14 +95,18 @@ bool mapa_especie_mapeada(mapa_pokemones unMapa, especie_pokemon unaEspecie){
 		return especie_cmp(deLista->especie, unaEspecie);
 	}
 
-	return list_any_satisfy(unMapa, (bool(*)(void*))&mismaEspecieQue);
+	pthread_mutex_lock(unMapa->mutex); //TODO
+	bool resultado = list_any_satisfy(unMapa->lista, (bool(*)(void*))&mismaEspecieQue);
+	pthread_mutex_unlock(unMapa->mutex);
+
+	return resultado;
 }
 
 pokemon* mapa_desmapear(mapa_pokemones unMapa){
-	return (pokemon*) list_remove(unMapa, 0);
+	return (pokemon*) cr_list_wait_and_remove(unMapa, 0);
 }
 
 //Destructor
 void mapa_destroy(mapa_pokemones destruido){
-	list_destroy_and_destroy_elements(destruido, (void(*)(void*)) &pokemon_destroy);
+	cr_list_destroy_and_destroy_elements(destruido, (void(*)(void*)) &pokemon_destroy);
 }

@@ -26,7 +26,7 @@ void pokemon_destroy(pokemon*);
 
 //******************************************************************************
 //TAD MAPA: Es una lista que mapea los pokemones que van llegando del gamecard con el mensaje APPEARD
-typedef t_list* mapa_pokemones; //Mapa de pokemones
+typedef cr_list* mapa_pokemones; //Mapa de pokemones
 
 //Constructor
 mapa_pokemones mapa_create();

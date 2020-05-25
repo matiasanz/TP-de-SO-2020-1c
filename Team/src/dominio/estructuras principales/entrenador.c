@@ -7,7 +7,7 @@
 //Constructor Entrenador
 entrenador entrenador_create(t_id id, t_list* pokemonesEnInventario, t_list*objetivos, t_posicion unaPos){
 	entrenador nuevo = (entrenador) {objetivos, pokemonesEnInventario, unaPos, NEW, id, CATCHEAR};
-	nuevo.objetivoActual = CATCHEAR; //determinarSiguienteObjetivo(entrenador);
+	nuevo.siguienteTarea = CATCHEAR; //determinarSiguienteObjetivo(entrenador);
 	return nuevo;
 }
 
@@ -36,7 +36,7 @@ bool entrenador_objetivos_cumplidos(entrenador*unEntrenador){
 }
 
 void entrenador_ir_a(entrenador* unEntrenador, t_posicion posicionFinal){
-
+	t_posicion posicionActual = unEntrenador->posicion;
 //	int i=QUANTUM; if(criterio == ROUND_ROBBIN && distancia>QUANTUM){}
 
 //	numero distancia = posicion_distancia(unEntrenador->posicion, posicionFinal);
@@ -46,7 +46,9 @@ void entrenador_ir_a(entrenador* unEntrenador, t_posicion posicionFinal){
 //	sleep(distancia*tiempoPorDistancia);// VER alternativas para sleep... o un mutex?
 
 	unEntrenador->posicion = posicionFinal;
-	log_info(logger, "El Entrenador N°%u se desplazo hasta [%u] [%u]", unEntrenador->id, unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
+	pthread_mutex_lock(&Mutex_AndoLoggeando);
+	log_info(logger, "El Entrenador N°%u se desplazo desde [%u %u] hasta [%u %u]", unEntrenador->id, posicionActual.pos_x, posicionActual.pos_y, unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
+	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 }
 
 bool entrenador_llego_a(entrenador unEntrenador, t_posicion posicion){
@@ -54,7 +56,12 @@ bool entrenador_llego_a(entrenador unEntrenador, t_posicion posicion){
 }
 
 bool entrenador_en_estado(entrenador* unEntrenador, t_estado ESTADO){
-	return unEntrenador->estado == ESTADO;
+
+//	pthread_mutex_lock(&Mutex_Entrenador[unEntrenador->id]);
+	bool estaEnEstado = unEntrenador->estado == ESTADO;
+//	pthread_mutex_lock(&Mutex_Entrenador[unEntrenador->id]);
+
+	return estaEnEstado;
 }
 
 bool entrenador_puede_cazar_mas_pokemones(entrenador unEntrenador){
@@ -75,30 +82,12 @@ char*estadoFromEnum(t_estado unEstado){
 void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const char*motivo){
 	char*estadoActual = estadoFromEnum(unEntrenador->estado);
 	unEntrenador->estado = estadoFinal;
+
+	pthread_mutex_lock(&Mutex_AndoLoggeando);
 	log_info(logger, "El Entrenador N°%u se paso de la cola de %s a %s, Motivo: %s", unEntrenador->id, estadoActual, estadoFromEnum(estadoFinal), motivo);
+	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 
 	if(estadoFinal==EXIT) entrenador_destroy(unEntrenador);
-}
-
-void entrenador_bloquear_hasta_APPEARD(entrenador* unEntrenador){
-	unEntrenador->estado = LOCKED_HASTA_APPEARD;
-	puts("<<Se ha bloqueado al entrenador hasta appeard>>");
-}
-
-void entrenador_bloquear_hasta_CAUGHT(entrenador*unEntrenador){
-	unEntrenador->estado = LOCKED_HASTA_APPEARD;
-	puts("<<Se ha bloqueado al entrenador hasta caught>>");
-
-}
-
-void entrenador_bloquear_hasta_DEADLOCK(entrenador*unEntrenador){
-	unEntrenador->estado = LOCKED_HASTA_DEADLOCK;
-	puts("<<Se ha bloqueado al entrenador hasta deadlock>>");
-}
-
-void entrenador_desbloquear(entrenador*unEntrenador){
-	unEntrenador->estado = READY;
-	puts("entrenador en ready");
 }
 
 void entrenador_destroy(entrenador* destruido){
@@ -123,22 +112,9 @@ entrenador* entrenadores_remover_del_equipo_a(entrenadores unEquipo, t_id id){
 
 especies_pokemones entrenadores_objetivos_globales(entrenadores unEquipo){
 
-	especies_pokemones objetivosGlobales = list_create();
+	especies_pokemones objetivosGlobales = list_create(); //Implementar con dictionary
 
-//	void agregarObjetivosSinRepetidos(especies_pokemones especies){
-//
-//		void agregarObjetivoSinRepetidos(especie_pokemon unaEspecie){
-//
-//			bool especieRepetida(especie_pokemon otraEspecie){
-//				return especie_cmp(unaEspecie,  otraEspecie);
-//			}
-//
-//			if(!list_find(objetivosGlobales, (bool*) especieRepetida))
-//				especies_agregar(objetivosGlobales, unaEspecie);
-//		}
-//
-//		list_iterate(especies, (void*) agregarObjetivoSinRepetidos);
-//	}
+	//TODO
 
 	void agregarObjetivos(entrenador*unEntrenador){
 		list_add_all(objetivosGlobales, entrenador_objetivos(unEntrenador));
