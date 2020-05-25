@@ -2,6 +2,7 @@
 #include "../src/crenito-commons/mensajes/mensaje_localized_pokemon.h"
 #include "../src/crenito-commons/mensajes/mensaje_get_pokemon.h"
 #include <crenito-commons/mensajes/mensaje_appeared_catch_pokemon.h>
+#include <crenito-commons/mensajes/mensaje_caught_pokemon.h>
 #include <commons/collections/list.h>
 #include "test_utils.h"
 
@@ -13,7 +14,7 @@ context (test_mensajes) {
 		should_int(real.id_correlativo) be equal to (esperado.id_correlativo);
 	}
 
-	void assert_mensaje_new_pokemon(t_mensaje_new_pokemon* esperado, 
+	void assert_mensaje_new_pokemon(t_mensaje_new_pokemon* esperado,
 			t_mensaje_new_pokemon* real) {
 
 		should_ptr(real) not be null;
@@ -51,12 +52,21 @@ context (test_mensajes) {
 		should_string(real ->especie) be equal to (esperado ->especie);
 	}
 
-	void assert_mensaje_appeared_catch_pokemon(t_mensaje_appeared_catch_pokemon* esperado,
+	void assert_mensaje_appeared_catch_pokemon(
+			t_mensaje_appeared_catch_pokemon* esperado,
 			t_mensaje_appeared_catch_pokemon* real) {
 
 		should_ptr(real) not be null;
 		should_ids(real->ids, esperado->ids);
 		should_pokemon(real->pokemon, esperado->pokemon);
+	}
+
+	void assert_mensaje_caught_pokemon(t_mensaje_caught_pokemon* esperado,
+			t_mensaje_caught_pokemon* real) {
+
+		should_ptr(real) not be null;
+		should_ids(real->ids, esperado->ids);
+		should_int(real -> atrapado) be equal to (esperado -> atrapado);
 	}
 
 	describe("serializacion de mensajes") {
@@ -140,6 +150,24 @@ context (test_mensajes) {
 			//Free
 			mensaje_appeared_catch_pokemon_destruir(msj_esperado);
 			mensaje_appeared_catch_pokemon_destruir(msj_real);
+
+		}end
+
+		it("Serializacion mensaje_caught_pokemon") {
+
+			//Arrange
+			t_mensaje_caught_pokemon* msj_esperado = mensaje_caught_pokemon_crear(1);
+
+			//Action
+			t_buffer* msj_serializado = mensaje_caught_pokemon_serializar(msj_esperado);
+			t_mensaje_caught_pokemon* msj_real = mensaje_caught_pokemon_deserializar(msj_serializado);
+
+			//Assert
+			assert_mensaje_caught_pokemon(msj_esperado, msj_real);
+
+			//Free
+			mensaje_caught_pokemon_destruir(msj_esperado);
+			mensaje_caught_pokemon_destruir(msj_real);
 
 		}end
 
