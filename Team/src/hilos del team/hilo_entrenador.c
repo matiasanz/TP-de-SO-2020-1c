@@ -15,7 +15,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 	bool hiloActivo = true;
 	while(hiloActivo){
 
-		sem_wait(&sem_Entrenador[pid]);
+		sem_wait(&EjecutarEntrenador[pid]);
 		entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar");
 
 		printf("Objetivo: %s\n", (unEntrenador->siguienteTarea == CATCHEAR? "catchear": unEntrenador->siguienteTarea == CAPTURAR? "capturar": "deadlock"));
@@ -62,7 +62,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 					//VER TODO muchos if anidados
 
 //				pthread_mutex_lock(&mutexEntrenador[unEntrenador->id]);
-				if(entrenador_puede_cazar_mas_pokemones(*unEntrenador)){
+				if(entrenador_puede_cazar_mas_pokemones(*unEntrenador)){ //Ver si cambios de estado se pueden delegar al planificador
 					unEntrenador->siguienteTarea = CATCHEAR;
 					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARD, "Tuvo exito en la captura y todavia puede cazar mas pokemones");
 				}
@@ -78,7 +78,10 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 					unEntrenador->siguienteTarea = DEADLOCK;
 					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_DEADLOCK, "Su inventario esta lleno y no cumplio sus objetivos");
 
+					//TODO: Ver en que momento estos entrenadores vuelven a READY
 					entrenador_pasar_a(unEntrenador, EXIT, "Aun no esta implementado el algoritmo de deadlock");
+					entrenadores_remover_del_equipo_a(equipo, pid);
+					hiloActivo = false;
 				}
 
 				break;
@@ -105,11 +108,11 @@ pthread_t* inicializar_hilos_entrenadores(int*cantidadEntrenadores){
 	int i, cantidadDeHilos = list_size(equipo);
 	pthread_t* hilosEntrenadores = malloc(sizeof(pthread_t)*cantidadDeHilos);
 
-	sem_Entrenador = malloc(sizeof(sem_t)*cantidadDeHilos);
+	EjecutarEntrenador = malloc(sizeof(sem_t)*cantidadDeHilos);
 //	mutexEntrenador = malloc(sizeof(pthread_mutex_t)*cantidadDeHilos);
 
 	for(i=0; i<cantidadDeHilos; i++){
-		sem_init(&sem_Entrenador[i], 0, 0);
+		sem_init(&EjecutarEntrenador[i], 0, 0);
 //		pthread_mutex_init(&mutexEntrenador[i], NULL);
 		pthread_create(&hilosEntrenadores[i], NULL, (void*) team_hilo_entrenador, list_get(equipo, i));
 	}

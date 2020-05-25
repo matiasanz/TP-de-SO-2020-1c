@@ -16,19 +16,15 @@
 
 
 int main(void) {
+
 	team_inicializar();
 	log_info(event_logger, "\n\n****************************************\n!!!Jellou World Team!!!\n"); /* prints !!!Hello World!!! */
 	log_info(logger, "\n\n");
 
-		mensajesAPPEARD = cr_list_create();
-		mensajesCAUGHT = cr_list_create();
+		mensajesAPPEARD = cr_list_create(); //Para pruebas sin broker
+		mensajesCAUGHT = cr_list_create(); //Para pruebas sin broker
 
- 	inicializar_semaforos();
-
-	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) broker_simulator, NULL);
-	pthread_create(&hiloMensajesAppeard, NULL, (void*)team_suscriptor_cola_APPEARD, mensajesAPPEARD);
-	pthread_create(&hiloMensajesCAUGHT, NULL, (void*)team_suscriptor_cola_CAUGHT, mensajesCAUGHT);
-//	pthread_create(&hiloMensajesLOCALIZED, NULL, (void*)team_suscriptor_cola_APPEARD(), colaDeMensajesAPPEARD);
+	inicializar_hilos();
 
 	int cantidadDeEntrenadores=0;
 	pthread_t* hilosEntrenadores = inicializar_hilos_entrenadores(&cantidadDeEntrenadores);
@@ -42,9 +38,6 @@ int main(void) {
 
 
 //////Matar planificador
-
-	pthread_join(hiloMensajesAppeard, NULL);
-	pthread_join(hiloMensajesCAUGHT, NULL);
 
 	finalizar_hilos();
 
@@ -67,10 +60,6 @@ int main(void) {
 void team_inicializar(){
 	config=config_create("config/team.config");
 
-	char*algo = config_get_string_value(config, "LOG_FILE");
-
-	printf("%s", algo);
-
 	logger=log_create("log/team.log","TEAM",true,LOG_LEVEL_INFO);
 
 	event_logger = log_create("log/team_event.log", "TEAM_EVENT", true, LOG_LEVEL_INFO);
@@ -87,6 +76,8 @@ void team_inicializar(){
 /*-------*/
 
 	inicializar_listas();
+
+ 	inicializar_semaforos();
 
 //	inicializar_hilos();
 
@@ -110,9 +101,9 @@ int team_exit(){
 	return EXIT_SUCCESS;
 }
 
-//**************************************************************
-//Funciones auxiliares:
+/***********************************Funciones auxiliares *************************************/
 
+//Listas
 void inicializar_listas() {
 	equipo = entrenadores_create();
 	entrenadores_cargar(equipo);
@@ -128,13 +119,30 @@ void listas_destroy(){
 	list_destroy(historialDePokemones);
 }
 
+//Colas
 void subscribpcion_colas(){
 	//TODO Gustavo//
 }
 
-void inicializar_semaforos(){
-	sem_init(&sem_HayMensajesRecibidos, 0, 0);//
+//Hilos
+void inicializar_hilos(){
+	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) broker_simulator, NULL); //Para pruebas sin broker
 
+	pthread_create(&hiloMensajesAppeard, NULL, (void*)team_suscriptor_cola_APPEARD, mensajesAPPEARD);
+	pthread_create(&hiloMensajesCAUGHT, NULL, (void*)team_suscriptor_cola_CAUGHT, mensajesCAUGHT);
+//	pthread_create(&hiloMensajesLOCALIZED, NULL, (void*)team_suscriptor_cola_APPEARD(), colaDeMensajesAPPEARD);
+}
+
+void finalizar_hilos(){
+	FinDelProceso = true;
+
+	pthread_join(hiloPlanificador, NULL);
+	pthread_join(hiloMensajesAppeard, NULL);
+	pthread_join(hiloMensajesCAUGHT, NULL);
+
+}
+
+void inicializar_semaforos(){
 	sem_init(&EntradaSalida_o_FinDeEjecucion, 0, 1);
 	sem_init(&HayTareasPendientes, 0, 0);
 
@@ -144,13 +152,10 @@ void inicializar_semaforos(){
 }
 
 void finalizar_semaforos(){
-	sem_destroy(&sem_HayMensajesRecibidos);
-}
+	//Los semaforos de los entrenadores se finalizan cuando se destruye el entrenador
+	sem_destroy(&HayTareasPendientes);
+	sem_destroy(&EntradaSalida_o_FinDeEjecucion);
 
-void finalizar_hilos(){
-	FinDelProceso = true;
-
-	pthread_join(hiloPlanificador, NULL);
-	pthread_join(hiloProcesadorDeMensajes, NULL);
-	pthread_join(hiloReceptorDeMensajes, NULL);
+	pthread_mutex_destroy(&Mutex_AndoLoggeando);
+	pthread_mutex_destroy(&Mutex_AndoLoggeandoEventos);
 }

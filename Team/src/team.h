@@ -21,10 +21,13 @@ int team_exit();
 //funciones auxiliares
 void inicializar_listas();
 void listas_destroy();
-void subscribpcion_colas();
+
+void subscribpcion_colas(); //(?)
 
 void inicializar_semaforos();
 void finalizar_semaforos();
+
+void inicializar_hilos();
 void finalizar_hilos();
 
 

@@ -44,7 +44,7 @@ void team_planificar(){
 
 		if(idProximoEntrenador){
 			printf(">>>Planificar: signal(Entrenador N°%u)\n", *idProximoEntrenador);
-			sem_post(&sem_Entrenador[*idProximoEntrenador]); //signal(id);
+			sem_post(&EjecutarEntrenador[*idProximoEntrenador]); //signal(id);
 
 			sem_wait(&EntradaSalida_o_FinDeEjecucion);
 		}

@@ -9,16 +9,14 @@
 
 //Hilos
 pthread_t hiloReceptorDeMensajes;
-pthread_t hiloProcesadorDeMensajes;
 pthread_t hiloPlanificador;
 pthread_t hiloMensajesAppeard;
 pthread_t hiloMensajesCAUGHT;
+pthread_t hiloMensajesLOCALIZED;
 
 //Semaforos
 
-sem_t sem_HayMensajesRecibidos;
-sem_t sem_PokemonRemovido; //implementacion vieja
-sem_t* sem_Entrenador;
+sem_t* EjecutarEntrenador;
 sem_t EntradaSalida_o_FinDeEjecucion;
 sem_t HayTareasPendientes;
 

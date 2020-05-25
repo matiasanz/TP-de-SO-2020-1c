@@ -3,7 +3,6 @@
 
 #include "../header_global_team.h"
 #include "../estructuras principales/pokemon.h" //hardcodeado
-#include "resultado_captura.h"
 //#include <crenito-commons/mensajes/mensaje_new_pokemon.h>
 
 //Prueba
@@ -21,10 +20,14 @@ typedef struct Mensaje{
 } mensaje;
 
 //estructuras empaquetadas:
+typedef struct{
+	t_id idCaptura;
+	bool tuvoExito;
+}resultado_captura;
 
 //funciones de desempaquetado
 pokemon*desempaquetar_pokemon(void*empaquetado);
-resultado_captura* desempaquetar_resultado(void*empaquetado);
+void* desempaquetar_resultado(void*empaquetado);
 
 //mensajes entre modulos
 mensaje recibir_mensaje();
