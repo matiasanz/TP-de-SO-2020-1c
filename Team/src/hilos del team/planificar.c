@@ -26,7 +26,6 @@ void team_planificar(){
 
 		pthread_mutex_lock(pokemonesRequeridos->mutex);
 		if(!list_is_empty(pokemonesRequeridos->lista)){ //TODO abstraer
-			puts(">>>Planificar: wait(pokemon removido)");
 			pokemon*unPokemon = list_get(pokemonesRequeridos->lista, 0);
 			pthread_mutex_unlock(pokemonesRequeridos->mutex);
 

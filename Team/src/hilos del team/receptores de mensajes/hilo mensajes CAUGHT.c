@@ -7,26 +7,13 @@ void team_suscriptor_cola_CAUGHT(cr_list* mensajes){
 
 		mensaje* mensajeRecibido = cr_list_wait_and_remove(mensajes, 0);
 
-		puts("---------------------------------------------------------------------entra caught");
-
 		resultado_captura* resultado = desempaquetar_resultado(mensajeRecibido->serializado);
-
-		puts("---------------------------------------------------------------------rdo desempaquetado");
 
 		pendiente* capturaPendiente = pendientes_get(capturasPendientes, resultado->idCaptura);
 
-		if(!capturaPendiente){
-			pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-			log_info(event_logger, "Se recibio un resultado con id %u desconocido\n", resultado->idCaptura);
-			pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
-		}
-
-		else {
-			puts("---------------------------------------------------------------hay algo de verdad");
+		if(capturaPendiente) {
 			entrenador* unEntrenador = capturaPendiente->cazador;
 			pokemon*pokemonCatcheado = capturaPendiente->pokemonCatcheado;
-
-			puts("---------------------------------------------------Efectivamente era un pendiente");
 
 			pthread_mutex_lock(&Mutex_AndoLoggeando);
 			log_info(logger, "CAUGHT %s: %s", pokemonCatcheado->especie, (resultado->tuvoExito? "Exitoso": "Fallido"));
@@ -45,5 +32,16 @@ void team_suscriptor_cola_CAUGHT(cr_list* mensajes){
 
 			sem_post(&HayTareasPendientes);
 		}
+
+		else {
+			pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
+			log_info(event_logger, "Se recibio un resultado con id %u desconocido\n", resultado->idCaptura);
+			pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+		}
+
 	}
+
+	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
+	log_info(event_logger, "Finalizo suscripcion a cola CAUGHT"); //Ver TODO si pokemon localized hace esto. Ver como saltear esta parte.
+	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 }

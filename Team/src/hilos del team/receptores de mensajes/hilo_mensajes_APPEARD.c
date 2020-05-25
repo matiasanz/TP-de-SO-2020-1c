@@ -16,4 +16,25 @@ void team_suscriptor_cola_APPEARD(cr_list* mensajes){
 
 		sem_post(&HayTareasPendientes);
 	}
+
+	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
+	log_info(event_logger, "Finalizo suscripcion a cola APPEARD");
+	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+}
+
+/********************************** Auxiliares ************************************/
+
+void registrar_pokemon(pokemon*unPokemon){
+
+	especies_agregar(historialDePokemones, unPokemon->especie);
+
+	if( es_objetivo_de_alguien(*unPokemon, equipo ) && !mapa_especie_mapeada(pokemonesRequeridos, unPokemon->especie)){
+		mapa_mapear_objetivo(pokemonesRequeridos, unPokemon);
+		puts(">>>Signal(hay mas pokemones)");
+	}
+
+	else{
+		printf("Se recibio un %s y pokemon que no es objetivo de nadie o que ya tengo en mapa, es cartera\n", unPokemon->especie);
+		pokemon_destroy(unPokemon); //"descartar al pokemon"
+	}
 }

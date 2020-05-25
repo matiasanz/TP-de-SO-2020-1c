@@ -1,7 +1,7 @@
 #include "hilos_team.h"
 #include "../team.h"
 
-void team_recibir_mensajes(t_list* mensajes){
+void broker_simulator(){
 	puts("Simulacro de recepcion de mensajes");
 
 	int i;

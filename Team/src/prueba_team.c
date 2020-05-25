@@ -11,7 +11,6 @@
 #include "hilos del team/hilos_team.h"
 //#include "tests/tests_team.o"
 
-t_list* mensajes; //Sacar a futuro (es para prueabs de escritorio)
 //cr_list*mensajesAPPEARD; //globales
 //cr_list*mensajesCAUGHT;
 
@@ -26,7 +25,7 @@ int main(void) {
 
  	inicializar_semaforos();
 
-	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) team_recibir_mensajes, mensajes);
+	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) broker_simulator, NULL);
 	pthread_create(&hiloMensajesAppeard, NULL, (void*)team_suscriptor_cola_APPEARD, mensajesAPPEARD);
 	pthread_create(&hiloMensajesCAUGHT, NULL, (void*)team_suscriptor_cola_CAUGHT, mensajesCAUGHT);
 //	pthread_create(&hiloMensajesLOCALIZED, NULL, (void*)team_suscriptor_cola_APPEARD(), colaDeMensajesAPPEARD);
@@ -44,8 +43,6 @@ int main(void) {
 
 //////Matar planificador
 
-
-
 	pthread_join(hiloMensajesAppeard, NULL);
 	pthread_join(hiloMensajesCAUGHT, NULL);
 
@@ -55,10 +52,9 @@ int main(void) {
 
 	log_info(event_logger, "chau team\n****************************************");
 
-	list_destroy(mensajes); //Para pruebas de escritorio
-
 	cr_list_destroy(tareasPendientes);
 	cr_list_destroy(mensajesAPPEARD);
+	cr_list_destroy(mensajesCAUGHT);
 
 	return team_exit(); //Destruye listas, cierra config, cierra log
 }
@@ -144,9 +140,6 @@ void inicializar_semaforos(){
 
 	pthread_mutex_init(&Mutex_AndoLoggeando, NULL);
 	pthread_mutex_init(&Mutex_AndoLoggeandoEventos, NULL);
-//	pthread_mutex_init(&mutexMensaje, NULL);
-//	pthread_mutex_init(&mutexMapaPokemones, NULL);
-//	pthread_mutex_init(&mutexCapturasPendientes, NULL);
 //	pthread_mutex_init(&mutexFinDeProceso, NULL);
 }
 

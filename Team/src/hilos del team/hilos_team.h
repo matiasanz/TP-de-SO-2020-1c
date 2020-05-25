@@ -44,7 +44,7 @@ void MODELO_PLANIFICAR();
 void team_planificar(); //nueva implementacion
 
 //Hilo que se encarga de recibir los mensajes
-void team_recibir_mensajes(t_list* mensajes);
+void broker_simulator();
 void team_suscriptor_cola_APPEARD(cr_list* mensajes);
 void team_suscriptor_cola_CAUGHT(cr_list* mensajes);
 

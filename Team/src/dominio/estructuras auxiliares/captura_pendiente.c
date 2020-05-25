@@ -29,8 +29,6 @@ void agregar_pendiente(pendientes mensajesPendientes, t_id idMensaje, entrenador
 //Obtener
 pendiente* pendientes_get(pendientes mensajesPendientes, t_id idRespuesta){
 	bool cmp_pendiente_id(void* unPendiente){
-		printf("ID: %u == %u?", ((pendiente*) unPendiente)->cazador->id, idRespuesta);
-
 		return ((pendiente*)unPendiente)->id == idRespuesta;
 	}
 
@@ -41,7 +39,6 @@ pendiente* pendientes_get(pendientes mensajesPendientes, t_id idRespuesta){
 pendiente*pendientes_pendiente_del_entrenador(pendientes mensajesPendientes, t_id idEntrenador){
 
 	bool esElEntrenador(void*unPendiente){
-		printf("ID: %u == %u?", ((pendiente*) unPendiente)->cazador->id, idEntrenador);
 		return ((pendiente*) unPendiente)->cazador->id == idEntrenador;
 	}
 
