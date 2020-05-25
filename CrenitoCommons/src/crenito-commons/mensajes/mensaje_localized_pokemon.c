@@ -116,3 +116,21 @@ t_mensaje_localized_pokemon* mensaje_localized_pokemon_deserializar(t_buffer* bu
 
 	return msj;
 }
+
+// Getters
+uint32_t mensaje_localized_pokemon_get_id(t_mensaje_localized_pokemon* msj){
+	return msj->ids.id;
+}
+
+uint32_t mensaje_localized_pokemon_get_id_correlativo(t_mensaje_localized_pokemon* msj){
+	return msj->ids.id_correlativo;
+}
+
+//Setters
+void mensaje_localized_pokemon_set_id(t_mensaje_localized_pokemon* msj, uint32_t id){
+	msj->ids.id = id;
+}
+
+void mensaje_localized_pokemon_set_id_correlativo(t_mensaje_localized_pokemon* msj, uint32_t id_correlativo){
+	msj->ids.id_correlativo = id_correlativo;
+}

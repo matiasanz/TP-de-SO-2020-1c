@@ -25,4 +25,12 @@ void mensaje_localized_pokemon_destruir(t_mensaje_localized_pokemon* localized_p
 t_buffer* mensaje_localized_pokemon_serializar(t_mensaje_localized_pokemon* localized_pokemon);
 t_mensaje_localized_pokemon* mensaje_localized_pokemon_deserializar(t_buffer* buffer);
 
+//Getters
+uint32_t mensaje_localized_pokemon_get_id(t_mensaje_localized_pokemon* msj);
+uint32_t mensaje_localized_pokemon_get_id_correlativo(t_mensaje_localized_pokemon* msj);
+
+//Setters
+void mensaje_localized_pokemon_set_id(t_mensaje_localized_pokemon* msj, uint32_t id);
+void mensaje_localized_pokemon_set_id_correlativo(t_mensaje_localized_pokemon* msj, uint32_t id_correlativo);
+
 #endif /* SRC_CRENITO_COMMONS_MENSAJES_MENSAJE_LOCALIZED_POKEMON_H_ */

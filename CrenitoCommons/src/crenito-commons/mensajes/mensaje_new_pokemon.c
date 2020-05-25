@@ -80,3 +80,21 @@ t_mensaje_new_pokemon* mensaje_new_pokemon_deserializar(t_buffer* buffer) {
 	
 	return msj;
 }
+
+// Getters
+uint32_t mensaje_new_pokemon_get_id(t_mensaje_new_pokemon* msj){
+	return msj->ids.id;
+}
+
+uint32_t mensaje_new_pokemon_get_id_correlativo(t_mensaje_new_pokemon* msj){
+	return msj->ids.id_correlativo;
+}
+
+//Setters
+void mensaje_new_pokemon_set_id(t_mensaje_new_pokemon* msj, uint32_t id){
+	msj->ids.id = id;
+}
+
+void mensaje_new_pokemon_set_id_correlativo(t_mensaje_new_pokemon* msj, uint32_t id_correlativo){
+	msj->ids.id_correlativo = id_correlativo;
+}

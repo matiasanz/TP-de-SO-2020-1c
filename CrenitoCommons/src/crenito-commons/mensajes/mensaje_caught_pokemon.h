@@ -22,4 +22,12 @@ void mensaje_caught_pokemon_destruir(t_mensaje_caught_pokemon* caught_pokemon);
 t_buffer* mensaje_caught_pokemon_serializar(t_mensaje_caught_pokemon* caught_pokemon);
 t_mensaje_caught_pokemon* mensaje_caught_pokemon_deserializar(t_buffer* buffer);
 
+//Getters
+uint32_t mensaje_caught_pokemon_get_id(t_mensaje_caught_pokemon* msj);
+uint32_t mensaje_caught_pokemon_get_id_correlativo(t_mensaje_caught_pokemon* msj);
+
+//Setters
+void mensaje_caught_pokemon_set_id(t_mensaje_caught_pokemon* msj, uint32_t id);
+void mensaje_caught_pokemon_set_id_correlativo(t_mensaje_caught_pokemon* msj, uint32_t id_correlativo);
+
 #endif /* SRC_CRENITO_COMMONS_MENSAJES_MENSAJE_CAUGHT_POKEMON_H_ */
