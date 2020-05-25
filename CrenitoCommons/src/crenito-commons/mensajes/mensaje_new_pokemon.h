@@ -12,7 +12,7 @@
 #include "../conexiones/buffer.h"
 
 typedef struct {
-	t_mensaje_id ids;
+	t_mensaje_header mensaje_header;
 	t_pokemon pokemon;
 	uint32_t cantidad;
 } t_mensaje_new_pokemon;

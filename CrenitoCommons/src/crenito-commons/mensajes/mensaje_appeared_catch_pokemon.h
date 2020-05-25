@@ -12,7 +12,7 @@
 #include "../conexiones/buffer.h"
 
 typedef struct {
-	t_mensaje_id ids;
+	t_mensaje_header mensaje_header;
 	t_pokemon pokemon;
 } t_mensaje_appeared_catch_pokemon;
 

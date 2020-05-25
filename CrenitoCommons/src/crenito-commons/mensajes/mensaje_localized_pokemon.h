@@ -13,7 +13,7 @@
 #include <commons/collections/list.h>
 
 typedef struct {
-	t_mensaje_id ids;
+	t_mensaje_header mensaje_header;
 	char* especie;
 	uint32_t especie_lenght;
 	uint32_t posiciones_lenght;

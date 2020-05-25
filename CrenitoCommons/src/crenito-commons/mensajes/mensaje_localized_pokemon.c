@@ -11,7 +11,7 @@ t_mensaje_localized_pokemon* mensaje_localized_pokemon_crear(char* especie, t_li
 	t_mensaje_localized_pokemon* localized_pokemon = malloc(
 			sizeof(t_mensaje_localized_pokemon));
 
-	mensaje_id_inicializar(&localized_pokemon->ids);
+	mensaje_header_inicializar(&localized_pokemon->mensaje_header);
 
 	localized_pokemon->especie_lenght = strlen(especie) + 1;
 	localized_pokemon->especie = malloc(localized_pokemon->especie_lenght);
@@ -34,7 +34,7 @@ void mensaje_localized_pokemon_destruir(t_mensaje_localized_pokemon* localized_p
 
 t_buffer* mensaje_localized_pokemon_serializar(t_mensaje_localized_pokemon* localized_pokemon) {
 
-	int size = sizeof(localized_pokemon->ids)
+	int size = sizeof(localized_pokemon->mensaje_header)
 			 + sizeof(localized_pokemon->especie_lenght)
 			 + localized_pokemon->especie_lenght
 			 + sizeof(localized_pokemon->posiciones_lenght)
@@ -43,10 +43,10 @@ t_buffer* mensaje_localized_pokemon_serializar(t_mensaje_localized_pokemon* loca
 	t_buffer* bfr = buffer_crear(size);
 	int desplazamiento = 0;
 
-	// id
-	memcpy(bfr->stream + desplazamiento, &localized_pokemon->ids,
-			sizeof(localized_pokemon->ids));
-	desplazamiento += sizeof(localized_pokemon->ids);
+	// header
+	memcpy(bfr->stream + desplazamiento, &localized_pokemon->mensaje_header,
+			sizeof(localized_pokemon->mensaje_header));
+	desplazamiento += sizeof(localized_pokemon->mensaje_header);
 
 	//especie_lenght
 	memcpy(bfr->stream + desplazamiento, &localized_pokemon->especie_lenght,
@@ -80,9 +80,9 @@ t_mensaje_localized_pokemon* mensaje_localized_pokemon_deserializar(t_buffer* bu
 	t_mensaje_localized_pokemon* msj = malloc(sizeof(t_mensaje_localized_pokemon));
 	int desplazamiento = 0;
 
-	// id
-	memcpy(&msj->ids, buffer->stream + desplazamiento, sizeof(msj->ids));
-	desplazamiento += sizeof(msj->ids);
+	// header
+	memcpy(&msj->mensaje_header, buffer->stream + desplazamiento, sizeof(msj->mensaje_header));
+	desplazamiento += sizeof(msj->mensaje_header);
 
 	//especie_lenght
 	memcpy(&msj->especie_lenght, buffer->stream + desplazamiento,
@@ -119,18 +119,18 @@ t_mensaje_localized_pokemon* mensaje_localized_pokemon_deserializar(t_buffer* bu
 
 // Getters
 uint32_t mensaje_localized_pokemon_get_id(t_mensaje_localized_pokemon* msj){
-	return msj->ids.id;
+	return msj->mensaje_header.id;
 }
 
 uint32_t mensaje_localized_pokemon_get_id_correlativo(t_mensaje_localized_pokemon* msj){
-	return msj->ids.id_correlativo;
+	return msj->mensaje_header.id_correlativo;
 }
 
 //Setters
 void mensaje_localized_pokemon_set_id(t_mensaje_localized_pokemon* msj, uint32_t id){
-	msj->ids.id = id;
+	msj->mensaje_header.id = id;
 }
 
 void mensaje_localized_pokemon_set_id_correlativo(t_mensaje_localized_pokemon* msj, uint32_t id_correlativo){
-	msj->ids.id_correlativo = id_correlativo;
+	msj->mensaje_header.id_correlativo = id_correlativo;
 }

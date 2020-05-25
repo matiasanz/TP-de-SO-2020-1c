@@ -10,7 +10,7 @@ t_mensaje_caught_pokemon* mensaje_caught_pokemon_crear(uint32_t atrapado) {
 
 	t_mensaje_caught_pokemon* caught_pokemon = malloc(sizeof(t_mensaje_caught_pokemon));
 
-	mensaje_id_inicializar(&caught_pokemon->ids);
+	mensaje_header_inicializar(&caught_pokemon->mensaje_header);
 	caught_pokemon->atrapado = atrapado;
 
 	return caught_pokemon;
@@ -23,16 +23,16 @@ void mensaje_caught_pokemon_destruir(t_mensaje_caught_pokemon* caught_pokemon) {
 
 t_buffer* mensaje_caught_pokemon_serializar(t_mensaje_caught_pokemon* caught_pokemon) {
 
-	int size = sizeof(caught_pokemon->ids) 
+	int size = sizeof(caught_pokemon->mensaje_header) 
 	         + sizeof(caught_pokemon->atrapado);
 
 	t_buffer* bfr = buffer_crear(size);
 	int desplazamiento = 0;
 
-	// id
-	memcpy(bfr->stream + desplazamiento, &(caught_pokemon->ids),
-			sizeof(caught_pokemon->ids));
-	desplazamiento += sizeof(caught_pokemon->ids);
+	// header
+	memcpy(bfr->stream + desplazamiento, &(caught_pokemon->mensaje_header),
+			sizeof(caught_pokemon->mensaje_header));
+	desplazamiento += sizeof(caught_pokemon->mensaje_header);
 
 	//atrapado
 	memcpy(bfr->stream + desplazamiento, &(caught_pokemon->atrapado),
@@ -47,9 +47,9 @@ t_mensaje_caught_pokemon* mensaje_caught_pokemon_deserializar(t_buffer* buffer) 
 	t_mensaje_caught_pokemon* msj = malloc(sizeof(t_mensaje_caught_pokemon));
 	int desplazamiento = 0;
 
-	// id
-	memcpy(&msj->ids, buffer->stream + desplazamiento, sizeof(msj->ids));
-	desplazamiento += sizeof(msj->ids);
+	// header
+	memcpy(&msj->mensaje_header, buffer->stream + desplazamiento, sizeof(msj->mensaje_header));
+	desplazamiento += sizeof(msj->mensaje_header);
 
 	//atrapado
 	memcpy(&msj->atrapado, buffer->stream + desplazamiento,
@@ -63,18 +63,18 @@ t_mensaje_caught_pokemon* mensaje_caught_pokemon_deserializar(t_buffer* buffer) 
 
 // Getters
 uint32_t mensaje_caught_pokemon_get_id(t_mensaje_caught_pokemon* msj){
-	return msj->ids.id;
+	return msj->mensaje_header.id;
 }
 
 uint32_t mensaje_caught_pokemon_get_id_correlativo(t_mensaje_caught_pokemon* msj){
-	return msj->ids.id_correlativo;
+	return msj->mensaje_header.id_correlativo;
 }
 
 //Setters
 void mensaje_caught_pokemon_set_id(t_mensaje_caught_pokemon* msj, uint32_t id){
-	msj->ids.id = id;
+	msj->mensaje_header.id = id;
 }
 
 void mensaje_caught_pokemon_set_id_correlativo(t_mensaje_caught_pokemon* msj, uint32_t id_correlativo){
-	msj->ids.id_correlativo = id_correlativo;
+	msj->mensaje_header.id_correlativo = id_correlativo;
 }

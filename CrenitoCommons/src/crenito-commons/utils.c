@@ -7,10 +7,10 @@
 
 #include"utils.h"
 
-void mensaje_id_inicializar(t_mensaje_id* ids) {
+void mensaje_header_inicializar(t_mensaje_header* header) {
 
-	ids->id = 0;
-	ids-> id_correlativo = 0;
+	header->id = 0;
+	header-> id_correlativo = 0;
 }
 
 t_log* get_crnito_logger() {

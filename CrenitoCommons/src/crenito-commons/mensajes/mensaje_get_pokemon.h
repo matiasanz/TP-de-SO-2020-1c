@@ -11,7 +11,7 @@
 #include "../conexiones/buffer.h"
 
 typedef struct {
-	t_mensaje_id ids;
+	t_mensaje_header mensaje_header;
 	char* especie;
 	uint32_t especie_lenght;
 } t_mensaje_get_pokemon;

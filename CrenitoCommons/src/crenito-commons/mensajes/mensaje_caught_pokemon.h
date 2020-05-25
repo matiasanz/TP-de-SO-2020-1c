@@ -13,7 +13,7 @@
 /* Este mensaje podría ser empaquetado sin serialziar pero es preferible que todos
 *  sigan la misma interfaz */
 typedef struct {
-	t_mensaje_id ids;
+	t_mensaje_header mensaje_header;
 	uint32_t atrapado;  // 1 o 0
 } t_mensaje_caught_pokemon;
 
