@@ -21,14 +21,12 @@ int main(void) {
 	log_info(event_logger, "\n\n****************************************\n!!!Jellou World Team!!!\n"); /* prints !!!Hello World!!! */
 	log_info(logger, "\n\n");
 
-//		mensajes = list_create(); //Sacar
 		mensajesAPPEARD = cr_list_create();
 		mensajesCAUGHT = cr_list_create();
 
  	inicializar_semaforos();
 
 	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) team_recibir_mensajes, mensajes);
-//	pthread_create(&hiloProcesadorDeMensajes, NULL, (void*)team_procesar_mensajes, mensajes);
 	pthread_create(&hiloMensajesAppeard, NULL, (void*)team_suscriptor_cola_APPEARD, mensajesAPPEARD);
 	pthread_create(&hiloMensajesCAUGHT, NULL, (void*)team_suscriptor_cola_CAUGHT, mensajesCAUGHT);
 //	pthread_create(&hiloMensajesLOCALIZED, NULL, (void*)team_suscriptor_cola_APPEARD(), colaDeMensajesAPPEARD);

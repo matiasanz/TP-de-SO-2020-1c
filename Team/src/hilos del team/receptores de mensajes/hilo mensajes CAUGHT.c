@@ -7,11 +7,11 @@ void team_suscriptor_cola_CAUGHT(cr_list* mensajes){
 
 		mensaje* mensajeRecibido = cr_list_wait_and_remove(mensajes, 0);
 
-		puts("entra caught");
+		puts("---------------------------------------------------------------------entra caught");
 
 		resultado_captura* resultado = desempaquetar_resultado(mensajeRecibido->serializado);
 
-		puts("rdo desempaquetado");
+		puts("---------------------------------------------------------------------rdo desempaquetado");
 
 		pendiente* capturaPendiente = pendientes_get(capturasPendientes, resultado->idCaptura);
 
@@ -22,11 +22,11 @@ void team_suscriptor_cola_CAUGHT(cr_list* mensajes){
 		}
 
 		else {
-			puts("hay algo de verdad");
+			puts("---------------------------------------------------------------hay algo de verdad");
 			entrenador* unEntrenador = capturaPendiente->cazador;
 			pokemon*pokemonCatcheado = capturaPendiente->pokemonCatcheado;
 
-			puts("Efectivamente era un pendiente");
+			puts("---------------------------------------------------Efectivamente era un pendiente");
 
 			pthread_mutex_lock(&Mutex_AndoLoggeando);
 			log_info(logger, "CAUGHT %s: %s", pokemonCatcheado->especie, (resultado->tuvoExito? "Exitoso": "Fallido"));

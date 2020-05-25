@@ -21,13 +21,14 @@ void team_planificar(){
 
 	while(!FinDelProceso){
 		sem_wait(&HayTareasPendientes);
-		sem_wait(&EntradaSalida_o_FinDeEjecucion);
 
 		entrenadores colaDeReady = entrenadores_en_estado(equipo, READY);
 
-		if(!cr_list_is_empty(pokemonesRequeridos)){ //TODO abstraer
+		pthread_mutex_lock(pokemonesRequeridos->mutex);
+		if(!list_is_empty(pokemonesRequeridos->lista)){ //TODO abstraer
 			puts(">>>Planificar: wait(pokemon removido)");
-			pokemon*unPokemon = mapa_first(pokemonesRequeridos);
+			pokemon*unPokemon = list_get(pokemonesRequeridos->lista, 0);
+			pthread_mutex_unlock(pokemonesRequeridos->mutex);
 
 			if(!unPokemon){
 				error_show("Se intento leer un pokemon inexistente\n");
@@ -38,11 +39,15 @@ void team_planificar(){
 			colaDeReady = entrenadores_despertar_APPEARD(equipo, unPokemon);
 		}
 
+		else pthread_mutex_unlock(pokemonesRequeridos->mutex);
+
 		t_id* idProximoEntrenador = entrenadores_id_proximo_a_planificar(colaDeReady); // equipoReady) TODO
 
 		if(idProximoEntrenador){
 			printf(">>>Planificar: signal(Entrenador N°%u)\n", *idProximoEntrenador);
 			sem_post(&sem_Entrenador[*idProximoEntrenador]); //signal(id);
+
+			sem_wait(&EntradaSalida_o_FinDeEjecucion);
 		}
 	}
 
@@ -75,29 +80,4 @@ entrenadores entrenadores_despertar_APPEARD(entrenadores equipo, pokemon* unPoke
 	list_sort(enReady, (bool(*)(void*, void*)) &porCercania);
 
 	return enReady;
-}
-
-
-//****************************************** nueva version ***********************************
-
-void planificar(){
-	especies_pokemones objetivosGlobales = entrenadores_objetivos_globales(equipo);
-	Get_pokemones(objetivosGlobales);
-
-	puts("**********************************************\nSe va a planificar");
-//
-//	while(!FinDelProceso){
-//		wait(puedoPlanificar);
-//		if(seDetectoDeadlock){
-//
-//		}
-
-//	/*	else*/ if(captura){
-//
-//		}
-
-//		else if(aparecioPokemon){
-//
-//		}
-//	}
 }
