@@ -36,7 +36,7 @@ t_log* crenito_logger;
 typedef struct {
 	uint32_t id;
 	uint32_t id_correlativo;
-} t_mensaje_id;
+} t_mensaje_header;
 
 typedef enum {
 	NEW_POKEMON = 1,
@@ -52,7 +52,7 @@ typedef enum {
 } t_id_proceso;
 
 // Inicializa los ids para prevenir errores con valgrind
-void mensaje_id_inicializar(t_mensaje_id* ids);
+void mensaje_header_inicializar(t_mensaje_header* ids);
 // singleton para el logger de las commons
 t_log* get_crnito_logger();
 // dado un id de proceso devuelve el mismo representado por un string

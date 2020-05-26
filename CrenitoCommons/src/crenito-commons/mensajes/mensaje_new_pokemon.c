@@ -11,7 +11,7 @@ t_mensaje_new_pokemon* mensaje_new_pokemon_crear(char* especie, uint32_t pos_x,
 
 	t_mensaje_new_pokemon* new_pokemon = malloc(sizeof(t_mensaje_new_pokemon));
 
-	mensaje_id_inicializar(&new_pokemon->ids);
+	mensaje_header_inicializar(&new_pokemon->mensaje_header);
 	new_pokemon->pokemon = pokemon_crear(especie, pos_x, pos_y);
 	new_pokemon->cantidad = cantidad;
 
@@ -26,33 +26,28 @@ void mensaje_new_pokemon_destruir(t_mensaje_new_pokemon* new_pokemon) {
 
 t_buffer* mensaje_new_pokemon_serializar(t_mensaje_new_pokemon* new_pokemon) {
 
-	int size = sizeof(new_pokemon->ids) +
-			   new_pokemon-> pokemon.especie_lenght +
-			   sizeof(new_pokemon->pokemon.especie_lenght) +
-			   sizeof(new_pokemon->cantidad) +
-			   sizeof(new_pokemon->pokemon.posicion);
+	int bytes_pokemon = new_pokemon-> pokemon.especie_lenght +
+			            sizeof(new_pokemon->pokemon.especie_lenght) +
+						sizeof(new_pokemon->pokemon.posicion);
+
+	int size = sizeof(new_pokemon->mensaje_header) +
+			   bytes_pokemon +
+			   sizeof(new_pokemon->cantidad);
+
 
 	t_buffer* bfr = buffer_crear(size);
 	int desplazamiento = 0;
 
-	// id
-	memcpy(bfr->stream + desplazamiento, &(new_pokemon->ids),
-			sizeof(new_pokemon->ids));
-	desplazamiento += sizeof(new_pokemon->ids);
+	// header
+	memcpy(bfr->stream + desplazamiento, &(new_pokemon->mensaje_header),
+			sizeof(new_pokemon->mensaje_header));
+	desplazamiento += sizeof(new_pokemon->mensaje_header);
 
-	t_pokemon pkm = new_pokemon->pokemon;
-	//especie_lenght
-	memcpy(bfr->stream + desplazamiento, &(pkm.especie_lenght),
-			sizeof(pkm.especie_lenght));
-	desplazamiento += sizeof(pkm.especie_lenght);
-
-	//especie
-	memcpy(bfr->stream + desplazamiento, pkm.especie, pkm.especie_lenght);
-	desplazamiento += pkm.especie_lenght;
-
-	//posicion
-	memcpy(bfr->stream + desplazamiento, &(pkm.posicion), sizeof(pkm.posicion));
-	desplazamiento += sizeof(pkm.posicion);
+	// pokemon
+	void* pkm_serializado = pokemon_serializar(new_pokemon->pokemon, bytes_pokemon);
+	memcpy(bfr->stream + desplazamiento, pkm_serializado, bytes_pokemon);
+	free(pkm_serializado);
+	desplazamiento += bytes_pokemon;
 
 	//cantidad
 	memcpy(bfr->stream + desplazamiento, &(new_pokemon->cantidad),
@@ -67,34 +62,39 @@ t_mensaje_new_pokemon* mensaje_new_pokemon_deserializar(t_buffer* buffer) {
 	t_mensaje_new_pokemon* msj = malloc(sizeof(t_mensaje_new_pokemon));
 	int desplazamiento = 0;
 
-	// id
-	memcpy(&msj->ids, buffer->stream + desplazamiento, sizeof(msj->ids));
-	desplazamiento += sizeof(msj->ids);
+	// header
+	memcpy(&msj->mensaje_header, buffer->stream + desplazamiento, sizeof(msj->mensaje_header));
+	desplazamiento += sizeof(msj->mensaje_header);
 
-	t_pokemon pkm = msj->pokemon;
-	//especie_lenght
-	memcpy(&pkm.especie_lenght, buffer->stream + desplazamiento,
-			sizeof(pkm.especie_lenght));
-	desplazamiento += sizeof(pkm.especie_lenght);
-
-	//especie
-	char* especie = strdup(buffer->stream + desplazamiento);
-	pkm.especie = especie;
-	desplazamiento += pkm.especie_lenght;
-
-	//posicion
-	memcpy(&pkm.posicion, buffer->stream + desplazamiento,
-			sizeof(pkm.posicion));
-	desplazamiento += sizeof(pkm.posicion);
+	//pokemon
+	int bytes_pokemon = 0;
+	msj->pokemon = pokemon_deserializar(buffer -> stream + desplazamiento, &bytes_pokemon);
+	desplazamiento += bytes_pokemon;
 
 	//cantidad
 	memcpy(&msj->cantidad, buffer->stream + desplazamiento,
 			sizeof(msj->cantidad));
 	desplazamiento += sizeof(msj->cantidad);
-
-	msj->pokemon = pkm;
 	
 	buffer_destruir(buffer);
 	
 	return msj;
+}
+
+// Getters
+uint32_t mensaje_new_pokemon_get_id(t_mensaje_new_pokemon* msj){
+	return msj->mensaje_header.id;
+}
+
+uint32_t mensaje_new_pokemon_get_id_correlativo(t_mensaje_new_pokemon* msj){
+	return msj->mensaje_header.id_correlativo;
+}
+
+//Setters
+void mensaje_new_pokemon_set_id(t_mensaje_new_pokemon* msj, uint32_t id){
+	msj->mensaje_header.id = id;
+}
+
+void mensaje_new_pokemon_set_id_correlativo(t_mensaje_new_pokemon* msj, uint32_t id_correlativo){
+	msj->mensaje_header.id_correlativo = id_correlativo;
 }

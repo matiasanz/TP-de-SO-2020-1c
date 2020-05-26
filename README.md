@@ -5,3 +5,4 @@
  - _Matías Anzorandía_
  - _Emiliano González_
  - _Gastón Erazo_
+ - _Gustavo Choque_
