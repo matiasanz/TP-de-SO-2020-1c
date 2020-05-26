@@ -4,35 +4,34 @@
 void broker_simulator(){
 	puts("Simulacro de recepcion de mensajes");
 
-	sem_wait(&BORRAR_ESTO_MENSAJE_GET_ENVIADO); //pasar al switch de forma que vaya recorriendo la lista de objetivos globales (QUE TENGO QUE CORREGIR)
-	mensaje* unMensaje = malloc(sizeof(mensaje));
-	*unMensaje = (mensaje) {LOCALIZED_POKEMON_, localized_pokemon_crear("Pikachu")}; //a futuro le pasaria la cant de instancias que necesito del recurso
-
-	cr_list_add_and_signal(mensajesLOCALIZED, unMensaje);
-
 	int i;
 
 	for(i=0; !FinDelProceso; i= (i+1)%6){
 
-		unMensaje = malloc(sizeof(mensaje));
+		mensaje* unMensaje = malloc(sizeof(mensaje));
 
 		switch(i){
 			case 0: {
-				*unMensaje = (mensaje) {APPEARD_POKEMON_, pokemon_ptr_create("Charmander", 2, 9)};
+				*unMensaje = (mensaje) {LOCALIZED_POKEMON_, localized_pokemon_crear("Pikachu")}; //a futuro le pasaria la cant de instancias que necesito del recurso
 				break;
 			}
 
 			case 1: {
+				*unMensaje = (mensaje) {APPEARD_POKEMON_, pokemon_ptr_create("Charmander", 2, 9)};
+				break;
+			}
+
+			case 2: {
 				*unMensaje = (mensaje) {APPEARD_POKEMON_, pokemon_ptr_create("Pikachu", 7, 4)};
 				break;
 			}
 
-			case 2:{
-				*unMensaje = (mensaje) {APPEARD_POKEMON_, pokemon_ptr_create("Pidgey", 3, 1)};
+			case 3:{
+				*unMensaje = (mensaje) {LOCALIZED_POKEMON_, localized_pokemon_crear("Pidgey")};
 				break;
 			}
 
-			case 3:{
+			case 4:{
 				pendiente*unPendiente = cr_list_get(capturasPendientes, 0);
 
 				if(unPendiente){
@@ -51,8 +50,13 @@ void broker_simulator(){
 				break;
 			}
 
-			case 4:{
+			case 5:{
 				*unMensaje = (mensaje) {APPEARD_POKEMON_, pokemon_ptr_create("Squirtle", 3, 1)};
+				break;
+			}
+
+			case 6:{
+				*unMensaje = (mensaje) {LOCALIZED_POKEMON_, localized_pokemon_crear("Anianga")};
 				break;
 			}
 
@@ -70,6 +74,11 @@ void broker_simulator(){
 
 			case CAUGHT_POKEMON_:{
 				cr_list_add_and_signal(mensajesCAUGHT, unMensaje);
+				break;
+			}
+
+			case LOCALIZED_POKEMON_:{
+				cr_list_add_and_signal(mensajesLOCALIZED, unMensaje);
 				break;
 			}
 

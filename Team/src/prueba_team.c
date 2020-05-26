@@ -14,6 +14,9 @@
 int main(void) {
 
 	team_inicializar();
+
+	Get_pokemones(objetivosGlobales);
+
 	log_info(event_logger, "\n\n****************************************\n!!!Jellou World Team!!!\n"); /* prints !!!Hello World!!! */
 	log_info(logger, "\n\n");
 
@@ -104,6 +107,7 @@ int team_exit(){
 void inicializar_listas() {
 	equipo = entrenadores_create();
 	entrenadores_cargar(equipo);
+	objetivosGlobales = entrenadores_objetivos_globales(equipo);
 	pokemonesRequeridos = mapa_create();
 	capturasPendientes = pendientes_create();
 	historialDePokemones = list_create(); //Ver si vale la pena abstraer
@@ -144,12 +148,11 @@ void finalizar_hilos(){
 void inicializar_semaforos(){
 	sem_init(&EntradaSalida_o_FinDeEjecucion, 0, 1);
 	sem_init(&HayTareasPendientes, 0, 0);
+//	sem_init(&HayEntrenadores, 0, 0); VER??
 
 	pthread_mutex_init(&Mutex_AndoLoggeando, NULL);
 	pthread_mutex_init(&Mutex_AndoLoggeandoEventos, NULL);
 
-	//Hardcodeados
-	sem_init(&BORRAR_ESTO_MENSAJE_GET_ENVIADO, 0, 0);
 }
 
 void finalizar_semaforos(){

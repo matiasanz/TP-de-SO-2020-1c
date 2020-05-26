@@ -33,7 +33,7 @@ typedef struct pcb_Entrenador{
 	bool entrenador_llego_a(entrenador, t_posicion);
 
 // Retorna true si la cantidad de pokemones cazados no supera la cantidad permitida para ese entrenador
-	bool entrenador_puede_cazar_mas_pokemones(entrenador);
+	bool entrenador_puede_cazar_mas_pokemones(entrenador*);
 
 // Retorna true si todos los objetivos fueron cazados
 	bool entrenador_objetivos_cumplidos(entrenador*);
@@ -77,11 +77,14 @@ entrenador* entrenadores_remover_del_equipo_a(entrenadores, t_id);
 //Pasa al entrenador que se este ejecutando a LOCKED hasta APPEARD
 	void entrenadores_bloquear_por_captura(entrenadores);
 
-//Destructor
-	void entrenadores_destroy(entrenadores);
-
 //Retorna true si el entrenador requiere al menos una instancia de la especie
 	bool entrenador_necesita_recurso(entrenador*unEntrenador); //TODO
+
+//Retorna true si los recursos que tiene en su inventario cubren sus objetivos
+	bool entrenador_cumplio_sus_objetivos(entrenador*unEntrenador);
+
+//Destructor
+	void entrenadores_destroy(entrenadores);
 
 //****************************************************************************************
 //TAD Recursos (implementado con t_dictionary*)
@@ -117,10 +120,16 @@ typedef especie_pokemon recurso;
 // A la primera matriz le resta el contenido de la segunda, asumiendo que tiene recursos del mismo tipo
 	void recursos_restar_recursos_a(matriz_recursos, matriz_recursos);
 
+// Retorna la diferencia entre la primera y la segunda
+	matriz_recursos recursos_matriz_diferencia(matriz_recursos, matriz_recursos);
+
 // Retorna true si todos los recursos tienen 0 instancias
 	bool recursos_matriz_nula(matriz_recursos);
 
 // Retorna la cantidad total de recursos que posee la matriz
 	numero recursos_contar(matriz_recursos);
+
+// Retorna true si la proveedora tiene mas instancias de cada recurso que la receptora
+	bool recursos_suficientes_para(matriz_recursos proveedora, matriz_recursos receptora);
 
 # endif

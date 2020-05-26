@@ -60,14 +60,19 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 				entrenador_capturar(unEntrenador, pokemonCatcheado);
 
 //				pthread_mutex_lock(&mutexEntrenador[unEntrenador->id]);
-				if(entrenador_puede_cazar_mas_pokemones(*unEntrenador)){ //Ver si cambios de estado se pueden delegar al planificador
+				if(entrenador_puede_cazar_mas_pokemones(unEntrenador)){ //Ver si cambios de estado se pueden delegar al planificador
 					unEntrenador->siguienteTarea = CATCHEAR;
 					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARD, "Tuvo exito en la captura y todavia puede cazar mas pokemones");
 				}
 
-				else if(entrenador_objetivos_cumplidos(unEntrenador)){ //abstraer a mensaje objetivos cumplidos
+				else if(entrenador_cumplio_sus_objetivos(unEntrenador)){
 //					unEntrenador->siguienteTarea = FINALIZAR;
+
+					printf("Objetivos: "); recursos_mostrar(unEntrenador->objetivos);
+					printf("Inventario: "); recursos_mostrar(unEntrenador->pokemonesCazados);
+
 					entrenador_pasar_a(unEntrenador, EXIT, "Ya logro cumplir sus objetivos");
+
 					entrenadores_remover_del_equipo_a(equipo, pid);
 					hiloActivo = false;
 				}
@@ -75,6 +80,10 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 				else{
 					unEntrenador->siguienteTarea = DEADLOCK;
 					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_DEADLOCK, "Su inventario esta lleno y no cumplio sus objetivos");
+
+					printf("Objetivos: "); recursos_mostrar(unEntrenador->objetivos);puts("");
+					printf("Inventario: "); recursos_mostrar(unEntrenador->pokemonesCazados);puts("");
+
 
 					//TODO: Ver en que momento estos entrenadores vuelven a READY
 					entrenador_pasar_a(unEntrenador, EXIT, "Aun no esta implementado el algoritmo de deadlock");

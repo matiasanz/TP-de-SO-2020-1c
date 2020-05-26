@@ -19,12 +19,10 @@ pthread_t hiloMensajesLOCALIZED;
 sem_t* EjecutarEntrenador;
 sem_t EntradaSalida_o_FinDeEjecucion;
 sem_t HayTareasPendientes;
+sem_t HayEntrenadores;
 
 pthread_mutex_t mutexMensaje;
 //pthread_mutex_t*mutexEntrenador; TODO ver usos de acuerdo a implementacion
-
-//Semaforos hardcodeados
-sem_t BORRAR_ESTO_MENSAJE_GET_ENVIADO;
 
 //Variables globales
 bool FinDelProceso;
@@ -53,4 +51,9 @@ pthread_t* inicializar_hilos_entrenadores(int*cantidad);
 
 //auxiliares
 void registrar_pokemon(pokemon*);
+void registrar_en_cada_posicion(especie_pokemon, t_list*posiciones);
+void entrenadores_despertar_en_caso_de_APPEARD(entrenadores equipo, entrenadores enReady);
+entrenadores entrenadores_despertar_para_APPEARD(entrenadores, pokemon*);
+
+
 

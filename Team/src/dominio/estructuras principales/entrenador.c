@@ -21,8 +21,8 @@ matriz_recursos entrenador_objetivos(entrenador*unEntrenador){
 	return unEntrenador->objetivos;
 }
 
-bool entrenador_objetivos_cumplidos(entrenador*unEntrenador){
-	return recursos_matriz_nula(unEntrenador->objetivos);
+bool entrenador_cumplio_sus_objetivos(entrenador*unEntrenador){
+	return recursos_suficientes_para(unEntrenador->pokemonesCazados, unEntrenador->objetivos);
 }
 
 void entrenador_ir_a(entrenador* unEntrenador, t_posicion posicionFinal){
@@ -54,8 +54,8 @@ bool entrenador_en_estado(entrenador* unEntrenador, t_estado ESTADO){
 	return estaEnEstado;
 }
 
-bool entrenador_puede_cazar_mas_pokemones(entrenador unEntrenador){
-	return recursos_contar(unEntrenador.objetivos) > recursos_contar(unEntrenador.pokemonesCazados);
+bool entrenador_puede_cazar_mas_pokemones(entrenador* unEntrenador){
+	return recursos_contar(unEntrenador->objetivos) > recursos_contar(unEntrenador->pokemonesCazados);
 }
 
 char*estadoFromEnum(t_estado unEstado){
@@ -239,9 +239,9 @@ void recursos_destroy(matriz_recursos recursos){
 }
 
 void recursos_mostrar(matriz_recursos recursos){
-	puts("Se leyeron:");
+
 	void mostrar(especie_pokemon unaEspecie, void*cantidadDeInstancias){
-		printf(">> %u instancias de la especie %s\n", *((numero*)cantidadDeInstancias), unaEspecie);
+		printf(" (%s, %u)", unaEspecie, *((numero*)cantidadDeInstancias));
 	}
 
 	dictionary_iterator(recursos, &mostrar);
@@ -289,4 +289,33 @@ void recursos_restar_recursos_a(matriz_recursos unaMatriz, matriz_recursos otraM
 	}
 
 	dictionary_iterator(unaMatriz, restar_semejantes);
+}
+
+matriz_recursos recursos_duplicar(matriz_recursos recursos){
+	matriz_recursos duplicada = recursos_create();
+
+	void duplicar(char* recurso, void*cantidad){
+		numero* cantidadDuplicada = malloc(sizeof(numero));
+		      * cantidadDuplicada = *((numero*)cantidad);
+
+		dictionary_put(duplicada, recurso, cantidadDuplicada);
+	}
+
+	dictionary_iterator(recursos, duplicar);
+
+	return duplicada;
+}
+
+matriz_recursos recursos_matriz_diferencia(matriz_recursos unaMatriz, matriz_recursos otraMatriz){
+	matriz_recursos matrizDiferencia = recursos_duplicar(unaMatriz);
+	recursos_restar_recursos_a(matrizDiferencia, otraMatriz);
+	return matrizDiferencia;
+}
+
+bool recursos_suficientes_para(matriz_recursos proveedora, matriz_recursos receptora){
+	matriz_recursos diferencia = recursos_matriz_diferencia(proveedora, receptora);
+	bool SiONo = recursos_matriz_nula(diferencia);
+	recursos_destroy(diferencia);
+
+	return SiONo;
 }

@@ -25,10 +25,10 @@ void entrenadores_cargar(entrenadores miEquipo){
 		list_add(miEquipo, unEntrenador);
 //		list_iterate(unEntrenador->objetivos, &get); //Ver TODO
 
-		printf("Se agrego un entrenador en (%u, %u) con objetivos:", unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
+		printf("Se agrego un entrenador en [%u %u] con objetivos:", unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
 		recursos_mostrar(objetivos);
 
-		printf(", con inventario:");
+		printf(" e inventario:");
 		recursos_mostrar(pokemonesEnInventario);
 		printf("\n");
 
