@@ -13,8 +13,8 @@ typedef enum{CATCHEAR, CAPTURAR, DEADLOCK /*, FINALIZAR*/ } t_tarea;
 
 //TAD Entrenador
 typedef struct pcb_Entrenador{
-	especies_pokemones objetivos; //especie de los pokemones
-	especies_pokemones pokemonesCazados;
+	matriz_recursos objetivos; //especie de los pokemones
+	matriz_recursos pokemonesCazados;
 	t_posicion posicion; //(x,y)
 	t_estado estado;
 	t_id id;
@@ -22,9 +22,9 @@ typedef struct pcb_Entrenador{
 } entrenador;
 
 //	Constructor; agregar lista infinita de objetivos
-	entrenador entrenador_create(t_id, especies_pokemones pokemonesEnInventario, especies_pokemones objetivos, t_posicion unaPos);
+	entrenador entrenador_create(t_id, matriz_recursos pokemonesEnInventario, matriz_recursos objetivos, t_posicion unaPos);
 
-	entrenador*entrenador_ptr_create(t_id, especies_pokemones pokemonesEnInventario, especies_pokemones objetivos, t_posicion);
+	entrenador*entrenador_ptr_create(t_id, matriz_recursos pokemonesEnInventario, matriz_recursos objetivos, t_posicion);
 
 //	Desplaza un entrenador de una posicion a otra
 	void entrenador_ir_a(entrenador*, t_posicion);
@@ -61,7 +61,7 @@ typedef t_list* entrenadores;
 entrenador* entrenadores_remover_del_equipo_a(entrenadores, t_id);
 
 //retorna los objetivos de todos los entrenadores
-	especies_pokemones entrenadores_objetivos_globales(entrenadores);
+	matriz_recursos entrenadores_objetivos_globales(entrenadores);
 
 //retorna el entrenador mas cercano a una posicion
 	entrenador* entrenadores_mas_cercano(entrenadores, t_posicion);
@@ -102,16 +102,25 @@ typedef especie_pokemon recurso;
 // Agrega el recurso luego de validar que el mismo no es NULL
 	void recursos_agregar_validado(matriz_recursos, recurso);
 
+// Incrementa en N la cantidad de instancias de un recurso
+	void recursos_agregar_N_instancias_de(matriz_recursos, recurso, numero);
+
 // "R1|R2|R2|R3|R3|R3" --> {(R1,1), (R2,2), (R3,3)}
 	matriz_recursos recursos_from_string(char*cadena);
 
 // Muestra los recursos junto con su cantidad
-	void recursos_mostrar(matriz_recursos recursos);
+	void recursos_mostrar(matriz_recursos);
 
 // A la primera matriz le suma los recursos de la segunda
 	void recursos_sumar_recursos_a(matriz_recursos, matriz_recursos);
 
 // A la primera matriz le resta el contenido de la segunda, asumiendo que tiene recursos del mismo tipo
 	void recursos_restar_recursos_a(matriz_recursos, matriz_recursos);
+
+// Retorna true si todos los recursos tienen 0 instancias
+	bool recursos_matriz_nula(matriz_recursos);
+
+// Retorna la cantidad total de recursos que posee la matriz
+	numero recursos_contar(matriz_recursos);
 
 # endif

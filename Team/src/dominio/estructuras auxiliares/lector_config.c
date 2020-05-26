@@ -12,9 +12,11 @@ void entrenadores_cargar(entrenadores miEquipo){
 	int i;
 	for(i=0; !list_is_empty(posiciones); i++){
 
-		especies_pokemones pokemonesEnInventario =  especies_from_string(stringsDeInventarios[i]);
+		matriz_recursos pokemonesEnInventario = recursos_from_string(stringsDeInventarios[i]);
 
-		especies_pokemones objetivos = especies_from_string(stringsDeObjetivos[i]); //	mostrarObjetivos(cadenaObjetivos);
+		matriz_recursos objetivos = recursos_from_string(stringsDeObjetivos[i]);
+
+		//*******************************************************
 
 		t_posicion* posicion = list_remove(posiciones, 0);
 
@@ -24,12 +26,10 @@ void entrenadores_cargar(entrenadores miEquipo){
 //		list_iterate(unEntrenador->objetivos, &get); //Ver TODO
 
 		printf("Se agrego un entrenador en (%u, %u) con objetivos:", unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
-
-		list_iterate(unEntrenador->objetivos, (void(*)(void*))&printf);
+		recursos_mostrar(objetivos);
 
 		printf(", con inventario:");
-		list_iterate(unEntrenador->pokemonesCazados, (void(*)(void*))&printf);
-
+		recursos_mostrar(pokemonesEnInventario);
 		printf("\n");
 
 		free(posicion);

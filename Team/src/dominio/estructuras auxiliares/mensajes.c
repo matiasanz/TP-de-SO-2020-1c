@@ -43,9 +43,14 @@ void Get(void* especiePokemon) {
 //	log_info(event_logger, ">> get(%s)\n", (especie_pokemon) especiePokemon);
 }
 
-void Get_pokemones(especies_pokemones pokemones){
-	list_iterate(pokemones, Get); puts("");
-	list_destroy(pokemones);
+void Get_pokemones(matriz_recursos pokemones){
+
+	puts("hola");
+	void unGetPorPokemon(char* unaEspecie, void*cantidad){
+		Get(unaEspecie);
+	}
+
+	dictionary_iterator(pokemones, unGetPorPokemon); puts("");
 }
 
 t_id unIDhardcodeado=0;

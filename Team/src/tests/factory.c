@@ -2,7 +2,15 @@
 #include <commons/string.h>
 
 entrenador entrenador_CREATE(t_list* objetivos, coordenada X, coordenada Y){
-	return entrenador_create(1, list_create(), objetivos, posicion_create(X,Y));
+	matriz_recursos matrizObjetivos = recursos_create();
+
+	void agregar(void*recurso){
+		recursos_agregar_recurso(matrizObjetivos, recurso);
+	}
+
+	list_iterate(objetivos, agregar);
+
+	return entrenador_create(1, recursos_create(), matrizObjetivos, posicion_create(X,Y));
 }
 
 //id = 1, unico objetivo "pucho", pos (1,2)

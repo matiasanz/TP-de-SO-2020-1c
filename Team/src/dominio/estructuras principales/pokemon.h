@@ -15,7 +15,7 @@ pokemon pokemon_create(especie_pokemon, coordenada X, coordenada Y);
 pokemon* pokemon_ptr_create(especie_pokemon, coordenada x, coordenada y);
 
 //Me dice si algun miembro del equipo tiene por objetivo un pokemon de esa especie
-bool es_objetivo_de_alguien(pokemon, entrenadores);
+bool pokemon_es_objetivo(pokemon, matriz_recursos);
 
 //Destructor
 void pokemon_destroy(pokemon*);

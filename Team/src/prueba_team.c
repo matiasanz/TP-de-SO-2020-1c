@@ -113,7 +113,7 @@ void listas_destroy(){
 	entrenadores_destroy(equipo);
 	mapa_destroy(pokemonesRequeridos);
 	pendientes_destroy(capturasPendientes);
-	list_destroy(historialDePokemones);
+//	list_destroy_and_destroy_elements(historialDePokemones, free); //TODO puede ser que rompa
 }
 
 //Colas
@@ -147,7 +147,6 @@ void inicializar_semaforos(){
 
 	pthread_mutex_init(&Mutex_AndoLoggeando, NULL);
 	pthread_mutex_init(&Mutex_AndoLoggeandoEventos, NULL);
-//	pthread_mutex_init(&mutexFinDeProceso, NULL); //TODO
 
 	//Hardcodeados
 	sem_init(&BORRAR_ESTO_MENSAJE_GET_ENVIADO, 0, 0);

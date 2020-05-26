@@ -34,7 +34,7 @@ void finalizar_hilos();
 /*Mis Listas (son variables globales, para que puedan acceder todos los hilos)*/
 	entrenadores equipo;
 	mapa_pokemones pokemonesRequeridos;
-//	recursos objetivosGlobales; //Para deadlock TODO (VER a futuro)
+	matriz_recursos objetivosGlobales; //Para deadlock TODO (VER a futuro)
 	pendientes capturasPendientes;
 	cr_list* tareasPendientes; //De prueba
 	especies_pokemones historialDePokemones;

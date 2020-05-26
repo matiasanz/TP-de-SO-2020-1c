@@ -46,7 +46,7 @@ mensaje_localized_pokemon* desempaquetar_localized(void*empaquetado);
 //mensajes entre modulos
 mensaje recibir_mensaje();
 void Get(void* especiePokemon);
-void Get_pokemones(especies_pokemones);
+void Get_pokemones(matriz_recursos);
 t_id Catch(especie_pokemon); //momentaneamente (TODO) retorna el id del mensaje pendiente que crea
 
 //constructores de empaquetados

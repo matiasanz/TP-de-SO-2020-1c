@@ -43,30 +43,15 @@ bool pokemon_misma_especie(pokemon unPokemon, pokemon otroPokemon){
 	return especie_cmp(unPokemon.especie, otroPokemon.especie); //string_equals_ignore_case(objetivo->especie, deLista->especie);
 }
 
-bool pokemon_es_objetivo_de(pokemon unPokemon, entrenador unEntrenador){
-	return list_any_satisfy(unEntrenador.objetivos, (bool(*)(void*))&pokemon_misma_especie);
-}
-
-bool es_objetivo_de_alguien(pokemon unPokemon, entrenadores unEquipo){
-	especies_pokemones objetivos = entrenadores_objetivos_globales(unEquipo);
-
-	bool esElMismo(void* unaEspecie){
-		return especie_cmp((especie_pokemon) unaEspecie, unPokemon.especie);
-	}
-
-	bool esObjetivo = list_any_satisfy(objetivos, esElMismo);
-
-	list_destroy(objetivos);
-
-	return esObjetivo;
+bool pokemon_es_objetivo(pokemon unPokemon, matriz_recursos objetivos){
+	return recursos_cantidad_de_instancias_de(objetivos, unPokemon.especie);
 }
 
 void entrenador_capturar(entrenador*entrenador, pokemon*victima){
-	/*Ver si conviene en caso de que sea un objetivo directamente eliminarlo de la lista.
-	*Seria mas facil pero no se si respeta la consigna y aparte si no complica los test...*/
-	list_add(entrenador->pokemonesCazados, victima->especie);
+	recursos_agregar_recurso(entrenador->pokemonesCazados, victima->especie);
+
 	printf("Se ha capturado a %s\n", victima->especie);
-	pokemon_destroy(victima);//ROMPE
+	pokemon_destroy(victima);
 }
 
 //Destructor

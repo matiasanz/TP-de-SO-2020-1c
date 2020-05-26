@@ -57,9 +57,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 
 				pokemon*pokemonCatcheado = capturaPendiente->pokemonCatcheado;
 
-				entrenador_capturar(unEntrenador, pokemonCatcheado); //TODO
-
-					//VER TODO muchos if anidados
+				entrenador_capturar(unEntrenador, pokemonCatcheado);
 
 //				pthread_mutex_lock(&mutexEntrenador[unEntrenador->id]);
 				if(entrenador_puede_cazar_mas_pokemones(*unEntrenador)){ //Ver si cambios de estado se pueden delegar al planificador

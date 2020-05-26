@@ -21,7 +21,6 @@ sem_t EntradaSalida_o_FinDeEjecucion;
 sem_t HayTareasPendientes;
 
 pthread_mutex_t mutexMensaje;
-//pthread_mutex_t mutexFinDeProceso; TODO ver si vale la pena
 //pthread_mutex_t*mutexEntrenador; TODO ver usos de acuerdo a implementacion
 
 //Semaforos hardcodeados

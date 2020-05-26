@@ -11,8 +11,7 @@
  * No frena nunca
  */
 void team_planificar(){
-
-		especies_pokemones objetivosGlobales = entrenadores_objetivos_globales(equipo);
+		objetivosGlobales = entrenadores_objetivos_globales(equipo);
 		Get_pokemones(objetivosGlobales);
 		sem_post(&BORRAR_ESTO_MENSAJE_GET_ENVIADO); //hardcodeado para que me llegue localized
 
@@ -47,6 +46,8 @@ void team_planificar(){
 
 			sem_wait(&EntradaSalida_o_FinDeEjecucion);
 		}
+
+		else puts("No hay entrenadores en ready");
 	}
 
 	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
