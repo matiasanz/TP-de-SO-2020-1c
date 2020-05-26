@@ -48,7 +48,7 @@ typedef enum {
 } t_tipo_cola_mensaje;
 
 typedef enum {
-	BROKER = 1, GAMEBOY = 2, GAMECARD = 3, TEAM = 4,SUSCRIPTOR=5
+	BROKER = 1, GAMEBOY = 2, GAMECARD = 3, TEAM = 4
 } t_id_proceso;
 
 // Inicializa los ids para prevenir errores con valgrind
