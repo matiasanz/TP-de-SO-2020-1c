@@ -4,9 +4,9 @@
 #include <semaphore.h>
 #include "posicion.h"
 
-typedef char* especie_pokemon;
+typedef /*const*/char* especie_pokemon;
 typedef t_list* especies_pokemones;
-typedef t_dictionary recursos;
+typedef t_dictionary* matriz_recursos;
 
 typedef enum{NEW,READY,	EXECUTE, LOCKED_HASTA_APPEARD, LOCKED_HASTA_DEADLOCK, LOCKED_HASTA_CAUGHT,	EXIT} t_estado; //VER cuales vale la pena conservar
 typedef enum{CATCHEAR, CAPTURAR, DEADLOCK /*, FINALIZAR*/ } t_tarea;
@@ -47,6 +47,9 @@ typedef struct pcb_Entrenador{
 //Destructor
 	void entrenador_destroy(entrenador*);
 
+//bool entrenador_necesita_recurso(entrenador*unEntrenador);
+
+
 //****************************************************************************************
 //Cola de entrenadores
 typedef t_list* entrenadores;
@@ -76,5 +79,39 @@ entrenador* entrenadores_remover_del_equipo_a(entrenadores, t_id);
 
 //Destructor
 	void entrenadores_destroy(entrenadores);
+
+//Retorna true si el entrenador requiere al menos una instancia de la especie
+	bool entrenador_necesita_recurso(entrenador*unEntrenador); //TODO
+
+//****************************************************************************************
+//TAD Recursos (implementado con t_dictionary*)
+typedef especie_pokemon recurso;
+
+// Constructor
+	matriz_recursos recursos_create();
+
+// Destructor
+	void recursos_destroy(matriz_recursos recursos);
+
+// Retorna la cantidad de instancias que se tienen de ese recurso
+	numero recursos_cantidad_de_instancias_de(matriz_recursos, recurso);
+
+// Incrementa en 1 la cantidad de instancias de un recurso
+	void recursos_agregar_recurso(matriz_recursos, recurso);
+
+// Agrega el recurso luego de validar que el mismo no es NULL
+	void recursos_agregar_validado(matriz_recursos, recurso);
+
+// "R1|R2|R2|R3|R3|R3" --> {(R1,1), (R2,2), (R3,3)}
+	matriz_recursos recursos_from_string(char*cadena);
+
+// Muestra los recursos junto con su cantidad
+	void recursos_mostrar(matriz_recursos recursos);
+
+// A la primera matriz le suma los recursos de la segunda
+	void recursos_sumar_recursos_a(matriz_recursos, matriz_recursos);
+
+// A la primera matriz le resta el contenido de la segunda, asumiendo que tiene recursos del mismo tipo
+	void recursos_restar_recursos_a(matriz_recursos, matriz_recursos);
 
 # endif

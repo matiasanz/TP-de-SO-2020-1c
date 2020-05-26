@@ -11,10 +11,6 @@
 #include "hilos del team/hilos_team.h"
 //#include "tests/tests_team.o"
 
-//cr_list*mensajesAPPEARD; //globales
-//cr_list*mensajesCAUGHT;
-
-
 int main(void) {
 
 	team_inicializar();

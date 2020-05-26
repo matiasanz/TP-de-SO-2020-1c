@@ -1,9 +1,11 @@
-#include <commons/string.h>
 #include "entrenador.h"
+
+#include <commons/string.h>
+
 #include "pokemon.h"
 
 //Constructor Entrenador
-entrenador entrenador_create(t_id id, t_list* pokemonesEnInventario, t_list*objetivos, t_posicion unaPos){
+entrenador entrenador_create(t_id id, especies_pokemones pokemonesEnInventario, especies_pokemones objetivos, t_posicion unaPos){
 	entrenador nuevo = (entrenador) {objetivos, pokemonesEnInventario, unaPos, NEW, id, CATCHEAR};
 	nuevo.siguienteTarea = CATCHEAR; //determinarSiguienteObjetivo(entrenador);
 	return nuevo;
@@ -15,7 +17,7 @@ entrenador*entrenador_ptr_create(t_id id, t_list* pokemonesEnInventario, t_list*
 	return nuevo;
 }
 
-t_list*entrenador_objetivos(entrenador*unEntrenador){
+especies_pokemones entrenador_objetivos(entrenador*unEntrenador){
 	return unEntrenador->objetivos;
 }
 
@@ -182,3 +184,89 @@ void entrenadores_destroy(entrenadores equipo){
 	list_destroy_and_destroy_elements(equipo, (void(*)(void*)) &entrenador_destroy);
 }
 
+//***************************************************************************
+
+matriz_recursos recursos_create(){
+	return dictionary_create();
+}
+
+numero recursos_cantidad_de_instancias_de(matriz_recursos recursos, recurso unaEspecie){
+	numero*cantidadDeInstancias = dictionary_get(recursos, unaEspecie);
+	return cantidadDeInstancias? *cantidadDeInstancias : 0;
+}
+
+void recursos_agregar_recurso(matriz_recursos recursos, recurso unaEspecie){
+	numero* cantidadDeInstancias = dictionary_get(recursos, unaEspecie);
+
+	if(cantidadDeInstancias){
+		(*cantidadDeInstancias)++;
+	}
+	else{
+		cantidadDeInstancias = malloc(sizeof(numero));
+		*cantidadDeInstancias = 1;
+		dictionary_put(recursos, unaEspecie, cantidadDeInstancias);
+	}
+}
+
+void recursos_agregar_validado(matriz_recursos recursos, recurso unaEspecie){
+	if(!unaEspecie){
+		error_show("E de Error de lectura (y de estupido)");
+		exit(1);
+	}
+
+	recursos_agregar_recurso(recursos, unaEspecie);
+}
+
+matriz_recursos recursos_from_string(char*cadena){
+
+	if(!cadena){
+		error_show("E de Error de lectura (y de estupido)");
+	}
+
+	matriz_recursos recursosLeidos = dictionary_create();
+
+		void _a_la_matriz(especie_pokemon unaEspecie) {
+			recursos_agregar_validado(recursosLeidos, unaEspecie);
+		}
+
+    especie_pokemon*tokens = string_split(cadena, "|");
+
+    string_iterate_lines(tokens, _a_la_matriz);
+
+//    void mostrar(t_posicion pos){
+//    	printf("pos: (%u, %u)\n", pos.x, pos.y);
+//    }
+
+    free(tokens);
+//    string_array_destroy(tokens);
+
+    return recursosLeidos;
+}
+
+void recursos_destroy(matriz_recursos recursos){
+	dictionary_destroy_and_destroy_elements(recursos, free);
+}
+
+void recursos_mostrar(matriz_recursos recursos){
+	void mostrar(especie_pokemon unaEspecie, void*cantidadDeInstancias){
+		printf("Se leyeron %u instancias de la especie %s\n", *((numero*)cantidadDeInstancias), unaEspecie);
+	}
+
+	dictionary_iterator(recursos, &mostrar);
+}
+
+void operar_recursos_semejantes(matriz_recursos unaMatriz, matriz_recursos otraMatriz, short signo){
+	void restar_recursos(especie_pokemon unaEspecie, void*cantidadDeInstancias){
+		*((numero*) cantidadDeInstancias) += signo*recursos_cantidad_de_instancias_de(otraMatriz, unaEspecie);
+	}
+
+	dictionary_iterator(unaMatriz, restar_recursos);
+}
+
+void recursos_sumar_recursos_a(matriz_recursos unaMatriz, matriz_recursos otraMatriz){
+	operar_recursos_semejantes(unaMatriz, otraMatriz, 1);
+}
+
+void recursos_restar_recursos_a(matriz_recursos unaMatriz, matriz_recursos otraMatriz){
+	operar_recursos_semejantes(unaMatriz, otraMatriz, -1);
+}
