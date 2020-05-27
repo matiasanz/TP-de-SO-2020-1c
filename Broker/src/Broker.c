@@ -10,7 +10,7 @@ int main(void) {
 			config_get_string_value(config, "IP_BROKER"),
 			config_get_string_value(config, "PUERTO_BROKER"));
 
-	log_info(event_logger, "%s iniciado exitosamente", BROKER_STRING);
+	log_info(event_logger, "%s iniciado exitosamente \n", BROKER_STRING);
 
 	while (1) {
 
@@ -67,7 +67,7 @@ void atender_cliente(int* socket) {
 	}
 	default:
 		log_error(event_logger,
-				"El codigo de operacion %d recibido desde el socket: %d por el proceso %s es incorrecto",
+				"El codigo de operacion %d recibido desde el socket: %d por el proceso %s es incorrecto \n",
 				header.codigo_operacion, *socket,
 				get_nombre_proceso(header.id_proceso));
 	}
@@ -79,10 +79,10 @@ static void validar_header(t_paquete_header header) {
 
 	if (header.codigo_operacion == ERROR_SOCKET) {
 		log_error(event_logger,
-				"Error al recibir el header del mensaje, finalizando hilo");
+				"Error al recibir el header del mensaje, finalizando hilo \n");
 		pthread_exit(NULL);
 	} else {
-		log_info(logger, "El proceso %s se conectó correctamente al %s",
+		log_info(logger, "El proceso %s se conectó correctamente al %s \n",
 				get_nombre_proceso(header.id_proceso), BROKER_STRING);
 	}
 }

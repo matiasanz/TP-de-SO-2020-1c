@@ -17,9 +17,7 @@ t_log* event_logger;
 
 //Estructura con la información solicitada por el tp en la parte "Administración de Mensajes"
 typedef struct {
-	int id;
-	int id_correlativo;
-//	int tipo; --> ver si es necesario
+	t_id_cola tipo;
 	t_list* subscriptores_enviados;
 	t_list* subscriptores_confirmados;
 } t_mensaje_metadata;

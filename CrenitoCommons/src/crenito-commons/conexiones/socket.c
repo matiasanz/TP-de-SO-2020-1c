@@ -7,8 +7,9 @@
 
 #include "socket.h"
 
-// función auxilizar para loggear errores
+// funciones auxiliares
 void static manejar_error_socket(int socket, char* operacion);
+int static socket_error(int indicador_conexion);
 
 void socket_bind(int socket, struct addrinfo* info) {
 
@@ -115,6 +116,7 @@ int socket_aceptar_conexion(int socket_servidor) {
 	if ((socket = accept(socket_servidor, (struct sockaddr *) &dir_cliente,
 			(socklen_t*) &tam_direccion)) == ERROR_SOCKET) {
 		manejar_error_socket(socket, "accept");
+		socket = ERROR_SOCKET;
 	}
 
 	return socket;
@@ -126,6 +128,7 @@ int socket_recibir_int(int socket_cliente) {
 
 	if (recv(socket_cliente, &entero, sizeof(int), MSG_WAITALL) == ERROR_SOCKET) {
 		manejar_error_socket(socket_cliente, "recv");
+		entero = ERROR_SOCKET;
 	}
 
 	return entero;
@@ -133,19 +136,21 @@ int socket_recibir_int(int socket_cliente) {
 
 void* socket_recibir_mensaje(int socket_cliente, int *size) {
 
-	void * bytes;
+	*size = socket_recibir_int(socket_cliente);
 
-	if (recv(socket_cliente, size, sizeof(int), MSG_WAITALL) == ERROR_SOCKET) {
+	if (socket_error(*size)){
 		manejar_error_socket(socket_cliente, "recv");
+		return NULL;
 	}
 
-	bytes = malloc(*size);
+	void* msj = malloc(*size);
 
-	if (recv(socket_cliente, bytes, *size, MSG_WAITALL) == ERROR_SOCKET) {
+	if (recv(socket_cliente, msj, *size, MSG_WAITALL) == ERROR_SOCKET) {
 		manejar_error_socket(socket_cliente, "recv");
+		return NULL;
 	}
 
-	return bytes;
+	return msj;
 }
 
 t_paquete_header socket_recibir_header(int socket_cliente) {
@@ -159,6 +164,10 @@ t_paquete_header socket_recibir_header(int socket_cliente) {
 	}
 
 	return header;
+}
+
+int static socket_error(int indicador_conexion) {
+	return indicador_conexion == ERROR_SOCKET;
 }
 
 void static manejar_error_socket(int socket, char* operacion) {

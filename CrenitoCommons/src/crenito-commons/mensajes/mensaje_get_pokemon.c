@@ -53,26 +53,26 @@ t_buffer* mensaje_get_pokemon_serializar(t_mensaje_get_pokemon* get_pokemon) {
 	return bfr;
 }
 
-t_mensaje_get_pokemon* mensaje_get_pokemon_deserializar(t_buffer* buffer) {
+t_mensaje_get_pokemon* mensaje_get_pokemon_deserializar(void* stream) {
 
 	t_mensaje_get_pokemon* msj = malloc(sizeof(t_mensaje_get_pokemon));
 	int desplazamiento = 0;
 
 	// header
-	memcpy(&msj->mensaje_header, buffer->stream + desplazamiento, sizeof(msj->mensaje_header));
+	memcpy(&msj->mensaje_header, stream + desplazamiento, sizeof(msj->mensaje_header));
 	desplazamiento += sizeof(msj->mensaje_header);
 
 	//especie_lenght
-	memcpy(&msj->especie_lenght, buffer->stream + desplazamiento,
+	memcpy(&msj->especie_lenght, stream + desplazamiento,
 			sizeof(msj->especie_lenght));
 	desplazamiento += sizeof(msj->especie_lenght);
 
 	//especie
-	char* especie = strdup(buffer->stream + desplazamiento);
+	char* especie = strdup(stream + desplazamiento);
 	msj->especie = especie;
 	desplazamiento += msj->especie_lenght;
 
-	buffer_destruir(buffer);
+	free(stream);
 
 	return msj;
 
