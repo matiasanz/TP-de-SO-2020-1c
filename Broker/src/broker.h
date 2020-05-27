@@ -8,6 +8,10 @@
 
 t_config* config;
 
-void inicializar(void);
-void inicializarColas();
+void atender_cliente(int* socket);
+void inicializar();
+void inicializar_config();
+void inicializar_logs();
+void crear_colas();
+
 #endif /* BROKER_H_ */

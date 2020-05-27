@@ -7,23 +7,23 @@
 
 #include "paquete.h"
 
-t_paquete* paquete_crear(t_codigo_operacion cod_op, t_id_proceso id_proceso, t_tipo_cola_mensaje tipo_mensaje, t_buffer* buffer) {
+t_paquete* paquete_crear(t_codigo_operacion cod_op, t_id_proceso id_proceso, t_id_cola id_cola, t_buffer* buffer) {
 
 	t_paquete* paquete = malloc(sizeof(t_paquete));
 
-	paquete->header = crear_paquete_header(cod_op, id_proceso, tipo_mensaje);
+	paquete->header = paquete_header_crear(cod_op, id_proceso, id_cola);
 	paquete->buffer = buffer;
 
 	return paquete;
 }
 
-t_paquete_header crear_paquete_header(t_codigo_operacion cod_op, t_id_proceso id_proceso,
-		t_tipo_cola_mensaje tipo_mensaje) {
+t_paquete_header paquete_header_crear(t_codigo_operacion cod_op, t_id_proceso id_proceso,
+		t_id_cola id_cola) {
 
 	t_paquete_header header;
 	header.codigo_operacion = cod_op;
 	header.id_proceso = id_proceso;
-	header.tipo_cola_mensaje = tipo_mensaje;
+	header.id_cola = id_cola;
 	return header;
 
 }
@@ -55,21 +55,4 @@ void* paquete_serializar(t_paquete* paquete, int *bytes) {
 	desplazamiento += paquete->buffer->size;
 
 	return stream;
-}
-
-t_paquete_header* paquete_subscripcion_crear(
-		t_id_proceso id_proceso, t_tipo_cola_mensaje nombre_cola) {
-
-	t_paquete_header* msj = malloc(sizeof(t_paquete_header));
-
-	msj->codigo_operacion = SUBSCRIPCION;
-	msj->id_proceso = id_proceso;
-	msj->tipo_cola_mensaje = nombre_cola;
-
-	return msj;
-}
-
-void paquete_subscripcion_destruir(t_paquete_header* msj){
-
-	free(msj);
 }

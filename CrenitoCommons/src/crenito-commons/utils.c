@@ -40,9 +40,9 @@ char* get_nombre_proceso(t_id_proceso id_proceso) {
 	}
 }
 
-char* get_nombre_cola_mensaje(t_tipo_cola_mensaje tipo_cola_mensaje) {
+char* get_nombre_cola(t_id_cola id_cola) {
 
-	switch (tipo_cola_mensaje) {
+	switch (id_cola) {
 	case NEW_POKEMON:
 		return NEW_POKEMON_STRING;
 	case APPEARED_POKEMON:
@@ -57,7 +57,7 @@ char* get_nombre_cola_mensaje(t_tipo_cola_mensaje tipo_cola_mensaje) {
 		return LOCALIZED_POKEMON_STRING;
 	default:
 		log_error(get_crnito_logger(), "No existe el tipo de cola: %d",
-				tipo_cola_mensaje);
+				id_cola);
 		abort();
 		return NULL;
 	}
