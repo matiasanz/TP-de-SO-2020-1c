@@ -76,8 +76,6 @@ t_mensaje_new_pokemon* mensaje_new_pokemon_deserializar(void* stream) {
 			sizeof(msj->cantidad));
 	desplazamiento += sizeof(msj->cantidad);
 	
-	free(stream);
-	
 	return msj;
 }
 

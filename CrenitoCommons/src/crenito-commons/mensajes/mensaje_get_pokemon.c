@@ -72,8 +72,6 @@ t_mensaje_get_pokemon* mensaje_get_pokemon_deserializar(void* stream) {
 	msj->especie = especie;
 	desplazamiento += msj->especie_lenght;
 
-	free(stream);
-
 	return msj;
 
 }

@@ -112,7 +112,6 @@ t_mensaje_localized_pokemon* mensaje_localized_pokemon_deserializar(void* stream
 	}
 
 	free(posicion);
-	free(stream);
 
 	return msj;
 }
