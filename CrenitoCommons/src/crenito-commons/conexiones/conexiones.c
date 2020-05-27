@@ -57,6 +57,7 @@ int enviar(t_conexion_server server, t_paquete* pqt) {
 	int id_mensaje = handshake(socket, a_enviar, bytes);
 
 	socket_cerrar(socket);
+	free(a_enviar);
 
 	return id_mensaje;
 }
