@@ -76,8 +76,6 @@ void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const cha
 	pthread_mutex_lock(&Mutex_AndoLoggeando);
 	log_info(logger, "El Entrenador N°%u se paso de la cola de %s a %s, Motivo: %s", unEntrenador->id, estadoActual, estadoFromEnum(estadoFinal), motivo);
 	pthread_mutex_unlock(&Mutex_AndoLoggeando);
-
-	if(estadoFinal==EXIT) entrenador_destroy(unEntrenador);
 }
 
 void entrenador_destroy(entrenador* destruido){
@@ -113,44 +111,10 @@ matriz_recursos entrenadores_objetivos_globales(entrenadores unEquipo){
 	return objetivosGlobales;
 }
 
-entrenador* entrenadores_mas_cercano(entrenadores unEquipo, t_posicion unaPosicion){
-	entrenador*entrenador_mas_cercano(entrenador*uno, entrenador*otro){
-		if(!uno){
-			return otro;
-		}
-
-		return posicion_distancia(uno->posicion, unaPosicion)>=posicion_distancia(otro->posicion, unaPosicion)? uno : otro;
-	}
-
-	return list_fold(unEquipo, NULL, (void*(*)(void*, void*))&entrenador_mas_cercano);
-}
-
-//Ver si poner CRITERIO, con enum
-entrenador* entrenadores_proximo_a_planificar(entrenadores equipo){ //, pokemon){
-//	switch(criterio){
-//		case FIFO: {
-		entrenadores entrenadores_ready = entrenadores_en_estado(equipo, READY);
-		entrenador*proximo = list_remove(entrenadores_ready, 0); //FIFO
-		list_destroy(entrenadores_ready);
-		return proximo;
-//		}
-//		default:
-//			return NULL;
-}
-
-t_id* entrenadores_id_proximo_a_planificar(entrenadores equipo){
-	entrenador*proximo = entrenadores_proximo_a_planificar(equipo);
-	if(!proximo){
-		return NULL; //quiere decir que no hay entrenadores disponibles. Deadlock?
-	}
-
-	return &proximo->id;
-//	return proximo->SEMAFORO_IDENTIFICADOR;
-}
-
 //
 entrenadores entrenadores_en_estado(entrenadores equipo, t_estado unEstado){
 	bool esta_en_estado(void* unEntrenador){
+		puts(estadoFromEnum(((entrenador*)unEntrenador)->estado));
 		return entrenador_en_estado((entrenador*) unEntrenador, unEstado);
 	}
 
@@ -169,6 +133,38 @@ void entrenadores_bloquear_por_captura(entrenadores unEquipo){
 //Destructor de equipo
 void entrenadores_destroy(entrenadores equipo){
 	list_destroy_and_destroy_elements(equipo, (void(*)(void*)) &entrenador_destroy);
+}
+
+//***************************************************************************
+
+void entrenador_agregar_a_cola(entrenador*unEntrenador, cola_entrenadores cola){
+	cr_list_add_and_signal(cola, unEntrenador);
+}
+
+entrenador*entrenador_esperar_y_desencolar(cola_entrenadores cola){
+	return cr_list_wait_and_remove(cola, 0);
+}
+
+//Ver si poner CRITERIO, con enum
+entrenador* entrenadores_proximo_a_planificar(cola_entrenadores colaDeReady){
+//	switch(criterio){
+//		case FIFO: {
+		entrenador*proximo = cr_list_wait_and_remove(colaDeReady, 0); //FIFO
+		return proximo;
+//		}
+//		default:
+//			error_show("Algoritmo de planificacion desconocido");
+//			exit(1);
+//			return NULL;
+}
+
+t_id* entrenadores_id_proximo_a_planificar(cola_entrenadores colaDeReady){
+	entrenador*proximo = entrenadores_proximo_a_planificar(colaDeReady);
+	if(!proximo){
+		return NULL; //quiere decir que no hay entrenadores disponibles. Deadlock?
+	}
+
+	return &proximo->id;
 }
 
 //***************************************************************************
@@ -197,8 +193,8 @@ matriz_recursos recursos_from_string(char*cadena){
 //    	printf("pos: (%u, %u)\n", pos.x, pos.y);
 //    }
 
-    free(tokens);
-//    string_array_destroy(tokens); TODO ver antes rompia
+//    free(tokens);
+    string_iterate_lines(tokens, (void*)free); //TODO ver antes rompia
 
     return recursosLeidos;
 }

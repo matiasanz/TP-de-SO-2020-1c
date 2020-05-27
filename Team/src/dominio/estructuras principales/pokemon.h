@@ -3,6 +3,7 @@
 
 //#include <commons/collections/list.h>
 #include "entrenador.h"
+typedef t_list* especies_pokemones;
 
 //TAD Pokemon									 Pasar a commons
 typedef struct Pokemon{

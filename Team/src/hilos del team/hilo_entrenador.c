@@ -1,13 +1,6 @@
 #include "hilos_team.h"
 #include "../team.h"
 
-/*TODO
- * corregir implementacion de capturar pokemon, considerar que cada llamado a objetivos globales pasa a ser region critica.
- * Puede pasar eventualmente que un entrenador necesite capturar un pokemon y se ejecute a la par que otro. Duda: Puedo pausar un hilo?
- */
-
-/************************************ nueva implementacion ****************************************/
-
 void team_hilo_entrenador(entrenador*unEntrenador){
 	printf("Entrenador N°%u en espera\n", unEntrenador->id);
 	t_id pid = unEntrenador->id;
@@ -17,8 +10,6 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 
 		sem_wait(&EjecutarEntrenador[pid]);
 		entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar");
-
-		printf("Objetivo: %s\n", (unEntrenador->siguienteTarea == CATCHEAR? "catchear": unEntrenador->siguienteTarea == CAPTURAR? "capturar": "deadlock"));
 
 		switch(unEntrenador->siguienteTarea){
 			case CATCHEAR: {
@@ -30,7 +21,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 				if(entrenador_llego_a(*unEntrenador, unPokemon->posicion)){
 		//					pthread_mutex_unlock(&mutexEntrenador[pid]);
 					t_id id_mensaje_pendiente = Catch(unPokemon->especie);
-					//Agregar semaforo
+
 					agregar_pendiente(capturasPendientes, id_mensaje_pendiente, unEntrenador, unPokemon);
 
 					unEntrenador->siguienteTarea = CAPTURAR;
@@ -47,7 +38,6 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 			}
 
 			case CAPTURAR: {
-				puts("Proximamente capturar");
 				pendiente* capturaPendiente = pendientes_pendiente_del_entrenador(capturasPendientes, pid);
 
 				if(!capturaPendiente){
@@ -104,26 +94,35 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 		sem_post(&EntradaSalida_o_FinDeEjecucion);
 	}
 
+	entrenador_destroy(unEntrenador);
+
 	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
 	log_info(event_logger, "Finalizo un hilo entrenador");
 	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 
 }
 
-pthread_t* inicializar_hilos_entrenadores(int*cantidadEntrenadores){
+numero cantidadDeEntrenadores;
 
-	int i, cantidadDeHilos = list_size(equipo);
-	pthread_t* hilosEntrenadores = malloc(sizeof(pthread_t)*cantidadDeHilos);
+void inicializar_hilos_entrenadores(){
+	cantidadDeEntrenadores = list_size(equipo);
 
-	EjecutarEntrenador = malloc(sizeof(sem_t)*cantidadDeHilos);
+	hilosEntrenadores = malloc(sizeof(pthread_t)*cantidadDeEntrenadores);
+
+	EjecutarEntrenador = malloc(sizeof(sem_t)*cantidadDeEntrenadores);
 //	mutexEntrenador = malloc(sizeof(pthread_mutex_t)*cantidadDeHilos);
 
-	for(i=0; i<cantidadDeHilos; i++){
+	int i;
+	for(i=0; i<cantidadDeEntrenadores; i++){
 		sem_init(&EjecutarEntrenador[i], 0, 0);
 //		pthread_mutex_init(&mutexEntrenador[i], NULL);
 		pthread_create(&hilosEntrenadores[i], NULL, (void*) team_hilo_entrenador, list_get(equipo, i));
 	}
+}
 
-	*cantidadEntrenadores = cantidadDeHilos;
-	return hilosEntrenadores;
+void finalizar_hilos_entrenadores(){
+	int i=0;
+	for(i=0; i<cantidadDeEntrenadores; i++){
+		pthread_join(hilosEntrenadores[i], NULL);
+	}
 }

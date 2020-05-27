@@ -25,10 +25,22 @@ cr_list* cr_list_create(){
 	return cr_list_construct(list_create(), unMutex);
 }
 
+cr_list* cr_list_from_list(t_list*unaLista){
+	pthread_mutex_t* mutex = malloc(sizeof(pthread_mutex_t));
+	pthread_mutex_init(mutex, NULL);
+	return cr_list_construct(unaLista, mutex);
+}
+
 void cr_list_destroy(cr_list* unaLista){
 	list_destroy(unaLista->lista);
 	sem_destroy(&unaLista->hayMas);
 	pthread_mutex_destroy(unaLista->mutex);
+	free(unaLista);
+}
+
+void cr_duplicated_list_destroy(cr_list* unaLista){
+	list_destroy(unaLista->lista);
+	sem_destroy(&unaLista->hayMas);
 	free(unaLista);
 }
 
@@ -171,4 +183,20 @@ void cr_list_iterate(cr_list*unaLista, void(*closure)(void*)){
 	pthread_mutex_lock(unaLista->mutex);
 	list_iterate(unaLista->lista, closure);
 	pthread_mutex_unlock(unaLista->mutex);
+}
+
+bool cr_list_all(cr_list*unaLista, bool(*condition)(void*)){
+	pthread_mutex_lock(unaLista->mutex);
+	bool todosCumplen = list_all_satisfy(unaLista->lista, condition);
+	pthread_mutex_unlock(unaLista->mutex);
+
+	return todosCumplen;
+}
+
+bool cr_list_any(cr_list*unaLista, bool(*condition)(void*)){
+	pthread_mutex_lock(unaLista->mutex);
+	bool algunoCumple = list_any_satisfy(unaLista->lista, condition);
+	pthread_mutex_unlock(unaLista->mutex);
+
+	return algunoCumple;
 }

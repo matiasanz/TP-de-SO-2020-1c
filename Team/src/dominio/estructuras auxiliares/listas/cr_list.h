@@ -13,14 +13,20 @@ typedef struct{
 	pthread_mutex_t* mutex;
 }cr_list;
 
-//constructor de lista vacia con semaforos activos
+//Constructor de lista vacia con semaforos activos
 cr_list* cr_list_create();
+
+//Crea una cr_lista a partir de una lista
+cr_list* cr_list_from_list();
 
 //Destruye lista y semaforos, deja los elementos
 void cr_list_destroy(cr_list*);
 
 //Destruye lista, elementos y semaforos
 void cr_list_destroy_and_destroy_elements(cr_list*, void(*element_destroyer)(void*));
+
+//Para casos de listas duplicadas, deja el mutex activo por si lo usa otra lista.
+void cr_duplicated_list_destroy(cr_list*);
 
 //Agrega un elemento al final y hace signal
 int cr_list_add_and_signal(cr_list*, void *element);
@@ -63,5 +69,11 @@ void cr_list_sort(cr_list*, bool (*comparator)(void *, void *));
 
 //Aplica la funcion a cada elemento de la lista
 void cr_list_iterate(cr_list*, void(*funcion)(void*));
+
+//Retorna true si todos los elementos de la lista cumplen la condicion
+bool cr_list_all(cr_list*, bool(*condition)(void*));
+
+//Retorna true si al menos un elemento de la lista cumple la condicion
+bool cr_list_any(cr_list*, bool(*condition)(void*));
 
 # endif

@@ -4,7 +4,7 @@
 
 #include "../estructuras principales/pokemon.h"
 
-void entrenadores_cargar();
+entrenadores entrenadores_cargar();
 
 //auxiliares:
 t_list* config_get_posiciones();

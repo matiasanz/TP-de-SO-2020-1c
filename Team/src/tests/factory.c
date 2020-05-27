@@ -71,7 +71,7 @@ entrenadores entrenadores_CREATE(){
 
 
 entrenadores factory_entrenadores_de_prueba(int cantidad){
-	entrenadores equipo = entrenadores_create();
+	t_list* equipo = list_create();
 
 	int i;
 	for(i=0; i<cantidad; i++){

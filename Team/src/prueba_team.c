@@ -17,27 +17,14 @@ int main(void) {
 
 	Get_pokemones(objetivosGlobales);
 
-	log_info(event_logger, "\n\n****************************************\n!!!Jellou World Team!!!\n"); /* prints !!!Hello World!!! */
+	log_info(event_logger, "\n\n****************************************\n¡¡¡Jellou World Team!!!\n"); /* prints !!!Hello World!!! */
 	log_info(logger, "\n\n");
 
-		mensajesAPPEARD = cr_list_create(); //Para pruebas sin broker
-		mensajesCAUGHT = cr_list_create(); //Para pruebas sin broker
+		mensajesAPPEARD = cr_list_create();
+		mensajesCAUGHT = cr_list_create();
 		mensajesLOCALIZED = cr_list_create();
 
 	inicializar_hilos();
-
-	int cantidadDeEntrenadores=0;
-	pthread_t* hilosEntrenadores = inicializar_hilos_entrenadores(&cantidadDeEntrenadores);
-
-	pthread_create(&hiloPlanificador, NULL, (void*) team_planificar, NULL);
-
-	int i=0;
-	for(i=0; i<cantidadDeEntrenadores; i++){
-		pthread_join(hilosEntrenadores[i], NULL);
-	}
-
-
-//////Matar planificador
 
 	finalizar_hilos();
 
@@ -45,9 +32,9 @@ int main(void) {
 
 	log_info(event_logger, "chau team\n****************************************");
 
-	cr_list_destroy(tareasPendientes);
 	cr_list_destroy(mensajesAPPEARD);
 	cr_list_destroy(mensajesCAUGHT);
+	cr_list_destroy(mensajesLOCALIZED);
 
 	return team_exit(); //Destruye listas, cierra config, cierra log
 }
@@ -64,10 +51,8 @@ void team_inicializar(){
 
 	event_logger = log_create("log/team_event.log", "TEAM_EVENT", true, LOG_LEVEL_INFO);
 
-
-//	subscribpcion_colas();
-
 /*Gustavo*/
+//	subscribpcion_colas(); (?) Gustavo
 //	tiempo_reconexion=config_get_int_value(config,"TIEMPO_RECONEXION");
 //	retardo_ciclo_cpu=config_get_int_value(config,"RETARDO_CICLO_CPU");
 //	algoritmo_planificacion=config_get_string_value(config,"ALGORITMO_PLANIFICACION");
@@ -105,12 +90,13 @@ int team_exit(){
 
 //Listas
 void inicializar_listas() {
-	equipo = entrenadores_create();
-	entrenadores_cargar(equipo);
+	equipo = entrenadores_cargar();
 	objetivosGlobales = entrenadores_objetivos_globales(equipo);
 	pokemonesRequeridos = mapa_create();
 	capturasPendientes = pendientes_create();
 	historialDePokemones = list_create(); //Ver si vale la pena abstraer
+
+	entrenadoresReady = cr_list_create();
 }
 
 void listas_destroy(){
@@ -132,9 +118,16 @@ void inicializar_hilos(){
 	pthread_create(&hiloMensajesAppeard, NULL, (void*)team_suscriptor_cola_APPEARD, mensajesAPPEARD);
 	pthread_create(&hiloMensajesCAUGHT, NULL, (void*)team_suscriptor_cola_CAUGHT, mensajesCAUGHT);
 	pthread_create(&hiloMensajesLOCALIZED, NULL, (void*)team_suscriptor_cola_LOCALIZED, mensajesLOCALIZED);
+
+	inicializar_hilos_entrenadores();
+
+	pthread_create(&hiloPlanificador, NULL, (void*) team_planificar, NULL);
+
 }
 
 void finalizar_hilos(){
+	finalizar_hilos_entrenadores();
+
 	FinDelProceso = true;
 
 	pthread_join(hiloPlanificador, NULL);

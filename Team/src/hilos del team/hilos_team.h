@@ -8,6 +8,7 @@
 #include "../dominio/estructuras principales/pokemon.h"
 
 //Hilos
+pthread_t* hilosEntrenadores;
 pthread_t hiloReceptorDeMensajes;
 pthread_t hiloPlanificador;
 pthread_t hiloMensajesAppeard;
@@ -27,15 +28,14 @@ pthread_mutex_t mutexMensaje;
 //Variables globales
 bool FinDelProceso;
 
+
 /*----------------*/
 
 //Hilo correspondiente a un entrenador
-void modelo_hilo_entrenador();
 void team_hilo_entrenador();
 
 //Hilo que se encarga de planificar los hilos entrenadores
-void MODELO_PLANIFICAR();
-void team_planificar(); //nueva implementacion
+void team_planificar();
 
 //Hilo que se encarga de recibir los mensajes
 void broker_simulator();
@@ -47,13 +47,13 @@ void team_suscriptor_cola_LOCALIZED(cr_list*mensajes);
 void team_procesar_mensajes();
 
 //inicializar
-pthread_t* inicializar_hilos_entrenadores(int*cantidad);
+void inicializar_hilos_entrenadores();
+
+//finalizar
+void finalizar_hilos_entrenadores();
 
 //auxiliares
 void registrar_pokemon(pokemon*);
 void registrar_en_cada_posicion(especie_pokemon, t_list*posiciones);
-void entrenadores_despertar_en_caso_de_APPEARD(entrenadores equipo, entrenadores enReady);
-entrenadores entrenadores_despertar_para_APPEARD(entrenadores, pokemon*);
-
-
-
+void equipo_despertar_en_caso_de_APPEARD();
+void entrenadores_despertar(entrenadores, pokemon*);

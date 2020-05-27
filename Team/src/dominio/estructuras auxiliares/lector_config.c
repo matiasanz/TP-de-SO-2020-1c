@@ -3,7 +3,8 @@
 #include "lector_config.h"
 #include "mensajes.h"
 
-void entrenadores_cargar(entrenadores miEquipo){
+entrenadores entrenadores_cargar(){
+	entrenadores miEquipo = entrenadores_create();
 
 	t_list*posiciones = config_get_posiciones();
 	char**stringsDeInventarios = config_get_array_value(config, "POKEMON_ENTRENADORES");
@@ -35,10 +36,13 @@ void entrenadores_cargar(entrenadores miEquipo){
 		free(posicion);
 	}
 
+
 	list_destroy(posiciones);
 
 	string_array_destroy(stringsDeObjetivos);
 	string_array_destroy(stringsDeInventarios);
+
+	return miEquipo;
 }
 
 //*************************************************

@@ -5,7 +5,6 @@
 #include "posicion.h"
 
 typedef /*const*/char* especie_pokemon;
-typedef t_list* especies_pokemones;
 typedef t_dictionary* matriz_recursos;
 
 typedef enum{NEW,READY,	EXECUTE, LOCKED_HASTA_APPEARD, LOCKED_HASTA_DEADLOCK, LOCKED_HASTA_CAUGHT,	EXIT} t_estado; //VER cuales vale la pena conservar
@@ -49,9 +48,8 @@ typedef struct pcb_Entrenador{
 
 //bool entrenador_necesita_recurso(entrenador*unEntrenador);
 
-
 //****************************************************************************************
-//Cola de entrenadores
+//Equipo completo
 typedef t_list* entrenadores;
 
 //Constructor
@@ -66,11 +64,6 @@ entrenador* entrenadores_remover_del_equipo_a(entrenadores, t_id);
 //retorna el entrenador mas cercano a una posicion
 	entrenador* entrenadores_mas_cercano(entrenadores, t_posicion);
 
-//Retorna el proximo entrenador a ser planificado
-	entrenador* entrenadores_proximo_a_planificar(entrenadores); //, criterio); Hacer con enum
-
-//Retorna el id del proximo entrenador a ser planificado
-	t_id* entrenadores_id_proximo_a_planificar(entrenadores equipo);
 //Retorna los entrenadores que se encuentran en un estado
 	entrenadores entrenadores_en_estado(entrenadores, t_estado estado);
 
@@ -85,6 +78,23 @@ entrenador* entrenadores_remover_del_equipo_a(entrenadores, t_id);
 
 //Destructor
 	void entrenadores_destroy(entrenadores);
+
+//***************************************************************************************
+//Cola de entrenadores
+typedef cr_list* cola_entrenadores;
+
+//Agrega a la cola y avisa que hay elementos
+	void entrenador_agregar_a_cola(entrenador*, cola_entrenadores);
+
+//Queda en wait hasta que haya algun elemento en la cola y luego remueve el primer elemento
+	entrenador*entrenador_esperar_y_desencolar(cola_entrenadores);
+
+//Retorna el proximo entrenador a ser planificado
+	entrenador* entrenadores_proximo_a_planificar(cola_entrenadores); //, criterio); Hacer con enum
+
+//Retorna el id del proximo entrenador a ser planificado
+	t_id* entrenadores_id_proximo_a_planificar(cola_entrenadores);
+
 
 //****************************************************************************************
 //TAD Recursos (implementado con t_dictionary*)

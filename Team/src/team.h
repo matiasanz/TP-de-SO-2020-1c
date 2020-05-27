@@ -36,7 +36,7 @@ void finalizar_hilos();
 	mapa_pokemones pokemonesRequeridos;
 	matriz_recursos objetivosGlobales; //Para deadlock TODO (VER a futuro)
 	pendientes capturasPendientes;
-	cr_list* tareasPendientes; //De prueba
+	cola_entrenadores entrenadoresReady;
 	especies_pokemones historialDePokemones;
 
 //Colas de mensajes (BORRAR A FUTURO)

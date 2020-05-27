@@ -10,22 +10,19 @@ void team_planificar(){
 
 	while(!FinDelProceso){
 		sem_wait(&HayTareasPendientes);
-//		sem_wait(&HayEntrenadores); //TODO Resolver espera activa; problema: en cuanto inicializar y no se contempla caso deadlock
 
-		entrenadores colaDeReady = entrenadores_en_estado(equipo, READY); //TODO VERRRR
+		equipo_despertar_en_caso_de_APPEARD();
 
-		entrenadores_despertar_en_caso_de_APPEARD(equipo, colaDeReady);
-//wait(colaDeReady->hayMas) //colaDeReady tendria que ser otra lista global :(
-		t_id* idProximoEntrenador = entrenadores_id_proximo_a_planificar(colaDeReady);
+		t_id* idProximoEntrenador = entrenadores_id_proximo_a_planificar(entrenadoresReady);
 
-		if(idProximoEntrenador){
-			printf(">>>Planificar: signal(Entrenador N°%u)\n", *idProximoEntrenador);
-			sem_post(&EjecutarEntrenador[*idProximoEntrenador]); //signal(id);
-
-			sem_wait(&EntradaSalida_o_FinDeEjecucion);
+		if(!idProximoEntrenador){
+			error_show("Se intento leer un id nulo");
+			exit(1);
 		}
 
-		else puts("No hay entrenadores en ready");
+		printf(">>>Planificar: signal(Entrenador N°%u)\n", *idProximoEntrenador);
+		sem_post(&EjecutarEntrenador[*idProximoEntrenador]); //signal(id);
+		sem_wait(&EntradaSalida_o_FinDeEjecucion);
 	}
 
 	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
@@ -36,9 +33,15 @@ void team_planificar(){
 
 /***************************************** Funciones Auxiliares ***************************************************/
 
-void entrenadores_despertar_en_caso_de_APPEARD(entrenadores unEquipo, entrenadores colaDeReady){
+void equipo_despertar_en_caso_de_APPEARD(){
+
 	pthread_mutex_lock(pokemonesRequeridos->mutex);
-	if(!list_is_empty(pokemonesRequeridos->lista)){
+	if(list_is_empty(pokemonesRequeridos->lista)){
+		/*no hacer nada*/
+		pthread_mutex_unlock(pokemonesRequeridos->mutex);
+	}
+
+	else{
 		pokemon*unPokemon = list_get(pokemonesRequeridos->lista, 0);
 		pthread_mutex_unlock(pokemonesRequeridos->mutex);
 
@@ -47,27 +50,21 @@ void entrenadores_despertar_en_caso_de_APPEARD(entrenadores unEquipo, entrenador
 			exit(1);
 		}
 
-		list_destroy(colaDeReady);
-		colaDeReady = entrenadores_despertar_para_APPEARD(unEquipo, unPokemon);
+		entrenadores_despertar(equipo, unPokemon);
 	}
-
-	else pthread_mutex_unlock(pokemonesRequeridos->mutex);
-
 }
 
 
-entrenadores entrenadores_despertar_para_APPEARD(entrenadores unEquipo, pokemon* unPokemon){
+void entrenadores_despertar(entrenadores unEquipo, pokemon* unPokemon){
 
-	void entrenador_despertar_appeard(entrenador*unEntrenador){
-		//if(unEntrenador->siguienteTarea == CATCHEAR) && no esta en ready. Aca tendria sentido tener dos listas.
-		if(entrenador_en_estado(unEntrenador, NEW) || entrenador_en_estado(unEntrenador, LOCKED_HASTA_APPEARD)){
+	void entrenador_despertar(entrenador*unEntrenador){
+		if(unEntrenador->siguienteTarea == CATCHEAR && unEntrenador->estado!=READY){
 			entrenador_pasar_a(unEntrenador, READY, "Acaba de llegar un pokemon que puede cazar");
+			entrenador_agregar_a_cola(unEntrenador, entrenadoresReady);
 		}
 	}
 
-	list_iterate(unEquipo, (void(*)(void*)) &entrenador_despertar_appeard);
-
-	entrenadores enReady = entrenadores_en_estado(unEquipo, READY);
+	list_iterate(unEquipo, (void(*)(void*)) &entrenador_despertar);
 
 	bool porCercania(entrenador*unEntrenador, entrenador* otroEntrenador){
 		numero distanciaDelPrimero = posicion_distancia(unEntrenador->posicion, unPokemon->posicion);
@@ -75,7 +72,5 @@ entrenadores entrenadores_despertar_para_APPEARD(entrenadores unEquipo, pokemon*
 		return  distanciaDelPrimero - distanciaDelSegundo;
 	}
 
-	list_sort(enReady, (bool(*)(void*, void*)) &porCercania);
-
-	return enReady;
+	cr_list_sort(entrenadoresReady, (bool(*)(void*, void*)) &porCercania);
 }
