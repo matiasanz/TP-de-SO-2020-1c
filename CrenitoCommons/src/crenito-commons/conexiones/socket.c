@@ -172,7 +172,7 @@ int static socket_error(int indicador_conexion) {
 
 void static manejar_error_socket(int socket, char* operacion) {
 
-	log_error(get_crnito_logger(),
+	log_error(event_logger,
 			"Error al realizar la operación %s, socket: %d", operacion, socket);
 	close(socket);
 }

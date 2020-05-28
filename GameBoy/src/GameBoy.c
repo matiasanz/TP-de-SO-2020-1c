@@ -12,6 +12,8 @@
 
 int main(void) {
 
+	inicializar_logs();
+
 	//Me traigo la config para conocer la ip puerto del broker
 	t_config* config = config_create("./config/gameboy.config");
 
@@ -43,14 +45,8 @@ int main(void) {
 
 }
 
+void inicializar_logs() {
 
-//void paquete_enviar(int cod_op, t_buffer* buffer, int socket_cliente) {
-//	t_paquete* paquete = paquete_crear(cod_op, BROKER, buffer);
-//
-//	int bytes = 0;
-//
-//
-//	send(socket_cliente, a_enviar, bytes, 0);
-//
-//	free(a_enviar);
-//}
+	logger = log_create("./log/gameboy.log", GAMEBOY_STRING, 1, LOG_LEVEL_INFO);
+	event_logger = log_create("./log/gameboy_event.log", "GAMEBOY_EVENT", 1, LOG_LEVEL_INFO);
+}

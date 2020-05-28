@@ -8,11 +8,10 @@
 #ifndef SRC_CRENITO_COMMONS_SOCKET_H_
 #define SRC_CRENITO_COMMONS_SOCKET_H_
 
-#include <arpa/inet.h>
+#include<arpa/inet.h>
 #include<sys/socket.h>
 #include<unistd.h>
 #include<netdb.h>
-#include "../utils.h"
 #include "paquete.h"
 
 #define ERROR_SOCKET -1

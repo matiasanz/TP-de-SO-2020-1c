@@ -56,8 +56,6 @@ t_mensaje_caught_pokemon* mensaje_caught_pokemon_deserializar(void* stream) {
 			sizeof(msj->atrapado));
 	desplazamiento += sizeof(msj->atrapado);
 
-	free(stream);
-
 	return msj;
 }
 

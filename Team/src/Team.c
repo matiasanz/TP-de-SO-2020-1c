@@ -28,6 +28,7 @@ int inicializar(){
 	config=config_create(CONFIG_PATH);
 
 	logger=log_create(config_get_string_value(config,"LOG_FILE"),TEAM_STRING,true,LOG_LEVEL_INFO);
+	event_logger = log_create("./log/team_event.log", "TEAM_EVENT", 1, LOG_LEVEL_INFO);
 
 	inicializar_conexiones();
 

@@ -66,8 +66,6 @@ t_mensaje_appeared_catch_pokemon* mensaje_appeared_catch_pokemon_deserializar(vo
 			&bytes_pokemon);
 	desplazamiento += bytes_pokemon;
 
-	free(stream);
-
 	return msj;
 }
 
