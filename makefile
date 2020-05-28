@@ -29,7 +29,11 @@ debug:
 
 install:
 	-cd CrenitoCommons && $(MAKE) install
+	-cd Broker && $(MAKE) all
+	-cd GameBoy && $(MAKE) all
+	-cd GameCard && $(MAKE) all
+	-cd Team && $(MAKE) all
 	-cd CrenitoCommons && $(MAKE) test
 
 uninstall:
-	-cd CrenitoCommons && $(MAKE) install
+	-cd CrenitoCommons && $(MAKE) uninstall
