@@ -6,3 +6,8 @@
  - _Emiliano González_
  - _Gastón Erazo_
  - _Gustavo Choque_
+
+**Instalación:**
+1. `git clone https://github.com/sisoputnfrba/tp-2020-1c-Crenito-casero`
+1. `cd tp-2020-1c-Crenito-casero`
+1. `sudo bash Instalador`
