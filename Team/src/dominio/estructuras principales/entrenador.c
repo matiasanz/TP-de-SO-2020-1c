@@ -111,6 +111,19 @@ matriz_recursos entrenadores_objetivos_globales(entrenadores unEquipo){
 	return objetivosGlobales;
 }
 
+matriz_recursos entrenadores_inventarios_globales(entrenadores unEquipo){ //Ver como abstraer logica repetida
+	matriz_recursos inventariosGlobales = recursos_create();
+
+	void agregarInventarios(entrenador*unEntrenador){
+		recursos_sumar_recursos_a(inventariosGlobales, unEntrenador->pokemonesCazados);
+	}
+
+	list_iterate(unEquipo, (void(*)(void*))&agregarInventarios);
+
+	return inventariosGlobales;
+
+}
+
 //
 entrenadores entrenadores_en_estado(entrenadores equipo, t_estado unEstado){
 	bool esta_en_estado(void* unEntrenador){
@@ -119,15 +132,6 @@ entrenadores entrenadores_en_estado(entrenadores equipo, t_estado unEstado){
 	}
 
 	return list_filter(equipo, &esta_en_estado);
-}
-
-void entrenadores_bloquear_por_captura(entrenadores unEquipo){
-
-	void sacar_de_execute(entrenador*unEntrenador){
-		if(entrenador_en_estado(unEntrenador, EXECUTE)) entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARD, "Se ejecutara a otro entrenador");
-	}
-
-	list_iterate(unEquipo, (void(*)(void*)) &sacar_de_execute);
 }
 
 //Destructor de equipo

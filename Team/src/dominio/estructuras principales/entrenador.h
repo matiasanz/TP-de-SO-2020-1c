@@ -67,9 +67,6 @@ entrenador* entrenadores_remover_del_equipo_a(entrenadores, t_id);
 //Retorna los entrenadores que se encuentran en un estado
 	entrenadores entrenadores_en_estado(entrenadores, t_estado estado);
 
-//Pasa al entrenador que se este ejecutando a LOCKED hasta APPEARD
-	void entrenadores_bloquear_por_captura(entrenadores);
-
 //Retorna true si el entrenador requiere al menos una instancia de la especie
 	bool entrenador_necesita_recurso(entrenador*unEntrenador); //TODO
 

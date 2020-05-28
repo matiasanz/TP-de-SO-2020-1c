@@ -35,6 +35,7 @@ void finalizar_hilos();
 	entrenadores equipo;
 	mapa_pokemones pokemonesRequeridos;
 	matriz_recursos objetivosGlobales; //Para deadlock TODO (VER a futuro)
+	matriz_recursos inventariosGlobales;
 	pendientes capturasPendientes;
 	cola_entrenadores entrenadoresReady;
 	especies_pokemones historialDePokemones;

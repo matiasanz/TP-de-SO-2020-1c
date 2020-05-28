@@ -126,3 +126,17 @@ void finalizar_hilos_entrenadores(){
 		pthread_join(hilosEntrenadores[i], NULL);
 	}
 }
+
+void entrenador_capturar(entrenador*entrenador, pokemon*victima){
+	recursos_agregar_recurso(entrenador->pokemonesCazados, victima->especie);
+	recursos_agregar_recurso(inventariosGlobales, victima->especie);
+
+	t_posicion posicionDelEvento = entrenador->posicion;
+
+	pthread_mutex_lock(&Mutex_AndoLoggeando);
+	log_info(logger, "El Entrenador N°%u ha capturado un %s en la posicion [%u %u]", entrenador->id, victima->especie, posicionDelEvento.pos_x, posicionDelEvento.pos_y);
+	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+
+	pokemon_destroy(victima);
+}
+

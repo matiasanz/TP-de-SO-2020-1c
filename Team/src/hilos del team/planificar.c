@@ -69,7 +69,7 @@ void entrenadores_despertar(entrenadores unEquipo, pokemon* unPokemon){
 	bool porCercania(entrenador*unEntrenador, entrenador* otroEntrenador){
 		numero distanciaDelPrimero = posicion_distancia(unEntrenador->posicion, unPokemon->posicion);
 		numero distanciaDelSegundo = posicion_distancia(otroEntrenador->posicion, unPokemon->posicion);
-		return  distanciaDelPrimero - distanciaDelSegundo;
+		return  distanciaDelPrimero >= distanciaDelSegundo;
 	}
 
 	cr_list_sort(entrenadoresReady, (bool(*)(void*, void*)) &porCercania);
