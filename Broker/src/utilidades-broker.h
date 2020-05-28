@@ -1,19 +1,9 @@
 #ifndef UTILIDADESBROKER_H_
 #define UTILIDADESBROKER_H_
 
-#include<commons/log.h>
-#include<pthread.h>
-#include <crenito-commons/conexiones/conexiones.h>
-#include <commons/collections/queue.h>
-#include <commons/collections/list.h>
+#include "crenito-commons/conexiones/conexiones.h"
 
 pthread_t thread;
-
-//Logger para uso exclusivo de informacion pedida por el tp
-t_log* logger;
-
-//Logger para grabar informacion adicional/errores
-t_log* event_logger;
 
 //Estructura con la información solicitada por el tp en la parte "Administración de Mensajes"
 typedef struct {

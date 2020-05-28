@@ -8,11 +8,18 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
+// En utils.h estan los headers y variables globales compartidas entre procesos
 #include<stdint.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include<stdbool.h>
+#include<pthread.h>
+
 #include<commons/log.h>
+#include<commons/config.h>
+#include<commons/collections/list.h>
+#include<commons/collections/queue.h>
 
 #define NEW_POKEMON_STRING "NEW_POKEMON"
 #define APPEARED_POKEMON_STRING "APPEARED_POKEMON"
@@ -26,8 +33,12 @@
 #define GAMECARD_STRING "GAME_CARD"
 #define TEAM_STRING "TEAM"
 
-// logger para las commons
-t_log* crenito_logger;
+t_config* config;
+
+//Logger para uso exclusivo de informacion pedida por el tp
+t_log* logger;
+//Logger para grabar informacion adicional/errores
+t_log* event_logger;
 
 //Estructura administrativa para ids de mensajes
 typedef struct {
@@ -53,8 +64,6 @@ typedef enum {
 
 // Inicializa los ids para prevenir errores con valgrind
 void mensaje_header_inicializar(t_mensaje_header* header);
-// singleton para el logger de las commons
-t_log* get_crnito_logger();
 // dado un id de proceso devuelve el mismo representado por un string
 char* get_nombre_proceso(t_id_proceso id_proceso);
 // dado un id de mensaje/nombre de cola el mismo representado por un string
