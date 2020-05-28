@@ -36,9 +36,6 @@ void inicializar_conexiones() {
 			config_get_string_value(config, "PUERTO_BROKER"), GAMECARD,
 			config_get_int_value(config, "TIEMPO_DE_REINTENTO_CONEXION"));
 
-	pthread_t hilo_subscriptor;
-	pthread_create(&hilo_subscriptor, NULL, (void*) subscribir_colas, NULL);
-	pthread_detach(hilo_subscriptor);
 }
 
 void inicializar_logs() {
@@ -49,9 +46,4 @@ void inicializar_logs() {
 
 void subscribir_colas(void* arg) {
 
-	conexion_catch_pokemon = subscribir_cola(conexion_broker, CATCH_POKEMON);
-	conexion_get_pokemon = subscribir_cola(conexion_broker, GET_POKEMON);
-	conexion_new_pokemon = subscribir_cola(conexion_broker, NEW_POKEMON);
-
-    pthread_exit(NULL);
 }

@@ -22,25 +22,6 @@ int main(void) {
 				config_get_string_value(config, "PUERTO_BROKER"), GAMEBOY,
 				0);
 
-		// Creo un mensaje de prueba
-	t_mensaje_new_pokemon* msj = mensaje_new_pokemon_crear("pickachu", 1, 2, 3);
-
-	//Empaqueto el mensaje de prueba
-	t_buffer* bfr = mensaje_new_pokemon_serializar(msj);
-	t_paquete* pqt = paquete_crear(MENSAJE,
-				                   GAMEBOY,
-								   NEW_POKEMON,
-								   bfr);
-
-	//envio el mensaje
-	int respuesta = enviar(conexion_broker, pqt);
-
-	printf("Id obtenido del Broker: %d \n", respuesta);
-
-	config_destroy(config);
-	mensaje_new_pokemon_destruir(msj);
-	paquete_destruir(pqt);
-
 	return 1;
 
 }

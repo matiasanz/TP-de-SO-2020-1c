@@ -42,18 +42,10 @@ void inicializar_conexiones() {
 			config_get_string_value(config, "PUERTO_BROKER"), TEAM,
 			config_get_int_value(config, "TIEMPO_RECONEXION"));
 
-	pthread_t hilo_subscriptor;
-	pthread_create(&hilo_subscriptor, NULL, (void*) subscribir_colas, NULL);
-	pthread_detach(hilo_subscriptor);
 }
 
 void subscribir_colas(void* arg) {
 
-	conexion_appeared_pokemon = subscribir_cola(conexion_broker, APPEARED_POKEMON);
-	conexion_localized_pokemon = subscribir_cola(conexion_broker, LOCALIZED_POKEMON);
-	conexion_caught_pokemon = subscribir_cola(conexion_broker, NEW_POKEMON);
-
-    pthread_exit(NULL);
 }
 
 
