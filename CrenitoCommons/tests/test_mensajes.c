@@ -42,7 +42,7 @@ context (test_mensajes) {
 			t_posicion* posicion_esperada = list_get(esperado->posiciones, i);
 			t_posicion* posicion_real = list_get(real->posiciones, i);
 
-			should_ptr(posicion_esperada) be equal to (posicion_real);
+			should_posicion(*posicion_esperada, *posicion_real);
 		}
 
 	}
@@ -114,14 +114,14 @@ context (test_mensajes) {
 			//Arrange
 			t_list * posiciones = list_create();
 
-			t_posicion* p0 = posicion_crear_ptr(0, 0);
-			list_add(posiciones, p0);
+			t_posicion p0 = posicion_crear(0, 0);
+			list_add(posiciones, &p0);
 
-			t_posicion* p1 = posicion_crear_ptr(2, 4);
-			list_add(posiciones, p1);
+			t_posicion p1 = posicion_crear(2, 4);
+			list_add(posiciones, &p1);
 
-			t_posicion* p2 = posicion_crear_ptr(5, 3);
-			list_add(posiciones, p2);
+			t_posicion p2 = posicion_crear(5, 3);
+			list_add(posiciones, &p2);
 
 			t_mensaje_localized_pokemon* lcd_esperado = mensaje_localized_pokemon_crear("bulbasaur", posiciones);
 			mensaje_localized_pokemon_set_id(lcd_esperado, 3);
@@ -135,6 +135,7 @@ context (test_mensajes) {
 			assert_mensaje_localized_pokemon(lcd_esperado, lcd_real);
 
 			//Free
+			list_destroy(posiciones);
 			buffer_destruir(lcd_serializado);
 			mensaje_localized_pokemon_destruir(lcd_esperado);
 			mensaje_localized_pokemon_destruir(lcd_real);

@@ -16,7 +16,5 @@ typedef struct {
 } t_posicion;
 
 t_posicion posicion_crear(uint32_t pos_x, uint32_t pos_y);
-t_posicion* posicion_crear_ptr(uint32_t pos_x, uint32_t pos_y);
-void posicion_destruir(t_posicion* posicion);
 
 #endif /* SRC_CRENITO_COMMONS_MODELO_POSICION_H_ */
