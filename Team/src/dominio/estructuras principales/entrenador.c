@@ -68,16 +68,6 @@ char*estadoFromEnum(t_estado unEstado){
 	}
 }
 
-
-void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const char*motivo){
-	char*estadoActual = estadoFromEnum(unEntrenador->estado);
-	unEntrenador->estado = estadoFinal;
-
-	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	log_info(logger, "El Entrenador N°%u se paso de la cola de %s a %s, Motivo: %s", unEntrenador->id, estadoActual, estadoFromEnum(estadoFinal), motivo);
-	pthread_mutex_unlock(&Mutex_AndoLoggeando);
-}
-
 void entrenador_destroy(entrenador* destruido){
 	recursos_destroy(destruido->objetivos);
 	recursos_destroy(destruido->pokemonesCazados);
@@ -89,13 +79,6 @@ void entrenador_destroy(entrenador* destruido){
 //Constructor de equipo
 entrenadores entrenadores_create(){
 	return list_create();
-}
-
-entrenador* entrenadores_remover_del_equipo_a(entrenadores unEquipo, t_id id){
-	bool entrenador_cmpId(entrenador*unEntrenador){
-		return id == unEntrenador->id;
-	}
-	return list_remove_by_condition(unEquipo, (bool(*)(void*)) &entrenador_cmpId);
 }
 
 matriz_recursos entrenadores_objetivos_globales(entrenadores unEquipo){

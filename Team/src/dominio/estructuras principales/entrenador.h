@@ -43,6 +43,9 @@ typedef struct pcb_Entrenador{
 //	Pasa entrenador a un estado y loggea el pasaje con el motivo
 	void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const char*motivo);
 
+// Retorna una cadena de caracteres con el estado
+	char*estadoFromEnum(t_estado);
+
 //Destructor
 	void entrenador_destroy(entrenador*);
 

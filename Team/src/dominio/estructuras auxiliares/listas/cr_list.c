@@ -1,6 +1,6 @@
 #include "cr_list.h"
 
-//Ver a futuro
+//Ver a futuro, no logre que anduviera
 void* cr_list_entre_mutex(cr_list*unaLista, void*(*funcionDeLista)(t_list*, void*), void* argumento){
 	pthread_mutex_lock(unaLista->mutex);
 	void* retorno = funcionDeLista(unaLista->lista, argumento);
@@ -9,26 +9,20 @@ void* cr_list_entre_mutex(cr_list*unaLista, void*(*funcionDeLista)(t_list*, void
 	return retorno;
 }
 
-cr_list* cr_list_construct(t_list*lista, pthread_mutex_t*semaforoMutex){
-	cr_list* nueva = malloc(sizeof(cr_list));
-	nueva->lista = lista;
-	nueva->mutex = semaforoMutex;
-
-	sem_init(&nueva->hayMas, 0, list_size(lista));
-
-	return nueva;
-}
-
 cr_list* cr_list_create(){
-	pthread_mutex_t* unMutex = malloc(sizeof(pthread_mutex_t));
-	pthread_mutex_init(unMutex, NULL);
-	return cr_list_construct(list_create(), unMutex);
+	return cr_list_from_list(list_create());
 }
 
 cr_list* cr_list_from_list(t_list*unaLista){
 	pthread_mutex_t* mutex = malloc(sizeof(pthread_mutex_t));
 	pthread_mutex_init(mutex, NULL);
-	return cr_list_construct(unaLista, mutex);
+
+	cr_list* nueva = malloc(sizeof(cr_list));
+	nueva->lista = unaLista;
+	nueva->mutex = mutex;
+	sem_init(&nueva->hayMas, 0, list_size(unaLista));
+
+	return nueva;
 }
 
 void cr_list_destroy(cr_list* unaLista){
@@ -146,7 +140,7 @@ cr_list* cr_list_filter(cr_list* unaLista, bool(*condition)(void*)){
 	t_list*filtrada = list_filter(unaLista->lista, condition);
 	pthread_mutex_unlock(unaLista->mutex);
 
-	return cr_list_construct(filtrada, unaLista->mutex);
+	return cr_list_from_list(filtrada);
 }
 
 bool cr_list_is_empty(cr_list* unaLista){

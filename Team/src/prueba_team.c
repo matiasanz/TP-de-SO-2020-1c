@@ -103,7 +103,9 @@ void listas_destroy(){
 	entrenadores_destroy(equipo);
 	mapa_destroy(pokemonesRequeridos);
 	pendientes_destroy(capturasPendientes);
-//	list_destroy_and_destroy_elements(historialDePokemones, free); //TODO puede ser que rompa
+	recursos_destroy(objetivosGlobales);
+	recursos_destroy(inventariosGlobales);
+	list_destroy(historialDePokemones);
 }
 
 //Colas
@@ -139,10 +141,11 @@ void finalizar_hilos(){
 //Semaforos
 
 void inicializar_semaforos(){
-	sem_init(&EntradaSalida_o_FinDeEjecucion, 0, 1);
 	sem_init(&HayTareasPendientes, 0, 0);
-//	sem_init(&HayEntrenadores, 0, 0); VER??
+	sem_init(&EntradaSalida_o_FinDeEjecucion, 0, 1);
 
+	pthread_mutex_init(&mutexEntrenadores, NULL);
+	pthread_mutex_init(&mutexHistorialEspecies, NULL);
 	pthread_mutex_init(&Mutex_AndoLoggeando, NULL);
 	pthread_mutex_init(&Mutex_AndoLoggeandoEventos, NULL);
 
@@ -153,6 +156,7 @@ void finalizar_semaforos(){
 	sem_destroy(&HayTareasPendientes);
 	sem_destroy(&EntradaSalida_o_FinDeEjecucion);
 
+	pthread_mutex_destroy(&mutexHistorialEspecies);
 	pthread_mutex_destroy(&Mutex_AndoLoggeando);
 	pthread_mutex_destroy(&Mutex_AndoLoggeandoEventos);
 }

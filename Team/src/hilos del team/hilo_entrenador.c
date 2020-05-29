@@ -110,12 +110,12 @@ void inicializar_hilos_entrenadores(){
 	hilosEntrenadores = malloc(sizeof(pthread_t)*cantidadDeEntrenadores);
 
 	EjecutarEntrenador = malloc(sizeof(sem_t)*cantidadDeEntrenadores);
-//	mutexEntrenador = malloc(sizeof(pthread_mutex_t)*cantidadDeHilos);
+	mutexEstadoEntrenador = malloc(sizeof(pthread_mutex_t)*cantidadDeEntrenadores);
 
 	int i;
 	for(i=0; i<cantidadDeEntrenadores; i++){
 		sem_init(&EjecutarEntrenador[i], 0, 0);
-//		pthread_mutex_init(&mutexEntrenador[i], NULL);
+		pthread_mutex_init(&mutexEstadoEntrenador[i], NULL);
 		pthread_create(&hilosEntrenadores[i], NULL, (void*) team_hilo_entrenador, list_get(equipo, i));
 	}
 }
@@ -124,12 +124,27 @@ void finalizar_hilos_entrenadores(){
 	int i=0;
 	for(i=0; i<cantidadDeEntrenadores; i++){
 		pthread_join(hilosEntrenadores[i], NULL);
+		pthread_mutex_destroy(&mutexEstadoEntrenador[i]);
 	}
 }
 
+
+
+void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const char*motivo){
+	pthread_mutex_lock(&mutexEstadoEntrenador[unEntrenador->id]);
+	t_estado estadoActual = unEntrenador->estado;
+	unEntrenador->estado = estadoFinal;
+	pthread_mutex_unlock(&mutexEstadoEntrenador[unEntrenador->id]);
+
+	pthread_mutex_lock(&Mutex_AndoLoggeando);
+	log_info(logger, "El Entrenador N°%u se paso de la cola de %s a %s, Motivo: %s", unEntrenador->id, estadoFromEnum(estadoActual), estadoFromEnum(estadoFinal), motivo);
+	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+}
+
 void entrenador_capturar(entrenador*entrenador, pokemon*victima){
+
 	recursos_agregar_recurso(entrenador->pokemonesCazados, victima->especie);
-	recursos_agregar_recurso(inventariosGlobales, victima->especie);
+//	recursos_agregar_recurso(inventariosGlobales, victima->especie);
 
 	t_posicion posicionDelEvento = entrenador->posicion;
 
@@ -138,5 +153,17 @@ void entrenador_capturar(entrenador*entrenador, pokemon*victima){
 	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 
 	pokemon_destroy(victima);
+}
+
+entrenador* entrenadores_remover_del_equipo_a(entrenadores unEquipo, t_id id){
+	bool entrenador_cmpId(entrenador*unEntrenador){
+		return id == unEntrenador->id;
+	}
+
+	pthread_mutex_lock(&mutexEntrenadores);
+	entrenador*removido = list_remove_by_condition(unEquipo, (bool(*)(void*)) &entrenador_cmpId);
+	pthread_mutex_unlock(&mutexEntrenadores);
+
+	return removido;
 }
 

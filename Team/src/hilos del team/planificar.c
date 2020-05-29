@@ -10,7 +10,6 @@ void team_planificar(){
 
 	while(!FinDelProceso){
 		sem_wait(&HayTareasPendientes);
-
 		equipo_despertar_en_caso_de_APPEARD();
 
 		t_id* idProximoEntrenador = entrenadores_id_proximo_a_planificar(entrenadoresReady);
@@ -54,17 +53,18 @@ void equipo_despertar_en_caso_de_APPEARD(){
 	}
 }
 
-
 void entrenadores_despertar(entrenadores unEquipo, pokemon* unPokemon){
 
 	void entrenador_despertar(entrenador*unEntrenador){
-		if(unEntrenador->siguienteTarea == CATCHEAR && unEntrenador->estado!=READY){
+		if(entrenador_dormido_hasta_APPEARD(unEntrenador)){
 			entrenador_pasar_a(unEntrenador, READY, "Acaba de llegar un pokemon que puede cazar");
 			entrenador_agregar_a_cola(unEntrenador, entrenadoresReady);
 		}
 	}
 
+	pthread_mutex_lock(&mutexEntrenadores);
 	list_iterate(unEquipo, (void(*)(void*)) &entrenador_despertar);
+	pthread_mutex_unlock(&mutexEntrenadores);
 
 	bool porCercania(entrenador*unEntrenador, entrenador* otroEntrenador){
 		numero distanciaDelPrimero = posicion_distancia(unEntrenador->posicion, unPokemon->posicion);
@@ -73,4 +73,11 @@ void entrenadores_despertar(entrenadores unEquipo, pokemon* unPokemon){
 	}
 
 	cr_list_sort(entrenadoresReady, (bool(*)(void*, void*)) &porCercania);
+}
+
+bool entrenador_dormido_hasta_APPEARD(entrenador*unEntrenador){
+	pthread_mutex_lock(&mutexEstadoEntrenador[unEntrenador->id]);
+	bool estaDormido = unEntrenador->estado == LOCKED_HASTA_APPEARD || unEntrenador->estado ==NEW;
+	pthread_mutex_unlock(&mutexEstadoEntrenador[unEntrenador->id]);
+	return estaDormido;
 }

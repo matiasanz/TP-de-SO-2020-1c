@@ -19,15 +19,6 @@ void especies_agregar_validado(especies_pokemones especies, especie_pokemon unaE
 	especies_agregar(especies, unaEspecie);
 }
 
-bool especie_recibida_con_anterioridad(especie_pokemon especie, especies_pokemones historial){
-
-	bool yaLaTengo(void*especieDeLista){
-		return especie_cmp((especie_pokemon)especieDeLista, especie);
-	}
-
-	return list_any_satisfy(historial, &yaLaTengo);
-}
-
 //TAD pokemon
 pokemon pokemon_create(especie_pokemon especie, coordenada coordenadaX, coordenada coordenadaY){
 	return (pokemon) {especie, posicion_create(coordenadaX, coordenadaY)};
@@ -41,10 +32,6 @@ pokemon* pokemon_ptr_create(especie_pokemon especie, coordenada coordenadaX, coo
 
 bool pokemon_misma_especie(pokemon unPokemon, pokemon otroPokemon){
 	return especie_cmp(unPokemon.especie, otroPokemon.especie); //string_equals_ignore_case(objetivo->especie, deLista->especie);
-}
-
-bool pokemon_es_objetivo(pokemon unPokemon, matriz_recursos objetivos){
-	return recursos_cantidad_de_instancias_de(objetivos, unPokemon.especie);
 }
 
 //Destructor

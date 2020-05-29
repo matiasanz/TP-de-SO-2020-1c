@@ -22,8 +22,10 @@ sem_t EntradaSalida_o_FinDeEjecucion;
 sem_t HayTareasPendientes;
 sem_t HayEntrenadores;
 
-pthread_mutex_t mutexMensaje;
-//pthread_mutex_t*mutexEntrenador; TODO ver usos de acuerdo a implementacion
+pthread_mutex_t mutexHistorialEspecies;
+pthread_mutex_t mutexEntrenadores;
+pthread_mutex_t*mutexEstadoEntrenador;
+pthread_mutex_t mutexInventariosGlobales;
 
 //Variables globales
 bool FinDelProceso;
@@ -56,4 +58,6 @@ void finalizar_hilos_entrenadores();
 void registrar_pokemon(pokemon*);
 void registrar_en_cada_posicion(especie_pokemon, t_list*posiciones);
 void equipo_despertar_en_caso_de_APPEARD();
+bool entrenador_dormido_hasta_APPEARD(entrenador*);
 void entrenadores_despertar(entrenadores, pokemon*);
+bool pokemon_es_objetivo(pokemon unPokemon, matriz_recursos objetivos);
