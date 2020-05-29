@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include <crenito-commons/utils.h>
 #include <crenito-commons/mensajes/mensaje_new_pokemon.h>
+#include <crenito-commons/mensajes/mensaje_appeared_catch_pokemon.h>
+#include <crenito-commons/mensajes/mensaje_caught_pokemon.h>
+#include <crenito-commons/mensajes/mensaje_get_pokemon.h>
+#include <crenito-commons/mensajes/mensaje_localized_pokemon.h>
 #include <crenito-commons/conexiones/socket.h>
 #include <commons/log.h>
 #include <commons/config.h>

@@ -51,16 +51,50 @@ void validar_cantidad_argumentos(int cantidad,int numero){
 
 
 
-
 void validar_quien_conoce_newpokemon(char* proceso){
 	if(strcmp(proceso,BROKER_STRING) && strcmp(proceso,GAMECARD_STRING)){
 		log_error(event_logger,"este mensaje no lo entiende el  proceso %s",proceso);
 		abort();
 	}
 }
+
+void validar_quien_conoce_appearedpokemon(char* proceso){
+	if(strcmp(proceso,BROKER_STRING) && strcmp(proceso,TEAM_STRING)){
+		log_error(event_logger,"este mensaje no lo entiende el  proceso %s",proceso);
+		abort();
+	}
+}
+
+void validar_quien_conoce_catchpokemon(char* proceso){
+	if(strcmp(proceso,BROKER_STRING) && strcmp(proceso,GAMECARD_STRING)){
+		log_error(event_logger,"este mensaje no lo entiende el  proceso %s",proceso);
+		abort();
+	}
+}
+
+void validar_quien_conoce_caughtpokemon(char* proceso){
+	if(strcmp(proceso,BROKER_STRING)){
+		log_error(event_logger,"este mensaje no lo entiende el  proceso %s",proceso);
+		abort();
+	}
+}
+
+void validar_quien_conoce_getpokemon(char* proceso){
+	if(strcmp(proceso,BROKER_STRING) && strcmp(proceso,GAMECARD_STRING)){
+		log_error(event_logger,"este mensaje no lo entiende el  proceso %s",proceso);
+		abort();
+	}
+}
+
+void validar_ok_fail(char* argumento){
+	if(strcmp(argumento,"OK")&&strcmp(argumento,"FAIL")){
+		log_error(event_logger,"el ultimo argumento no existe, ingreso %s",argumento);
+		abort();
+	}
+}
 void validar_mayor_a_cero(int* cantidad,char* num){
 	*cantidad=atoi(num);
-	puts(cantidad);
+
 	if(cantidad<=0){
 		log_error(event_logger,"la cantidad no puede ser menor o igual a cero, el numero que ingreso es %i",cantidad);
 		abort();
