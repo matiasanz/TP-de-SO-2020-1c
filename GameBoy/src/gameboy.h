@@ -12,12 +12,13 @@
 #include <crenito-commons/conexiones/socket.h>
 #include <commons/log.h>
 #include <commons/config.h>
+#include <crenito-commons/conexiones/conexiones.h>
 
 t_config* config;
 t_log* logger;
 t_log* event_logger;
 
-void inicializar(void);
+void inicializar_logs(void);
 
 
 #endif
