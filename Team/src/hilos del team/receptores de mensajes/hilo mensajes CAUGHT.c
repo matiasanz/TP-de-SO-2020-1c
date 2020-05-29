@@ -6,9 +6,7 @@ void team_suscriptor_cola_CAUGHT(cr_list* mensajes){
 	while(!FinDelProceso){
 
 		mensaje* mensajeRecibido = cr_list_wait_and_remove(mensajes, 0);
-
 		resultado_captura* resultado = desempaquetar_resultado(mensajeRecibido->serializado);
-
 		pendiente* capturaPendiente = pendientes_get(capturasPendientes, resultado->idCaptura);
 
 		if(capturaPendiente) {
@@ -34,7 +32,7 @@ void team_suscriptor_cola_CAUGHT(cr_list* mensajes){
 			sem_post(&HayTareasPendientes);
 		}
 
-		else {
+		else { //La idea es que esto despues no este
 			pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
 			log_info(event_logger, "Se recibio un resultado con id %u desconocido\n", resultado->idCaptura);
 			pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);

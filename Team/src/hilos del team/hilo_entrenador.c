@@ -15,11 +15,11 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 			case CATCHEAR: {
 				pokemon*unPokemon = mapa_desmapear(pokemonesRequeridos);
 
-		//				pthread_mutex_lock(&mutexEntrenador[pid]);
+		//				pthread_mutex_lock(&mutexEntrenadorPosicion[pid]);
 				entrenador_ir_a(unEntrenador, unPokemon->posicion);
 
 				if(entrenador_llego_a(*unEntrenador, unPokemon->posicion)){
-		//					pthread_mutex_unlock(&mutexEntrenador[pid]);
+		//					pthread_mutex_unlock(&mutexEntrenadorPosicion[pid]);
 					t_id id_mensaje_pendiente = Catch(unPokemon->especie);
 
 					agregar_pendiente(capturasPendientes, id_mensaje_pendiente, unEntrenador, unPokemon);
@@ -30,6 +30,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 				}
 
 				else{
+		// pthread_mutex_unlock(&mutexEntrenadorPosicion[pid]);
 					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARD, "No llego a la posicion del pokemon");
 					mapa_mapear_objetivo(pokemonesRequeridos, unPokemon);
 				}
@@ -49,7 +50,6 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 
 				entrenador_capturar(unEntrenador, pokemonCatcheado);
 
-//				pthread_mutex_lock(&mutexEntrenador[unEntrenador->id]);
 				if(entrenador_puede_cazar_mas_pokemones(unEntrenador)){ //Ver si cambios de estado se pueden delegar al planificador
 					unEntrenador->siguienteTarea = CATCHEAR;
 					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARD, "Tuvo exito en la captura y todavia puede cazar mas pokemones");
@@ -59,7 +59,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 //					unEntrenador->siguienteTarea = FINALIZAR;
 
 					printf("Objetivos: "); recursos_mostrar(unEntrenador->objetivos);
-					printf("Inventario: "); recursos_mostrar(unEntrenador->pokemonesCazados);
+					printf("Inventario: "); recursos_mostrar(unEntrenador->pokemonesCazados); puts("");
 
 					entrenador_pasar_a(unEntrenador, EXIT, "Ya logro cumplir sus objetivos");
 
@@ -73,7 +73,6 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 
 					printf("Objetivos: "); recursos_mostrar(unEntrenador->objetivos);puts("");
 					printf("Inventario: "); recursos_mostrar(unEntrenador->pokemonesCazados);puts("");
-
 
 					//TODO: Ver en que momento estos entrenadores vuelven a READY
 					entrenador_pasar_a(unEntrenador, EXIT, "Aun no esta implementado el algoritmo de deadlock");
@@ -90,7 +89,6 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 			}
 		}
 
-//				pthread_mutex_unlock(&mutexEntrenador[unEntrenador->id]);
 		sem_post(&EntradaSalida_o_FinDeEjecucion);
 	}
 
@@ -144,7 +142,9 @@ void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const cha
 void entrenador_capturar(entrenador*entrenador, pokemon*victima){
 
 	recursos_agregar_recurso(entrenador->pokemonesCazados, victima->especie);
-//	recursos_agregar_recurso(inventariosGlobales, victima->especie);
+	pthread_mutex_lock(&mutexInventariosGlobales);
+	recursos_agregar_recurso(inventariosGlobales, victima->especie);
+	pthread_mutex_unlock(&mutexInventariosGlobales);
 
 	t_posicion posicionDelEvento = entrenador->posicion;
 

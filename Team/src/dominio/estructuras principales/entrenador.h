@@ -64,6 +64,9 @@ entrenador* entrenadores_remover_del_equipo_a(entrenadores, t_id);
 //retorna los objetivos de todos los entrenadores
 	matriz_recursos entrenadores_objetivos_globales(entrenadores);
 
+// Retorna una matriz con los pokemones que fueron capturados por todos los entrenadores
+	matriz_recursos entrenadores_inventarios_globales(entrenadores unEquipo);
+
 //retorna el entrenador mas cercano a una posicion
 	entrenador* entrenadores_mas_cercano(entrenadores, t_posicion);
 

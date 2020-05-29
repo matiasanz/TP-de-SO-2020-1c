@@ -41,8 +41,12 @@ void registrar_pokemon(pokemon*unPokemon){
 }
 
 bool pokemon_es_objetivo(pokemon unPokemon, matriz_recursos objetivos){
-//	matriz_recursos objetivosActuales = recursos_matriz_diferencia(objetivosGlobales, inventariosGlobales);
-	return recursos_cantidad_de_instancias_de(objetivosGlobales/*objetivosActuales*/, unPokemon.especie);
+
+	pthread_mutex_lock(&mutexInventariosGlobales);
+	matriz_recursos objetivosActuales = recursos_matriz_diferencia(objetivosGlobales, inventariosGlobales);
+	pthread_mutex_unlock(&mutexInventariosGlobales);
+
+	return recursos_cantidad_de_instancias_de(objetivosActuales, unPokemon.especie);
 }
 
 bool especie_recibida_con_anterioridad(especie_pokemon especie, especies_pokemones historial){

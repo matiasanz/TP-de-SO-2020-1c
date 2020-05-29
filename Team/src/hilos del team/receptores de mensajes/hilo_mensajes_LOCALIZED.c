@@ -14,6 +14,7 @@ void team_suscriptor_cola_LOCALIZED(cr_list* mensajes){
 		}
 
 		else{
+			//TODO Primero filtrar segun criterio, no quiero todos los que me llegan. Me quedo solamente con los n mas cercanos a mis entrenadores
 			registrar_en_cada_posicion(pokemonLocalizado->especie, pokemonLocalizado->posiciones);
 		}
 	}

@@ -3,7 +3,7 @@
 #include<semaphore.h>
 
 /*TODO
- * No frena nunca
+ * Agregar equipo_despertar_en_caso_de_DEADLOCK();
  */
 void team_planificar(){
 	puts("**********************************************\nSe va a planificar");
@@ -32,6 +32,9 @@ void team_planificar(){
 
 /***************************************** Funciones Auxiliares ***************************************************/
 
+//Mensaje APPEARD
+
+// Despierta a los entrenadores dormidos hasta appeard, solamente si hay pokemones en el mapa
 void equipo_despertar_en_caso_de_APPEARD(){
 
 	pthread_mutex_lock(pokemonesRequeridos->mutex);
@@ -49,11 +52,12 @@ void equipo_despertar_en_caso_de_APPEARD(){
 			exit(1);
 		}
 
-		entrenadores_despertar(equipo, unPokemon);
+		entrenadores_despertar_para_catch(equipo, unPokemon);
 	}
 }
 
-void entrenadores_despertar(entrenadores unEquipo, pokemon* unPokemon){
+// Pasa a ready a los entrenadores que se encuentren a la espera de la llegada de un pokemon
+void entrenadores_despertar_para_catch(entrenadores unEquipo, pokemon* unPokemon){
 
 	void entrenador_despertar(entrenador*unEntrenador){
 		if(entrenador_dormido_hasta_APPEARD(unEntrenador)){
@@ -75,9 +79,12 @@ void entrenadores_despertar(entrenadores unEquipo, pokemon* unPokemon){
 	cr_list_sort(entrenadoresReady, (bool(*)(void*, void*)) &porCercania);
 }
 
+// Retorna true si el entrenador se encuentra a la espera de la llegada de un pokemon
 bool entrenador_dormido_hasta_APPEARD(entrenador*unEntrenador){
 	pthread_mutex_lock(&mutexEstadoEntrenador[unEntrenador->id]);
 	bool estaDormido = unEntrenador->estado == LOCKED_HASTA_APPEARD || unEntrenador->estado ==NEW;
 	pthread_mutex_unlock(&mutexEstadoEntrenador[unEntrenador->id]);
 	return estaDormido;
 }
+
+// Caso DEADLOCK detectado:

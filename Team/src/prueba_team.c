@@ -92,6 +92,7 @@ int team_exit(){
 void inicializar_listas() {
 	equipo = entrenadores_cargar();
 	objetivosGlobales = entrenadores_objetivos_globales(equipo);
+	inventariosGlobales = entrenadores_inventarios_globales(equipo);
 	pokemonesRequeridos = mapa_create();
 	capturasPendientes = pendientes_create();
 	historialDePokemones = list_create(); //Ver si vale la pena abstraer

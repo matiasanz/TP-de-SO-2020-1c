@@ -59,5 +59,5 @@ void registrar_pokemon(pokemon*);
 void registrar_en_cada_posicion(especie_pokemon, t_list*posiciones);
 void equipo_despertar_en_caso_de_APPEARD();
 bool entrenador_dormido_hasta_APPEARD(entrenador*);
-void entrenadores_despertar(entrenadores, pokemon*);
+void entrenadores_despertar_para_catch(entrenadores, pokemon*);
 bool pokemon_es_objetivo(pokemon unPokemon, matriz_recursos objetivos);
