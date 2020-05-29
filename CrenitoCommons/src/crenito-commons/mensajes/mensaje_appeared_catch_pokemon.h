@@ -19,7 +19,7 @@ typedef struct {
 t_mensaje_appeared_catch_pokemon* mensaje_appeared_catch_pokemon_crear(char* especie, uint32_t pos_x, uint32_t pos_y);
 void mensaje_appeared_catch_pokemon_destruir(t_mensaje_appeared_catch_pokemon* appeared_catch_pokemon);
 t_buffer* mensaje_appeared_catch_pokemon_serializar(t_mensaje_appeared_catch_pokemon* appeared_catch_pokemon);
-t_mensaje_appeared_catch_pokemon* mensaje_appeared_catch_pokemon_deserializar(t_buffer* buffer);
+t_mensaje_appeared_catch_pokemon* mensaje_appeared_catch_pokemon_deserializar(void* stream);
 
 //Getters
 uint32_t mensaje_appeared_catch_pokemon_get_id(t_mensaje_appeared_catch_pokemon* msj);

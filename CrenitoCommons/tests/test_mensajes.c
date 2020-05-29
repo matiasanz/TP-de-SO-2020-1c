@@ -1,9 +1,3 @@
-#include "../src/crenito-commons/mensajes/mensaje_new_pokemon.h"
-#include "../src/crenito-commons/mensajes/mensaje_localized_pokemon.h"
-#include "../src/crenito-commons/mensajes/mensaje_get_pokemon.h"
-#include <crenito-commons/mensajes/mensaje_appeared_catch_pokemon.h>
-#include <crenito-commons/mensajes/mensaje_caught_pokemon.h>
-#include <commons/collections/list.h>
 #include "test_utils.h"
 
 context (test_mensajes) {
@@ -42,7 +36,7 @@ context (test_mensajes) {
 			t_posicion* posicion_esperada = list_get(esperado->posiciones, i);
 			t_posicion* posicion_real = list_get(real->posiciones, i);
 
-			should_ptr(posicion_esperada) be equal to (posicion_real);
+			should_posicion(*posicion_esperada, *posicion_real);
 		}
 
 	}
@@ -97,12 +91,13 @@ context (test_mensajes) {
 
 			//Action
 			t_buffer* pkm_serializado = mensaje_new_pokemon_serializar(pkm_esperado);
-			t_mensaje_new_pokemon* pkm_real = mensaje_new_pokemon_deserializar(pkm_serializado);
+			t_mensaje_new_pokemon* pkm_real = mensaje_new_pokemon_deserializar(pkm_serializado -> stream);
 
 			//Assert
 			assert_mensaje_new_pokemon(pkm_esperado, pkm_real);
 
 			//Free
+			buffer_destruir(pkm_serializado);
 			mensaje_new_pokemon_destruir(pkm_esperado);
 			mensaje_new_pokemon_destruir(pkm_real);
 
@@ -113,14 +108,14 @@ context (test_mensajes) {
 			//Arrange
 			t_list * posiciones = list_create();
 
-			t_posicion* p0 = posicion_crear_ptr(0, 0);
-			list_add(posiciones, p0);
+			t_posicion p0 = posicion_crear(0, 0);
+			list_add(posiciones, &p0);
 
-			t_posicion* p1 = posicion_crear_ptr(2, 4);
-			list_add(posiciones, p1);
+			t_posicion p1 = posicion_crear(2, 4);
+			list_add(posiciones, &p1);
 
-			t_posicion* p2 = posicion_crear_ptr(5, 3);
-			list_add(posiciones, p2);
+			t_posicion p2 = posicion_crear(5, 3);
+			list_add(posiciones, &p2);
 
 			t_mensaje_localized_pokemon* lcd_esperado = mensaje_localized_pokemon_crear("bulbasaur", posiciones);
 			mensaje_localized_pokemon_set_id(lcd_esperado, 3);
@@ -128,12 +123,14 @@ context (test_mensajes) {
 
 			//Action
 			t_buffer* lcd_serializado = mensaje_localized_pokemon_serializar(lcd_esperado);
-			t_mensaje_localized_pokemon* lcd_real = mensaje_localized_pokemon_deserializar(lcd_serializado);
+			t_mensaje_localized_pokemon* lcd_real = mensaje_localized_pokemon_deserializar(lcd_serializado -> stream);
 
 			//Assert
 			assert_mensaje_localized_pokemon(lcd_esperado, lcd_real);
 
 			//Free
+			list_destroy(posiciones);
+			buffer_destruir(lcd_serializado);
 			mensaje_localized_pokemon_destruir(lcd_esperado);
 			mensaje_localized_pokemon_destruir(lcd_real);
 
@@ -148,12 +145,13 @@ context (test_mensajes) {
 
 			//Action
 			t_buffer* get_pkm_serializado = mensaje_get_pokemon_serializar(get_pkm_esperado);
-			t_mensaje_get_pokemon* get_pkm_real = mensaje_get_pokemon_deserializar(get_pkm_serializado);
+			t_mensaje_get_pokemon* get_pkm_real = mensaje_get_pokemon_deserializar(get_pkm_serializado -> stream);
 
 			//Assert
 			assert_mensaje_get_pokemon(get_pkm_esperado, get_pkm_real);
 
 			//Free
+			buffer_destruir(get_pkm_serializado);
 			mensaje_get_pokemon_destruir(get_pkm_esperado);
 			mensaje_get_pokemon_destruir(get_pkm_real);
 
@@ -167,12 +165,13 @@ context (test_mensajes) {
 			mensaje_appeared_catch_pokemon_set_id_correlativo(msj_esperado, 2);
 			//Action
 			t_buffer* msj_serializado = mensaje_appeared_catch_pokemon_serializar(msj_esperado);
-			t_mensaje_appeared_catch_pokemon* msj_real = mensaje_appeared_catch_pokemon_deserializar(msj_serializado);
+			t_mensaje_appeared_catch_pokemon* msj_real = mensaje_appeared_catch_pokemon_deserializar(msj_serializado -> stream);
 
 			//Assert
 			assert_mensaje_appeared_catch_pokemon(msj_esperado, msj_real);
 
 			//Free
+			buffer_destruir(msj_serializado);
 			mensaje_appeared_catch_pokemon_destruir(msj_esperado);
 			mensaje_appeared_catch_pokemon_destruir(msj_real);
 
@@ -187,12 +186,13 @@ context (test_mensajes) {
 
 			//Action
 			t_buffer* msj_serializado = mensaje_caught_pokemon_serializar(msj_esperado);
-			t_mensaje_caught_pokemon* msj_real = mensaje_caught_pokemon_deserializar(msj_serializado);
+			t_mensaje_caught_pokemon* msj_real = mensaje_caught_pokemon_deserializar(msj_serializado -> stream);
 
 			//Assert
 			assert_mensaje_caught_pokemon(msj_esperado, msj_real);
 
 			//Free
+			buffer_destruir(msj_serializado);
 			mensaje_caught_pokemon_destruir(msj_esperado);
 			mensaje_caught_pokemon_destruir(msj_real);
 

@@ -18,7 +18,6 @@ t_buffer* buffer_crear(int size) {
 }
 
 void buffer_destruir(t_buffer* buffer) {
-
-	free(buffer->stream);
+	free(buffer -> stream);
 	free(buffer);
 }

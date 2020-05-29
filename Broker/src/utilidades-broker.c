@@ -1,90 +1,76 @@
 #include"utilidades-broker.h"
 
-void serve_client(t_conexion* conexion) {
+//Funciones privadas
+static int subscribir_proceso(int socket, t_id_cola id_cola);
+static t_cola_container* get_cola(t_id_cola id_cola);
+static int encolar_mensaje(t_id_cola id_cola, void* msj);
 
-	int codigo_operacion = socket_recibir_int(conexion->socket);
-	char* nombre_proceso = get_nombre_proceso(socket_recibir_int(conexion->socket));
+t_cola_container* cola_crear() {
 
-	log_info(logger, "El proceso %s se conectó correctamente al %s",
-			nombre_proceso, BROKER_STRING);
+	t_cola_container* cola = malloc(sizeof(t_cola_container));
+	cola->cola = queue_create();
+	cola->subscriptores = list_create();
+	pthread_mutex_init(&cola->mutex, NULL);
 
-	switch (codigo_operacion) {
-	case MENSAJE: {
-		procesar_mensaje(conexion, nombre_proceso);
-		break;
-	}
-	case SUBSCRIPCION: {
-		procesar_subscripcion(conexion, nombre_proceso);
+	return cola;
+}
+
+void procesar_mensaje(int socket, t_paquete_header header) {
+
+	switch (header.id_cola) {
+	case NEW_POKEMON:
+	case APPEARED_POKEMON:
+	case CATCH_POKEMON:
+	case CAUGHT_POKEMON:
+	case GET_POKEMON:
+	case LOCALIZED_POKEMON: {
+		int size = 0;
+		//handshake
+		void* msj = socket_recibir_mensaje(socket, &size);
+		int id_mensaje = encolar_mensaje(header.id_cola, msj);
+		socket_send(socket, &id_mensaje, sizeof(id_mensaje));
+
 		break;
 	}
 	default:
+
 		log_error(event_logger,
-				"El codigo de operacion %d recibido desde el socket: %d por el proceso %s es incorrecto",
-				codigo_operacion, conexion->socket, nombre_proceso);
+				"La cola destino %d enviada desde el socket: %d por el proceso %s es incorrecto. Finzalizando hilo \n",
+				header.id_cola, socket, get_nombre_proceso(header.id_proceso));
 		pthread_exit(NULL);
-		abort();
 	}
 }
 
-void procesar_mensaje(t_conexion* conexion, char* nombre_proceso) {
+void procesar_subscripcion(int socket, t_paquete_header header) {
 
-	// Simula que recibió el mensaje y devuelve siempre un id = 1
-	int id_mensaje = 1;
+	int id_subscriptor = subscribir_proceso(socket, header.id_cola);
 
-	log_info(event_logger, "mensaje recibido, enviando id mensaje: %d", id_mensaje);
+	log_info(logger,
+			"El proceso %s se subscribió a la cola %s. El id_subscriptor generado es: %d \n",
+			get_nombre_proceso(header.id_proceso),
+			get_nombre_cola(header.id_cola), id_subscriptor);
 
-	send(conexion ->socket, &id_mensaje, sizeof(int), 0);
+	socket_send(socket, &id_subscriptor, sizeof(id_subscriptor));
 }
 
-void procesar_subscripcion(t_conexion* conexion, char* nombre_proceso) {
+static int subscribir_proceso(int socket, t_id_cola id_cola) {
 
-	t_tipo_cola_mensaje id_cola_container = socket_recibir_int(
-			conexion->socket);
+	t_cola_container* container = get_cola(id_cola);
 
-	int estado_subscripcion = subscribir_proceso_a_cola(conexion,
-			id_cola_container);
+	pthread_mutex_lock(&container->mutex);
 
-	log_estado_subscripcion(estado_subscripcion, nombre_proceso,
-			id_cola_container);
+	t_conexion_cliente* subscriptor = conexion_cliente_crear(socket,
+			list_size(container->subscriptores) + 1);
+	list_add(container->subscriptores, subscriptor);
 
-	socket_send(conexion->socket, &estado_subscripcion,
-			sizeof(estado_subscripcion));
+	pthread_mutex_unlock(&container->mutex);
+
+	return subscriptor->id_subcriptor;
 }
 
-void log_estado_subscripcion(int estado_subscripcion, char* nombre_proceso,
-		int id_cola_container) {
+static t_cola_container* get_cola(t_id_cola id_cola) {
 
-	char* nombre_cola = get_nombre_cola_mensaje(id_cola_container);
-
-	if (subscripcion_exitosa(estado_subscripcion)) {
-		log_info(logger,
-				"Subscripcion exitosa desde el proceso %s hacia la cola %s",
-				nombre_proceso, nombre_cola);
-
-		log_info(event_logger, "La cantidad de subcriptores en la cola %s es %d", nombre_cola,
-				queue_size(get_cola_container(id_cola_container)->cola));
-
-	} else {
-		log_error(event_logger, "No fue posible subscribir el proceso %s a la cola %s",
-				nombre_proceso, nombre_cola);
-	}
-}
-
-int subscribir_proceso_a_cola(t_conexion* conexion,
-		t_tipo_cola_mensaje cola_a_subscribir) {
-
-	t_cola_container* container = get_cola_container(cola_a_subscribir);
-
-	pthread_mutex_lock(&container->locker);
-	queue_push(container->cola, conexion);
-	pthread_mutex_unlock(&container->locker);
-
-	return SUBSCRIPCION_EXITO;
-}
-
-t_cola_container* get_cola_container(t_tipo_cola_mensaje cola_a_subscribir) {
-
-	switch (cola_a_subscribir) {
+	switch (id_cola) {
 	case NEW_POKEMON:
 		return cola_new_pokemon;
 	case APPEARED_POKEMON:
@@ -98,17 +84,27 @@ t_cola_container* get_cola_container(t_tipo_cola_mensaje cola_a_subscribir) {
 	case LOCALIZED_POKEMON:
 		return cola_localized_pokemon;
 	default:
-		log_error(event_logger, "No existe la cola: %d", cola_a_subscribir);
+		log_error(event_logger, "No existe la cola: %d. Finalizando hilo",
+				id_cola);
+		pthread_exit(NULL);
 		return NULL;
 	}
 }
 
-t_cola_container* inicializar_cola_container() {
+static int encolar_mensaje(t_id_cola id_cola, void* msj) {
 
-	t_cola_container* cola = malloc(sizeof(t_cola_container));
-	cola->cola = queue_create();
-	cola->subscriptores = list_create();
-	pthread_mutex_init(&cola->locker, NULL);
+	t_mensaje_new_pokemon* new_pokemon = mensaje_new_pokemon_deserializar(msj);
 
-	return cola;
+	t_cola_container* container = get_cola(id_cola);
+	int id_mensaje = 0;
+
+	pthread_mutex_lock(&container->mutex);
+
+	id_mensaje = queue_size(container->cola) + 1;
+	mensaje_new_pokemon_set_id(new_pokemon, id_mensaje);
+	queue_push(container->cola, new_pokemon);
+
+	pthread_mutex_unlock(&container->mutex);
+
+	return id_mensaje;
 }

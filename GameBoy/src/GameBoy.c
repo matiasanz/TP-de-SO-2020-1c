@@ -1,9 +1,9 @@
 /*
  ============================================================================
  Name        : GameBoy.c
- Author      : 
+ Author      :
  Version     :
- Copyright   : 
+ Copyright   :
  Description : Hello World in C, Ansi-style
  ============================================================================
  */

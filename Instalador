@@ -1,0 +1,33 @@
+echo ""
+echo "------------------ Inicio instalación Cspec ------------------------------------"
+echo ""
+
+git clone https://github.com/mumuki/cspec.git
+cd cspec
+make
+sudo make install
+cd ../
+
+echo ""
+echo "------------------  Fin instalación Cspec --------------------------------------"
+
+echo ""
+echo "------------------ Inicio instalación Commons ----------------------------------"
+
+git clone https://github.com/sisoputnfrba/so-commons-library
+cd so-commons-library
+make
+sudo make install
+cd ../
+
+echo ""
+echo "------------------ Fin instalación Commons -------------------------------------"
+
+
+echo ""
+echo "------------------ Inicio instalación Crenito-Casero ---------------------------"
+
+make
+sudo make install
+
+echo "------------------ Fin instalación Crenito-Casero ------------------------------"

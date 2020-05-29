@@ -18,31 +18,32 @@ int main(void) {
 }
 
 void inicializar(void) {
-	logger = log_create("./log/gamecard.log", GAMECARD_STRING, 1, LOG_LEVEL_INFO);
-	event_logger = log_create("./log/gamecard_event.log", "GAME_CARD_EVENT", 1, LOG_LEVEL_INFO);
-	config = config_create("./config/gamecard.config");
 
-	subscribpcion_colas();
+	inicializar_config();
+	inicializar_logs();
+	inicializar_conexiones();
+}
+
+void inicializar_config() {
+
+	config = config_create("./config/gamecard.config");
+}
+
+void inicializar_conexiones() {
+
+	conexion_broker = conexion_server_crear(
+			config_get_string_value(config, "IP_BROKER"),
+			config_get_string_value(config, "PUERTO_BROKER"), GAMECARD,
+			config_get_int_value(config, "TIEMPO_DE_REINTENTO_CONEXION"));
 
 }
 
-void subscribpcion_colas() {
-	char* ip_broker = config_get_string_value(config, "IP_BROKER");
-	char* puerto_broker = config_get_string_value(config, "PUERTO_BROKER");
-	int estado_subscipcion;
+void inicializar_logs() {
 
-	estado_subscipcion = subscripcion_cola(GAMECARD, NEW_POKEMON, ip_broker, puerto_broker);
-	log_info(event_logger , "Respuesta subscripcion a la cola %s: %s",
-			get_nombre_cola_mensaje(NEW_POKEMON),
-			subscripcion_exitosa(estado_subscipcion) ? "ok" : "error");
+	logger = log_create("./log/gamecard.log", GAMECARD_STRING, 1,LOG_LEVEL_INFO);
+	event_logger = log_create("./log/gamecard_event.log", "GAME_CARD_EVENT", 1, LOG_LEVEL_INFO);
+}
 
-	estado_subscipcion = subscripcion_cola(GAMECARD, CATCH_POKEMON, ip_broker, puerto_broker);
-	log_info(event_logger, "Respuesta subscripcion a la cola %s: %s",
-			get_nombre_cola_mensaje(CATCH_POKEMON),
-			subscripcion_exitosa(estado_subscipcion) ? "ok" : "error");
+void subscribir_colas(void* arg) {
 
-	estado_subscipcion = subscripcion_cola(GAMECARD, GET_POKEMON, ip_broker, puerto_broker);
-	log_info(event_logger, "Respuesta subscripcion a la cola %s: %s",
-			get_nombre_cola_mensaje(GET_POKEMON),
-			subscripcion_exitosa(estado_subscipcion) ? "ok" : "error");
 }

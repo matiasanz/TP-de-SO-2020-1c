@@ -20,7 +20,7 @@ typedef struct {
 t_mensaje_get_pokemon* mensaje_get_pokemon_crear(char* especie);
 void mensaje_get_pokemon_destruir(t_mensaje_get_pokemon* get_pokemon);
 t_buffer* mensaje_get_pokemon_serializar(t_mensaje_get_pokemon* get_pokemon);
-t_mensaje_get_pokemon* mensaje_get_pokemon_deserializar(t_buffer* buffer);
+t_mensaje_get_pokemon* mensaje_get_pokemon_deserializar(void* stream);
 
 //Getters
 uint32_t mensaje_get_pokemon_get_id(t_mensaje_get_pokemon* msj);

@@ -51,22 +51,20 @@ t_buffer* mensaje_appeared_catch_pokemon_serializar(t_mensaje_appeared_catch_pok
 	return bfr;
 }
 
-t_mensaje_appeared_catch_pokemon* mensaje_appeared_catch_pokemon_deserializar(t_buffer* buffer) {
+t_mensaje_appeared_catch_pokemon* mensaje_appeared_catch_pokemon_deserializar(void* stream) {
 
 	t_mensaje_appeared_catch_pokemon* msj = malloc(sizeof(t_mensaje_appeared_catch_pokemon));
 	int desplazamiento = 0;
 
 	// header
-	memcpy(&msj->mensaje_header, buffer->stream + desplazamiento, sizeof(msj->mensaje_header));
+	memcpy(&msj->mensaje_header, stream + desplazamiento, sizeof(msj->mensaje_header));
 	desplazamiento += sizeof(msj->mensaje_header);
 
 	//pokemon
 	int bytes_pokemon = 0;
-	msj->pokemon = pokemon_deserializar(buffer->stream + desplazamiento,
+	msj->pokemon = pokemon_deserializar(stream + desplazamiento,
 			&bytes_pokemon);
 	desplazamiento += bytes_pokemon;
-
-	buffer_destruir(buffer);
 
 	return msj;
 }
