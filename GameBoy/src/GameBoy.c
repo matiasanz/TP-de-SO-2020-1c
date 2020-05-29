@@ -8,8 +8,11 @@
  ============================================================================
  */
 
+#include "gameboy.h"
 
-inicializar_logs();
+int main(void) {
+
+	inicializar_logs();
 
 	//Me traigo la config para conocer la ip puerto del broker
 	t_config* config = config_create("./config/gameboy.config");
