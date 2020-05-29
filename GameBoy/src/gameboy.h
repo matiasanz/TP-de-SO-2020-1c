@@ -9,5 +9,3 @@ void inicializar_logs();
 
 #endif /* SRC_GAMEBOY_H_ */
 
-
-#endif
