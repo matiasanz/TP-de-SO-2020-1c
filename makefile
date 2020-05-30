@@ -1,17 +1,14 @@
 all: 
-	# descomentar esto para poder debuggear localmente
-	#-cd CrenitoCommons && $(MAKE) debug
-	#-cd Broker && $(MAKE) debug
-	#-cd GameBoy && $(MAKE) debug
-	#-cd GameCard && $(MAKE) debug
-	#-cd Team && $(MAKE) debug
-
-	-cd CrenitoCommons && $(MAKE) all
+	# descomentar la siguiente linea para poder debuggear localmente
+	#-cd CrenitoCommons/src && $(MAKE) debug
+	
+	# comentar la siguiente linea para poder debuggear localmente
+	-cd CrenitoCommons/src && $(MAKE) all
 	-cd Broker && $(MAKE) all
 	-cd GameBoy && $(MAKE) all
 	-cd GameCard && $(MAKE) all
 	-cd Team && $(MAKE) all
-	-cd CrenitoCommons && $(MAKE) test   
+	-cd CrenitoCommons && $(MAKE) test  
 
 clean:
 	-cd CrenitoCommons && $(MAKE) clean

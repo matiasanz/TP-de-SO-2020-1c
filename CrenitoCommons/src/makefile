@@ -14,7 +14,6 @@ create-dirs:
 	mkdir -p build/crenito-commons/conexiones
 	mkdir -p build/crenito-commons/mensajes
 	mkdir -p build/crenito-commons/modelo
-	mkdir -p ../log
 
 build/libCrenitoCommons.so: create-dirs $(OBJS)
 	$(CC) -shared -o "build/libCrenitoCommons.so" $(OBJS)
