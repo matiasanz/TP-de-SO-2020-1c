@@ -26,6 +26,7 @@ pthread_mutex_t mutexHistorialEspecies;
 pthread_mutex_t mutexEntrenadores;
 pthread_mutex_t*mutexEstadoEntrenador;
 pthread_mutex_t mutexInventariosGlobales;
+pthread_mutex_t mutexRecursosEnMapa;
 
 //Variables globales
 bool FinDelProceso;
@@ -54,10 +55,16 @@ void inicializar_hilos_entrenadores();
 //finalizar
 void finalizar_hilos_entrenadores();
 
-//auxiliares
-void registrar_pokemon(pokemon*);
-void registrar_en_cada_posicion(especie_pokemon, t_list*posiciones);
+//Planificador
 void equipo_despertar_en_caso_de_APPEARD();
 bool entrenador_dormido_hasta_APPEARD(entrenador*);
 void entrenadores_despertar_para_catch(entrenadores, pokemon*);
-bool pokemon_es_objetivo(pokemon unPokemon, matriz_recursos objetivos);
+
+//auxiliares
+void registrar_pokemon(pokemon*);
+void registrar_en_cada_posicion(especie_pokemon, t_list*posiciones);
+bool pokemon_es_requerido(pokemon unPokemon, matriz_recursos objetivos);
+void mapa_mapear_requerido(pokemon*);
+numero objetivos_cantidad_requerida_de(especie_pokemon unaEspecie);
+void objetivos_actualizar_por_captura_de(especie_pokemon);
+//matriz_recursos recursos_objetivos_actuales();

@@ -32,7 +32,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 				else{
 		// pthread_mutex_unlock(&mutexEntrenadorPosicion[pid]);
 					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARD, "No llego a la posicion del pokemon");
-					mapa_mapear_objetivo(pokemonesRequeridos, unPokemon);
+					mapa_mapear_pokemon(pokemonesRequeridos, unPokemon);
 				}
 
 				break;
@@ -142,9 +142,8 @@ void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const cha
 void entrenador_capturar(entrenador*entrenador, pokemon*victima){
 
 	recursos_agregar_recurso(entrenador->pokemonesCazados, victima->especie);
-	pthread_mutex_lock(&mutexInventariosGlobales);
-	recursos_agregar_recurso(inventariosGlobales, victima->especie);
-	pthread_mutex_unlock(&mutexInventariosGlobales);
+
+	objetivos_actualizar_por_captura_de(victima->especie);
 
 	t_posicion posicionDelEvento = entrenador->posicion;
 
@@ -153,6 +152,16 @@ void entrenador_capturar(entrenador*entrenador, pokemon*victima){
 	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 
 	pokemon_destroy(victima);
+}
+
+void objetivos_actualizar_por_captura_de(especie_pokemon unaEspecie){
+	pthread_mutex_lock(&mutexInventariosGlobales);
+	recursos_agregar_recurso(inventariosGlobales, unaEspecie);
+	pthread_mutex_unlock(&mutexInventariosGlobales);
+
+	pthread_mutex_lock(&mutexRecursosEnMapa);
+	recursos_quitar_instancia_de_recurso(recursosEnMapa, unaEspecie);
+	pthread_mutex_unlock(&mutexRecursosEnMapa);
 }
 
 entrenador* entrenadores_remover_del_equipo_a(entrenadores unEquipo, t_id id){

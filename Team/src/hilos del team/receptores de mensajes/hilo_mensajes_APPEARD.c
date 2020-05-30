@@ -27,11 +27,11 @@ void team_suscriptor_cola_APPEARD(cr_list* mensajes){
 }
 
 /********************************** Auxiliares ************************************/
-
+// Agrega los pokemones que van llegando al mapa en caso de ser requeridos
 void registrar_pokemon(pokemon*unPokemon){
 
-	if( pokemon_es_objetivo(*unPokemon, objetivosGlobales) && !mapa_especie_mapeada(pokemonesRequeridos, unPokemon->especie)){
-		mapa_mapear_objetivo(pokemonesRequeridos, unPokemon);
+	if( pokemon_es_requerido(*unPokemon, objetivosGlobales) ){
+		mapa_mapear_requerido(unPokemon);
 	}
 
 	else{
@@ -40,15 +40,33 @@ void registrar_pokemon(pokemon*unPokemon){
 	}
 }
 
-bool pokemon_es_objetivo(pokemon unPokemon, matriz_recursos objetivos){
-
-	pthread_mutex_lock(&mutexInventariosGlobales);
-	matriz_recursos objetivosActuales = recursos_matriz_diferencia(objetivosGlobales, inventariosGlobales);
-	pthread_mutex_unlock(&mutexInventariosGlobales);
-
-	return recursos_cantidad_de_instancias_de(objetivosActuales, unPokemon.especie);
+bool pokemon_es_requerido(pokemon unPokemon, matriz_recursos objetivos){
+	return objetivos_cantidad_requerida_de(unPokemon.especie);
 }
 
+numero objetivos_cantidad_requerida_de(especie_pokemon unaEspecie){
+	numero instanciasTotales = recursos_cantidad_de_instancias_de(objetivosGlobales, unaEspecie);
+
+	pthread_mutex_lock(&mutexInventariosGlobales);
+	numero instanciasDisponibles = recursos_cantidad_de_instancias_de(inventariosGlobales, unaEspecie);
+	pthread_mutex_unlock(&mutexInventariosGlobales);
+
+	pthread_mutex_lock(&mutexRecursosEnMapa);
+	numero instanciasEnMapa = recursos_cantidad_de_instancias_de(recursosEnMapa, unaEspecie);
+	pthread_mutex_unlock(&mutexRecursosEnMapa);
+
+	return instanciasTotales - (instanciasDisponibles + instanciasEnMapa);
+}
+
+void mapa_mapear_requerido(pokemon*unPokemon){
+	mapa_mapear_pokemon(pokemonesRequeridos, unPokemon);
+
+	pthread_mutex_lock(&mutexRecursosEnMapa);
+	recursos_agregar_recurso(recursosEnMapa, unPokemon->especie);
+	pthread_mutex_unlock(&mutexRecursosEnMapa);
+}
+
+// Retorna true si la especie ya se encuentra en el registro de especies
 bool especie_recibida_con_anterioridad(especie_pokemon especie, especies_pokemones historial){
 
 	bool yaLaTengo(void*especieDeLista){
@@ -62,3 +80,11 @@ bool especie_recibida_con_anterioridad(especie_pokemon especie, especies_pokemon
 
 	return siONo;
 }
+
+//matriz_recursos recursos_objetivos_actuales(){
+//	pthread_mutex_lock(&mutexInventariosGlobales);
+//	matriz_recursos objetivosActuales = recursos_matriz_diferencia(objetivosGlobales, inventariosGlobales);
+//	pthread_mutex_unlock(&mutexInventariosGlobales);
+//
+//	return objetivosActuales;
+//}

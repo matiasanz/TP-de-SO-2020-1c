@@ -23,8 +23,13 @@ void team_suscriptor_cola_CAUGHT(cr_list* mensajes){
 			}
 
 			else{
-				pokemon_destroy(pokemonCatcheado);
 				entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARD, "Fallo en capturar al pokemon pero puede seguir cazando mas");
+
+				pthread_mutex_lock(&mutexRecursosEnMapa);
+				recursos_quitar_instancia_de_recurso(recursosEnMapa, pokemonCatcheado->especie);
+				pthread_mutex_unlock(&mutexRecursosEnMapa);
+
+				pokemon_destroy(pokemonCatcheado);
 			}
 
 			free(resultado); //Se descarta el id

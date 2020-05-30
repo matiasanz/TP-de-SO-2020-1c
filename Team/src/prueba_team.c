@@ -93,6 +93,7 @@ void inicializar_listas() {
 	equipo = entrenadores_cargar();
 	objetivosGlobales = entrenadores_objetivos_globales(equipo);
 	inventariosGlobales = entrenadores_inventarios_globales(equipo);
+	recursosEnMapa = recursos_create(); //TODO
 	pokemonesRequeridos = mapa_create();
 	capturasPendientes = pendientes_create();
 	historialDePokemones = list_create(); //Ver si vale la pena abstraer
@@ -106,6 +107,7 @@ void listas_destroy(){
 	pendientes_destroy(capturasPendientes);
 	recursos_destroy(objetivosGlobales);
 	recursos_destroy(inventariosGlobales);
+	recursos_destroy(recursosEnMapa);
 	list_destroy(historialDePokemones);
 }
 
@@ -145,18 +147,21 @@ void inicializar_semaforos(){
 	sem_init(&HayTareasPendientes, 0, 0);
 	sem_init(&EntradaSalida_o_FinDeEjecucion, 0, 1);
 
-	pthread_mutex_init(&mutexEntrenadores, NULL);
-	pthread_mutex_init(&mutexHistorialEspecies, NULL);
 	pthread_mutex_init(&Mutex_AndoLoggeando, NULL);
 	pthread_mutex_init(&Mutex_AndoLoggeandoEventos, NULL);
-
+	pthread_mutex_init(&mutexEntrenadores, NULL);
+	pthread_mutex_init(&mutexHistorialEspecies, NULL);
+	pthread_mutex_init(&mutexInventariosGlobales, NULL);
+	pthread_mutex_init(&mutexRecursosEnMapa, NULL);
+	pthread_mutex_init(&mutexRecursosEnMapa, NULL);
 }
 
 void finalizar_semaforos(){
-	//Los semaforos de los entrenadores se finalizan cuando se destruye el entrenador
 	sem_destroy(&HayTareasPendientes);
 	sem_destroy(&EntradaSalida_o_FinDeEjecucion);
 
+	pthread_mutex_destroy(&mutexEntrenadores);
+	pthread_mutex_destroy(&mutexInventariosGlobales);
 	pthread_mutex_destroy(&mutexHistorialEspecies);
 	pthread_mutex_destroy(&Mutex_AndoLoggeando);
 	pthread_mutex_destroy(&Mutex_AndoLoggeandoEventos);

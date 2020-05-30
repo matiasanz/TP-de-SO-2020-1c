@@ -47,8 +47,8 @@ mapa_pokemones mapa_create(){
 	return cr_list_create();
 }
 
-void mapa_mapear_objetivo(mapa_pokemones unMapa, pokemon* objetivo){
-	cr_list_add_and_signal(unMapa, objetivo);
+void mapa_mapear_pokemon(mapa_pokemones unMapa, pokemon* unPokemon){
+	cr_list_add_and_signal(unMapa, unPokemon);
 }
 
 pokemon*mapa_first(mapa_pokemones unMapa){

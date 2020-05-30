@@ -172,7 +172,7 @@ context(tests_team){
 		before{
 			mapaDePokemones = mapa_create();
 			unPokemon = factory_pokemon_de_prueba();
-			mapa_mapear_objetivo(mapaDePokemones, unPokemon);
+			mapa_mapear_pokemon(mapaDePokemones, unPokemon);
 		}end
 
 		after{
