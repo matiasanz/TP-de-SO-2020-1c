@@ -50,9 +50,9 @@ int main(int argc, char*argv[]) {
 		}
 
 		t_paquete* pqt = crearMensaje(argv,argc);
-		puts("HOLAAAAA");
 		int respuesta= enviar(conexion,pqt);
 		printf("Id obtenido: %d", respuesta);
+		log_info(logger,"Mensaje enviado a la cola de mensajes!");
 		//obtener_conexion(argv[1],&conexion);
 
 

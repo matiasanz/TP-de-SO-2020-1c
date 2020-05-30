@@ -26,18 +26,23 @@ t_paquete* crearMensaje(char* argumentos[],int longitud){
 
 		Tipomensaje= NEW_POKEMON;
 		validar_quien_conoce_newpokemon(argumentos[1]);
+		validar_mayor_igual_a_cero(&posx,argumentos[4]);
+		validar_mayor_igual_a_cero(&posy,argumentos[5]);//en ambos casos valido esto
 		if(strcmp(argumentos[1],BROKER_STRING)==0){
 
 			validar_cantidad_argumentos(longitud,7);
 			//la especie no hace falta ser validada, ya que no puede recibir un espacio en blanco
 			especie=argumentos[3];
-			validar_mayor_igual_a_cero(&posx,argumentos[4]);
-			validar_mayor_igual_a_cero(&posy,argumentos[5]);
 			validar_mayor_a_cero(&cantidad,argumentos[6]);
 			t_mensaje_new_pokemon* msj = mensaje_new_pokemon_crear(especie, posx, posy, cantidad);
 			mensaje_serializado=mensaje_new_pokemon_serializar(msj);
+
 		}else{
 			//el mensaje serializado del new_pokemon del gamecard
+			validar_cantidad_argumentos(longitud,8);
+			especie=argumentos[3];
+			t_mensaje_new_pokemon* msj = mensaje_new_pokemon_crear(especie, posx, posy, cantidad);
+			mensaje_serializado=mensaje_new_pokemon_serializar(msj);
 		}
 
 
@@ -47,35 +52,45 @@ t_paquete* crearMensaje(char* argumentos[],int longitud){
 	case APPEARED_POKEMON:
 		Tipomensaje= APPEARED_POKEMON;
 		validar_quien_conoce_appearedpokemon(argumentos[1]);
+
+		validar_mayor_igual_a_cero(&posx,argumentos[4]);
+		validar_mayor_igual_a_cero(&posy,argumentos[5]);
+		especie=argumentos[3];
 		if(strcmp(argumentos[1],BROKER_STRING)==0){
 			validar_cantidad_argumentos(longitud,7);
-			especie=argumentos[3];
-			validar_mayor_igual_a_cero(&posx,argumentos[4]);
-			validar_mayor_igual_a_cero(&posy,argumentos[5]);
 			//se valida el id?? si no lo envio como parametro...
 			t_mensaje_new_pokemon* msj = mensaje_appeared_catch_pokemon_crear(especie, posx, posy);
 			mensaje_serializado=mensaje_appeared_catch_pokemon_serializar(msj);
 
 		}else{
 			//para el team
+			validar_cantidad_argumentos(longitud,6);
+			t_mensaje_new_pokemon* msj = mensaje_appeared_catch_pokemon_crear(especie, posx, posy);
+			mensaje_serializado=mensaje_appeared_catch_pokemon_serializar(msj);
+
 		}
+
+
+
 		break;
 	case CATCH_POKEMON:
 		Tipomensaje= CATCH_POKEMON;
 		validar_quien_conoce_catchpokemon(argumentos[1]);
+		especie=argumentos[3];
+		validar_mayor_igual_a_cero(&posx,argumentos[4]);
+		validar_mayor_igual_a_cero(&posy,argumentos[5]);
 		if(strcmp(argumentos[1],BROKER_STRING)==0){
 			validar_cantidad_argumentos(longitud,6);
-			especie=argumentos[3];
-			validar_mayor_igual_a_cero(&posx,argumentos[4]);
-			validar_mayor_igual_a_cero(&posy,argumentos[5]);
-
 			t_mensaje_new_pokemon* msj = mensaje_appeared_catch_pokemon_crear(especie, posx, posy);
 			mensaje_serializado=mensaje_appeared_catch_pokemon_serializar(msj);
-
-
 		}else{
 			//para el gamecard......
+			validar_cantidad_argumentos(longitud,7);
+			t_mensaje_new_pokemon* msj = mensaje_appeared_catch_pokemon_crear(especie, posx, posy);
+			mensaje_serializado=mensaje_appeared_catch_pokemon_serializar(msj);
 		}
+
+
 		break;
 	case CAUGHT_POKEMON:
 
@@ -94,14 +109,19 @@ t_paquete* crearMensaje(char* argumentos[],int longitud){
 	case GET_POKEMON:
 		Tipomensaje= GET_POKEMON;
 		validar_quien_conoce_getpokemon(argumentos[1]);
+		especie=argumentos[3];
 		if(strcmp(argumentos[1],BROKER_STRING)==0){
 			validar_cantidad_argumentos(longitud,4);
-			especie=argumentos[3];
 			t_mensaje_new_pokemon* msj = mensaje_get_pokemon_crear(especie);
 			mensaje_serializado=mensaje_get_pokemon_serializar(msj);
-		}else{
 
+		}else{
+			validar_cantidad_argumentos(longitud,5);
+			t_mensaje_new_pokemon* msj = mensaje_get_pokemon_crear(especie);
+			mensaje_serializado=mensaje_get_pokemon_serializar(msj);
 		}
+
+
 
 		break;
 
