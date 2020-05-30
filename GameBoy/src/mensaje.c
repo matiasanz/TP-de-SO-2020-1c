@@ -8,7 +8,7 @@
 t_paquete* crearMensaje(char* argumentos[],int longitud){
 
 	t_buffer* mensaje_serializado;
-	t_tipo_cola_mensaje Tipomensaje;
+	t_id_cola Tipomensaje;
 	char* especie;
 	int atrapado;
 	int i,cantidad,posx,posy;

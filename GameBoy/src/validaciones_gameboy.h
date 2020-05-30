@@ -1,9 +1,10 @@
 #ifndef _VALIDACIONES_GAMEBOY_
 #define _VALIDACIONES_GAMEBOY_
 
+
 void validar_proceso(char* proceso);
 void validar_mensaje(char* mensaje);
-void obtener_ip_puerto(char* proceso,char **ip,char  **puerto);
+//void obtener_conexion(char* proceso, t_conexion_server* conexion);
 void validar_cantidad_argumentos(int cantidad,int numero);
 void validar_quien_conoce_newpokemon(char* proceso);
 void validar_quien_conoce_appearedpokemon(char* proceso);

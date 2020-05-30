@@ -2,6 +2,7 @@
 #include <crenito-commons/utils.h>
 #include "gameboy.h"
 #include <stdlib.h>
+#include "crenito-commons/conexiones/conexiones.h"
 
 void validar_proceso(char* proceso){
 
@@ -21,26 +22,36 @@ void validar_mensaje(char* mensaje){
 
 }
 
-void obtener_ip_puerto(char* proceso,char **ip,char **puerto){
-
-	t_config* config = config_create("./config/gameboy.config");
-	if(strcmp(proceso,BROKER_STRING)==0){
-		*ip=config_get_string_value(config, "IP_BROKER");
-		*puerto=config_get_string_value(config, "PUERTO_BROKER");
-
-	}
-	if(strcmp(proceso,TEAM_STRING)==0){
-		*ip=config_get_string_value(config, "IP_TEAM");
-		*puerto=config_get_string_value(config, "PUERTO_TEAM");
-
-	}
-	if(strcmp(proceso,GAMECARD_STRING)==0){
-		*ip=config_get_string_value(config, "IP_GAMECARD");
-		*puerto=config_get_string_value(config, "PUERTO_GAMECARD");
-
-	}
-
-}
+//void obtener_conexion(char* proceso,t_conexion_server* conexion){
+//
+//	t_config* config = config_create("./config/gameboy.config");
+//
+//	if(strcmp(proceso,BROKER_STRING)==0){
+//		 conexion_broker = conexion_server_crear(
+//							config_get_string_value(config, "IP_BROKER"),
+//							config_get_string_value(config, "PUERTO_BROKER"), GAMEBOY,
+//							0);
+//		 conexion = conexion_broker;
+//
+//	}
+//	if(strcmp(proceso,TEAM_STRING)==0){
+//		 conexion_team = conexion_server_crear(
+//							config_get_string_value(config, "IP_TEAM"),
+//							config_get_string_value(config, "PUERTO_TEAM"), GAMEBOY,
+//							0);
+//		 rconexion= conexion_team;
+//
+//	}
+//
+//	if(strcmp(proceso,GAMECARD_STRING)==0){
+//		 conexion_gamecard = conexion_server_crear(
+//									config_get_string_value(config, "IP_GAMECARD"),
+//									config_get_string_value(config, "PUERTO_GAMECARD"), GAMEBOY,
+//									0);
+//		 conexion= conexion_gamecard;
+//	}
+//
+//}
 
 void validar_cantidad_argumentos(int cantidad,int numero){
 	if(cantidad!=numero){
