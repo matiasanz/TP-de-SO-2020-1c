@@ -6,7 +6,7 @@ void broker_simulator(){
 
 	int i;
 
-	for(i=0; !FinDelProceso; i= (i+1)%6){
+	for(i=0; PROCESO_ACTIVO; i= (i+1)%6){
 
 		mensaje* unMensaje = malloc(sizeof(mensaje));
 

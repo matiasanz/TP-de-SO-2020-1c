@@ -3,7 +3,7 @@
 
 void team_suscriptor_cola_CAUGHT(cr_list* mensajes){
 
-	while(!FinDelProceso){
+	while(PROCESO_ACTIVO){
 
 		mensaje* mensajeRecibido = cr_list_wait_and_remove(mensajes, 0);
 		resultado_captura* resultado = desempaquetar_resultado(mensajeRecibido->serializado);
@@ -28,7 +28,6 @@ void team_suscriptor_cola_CAUGHT(cr_list* mensajes){
 				pthread_mutex_lock(&mutexRecursosEnMapa);
 				recursos_quitar_instancia_de_recurso(recursosEnMapa, pokemonCatcheado->especie);
 				pthread_mutex_unlock(&mutexRecursosEnMapa);
-
 				pokemon_destroy(pokemonCatcheado);
 			}
 

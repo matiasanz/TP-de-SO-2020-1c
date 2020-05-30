@@ -60,13 +60,13 @@ context(tests_team){
 		}end
 
 		it("un entrenador se desplaza de una posicion a otra"){
-			entrenador_ir_a(unEntrenador, unaPosicion);
+			entrenador_desplazarse_hacia(unEntrenador, unaPosicion);
 			should_bool(posicion_cmp(unEntrenador->posicion, unaPosicion)) be truthy;
 		}end
 
 		it("un entrenador mueve a su misma posicion"){
 			t_posicion posActual = unEntrenador->posicion;
-			entrenador_ir_a(unEntrenador, posActual);
+			entrenador_desplazarse_hacia(unEntrenador, posActual);
 			should_bool(posicion_cmp(unEntrenador->posicion, posActual)) be truthy;
 		}end
 

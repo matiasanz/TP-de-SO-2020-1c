@@ -4,6 +4,7 @@
 #include "../header_global_team.h"
 
 typedef numero coordenada;
+typedef t_list* posiciones;
 
 typedef struct T_posicion{
 	coordenada pos_x;

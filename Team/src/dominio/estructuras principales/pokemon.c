@@ -56,13 +56,9 @@ pokemon*mapa_first(mapa_pokemones unMapa){
 }
 
 bool mapa_especie_mapeada(mapa_pokemones unMapa, especie_pokemon unaEspecie){
-	bool mismaEspecieQue(pokemon* deLista){
-		return especie_cmp(deLista->especie, unaEspecie);
-	}
-
-	pthread_mutex_lock(unMapa->mutex); //TODO
-	bool resultado = list_any_satisfy(unMapa->lista, (bool(*)(void*))&mismaEspecieQue);
-	pthread_mutex_unlock(unMapa->mutex);
+	pthread_mutex_lock(unMapa->mutex);
+	bool resultado = list_contains_element(unMapa->lista, unaEspecie, (bool(*)(void*, void*))&especie_cmp);
+	pthread_mutex_unlock(unMapa->mutex); puts((resultado? "especie mapeada": "especie no mapeada"));
 
 	return resultado;
 }

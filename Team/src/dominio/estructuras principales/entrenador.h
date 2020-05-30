@@ -23,10 +23,10 @@ typedef struct pcb_Entrenador{
 	entrenador*entrenador_ptr_create(t_id, matriz_recursos pokemonesEnInventario, matriz_recursos objetivos, t_posicion);
 
 //	Desplaza un entrenador de una posicion a otra
-	void entrenador_ir_a(entrenador*, t_posicion);
+	void entrenador_desplazarse_hacia(entrenador*, t_posicion);
 
 // Retorna true si la posicion del entrenador coincide con la dada
-	bool entrenador_llego_a(entrenador, t_posicion);
+	bool entrenador_llego_a(entrenador*, t_posicion);
 
 // Retorna true si la cantidad de pokemones cazados no supera la cantidad permitida para ese entrenador
 	bool entrenador_puede_cazar_mas_pokemones(entrenador*);

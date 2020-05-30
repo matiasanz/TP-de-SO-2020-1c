@@ -25,35 +25,6 @@ bool entrenador_cumplio_sus_objetivos(entrenador*unEntrenador){
 	return recursos_suficientes_para(unEntrenador->pokemonesCazados, unEntrenador->objetivos);
 }
 
-void entrenador_ir_a(entrenador* unEntrenador, t_posicion posicionFinal){
-	t_posicion posicionActual = unEntrenador->posicion;
-//	int i=QUANTUM; if(criterio == ROUND_ROBBIN && distancia>QUANTUM){}
-
-//	numero distancia = posicion_distancia(unEntrenador->posicion, posicionFinal);
-
-//	pthread_mutex_t bloqueado;
-//	pthread_mutex_init(&bloqueado, ...); //Duda, vale la pena?
-//	sleep(distancia*tiempoPorDistancia);// VER alternativas para sleep... o un mutex?
-
-	unEntrenador->posicion = posicionFinal;
-	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	log_info(logger, "El Entrenador N°%u se desplazo desde [%u %u] hasta [%u %u]", unEntrenador->id, posicionActual.pos_x, posicionActual.pos_y, unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
-	pthread_mutex_unlock(&Mutex_AndoLoggeando);
-}
-
-bool entrenador_llego_a(entrenador unEntrenador, t_posicion posicion){
-	return posicion_cmp(unEntrenador.posicion, posicion);
-}
-
-bool entrenador_en_estado(entrenador* unEntrenador, t_estado ESTADO){
-
-//	pthread_mutex_lock(&Mutex_Entrenador[unEntrenador->id]);
-	bool estaEnEstado = unEntrenador->estado == ESTADO;
-//	pthread_mutex_lock(&Mutex_Entrenador[unEntrenador->id]);
-
-	return estaEnEstado;
-}
-
 bool entrenador_puede_cazar_mas_pokemones(entrenador* unEntrenador){
 	return recursos_contar(unEntrenador->objetivos) > recursos_contar(unEntrenador->pokemonesCazados);
 }

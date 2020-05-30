@@ -16,9 +16,9 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 				pokemon*unPokemon = mapa_desmapear(pokemonesRequeridos);
 
 		//				pthread_mutex_lock(&mutexEntrenadorPosicion[pid]);
-				entrenador_ir_a(unEntrenador, unPokemon->posicion);
+				entrenador_desplazarse_hacia(unEntrenador, unPokemon->posicion);
 
-				if(entrenador_llego_a(*unEntrenador, unPokemon->posicion)){
+				if(entrenador_llego_a(unEntrenador, unPokemon->posicion)){
 		//					pthread_mutex_unlock(&mutexEntrenadorPosicion[pid]);
 					t_id id_mensaje_pendiente = Catch(unPokemon->especie);
 
@@ -30,7 +30,6 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 				}
 
 				else{
-		// pthread_mutex_unlock(&mutexEntrenadorPosicion[pid]);
 					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARD, "No llego a la posicion del pokemon");
 					mapa_mapear_pokemon(pokemonesRequeridos, unPokemon);
 				}
@@ -100,20 +99,24 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 
 }
 
-numero cantidadDeEntrenadores;
+/*************************************** Funciones Auxiliares ************************************************/
+
+numero cantidadDeEntrenadores; //Me guarda el tamaño del array para cuando tenga que finalizar
 
 void inicializar_hilos_entrenadores(){
 	cantidadDeEntrenadores = list_size(equipo);
 
 	hilosEntrenadores = malloc(sizeof(pthread_t)*cantidadDeEntrenadores);
 
-	EjecutarEntrenador = malloc(sizeof(sem_t)*cantidadDeEntrenadores);
-	mutexEstadoEntrenador = malloc(sizeof(pthread_mutex_t)*cantidadDeEntrenadores);
+	EjecutarEntrenador      = malloc(sizeof(sem_t)          *cantidadDeEntrenadores);
+	mutexEstadoEntrenador   = malloc(sizeof(pthread_mutex_t)*cantidadDeEntrenadores);
+	mutexPosicionEntrenador = malloc(sizeof(pthread_mutex_t)*cantidadDeEntrenadores);
 
 	int i;
 	for(i=0; i<cantidadDeEntrenadores; i++){
 		sem_init(&EjecutarEntrenador[i], 0, 0);
 		pthread_mutex_init(&mutexEstadoEntrenador[i], NULL);
+		pthread_mutex_init(&mutexPosicionEntrenador[i], NULL);
 		pthread_create(&hilosEntrenadores[i], NULL, (void*) team_hilo_entrenador, list_get(equipo, i));
 	}
 }
@@ -123,6 +126,7 @@ void finalizar_hilos_entrenadores(){
 	for(i=0; i<cantidadDeEntrenadores; i++){
 		pthread_join(hilosEntrenadores[i], NULL);
 		pthread_mutex_destroy(&mutexEstadoEntrenador[i]);
+		pthread_mutex_destroy(&mutexPosicionEntrenador[i]);
 	}
 }
 
@@ -176,3 +180,29 @@ entrenador* entrenadores_remover_del_equipo_a(entrenadores unEquipo, t_id id){
 	return removido;
 }
 
+void entrenador_desplazarse_hacia(entrenador* unEntrenador, t_posicion posicionFinal){
+	t_posicion posicionActual = unEntrenador->posicion;
+//	int i=QUANTUM; if(criterio == ROUND_ROBBIN && distancia>QUANTUM){}
+
+//	numero distancia = posicion_distancia(unEntrenador->posicion, posicionFinal);
+
+//	pthread_mutex_t bloqueado;
+//	pthread_mutex_init(&bloqueado, ...); //Duda, vale la pena?
+//	sleep(distancia*tiempoPorDistancia);// VER alternativas para sleep... o un mutex?
+
+	pthread_mutex_lock(&mutexPosicionEntrenador[unEntrenador->id]);
+	unEntrenador->posicion = posicionFinal;
+	pthread_mutex_unlock(&mutexPosicionEntrenador[unEntrenador->id]);
+
+	pthread_mutex_lock(&Mutex_AndoLoggeando);
+	log_info(logger, "El Entrenador N°%u se desplazo desde [%u %u] hasta [%u %u]", unEntrenador->id, posicionActual.pos_x, posicionActual.pos_y, unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
+	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+}
+
+bool entrenador_llego_a(entrenador* unEntrenador, t_posicion posicion){
+//	pthread_mutex_lock(&mutexPosicionEntrenador[unEntrenador->id]);
+	t_posicion posDelEntrenador = unEntrenador->posicion;
+//	pthread_mutex_unlock(&mutexPosicionEntrenador[unEntrenador->id]);
+
+	return posicion_cmp(posDelEntrenador, posicion);
+}

@@ -71,8 +71,6 @@ void team_inicializar(){
 		error_show("algo malio sal en el inicio :(");
 		exit(1);
 	}
-
-	FinDelProceso = false; //flag para hilos
 }
 
 
@@ -113,18 +111,18 @@ void listas_destroy(){
 
 //Colas
 void subscribpcion_colas(){
-	//TODO Gustavo// ?????????????????
+	//TODO Gustavo// (?)
 }
 
 //Hilos
 void inicializar_hilos(){
 	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) broker_simulator, NULL); //Para pruebas sin broker
 
+	inicializar_hilos_entrenadores();
+
 	pthread_create(&hiloMensajesAppeard, NULL, (void*)team_suscriptor_cola_APPEARD, mensajesAPPEARD);
 	pthread_create(&hiloMensajesCAUGHT, NULL, (void*)team_suscriptor_cola_CAUGHT, mensajesCAUGHT);
 	pthread_create(&hiloMensajesLOCALIZED, NULL, (void*)team_suscriptor_cola_LOCALIZED, mensajesLOCALIZED);
-
-	inicializar_hilos_entrenadores();
 
 	pthread_create(&hiloPlanificador, NULL, (void*) team_planificar, NULL);
 
@@ -132,8 +130,6 @@ void inicializar_hilos(){
 
 void finalizar_hilos(){
 	finalizar_hilos_entrenadores();
-
-	FinDelProceso = true;
 
 	pthread_join(hiloPlanificador, NULL);
 	pthread_join(hiloMensajesAppeard, NULL);
@@ -147,13 +143,14 @@ void inicializar_semaforos(){
 	sem_init(&HayTareasPendientes, 0, 0);
 	sem_init(&EntradaSalida_o_FinDeEjecucion, 0, 1);
 
-	pthread_mutex_init(&Mutex_AndoLoggeando, NULL);
+	pthread_mutex_init(&Mutex_AndoLoggeando       , NULL);
 	pthread_mutex_init(&Mutex_AndoLoggeandoEventos, NULL);
-	pthread_mutex_init(&mutexEntrenadores, NULL);
-	pthread_mutex_init(&mutexHistorialEspecies, NULL);
-	pthread_mutex_init(&mutexInventariosGlobales, NULL);
-	pthread_mutex_init(&mutexRecursosEnMapa, NULL);
-	pthread_mutex_init(&mutexRecursosEnMapa, NULL);
+
+	pthread_mutex_init(&mutexEntrenadores         , NULL);
+	pthread_mutex_init(&mutexHistorialEspecies    , NULL);
+	pthread_mutex_init(&mutexInventariosGlobales  , NULL);
+	pthread_mutex_init(&mutexRecursosEnMapa       , NULL);
+	pthread_mutex_init(&mutexRecursosEnMapa       , NULL);
 }
 
 void finalizar_semaforos(){

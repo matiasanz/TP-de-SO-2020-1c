@@ -8,7 +8,7 @@
 
 void team_suscriptor_cola_APPEARD(cr_list* mensajes){
 
-	while(!FinDelProceso){
+	while(PROCESO_ACTIVO){
 		mensaje* mensajeRecibido = cr_list_wait_and_remove(mensajes, 0);
 
 		pokemon* unPokemon = desempaquetar_pokemon(mensajeRecibido->serializado);
@@ -26,7 +26,8 @@ void team_suscriptor_cola_APPEARD(cr_list* mensajes){
 	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 }
 
-/********************************** Auxiliares ************************************/
+/*************************************** Funciones Auxiliares ************************************************/
+
 // Agrega los pokemones que van llegando al mapa en caso de ser requeridos
 void registrar_pokemon(pokemon*unPokemon){
 
@@ -80,11 +81,3 @@ bool especie_recibida_con_anterioridad(especie_pokemon especie, especies_pokemon
 
 	return siONo;
 }
-
-//matriz_recursos recursos_objetivos_actuales(){
-//	pthread_mutex_lock(&mutexInventariosGlobales);
-//	matriz_recursos objetivosActuales = recursos_matriz_diferencia(objetivosGlobales, inventariosGlobales);
-//	pthread_mutex_unlock(&mutexInventariosGlobales);
-//
-//	return objetivosActuales;
-//}

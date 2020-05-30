@@ -76,4 +76,11 @@ bool cr_list_all(cr_list*, bool(*condition)(void*));
 //Retorna true si al menos un elemento de la lista cumple la condicion
 bool cr_list_any(cr_list*, bool(*condition)(void*));
 
+//Retorna true si algun elemento de la lista coincide, segun el criterio dado
+bool cr_list_contains_element(cr_list*, void* elemento, bool (*comparator)(void *, void *));
+
+//Retorna true si algun elemento de la lista coincide, segun el criterio dado
+bool list_contains_element(t_list*, void* elemento, bool (*comparator)(void *, void *));
+
+
 # endif

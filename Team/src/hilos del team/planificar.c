@@ -8,7 +8,7 @@
 void team_planificar(){
 	puts("**********************************************\nSe va a planificar");
 
-	while(!FinDelProceso){
+	while(PROCESO_ACTIVO){
 		sem_wait(&HayTareasPendientes);
 		equipo_despertar_en_caso_de_APPEARD();
 
@@ -82,9 +82,20 @@ void entrenadores_despertar_para_catch(entrenadores unEquipo, pokemon* unPokemon
 // Retorna true si el entrenador se encuentra a la espera de la llegada de un pokemon
 bool entrenador_dormido_hasta_APPEARD(entrenador*unEntrenador){
 	pthread_mutex_lock(&mutexEstadoEntrenador[unEntrenador->id]);
-	bool estaDormido = unEntrenador->estado == LOCKED_HASTA_APPEARD || unEntrenador->estado ==NEW;
+	bool estaDormido = entrenador_en_estado(unEntrenador, LOCKED_HASTA_APPEARD) || entrenador_en_estado(unEntrenador, NEW);
 	pthread_mutex_unlock(&mutexEstadoEntrenador[unEntrenador->id]);
 	return estaDormido;
 }
+
+bool entrenador_en_estado(entrenador* unEntrenador, t_estado ESTADO){
+
+//	pthread_mutex_lock(&Mutex_Entrenador[unEntrenador->id]);
+	bool estaEnEstado = unEntrenador->estado == ESTADO;
+//	pthread_mutex_lock(&Mutex_Entrenador[unEntrenador->id]);
+
+	return estaEnEstado;
+}
+
+//Ver si hace falta despertar por caught (que actualmente se hace en caught) y despertar por deadlock
 
 // Caso DEADLOCK detectado:

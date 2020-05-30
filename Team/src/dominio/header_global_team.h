@@ -23,6 +23,8 @@
 //#include <crenito-commons/prueba.h>
 //#include <crenito-commons/conexiones/conexiones.h>
 
+# define NUMERO_MAXIMO 4294967295
+
 //Tipos de dato
 typedef uint32_t numero;
 typedef numero t_id;

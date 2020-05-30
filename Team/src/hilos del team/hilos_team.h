@@ -4,8 +4,9 @@
 #include <semaphore.h>
 
 #include <commons/collections/list.h>
-
 #include "../dominio/estructuras principales/pokemon.h"
+
+#define PROCESO_ACTIVO 1
 
 //Hilos
 pthread_t* hilosEntrenadores;
@@ -25,12 +26,9 @@ sem_t HayEntrenadores;
 pthread_mutex_t mutexHistorialEspecies;
 pthread_mutex_t mutexEntrenadores;
 pthread_mutex_t*mutexEstadoEntrenador;
+pthread_mutex_t*mutexPosicionEntrenador;
 pthread_mutex_t mutexInventariosGlobales;
 pthread_mutex_t mutexRecursosEnMapa;
-
-//Variables globales
-bool FinDelProceso;
-
 
 /*----------------*/
 
@@ -68,3 +66,6 @@ void mapa_mapear_requerido(pokemon*);
 numero objetivos_cantidad_requerida_de(especie_pokemon unaEspecie);
 void objetivos_actualizar_por_captura_de(especie_pokemon);
 //matriz_recursos recursos_objetivos_actuales();
+posiciones posiciones_N_mas_cercanas_al_equipo(posiciones, numero);
+numero posicion_distancia_a_equipo(t_posicion*);
+numero posicion_distancia_a_entrenadores(t_posicion*, entrenadores);
