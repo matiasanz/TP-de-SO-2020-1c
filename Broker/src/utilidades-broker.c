@@ -3,7 +3,9 @@
 //Funciones privadas
 static int subscribir_proceso(int socket, t_id_cola id_cola);
 static t_cola_container* get_cola(t_id_cola id_cola);
-static int encolar_mensaje(t_id_cola id_cola, void* msj);
+static int encolar_mensaje(t_cola_container* container, void* msj);
+static void replicar_mensaje(t_cola_container* container, void* deserializado,
+		t_id_cola id_cola);
 
 t_cola_container* cola_crear() {
 
@@ -17,18 +19,29 @@ t_cola_container* cola_crear() {
 
 void procesar_mensaje(int socket, t_paquete_header header) {
 
+	int size = 0;
+
+	void* msj = socket_recibir_mensaje(socket, &size);
+	t_cola_container* container = get_cola(header.id_cola);
+
+	void* deserializado = deserializar(msj, header.id_cola);
+
+	int id_mensaje = encolar_mensaje(container, deserializado);
+
+	socket_send(socket, &id_mensaje, sizeof(id_mensaje));
+
+	replicar_mensaje(container, deserializado, header.id_cola);
+
 	switch (header.id_cola) {
 	case NEW_POKEMON:
+		break;
 	case APPEARED_POKEMON:
+
+		break;
 	case CATCH_POKEMON:
 	case CAUGHT_POKEMON:
 	case GET_POKEMON:
 	case LOCALIZED_POKEMON: {
-		int size = 0;
-		//handshake
-		void* msj = socket_recibir_mensaje(socket, &size);
-		int id_mensaje = encolar_mensaje(header.id_cola, msj);
-		socket_send(socket, &id_mensaje, sizeof(id_mensaje));
 
 		break;
 	}
@@ -59,7 +72,7 @@ static int subscribir_proceso(int socket, t_id_cola id_cola) {
 
 	pthread_mutex_lock(&container->mutex);
 
-	t_conexion_cliente* subscriptor = conexion_cliente_crear(socket,
+	t_subscriptor* subscriptor = subscriptor_crear(socket,
 			list_size(container->subscriptores) + 1);
 	list_add(container->subscriptores, subscriptor);
 
@@ -91,20 +104,36 @@ static t_cola_container* get_cola(t_id_cola id_cola) {
 	}
 }
 
-static int encolar_mensaje(t_id_cola id_cola, void* msj) {
+static int encolar_mensaje(t_cola_container* container, void* msj) {
 
-	t_mensaje_new_pokemon* new_pokemon = mensaje_new_pokemon_deserializar(msj);
-
-	t_cola_container* container = get_cola(id_cola);
 	int id_mensaje = 0;
 
 	pthread_mutex_lock(&container->mutex);
 
 	id_mensaje = queue_size(container->cola) + 1;
-	mensaje_new_pokemon_set_id(new_pokemon, id_mensaje);
-	queue_push(container->cola, new_pokemon);
+	mensaje_new_pokemon_set_id(msj, id_mensaje);
+	queue_push(container->cola, msj);
 
 	pthread_mutex_unlock(&container->mutex);
 
 	return id_mensaje;
+}
+
+static void replicar_mensaje(t_cola_container* container, void* deserializado,
+		t_id_cola id_cola) {
+
+	for (int i = 0; i < list_size(container->subscriptores); ++i) {
+
+		t_subscriptor* subscriptor = list_get(container->subscriptores, i);
+
+		t_paquete* pqt = paquete_crear(MENSAJE, BROKER, id_cola,
+				serializar(deserializado, id_cola));
+
+		//TO-DO: registrar ACK
+		enviar_paquete(pqt, subscriptor->socket);
+
+		free(deserializado);
+		paquete_destruir(pqt);
+
+	}
 }

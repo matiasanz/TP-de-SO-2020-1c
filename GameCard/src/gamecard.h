@@ -9,18 +9,19 @@
 #define SRC_GAMECARD_H_
 
 #include <crenito-commons/conexiones/conexiones.h>
+#include "hilo_catch_pokemon.h"
+#include "hilo_get_pokemon.h"
+#include "hilo_new_pokemon.h"
 
-t_conexion_server conexion_broker;
-
-t_conexion_cliente conexion_catch_pokemon;
-t_conexion_cliente conexion_get_pokemon;
-t_conexion_cliente conexion_new_pokemon;
+sem_t objetivos_gamecard;
 
 void inicializar();
 void inicializar_config();
 void inicializar_logs();
 void inicializar_conexiones();
-void subscribir_colas(void* arg);
+void subscribir_y_escuchar_cola_catch_pokemon();
+void subscribir_y_escuchar_cola_get_pokemon();
+void subscribir_y_escuchar_cola_new_pokemon();
 
 
 #endif /* SRC_GAMECARD_H_ */

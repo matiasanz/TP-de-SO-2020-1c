@@ -70,3 +70,10 @@ t_pokemon pokemon_deserializar(void* stream, int* bytes_pokemon) {
 	return pkm;
 
 }
+
+void pokemon_log(t_log* un_logger, t_pokemon pokemon){
+
+	log_info(un_logger, "especie: %s", pokemon.especie);
+	posicion_log(un_logger, pokemon.posicion);
+
+}

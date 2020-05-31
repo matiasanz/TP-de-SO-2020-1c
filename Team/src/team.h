@@ -9,24 +9,24 @@
 #define SRC_TEAM_H_
 
 #include <crenito-commons/conexiones/conexiones.h>
+#include "hilo_appeared_pokemon.h"
+#include "hilo_caught_pokemon.h"
+#include "hilo_localized_pokemon.h"
 
 /*Constantes*/
 #define CONFIG_PATH "config/team.config"
 
 
 /*Variables Globales*/
-t_conexion_server conexion_broker;
-
-t_conexion_cliente conexion_appeared_pokemon;
-t_conexion_cliente conexion_localized_pokemon;
-t_conexion_cliente conexion_caught_pokemon;
+sem_t objetivos_team;
 
 /*--------------*/
 
 
 int inicializar();
 void inicializar_conexiones();
-void subscribir_colas(void* arg);
+void subscribir_y_escuchar_cola_localized_pokemon();
+
 void exit_team();
 
 

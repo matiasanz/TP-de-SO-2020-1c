@@ -72,11 +72,21 @@ t_mensaje_new_pokemon* mensaje_new_pokemon_deserializar(void* stream) {
 	desplazamiento += bytes_pokemon;
 
 	//cantidad
-	memcpy(&msj->cantidad, stream + desplazamiento,
+	memcpy(&msj->cantidad, stream + desplazamiento, 
 			sizeof(msj->cantidad));
 	desplazamiento += sizeof(msj->cantidad);
-	
+
 	return msj;
+}
+
+void mensaje_new_pokemon_log(t_log* un_logger, t_mensaje_new_pokemon* new_pokemon) {
+
+	pthread_mutex_lock(&mutex_mensaje_recibido_log);
+	log_separador(un_logger, LOG_HEADER_MENSAJE_RECIBIDO);
+	pokemon_log(un_logger, new_pokemon->pokemon);
+	log_info(un_logger, "cantidad: %d", new_pokemon -> cantidad);
+	pthread_mutex_unlock(&mutex_mensaje_recibido_log);
+
 }
 
 // Getters

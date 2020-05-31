@@ -10,24 +10,25 @@
 
 #include "team.h"
 
-
 int main(void) {
 
-	printf("hola soy el team");
-
-	if(inicializar()==-1){
+	if (inicializar() == -1) {
 		exit_team();
 		return EXIT_FAILURE;
 	};
 
+	sem_wait(&objetivos_team);
 	return EXIT_SUCCESS;
 }
 
-int inicializar(){
+int inicializar() {
 
-	config=config_create(CONFIG_PATH);
+	sem_init(&objetivos_team, 0, 0);
 
-	logger=log_create(config_get_string_value(config,"LOG_FILE"),TEAM_STRING,true,LOG_LEVEL_INFO);
+	config = config_create(CONFIG_PATH);
+
+	logger = log_create(config_get_string_value(config, "LOG_FILE"), TEAM_STRING, true, LOG_LEVEL_INFO);
+
 	event_logger = log_create("./log/team_event.log", "TEAM_EVENT", 1, LOG_LEVEL_INFO);
 
 	inicializar_conexiones();
@@ -39,18 +40,18 @@ void inicializar_conexiones() {
 
 	conexion_broker = conexion_server_crear(
 			config_get_string_value(config, "IP_BROKER"),
-			config_get_string_value(config, "PUERTO_BROKER"), TEAM,
-			config_get_int_value(config, "TIEMPO_RECONEXION"));
+			config_get_string_value(config, "PUERTO_BROKER"), TEAM);
+
+	pthread_mutex_init(&mutex_subscripcion, NULL);
+	pthread_mutex_init(&mutex_mensaje_recibido_log, NULL);
+
+	subscribir_y_escuchar_cola_appeared_pokemon();
+	subscribir_y_escuchar_cola_caught_pokemon();
+	subscribir_y_escuchar_cola_localized_pokemon();
 
 }
 
-void subscribir_colas(void* arg) {
-
-}
-
-
-
-void exit_team(){
+void exit_team() {
 
 	log_destroy(logger);
 	config_destroy(config);

@@ -8,35 +8,34 @@
 #ifndef SRC_CRENITO_COMMONS_CONEXIONES_CONEXIONES_H_
 #define SRC_CRENITO_COMMONS_CONEXIONES_CONEXIONES_H_
 
-#include "paquete.h"
-#include "socket.h"
+#include "conexiones-utils.h"
 
-//Mensajes
-#include "../mensajes/mensaje_new_pokemon.h"
-#include "../mensajes/mensaje_localized_pokemon.h"
-#include "../mensajes/mensaje_get_pokemon.h"
-#include "../mensajes/mensaje_appeared_catch_pokemon.h"
-#include "../mensajes/mensaje_caught_pokemon.h"
+/*Funcion utilizada por los procesos GAME_BOY, GAME_CARD y GAME_BOY para
+ * enviar mensajes a un servidor dados un IP y un PUERTO.
+ * La funcion crea un socket cliente, envia el paquete y luego cierra el socket.
+ * Esta funcion debe usarse desde GameBoyTeam, GameCard y Team,
+ */
+int enviar(t_conexion_server* server, t_paquete* pqt);
 
-typedef struct {
-	char* ip;
-	char* puerto;
-	t_id_proceso id_proceso;
-	int segundos_reconexion;
-} t_conexion_server;
+/*
+ * Envia un paquete al socket que recibe por parámetro.
+ * IMPORTANTE: Esta funcion debe usarse unicamente desde Broker que es el único
+ * proceso que mantiene el socket abierto luego del envío.
+ * Los demás procesos deben usar la funcion enviar(..) definida arriba.
+ */
+int enviar_paquete(t_paquete* pqt, int socket);
 
-typedef struct {
-	uint32_t id_subcriptor;
-	uint32_t socket;
-} t_conexion_cliente;
-
-//Funciones de comunicacion entre procesos
-t_conexion_cliente subscribir_cola(t_conexion_server server, t_id_cola id_cola);
-int enviar(t_conexion_server server, t_paquete* pqt);
-void* recibir(t_conexion_cliente cliente);
-
-//Funciones de creacion de conexiones
-t_conexion_server conexion_server_crear(char* ip, char* puerto, t_id_proceso id_proceso, int segundos_reconexion);
-t_conexion_cliente* conexion_cliente_crear(int socket, int id_subscriptor);
+/*
+ * Funcion utilizada por los procesos GAME_BOY, GAME_CARD y GAME_BOY para
+ * subscribirse a una cola de mensajes.
+ * Luego de subscribir al proceso, se queda esuchando mensajes en dicha cola 
+ * (escucha activa).
+ * Al recibir un mensaje lo reenvia a travpés de la funcion de escucha que 
+ * recibe por parámeetro.
+ * La nomenclatura de las funciones de escucha es [tipo_mensaje]_recibido
+ * Ejemplo: new_pokemon_recibido(...).
+ * Los procesos que usen estsa funcion deben definir la función de escucha.
+ */
+void subscribir_y_escuchar_cola(t_conexion* args);
 
 #endif /* SRC_CRENITO_COMMONS_CONEXIONES_CONEXIONES_H_ */

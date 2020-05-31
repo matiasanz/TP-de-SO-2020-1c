@@ -53,3 +53,13 @@ char* get_nombre_cola(t_id_cola id_cola) {
 		return NULL;
 	}
 }
+
+void log_separador(t_log*un_logger, char* texto) {
+
+	log_info(un_logger, "***** %s *****", texto);
+}
+
+void mensaje_header_log(t_log* un_logger, t_mensaje_header header){
+
+	log_info(un_logger, "id: %d, id_correlativo: %d", header.id, header.id_correlativo);
+}

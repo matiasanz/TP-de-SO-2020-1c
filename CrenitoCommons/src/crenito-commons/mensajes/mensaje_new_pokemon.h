@@ -23,6 +23,7 @@ t_mensaje_new_pokemon* mensaje_new_pokemon_crear(char* especie, uint32_t pos_x, 
 void mensaje_new_pokemon_destruir(t_mensaje_new_pokemon* new_pokemon);
 t_buffer* mensaje_new_pokemon_serializar(t_mensaje_new_pokemon* new_pokemon);
 t_mensaje_new_pokemon* mensaje_new_pokemon_deserializar(void* stream);
+void mensaje_new_pokemon_log(t_log* un_logger, t_mensaje_new_pokemon* new_pokemon);
 
 //Getters
 uint32_t mensaje_new_pokemon_get_id(t_mensaje_new_pokemon* msj);

@@ -14,10 +14,13 @@ int main(void) {
 
 	inicializar();
 
+	sem_wait(&objetivos_gamecard);
 	return EXIT_SUCCESS;
 }
 
 void inicializar(void) {
+
+	sem_init(&objetivos_gamecard, 0, 0);
 
 	inicializar_config();
 	inicializar_logs();
@@ -33,8 +36,14 @@ void inicializar_conexiones() {
 
 	conexion_broker = conexion_server_crear(
 			config_get_string_value(config, "IP_BROKER"),
-			config_get_string_value(config, "PUERTO_BROKER"), GAMECARD,
-			config_get_int_value(config, "TIEMPO_DE_REINTENTO_CONEXION"));
+			config_get_string_value(config, "PUERTO_BROKER"), GAMECARD);
+
+	pthread_mutex_init(&mutex_subscripcion, NULL);
+	pthread_mutex_init(&mutex_mensaje_recibido_log, NULL);
+
+	subscribir_y_escuchar_cola_catch_pokemon();
+	subscribir_y_escuchar_cola_get_pokemon();
+	subscribir_y_escuchar_cola_new_pokemon();
 
 }
 
@@ -42,8 +51,4 @@ void inicializar_logs() {
 
 	logger = log_create("./log/gamecard.log", GAMECARD_STRING, 1,LOG_LEVEL_INFO);
 	event_logger = log_create("./log/gamecard_event.log", "GAME_CARD_EVENT", 1, LOG_LEVEL_INFO);
-}
-
-void subscribir_colas(void* arg) {
-
 }

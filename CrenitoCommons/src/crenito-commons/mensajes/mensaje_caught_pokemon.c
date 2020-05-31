@@ -23,8 +23,8 @@ void mensaje_caught_pokemon_destruir(t_mensaje_caught_pokemon* caught_pokemon) {
 
 t_buffer* mensaje_caught_pokemon_serializar(t_mensaje_caught_pokemon* caught_pokemon) {
 
-	int size = sizeof(caught_pokemon->mensaje_header) 
-	         + sizeof(caught_pokemon->atrapado);
+	int size = sizeof(caught_pokemon->mensaje_header)
+			+ sizeof(caught_pokemon->atrapado);
 
 	t_buffer* bfr = buffer_crear(size);
 	int desplazamiento = 0;
@@ -52,11 +52,22 @@ t_mensaje_caught_pokemon* mensaje_caught_pokemon_deserializar(void* stream) {
 	desplazamiento += sizeof(msj->mensaje_header);
 
 	//atrapado
-	memcpy(&msj->atrapado, stream + desplazamiento,
+	memcpy(&msj->atrapado, stream + desplazamiento, 
 			sizeof(msj->atrapado));
 	desplazamiento += sizeof(msj->atrapado);
 
 	return msj;
+}
+
+void mensaje_caught_pokemon_log(t_log* un_logger, t_mensaje_caught_pokemon* caught_pokemon) {
+
+	pthread_mutex_lock(&mutex_mensaje_recibido_log);
+	log_separador(un_logger, LOG_HEADER_MENSAJE_RECIBIDO);
+	log_info(un_logger, "mensaje: %s", CAUGHT_POKEMON_STRING);
+	mensaje_header_log(un_logger, caught_pokemon->mensaje_header);
+	log_info(un_logger, "atrapado: %d", caught_pokemon ->atrapado);
+	pthread_mutex_unlock(&mutex_mensaje_recibido_log);
+
 }
 
 // Getters
