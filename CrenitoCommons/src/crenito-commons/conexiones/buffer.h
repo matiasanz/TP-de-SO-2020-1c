@@ -19,5 +19,7 @@ typedef struct {
 
 t_buffer* buffer_crear(int size);
 void buffer_destruir(t_buffer* buffer);
+void buffer_set_stream(t_buffer* buffer, void* stream);
+void* buffer_get_stream(t_buffer* buffer);
 
 #endif /* SRC_CRENITO_COMMONS_BUFFER_H_ */

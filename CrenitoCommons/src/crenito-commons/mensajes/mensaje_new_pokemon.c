@@ -83,6 +83,8 @@ void mensaje_new_pokemon_log(t_log* un_logger, t_mensaje_new_pokemon* new_pokemo
 
 	pthread_mutex_lock(&mutex_mensaje_recibido_log);
 	log_separador(un_logger, LOG_HEADER_MENSAJE_RECIBIDO);
+	log_info(un_logger, "mensaje: %s", NEW_POKEMON_STRING);
+	mensaje_header_log(un_logger, new_pokemon->mensaje_header);
 	pokemon_log(un_logger, new_pokemon->pokemon);
 	log_info(un_logger, "cantidad: %d", new_pokemon -> cantidad);
 	pthread_mutex_unlock(&mutex_mensaje_recibido_log);

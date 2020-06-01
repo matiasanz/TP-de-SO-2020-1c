@@ -9,9 +9,7 @@
 #define SRC_GAMECARD_H_
 
 #include <crenito-commons/conexiones/conexiones.h>
-#include "hilo_catch_pokemon.h"
-#include "hilo_get_pokemon.h"
-#include "hilo_new_pokemon.h"
+#include "mensajes-utils.h"
 
 sem_t objetivos_gamecard;
 

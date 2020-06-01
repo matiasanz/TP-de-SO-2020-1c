@@ -21,3 +21,12 @@ void buffer_destruir(t_buffer* buffer) {
 	free(buffer -> stream);
 	free(buffer);
 }
+
+void buffer_set_stream(t_buffer* buffer, void* stream){
+
+	buffer -> stream = stream;
+}
+
+void* buffer_get_stream(t_buffer* buffer){
+	return buffer -> stream;
+}

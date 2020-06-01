@@ -81,6 +81,7 @@ void mensaje_get_pokemon_log(t_log* un_logger, t_mensaje_get_pokemon* get_pokemo
 	pthread_mutex_lock(&mutex_mensaje_recibido_log);
 	log_separador(un_logger, LOG_HEADER_MENSAJE_RECIBIDO);
 	log_info(un_logger, "mensaje: %s", GET_POKEMON_STRING);
+	mensaje_header_log(un_logger, get_pokemon->mensaje_header);
 	log_info(un_logger, "especie: %s", get_pokemon->especie);
 	pthread_mutex_unlock(&mutex_mensaje_recibido_log);
 

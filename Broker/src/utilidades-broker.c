@@ -126,7 +126,7 @@ static void replicar_mensaje(t_cola_container* container, void* deserializado,
 
 		t_subscriptor* subscriptor = list_get(container->subscriptores, i);
 
-		t_paquete* pqt = paquete_crear(MENSAJE, BROKER, id_cola,
+		t_paquete* pqt = paquete_crear(paquete_header_crear(MENSAJE, BROKER, id_cola),
 				serializar(deserializado, id_cola));
 
 		//TO-DO: registrar ACK

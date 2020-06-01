@@ -30,12 +30,16 @@ typedef struct {
 } t_paquete;
 
 // Funciones t_paquete*
-t_paquete* paquete_crear(t_codigo_operacion cod_op, t_id_proceso id_proceso, t_id_cola id_cola, t_buffer* buffer);
+t_paquete* paquete_crear(t_paquete_header header, t_buffer* buffer);
 t_paquete_header paquete_header_crear(t_codigo_operacion cod_op, t_id_proceso id_proceso, t_id_cola id_cola);
 void paquete_destruir(t_paquete* paquete);
 
 /* Recibe un paquete y un puntero donde guarda la cantidad de bytes del stream serializado
  * dichos bytes deben usarse como parametro al realizar el send */
 void* paquete_serializar(t_paquete* paquete, int *bytes);
+
+void* paquete_get_stream(t_paquete* paquete);
+t_id_cola paquete_get_id_cola(t_paquete* paquete);
+
 
 #endif /* SRC_CRENITO_COMMONS_PAQUETE_H_ */

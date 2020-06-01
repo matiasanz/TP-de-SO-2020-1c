@@ -7,11 +7,11 @@
 
 #include "hilo_localized_pokemon.h"
 
-void subscribir_y_escuchar_cola_localized_pokemon() {
+void subscribir_y_escuchar_cola_localized_pokemon(void(*callback)(void*)) {
 
 	conexion_localized_pokemon = conexion_cliente_crear(LOCALIZED_POKEMON,
 			config_get_int_value(config, "TIEMPO_RECONEXION"),
-			(void*) localized_pokemon_recibido);
+			callback);
 
 	t_conexion* args_s = conexion_crear(conexion_broker,
 			conexion_localized_pokemon);

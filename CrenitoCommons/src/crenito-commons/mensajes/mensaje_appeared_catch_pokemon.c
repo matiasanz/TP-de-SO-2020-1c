@@ -69,11 +69,11 @@ t_mensaje_appeared_catch_pokemon* mensaje_appeared_catch_pokemon_deserializar(vo
 	return msj;
 }
 
-void mensaje_appeared_catch_pokemon_log(t_log* un_logger, t_mensaje_appeared_catch_pokemon* appeared_catch){
+void mensaje_appeared_catch_pokemon_log(t_log* un_logger, t_mensaje_appeared_catch_pokemon* appeared_catch, char* tipo){
 
 	pthread_mutex_lock(&mutex_mensaje_recibido_log);
 	log_separador(un_logger, LOG_HEADER_MENSAJE_RECIBIDO);
-	log_info(un_logger, "mensaje: %s", APPEARED_POKEMON_STRING);
+	log_info(un_logger, "mensaje: %s", tipo);
 	mensaje_header_log(un_logger, appeared_catch->mensaje_header);
 	pokemon_log(un_logger, appeared_catch->pokemon);
 	pthread_mutex_unlock(&mutex_mensaje_recibido_log);

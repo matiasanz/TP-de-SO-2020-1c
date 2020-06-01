@@ -26,7 +26,6 @@ char* get_nombre_proceso(t_id_proceso id_proceso) {
 		return TEAM_STRING;
 	default:
 		log_error(event_logger, "Id de proceso incorrecto: %d", id_proceso);
-		abort();
 		return NULL;
 	}
 }
@@ -49,7 +48,6 @@ char* get_nombre_cola(t_id_cola id_cola) {
 	default:
 		log_error(event_logger, "No existe el tipo de cola: %d",
 				id_cola);
-		abort();
 		return NULL;
 	}
 }

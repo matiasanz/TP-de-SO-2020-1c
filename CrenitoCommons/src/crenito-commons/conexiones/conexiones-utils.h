@@ -18,12 +18,16 @@
 #include "../mensajes/mensaje_appeared_catch_pokemon.h"
 #include "../mensajes/mensaje_caught_pokemon.h"
 
+/* 
+ * TAD para almacenar los datos luego de realizar una subscripción
+ */
 typedef struct {
 	uint32_t id_subcriptor;
 	uint32_t socket;
 } t_subscriptor;
 
-/* Contiene la información necesaria para poder enviarle mensajes 
+/* 
+ * Contiene la información necesaria para poder enviarle mensajes 
  * a un proceso servidor.
  * Ejemplo: cuando el TEAM o GAME_CARD nececistan enviarle información al BROKER.
  */
@@ -33,7 +37,8 @@ typedef struct {
 	t_id_proceso id_proceso;  //TEAM, GAMECARD, etc
 } t_conexion_server;
 
-/* Contiene la información necesaria para que un proceso actúe como cliente 
+/* 
+ * Contiene la información necesaria para que un proceso actúe como cliente 
  * Ejemplo: cuando el TEAM o GAME_CARD nececistan subscribirse a una cola
  * de mensajes y realizar escucha activa.
  */
@@ -44,17 +49,28 @@ typedef struct {
 	void(*callback)(void*); //funcion a ejecutar cuando se recibe un mensaje (funcion escucha)
 } t_conexion_cliente;
 
+/* 
+ * Contiene la información necesaria para que un proceso actúe como host 
+ * Ejemplo: cuando el TEAM o GAME_CARD nececsitan escuchar mensajes del GAME_BOY
+ */
+typedef struct {
+	char* ip;
+	char* puerto;
+	void(*callback)(void*); //funcion a ejecutar cuando se recibe un mensaje (funcion escucha)
+} t_conexion_host;
+
 typedef struct {
 	t_conexion_cliente* cliente;
 	t_conexion_server* server;
 } t_conexion;
 
 t_conexion_server* conexion_broker;
-t_conexion_server* conexion_gameboy;
+t_conexion_host* conexion_gameboy;
 
 pthread_mutex_t mutex_subscripcion;
 
 //Funciones auxiliares utilizadas por conexiones.h
+t_conexion_host* conexion_host_crear(char* ip, char* puerto, void(*callback)(void*));
 t_conexion_server* conexion_server_crear(char* ip, char* puerto, t_id_proceso id_proceso);
 t_conexion_cliente* conexion_cliente_crear(t_id_cola id_cola, int segundos_reconexion, void(*callback)(void*));
 t_conexion* conexion_crear(t_conexion_server* server, t_conexion_cliente* cliente);

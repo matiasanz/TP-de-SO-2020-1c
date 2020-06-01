@@ -7,6 +7,17 @@
 
 #include "conexiones-utils.h"
 
+t_conexion_host* conexion_host_crear(char* ip, char* puerto, void(*callback)(void*)) {
+
+	t_conexion_host* host = malloc(sizeof(t_conexion_host));
+
+	host-> ip = ip;
+	host-> puerto = puerto;
+	host-> callback = callback;
+
+	return host;
+}
+
 t_conexion_server* conexion_server_crear(char* ip, char* puerto, t_id_proceso id_proceso) {
 
 	t_conexion_server* server = malloc(sizeof(t_conexion_server));

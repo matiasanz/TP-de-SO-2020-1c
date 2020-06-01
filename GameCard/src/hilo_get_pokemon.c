@@ -7,11 +7,11 @@
 
 #include "hilo_get_pokemon.h"
 
-void subscribir_y_escuchar_cola_get_pokemon() {
+void subscribir_y_escuchar_cola_get_pokemon(void(*callback)(void*)) {
 
 	conexion_get_pokemon = conexion_cliente_crear(GET_POKEMON,
 			config_get_int_value(config, "TIEMPO_DE_REINTENTO_CONEXION"),
-			(void*) get_pokemon_recibido);
+			callback);
 
 	t_conexion* args = conexion_crear(conexion_broker,
 			conexion_get_pokemon);
