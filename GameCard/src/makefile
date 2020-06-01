@@ -16,16 +16,19 @@ create-dirs:
 	mkdir -p ../log
 	
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c)) 
+SUBCARPETAS = $(patsubst %.c, %.o, $(wildcard **/*.c)) 
+
 HEADERS = $(wildcard *.h)
 
 %.o: %.c $(HEADERS) 
 	$(CC) -I"../../CrenitoCommons/src" $(CFLAGS) -c $< -o $@ 
 
-.PRECIOUS: $(TARGET) $(OBJECTS) 
+.PRECIOUS: $(TARGET) $(SUBCARPETAS) $(OBJECTS)
 
-$(TARGET): create-dirs $(OBJECTS)
-	$(CC)  $(OBJECTS) $(CFLAGS) -L"$(CRENITO-COMMONS-BIN)" -lCrenitoCommons $(LIBS) -o $@ 
+$(TARGET): create-dirs $(SUBCARPETAS) $(OBJECTS) 
+	$(CC)  $(SUBCARPETAS) $(OBJECTS) $(CFLAGS) -L"$(CRENITO-COMMONS-BIN)" -lCrenitoCommons $(LIBS) -o $@ 
 
 clean: 
 	-rm -f *.o
+	-rm -f **/*.o
 	-rm -f $(TARGET)

@@ -1,4 +1,4 @@
-TARGET = ../Team 
+TARGET = ../Team
 
 CRENITO-COMMONS-DIR = ../../CrenitoCommons
 CRENITO-COMMONS-BIN = $(CRENITO-COMMONS-DIR)/src/build
@@ -18,20 +18,22 @@ all: default # Si ejecutan all, que ejecute la default
 
 create-dirs:
 	mkdir -p ../log
-
+	
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c)) #genera los .o
+SUBCARPETAS = $(patsubst %.c, %.o, $(wildcard **/*.c)) 
+
 HEADERS = $(wildcard *.h) # wildcard implica todos los .h
 
 %.o: %.c $(HEADERS) # usar todos los .c y todos los .h
-	$(CC) -I"../../CrenitoCommons/src" $(CFLAGS) -c $< -o $@
+	$(CC) -I"../../CrenitoCommons/src" $(CFLAGS) -c $< -o $@ 
 
-.PRECIOUS: $(TARGET) $(OBJECTS)
+.PRECIOUS: $(TARGET) $(SUBCARPETAS) $(OBJECTS)
 
  # Usamos compilador para linkear los objects a las bibliotecas y tener binario
-$(TARGET): create-dirs $(OBJECTS)
-	$(CC)  $(OBJECTS) $(CFLAGS) -L"$(CRENITO-COMMONS-BIN)" -lCrenitoCommons $(LIBS) -o $@ 
+$(TARGET): create-dirs $(SUBCARPETAS) $(OBJECTS) 
+	$(CC)  $(SUBCARPETAS) $(OBJECTS) $(CFLAGS) -L"$(CRENITO-COMMONS-BIN)" -lCrenitoCommons $(LIBS) -o $@ 
 
 clean: # tarea para eliminar todos los .o y el binario
 	-rm -f *.o
+	-rm -f **/*.o
 	-rm -f $(TARGET)
-	

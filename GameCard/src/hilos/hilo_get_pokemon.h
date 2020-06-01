@@ -5,8 +5,8 @@
  *      Author: utnso
  */
 
-#ifndef SRC_HILO_GET_POKEMON_H_
-#define SRC_HILO_GET_POKEMON_H_
+#ifndef SRC_HILOS_HILO_GET_POKEMON_H_
+#define SRC_HILOS_HILO_GET_POKEMON_H_
 
 #include <crenito-commons/conexiones/conexiones.h>
 
@@ -16,4 +16,4 @@ pthread_t hilo_get_pokemon;
 void get_pokemon_recibido(t_mensaje_get_pokemon* get_pokemon);
 void subscribir_y_escuchar_cola_get_pokemon(void(*callback)(void*));
 
-#endif /* SRC_HILO_GET_POKEMON_H_ */
+#endif /* SRC_HILOS_HILO_GET_POKEMON_H_ */

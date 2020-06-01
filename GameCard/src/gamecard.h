@@ -9,7 +9,7 @@
 #define SRC_GAMECARD_H_
 
 #include <crenito-commons/conexiones/conexiones.h>
-#include "mensajes-utils.h"
+#include "utils/mensajes-utils.h"
 
 sem_t objetivos_gamecard;
 
