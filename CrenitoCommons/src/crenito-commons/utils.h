@@ -15,11 +15,17 @@
 #include<string.h>
 #include<stdbool.h>
 #include<pthread.h>
+#include<semaphore.h>
 
 #include<commons/log.h>
 #include<commons/config.h>
 #include<commons/collections/list.h>
 #include<commons/collections/queue.h>
+#include<commons/string.h>
+
+#define ERROR_SOCKET -1
+
+#define LOG_HEADER_MENSAJE_RECIBIDO "MENSAJE RECIBIDO"
 
 #define NEW_POKEMON_STRING "NEW_POKEMON"
 #define APPEARED_POKEMON_STRING "APPEARED_POKEMON"
@@ -68,8 +74,11 @@ void mensaje_header_inicializar(t_mensaje_header* header);
 char* get_nombre_proceso(t_id_proceso id_proceso);
 // dado un id de mensaje/nombre de cola el mismo representado por un string
 char* get_nombre_cola(t_id_cola id_cola);
-// dado un string de mensaje/nombre devuelve su id respectivo
-int get_id_proceso(char* proceso);
 
+char* get_separador_string(char* texto);
+char* mensaje_header_to_string(t_mensaje_header header, char* tipo);
+
+int conexion_exitosa(int indicador_conexion);
+int error_conexion(int indicador_conexion);
 
 #endif /* UTILS_H_ */
