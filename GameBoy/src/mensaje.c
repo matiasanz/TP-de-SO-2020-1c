@@ -11,16 +11,10 @@ t_paquete* crearMensaje(char* argumentos[],int longitud){
 	t_id_cola Tipomensaje;
 	char* especie;
 	int atrapado;
-	int i,cantidad,posx,posy;
-	const char* tiposDeMensajes[] = { NEW_POKEMON_STRING, APPEARED_POKEMON_STRING,
-				CATCH_POKEMON_STRING, CAUGHT_POKEMON_STRING, GET_POKEMON_STRING };
+	int cantidad,posx,posy;
 
-	for (i = 0; i < 4; i++) {
-		if (!strcmp(argumentos[2], tiposDeMensajes[i]))
-			break;
-	}
 
-	switch(i+1){
+	switch(get_id_mensaje(argumentos[2])){
 
 	case NEW_POKEMON:
 
@@ -120,9 +114,6 @@ t_paquete* crearMensaje(char* argumentos[],int longitud){
 			t_mensaje_new_pokemon* msj = mensaje_get_pokemon_crear(especie);
 			mensaje_serializado=mensaje_get_pokemon_serializar(msj);
 		}
-
-
-
 		break;
 
 	}

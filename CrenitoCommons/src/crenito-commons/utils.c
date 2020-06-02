@@ -53,3 +53,33 @@ char* get_nombre_cola(t_id_cola id_cola) {
 		return NULL;
 	}
 }
+
+int get_id_proceso(char* proceso){
+	if(strcmp(proceso,BROKER_STRING)==0){
+		return BROKER;
+	}
+	if(strcmp(proceso,TEAM_STRING)==0){
+		return TEAM;
+	}
+	if(strcmp(proceso,GAMECARD_STRING)==0){
+		return GAMECARD;
+	}
+}
+int get_id_mensaje(char* mensaje){
+	if(strcmp(mensaje,NEW_POKEMON_STRING)==0){
+			return NEW_POKEMON;
+	}
+	if(strcmp(mensaje,APPEARED_POKEMON_STRING)==0){
+			return APPEARED_POKEMON;
+	}
+	if(strcmp(mensaje,CATCH_POKEMON_STRING)==0){
+			return CATCH_POKEMON;
+	}
+	if(strcmp(mensaje,CAUGHT_POKEMON_STRING)==0){
+			return CAUGHT_POKEMON;
+	}
+	if(strcmp(mensaje,GET_POKEMON_STRING)==0){
+			return GET_POKEMON;
+	}
+
+}

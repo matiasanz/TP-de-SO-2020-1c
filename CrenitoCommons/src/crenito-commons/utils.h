@@ -68,4 +68,8 @@ void mensaje_header_inicializar(t_mensaje_header* header);
 char* get_nombre_proceso(t_id_proceso id_proceso);
 // dado un id de mensaje/nombre de cola el mismo representado por un string
 char* get_nombre_cola(t_id_cola id_cola);
+// dado un string de mensaje/nombre devuelve su id respectivo
+int get_id_proceso(char* proceso);
+
+
 #endif /* UTILS_H_ */
