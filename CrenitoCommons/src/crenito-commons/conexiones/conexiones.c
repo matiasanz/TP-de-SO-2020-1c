@@ -21,22 +21,22 @@ static int handshake(int socket, void* pqt, int size);
  * Recibe un paquete usando el socket indicado por parámetro.
  * Al recibirlo, ejeceuta la funcion de escucha
  * que también recibe por parámetro.
+ * Si se produce un error, retorna ERROR_SOCKET
  */
-static void recibir(int socket, void (*callback)(void*));
+static int recibir(int socket, void (*callback)(void*));
 
 int enviar(t_conexion_server* server, t_paquete* pqt) {
 
 	int socket = socket_crear_client(server->ip, server->puerto);
 
-	if (error_conexion(socket)){
-			return ERROR_SOCKET;
+	if (error_conexion(socket)) {
+		return ERROR_SOCKET;
 	}
 
 	int id_mensaje = enviar_paquete(pqt, socket);
 
 	socket_cerrar(socket);
 
-	//TO-DO Si falla la conexion devolver -1
 	return id_mensaje;
 }
 
@@ -65,7 +65,14 @@ void subscribir_y_escuchar_cola(t_conexion* args) {
 	t_subscriptor* subscriptor = cliente->subscriptor;
 
 	while (1) {
-		recibir(subscriptor->socket, cliente->callback);
+
+		if (error_conexion(recibir(subscriptor->socket, cliente->callback))) {
+
+			log_warning(logger, "Se desconectó el %s, cancelando escucha sobre la cola %s",
+					BROKER_STRING, get_nombre_cola(cliente->id_cola));
+			break;
+		};
+
 	}
 }
 
@@ -92,27 +99,35 @@ int subscribir(t_conexion_server* server, t_conexion_cliente* cliente) {
 
 	//TO-DO reconectar
 	if (error_conexion(cliente->subscriptor->socket)) {
-		log_warning(event_logger,
+		log_warning(logger,
 				"el %s está desconectado, cancelando subscripción %s",
 				BROKER_STRING, get_nombre_cola(cliente->id_cola));
 		return ERROR_SOCKET;
 	}
 
 	t_paquete_header pqt = paquete_header_crear(SUBSCRIPCION,
-					server->id_proceso, cliente->id_cola);
+			server->id_proceso, cliente->id_cola);
 
 	cliente->subscriptor->id_subcriptor = handshake(
 			cliente->subscriptor->socket, &pqt, sizeof(t_paquete_header));
 
-	return EXIT_SUCCESS;
+	return cliente->subscriptor->id_subcriptor;
 }
 
-static void recibir(int socket, void (*callback)(void*)) {
+static int recibir(int socket, void (*callback)(void*)) {
 
 	t_paquete_header header = socket_recibir_header(socket);
 
+	if (error_conexion(header.codigo_operacion)) {
+		return ERROR_SOCKET;
+	}
+
 	int size = 0;
 	void* msj = socket_recibir_mensaje(socket, &size);
+
+	if (error_conexion(size)) {
+		return ERROR_SOCKET;
+	}
 
 	uint32_t ACK = 1;
 	socket_send(socket, &ACK, sizeof(ACK));
@@ -121,4 +136,6 @@ static void recibir(int socket, void (*callback)(void*)) {
 	buffer_set_stream(bfr, msj);
 
 	callback(paquete_crear(header, bfr));
+
+	return EXIT_SUCCESS;
 }
