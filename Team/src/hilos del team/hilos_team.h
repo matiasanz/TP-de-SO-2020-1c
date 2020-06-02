@@ -8,6 +8,7 @@
 
 #define PROCESO_ACTIVO 1
 
+
 //Hilos
 pthread_t* hilosEntrenadores;
 pthread_t hiloReceptorDeMensajes;
@@ -29,6 +30,11 @@ pthread_mutex_t*mutexEstadoEntrenador;
 pthread_mutex_t*mutexPosicionEntrenador;
 pthread_mutex_t mutexInventariosGlobales;
 pthread_mutex_t mutexRecursosEnMapa;
+
+
+//HARDCODEOS ---------------------------------- ACORDARME DE BORRARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
+pthread_mutex_t MUTEX_FIN_DE_PROCESO_BORRARRRRRRRRRRRRRRRR;
+bool finDeProceso;
 
 /*----------------*/
 

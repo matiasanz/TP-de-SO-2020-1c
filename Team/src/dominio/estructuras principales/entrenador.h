@@ -5,7 +5,7 @@
 #include "recursos.h"
 
 typedef enum{NEW,READY,	EXECUTE, LOCKED_HASTA_APPEARD, LOCKED_HASTA_DEADLOCK, LOCKED_HASTA_CAUGHT,	EXIT} t_estado; //VER cuales vale la pena conservar
-typedef enum{CATCHEAR, CAPTURAR, DEADLOCK /*, FINALIZAR*/ } t_tarea;
+typedef enum{CATCHEAR, CAPTURAR, INTERCAMBIAR /*, FINALIZAR*/ } t_tarea;
 
 //TAD Entrenador
 typedef struct pcb_Entrenador{

@@ -79,13 +79,23 @@ void recursos_destroy(matriz_recursos recursos){
 	dictionary_destroy_and_destroy_elements(recursos, free);
 }
 
+bool recursos_hay_recursos(matriz_recursos recursos){
+	return !recursos_matriz_nula(recursos);
+}
+
 void recursos_mostrar(matriz_recursos recursos){
 
-	void mostrar(especie_pokemon unaEspecie, void*cantidadDeInstancias){
-		printf(" (%s, %u)", unaEspecie, *((numero*)cantidadDeInstancias));
+	if(recursos_hay_recursos(recursos)){
+		void mostrar(especie_pokemon unaEspecie, void*cantidadDeInstancias){
+			printf(" (%s, %d)", unaEspecie, *((numero*)cantidadDeInstancias));
+		}
+
+		dictionary_iterator(recursos, &mostrar);
 	}
 
-	dictionary_iterator(recursos, &mostrar);
+	else{
+		printf(" NO HAY RECURSOS ");
+	}
 }
 
 bool recursos_matriz_nula(matriz_recursos recursos){
@@ -99,7 +109,7 @@ bool recursos_matriz_nula(matriz_recursos recursos){
 
 	dictionary_iterator(recursos, esoNoEsCierto);
 
-	return esNula;
+	return esNula || dictionary_is_empty(recursos);
 }
 
 numero recursos_contar(matriz_recursos recursos){
@@ -124,12 +134,16 @@ void recursos_sumar_recursos_a(matriz_recursos unaMatriz, matriz_recursos otraMa
 
 }
 
-void recursos_restar_recursos_a(matriz_recursos unaMatriz, matriz_recursos otraMatriz){
+int max(int i, int j){
+	return i>j? i: j;
+}
+
+void recursos_restar_recursos_a(matriz_recursos minuendo, matriz_recursos sustraendo){
 	void restar_semejantes(especie_pokemon unaEspecie, void*cantidadDeInstancias){
-		*((numero*) cantidadDeInstancias) -= recursos_cantidad_de_instancias_de(otraMatriz, unaEspecie);
+		*((numero*) cantidadDeInstancias) -= recursos_cantidad_de_instancias_de(sustraendo, unaEspecie);
 	}
 
-	dictionary_iterator(unaMatriz, restar_semejantes);
+	dictionary_iterator(minuendo, restar_semejantes);
 }
 
 matriz_recursos recursos_duplicar(matriz_recursos recursos){
@@ -153,8 +167,24 @@ matriz_recursos recursos_matriz_diferencia(matriz_recursos unaMatriz, matriz_rec
 	return matrizDiferencia;
 }
 
+void recursos_resta_positiva_de_recursos_a(matriz_recursos unaMatriz, matriz_recursos otraMatriz){
+	void restar_semejantes(especie_pokemon unaEspecie, void*cantidadDeInstancias){
+		numero instancias = *((numero*) cantidadDeInstancias) - recursos_cantidad_de_instancias_de(otraMatriz, unaEspecie);
+
+		*((numero*) cantidadDeInstancias) = max((int) instancias, 0);
+	}
+
+	dictionary_iterator(unaMatriz, restar_semejantes);
+}
+
+matriz_recursos recursos_matriz_diferencia_positiva(matriz_recursos unaMatriz, matriz_recursos otraMatriz){
+	matriz_recursos matrizDiferencia = recursos_duplicar(unaMatriz);
+	recursos_resta_positiva_de_recursos_a(matrizDiferencia, otraMatriz);
+	return matrizDiferencia;
+}
+
 bool recursos_suficientes_para(matriz_recursos proveedora, matriz_recursos receptora){
-	matriz_recursos diferencia = recursos_matriz_diferencia(proveedora, receptora);
+	matriz_recursos diferencia = recursos_matriz_diferencia_positiva(receptora, proveedora);
 	bool SiONo = recursos_matriz_nula(diferencia);
 	recursos_destroy(diferencia);
 

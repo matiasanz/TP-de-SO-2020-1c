@@ -33,12 +33,12 @@ void finalizar_hilos();
 
 /*Mis Listas (son variables globales, para que puedan acceder todos los hilos)*/
 	entrenadores equipo;
+	cola_entrenadores entrenadoresReady;
 	mapa_pokemones pokemonesRequeridos;
 	matriz_recursos objetivosGlobales;
-	matriz_recursos inventariosGlobales;
-	matriz_recursos recursosEnMapa;
-	pendientes capturasPendientes;
-	cola_entrenadores entrenadoresReady;
+	matriz_recursos inventariosGlobales; //cambiar nombre por recursosDisponiblesGlobales
+	matriz_recursos recursosEnMapa; //cambiar nombre por recursosPorAdquirir o algo mas representativo
+	pendientes capturasPendientes; //cambiar tipo de dato por capturas_pendientes
 	especies_pokemones historialDePokemones;
 
 //Colas de mensajes (BORRAR A FUTURO)

@@ -11,7 +11,11 @@
 #include "hilos del team/hilos_team.h"
 //#include "tests/tests_team.o"
 
+//int mainDePruebaDeadlock();
+
 int main(void) {
+
+//	return mainDePruebaDeadlock(); //Prueba deadlock;
 
 	team_inicializar();
 
@@ -61,7 +65,6 @@ void team_inicializar(){
 /*-------*/
 
 	inicializar_listas();
-
  	inicializar_semaforos();
 
 //	inicializar_hilos();
@@ -94,13 +97,17 @@ void inicializar_listas() {
 	recursosEnMapa = recursos_create(); //TODO
 	pokemonesRequeridos = mapa_create();
 	capturasPendientes = pendientes_create();
-	historialDePokemones = list_create(); //Ver si vale la pena abstraer
+
+//Ver si vale la pena abstraer
+	historialDePokemones = list_create();
 
 	entrenadoresReady = cr_list_create();
+	//***************
 }
 
 void listas_destroy(){
 	entrenadores_destroy(equipo);
+	cr_list_destroy(entrenadoresReady);
 	mapa_destroy(pokemonesRequeridos);
 	pendientes_destroy(capturasPendientes);
 	recursos_destroy(objetivosGlobales);
@@ -131,10 +138,15 @@ void inicializar_hilos(){
 void finalizar_hilos(){
 	finalizar_hilos_entrenadores();
 
-	pthread_join(hiloPlanificador, NULL);
-	pthread_join(hiloMensajesAppeard, NULL);
-	pthread_join(hiloMensajesCAUGHT, NULL);
-	pthread_join(hiloMensajesLOCALIZED, NULL);
+	pthread_mutex_lock(&MUTEX_FIN_DE_PROCESO_BORRARRRRRRRRRRRRRRRR);
+	finDeProceso = true;
+	pthread_mutex_unlock(&MUTEX_FIN_DE_PROCESO_BORRARRRRRRRRRRRRRRRR);
+
+	pthread_join(hiloReceptorDeMensajes, NULL);
+	pthread_join(hiloPlanificador	   , NULL);
+	pthread_join(hiloMensajesAppeard   , NULL);
+	pthread_join(hiloMensajesCAUGHT	   , NULL);
+	pthread_join(hiloMensajesLOCALIZED , NULL);
 }
 
 //Semaforos

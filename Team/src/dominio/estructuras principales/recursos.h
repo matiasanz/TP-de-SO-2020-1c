@@ -40,11 +40,17 @@ typedef especie_pokemon recurso;
 // A la primera matriz le suma los recursos de la segunda
 	void recursos_sumar_recursos_a(matriz_recursos, matriz_recursos);
 
-// A la primera matriz le resta el contenido de la segunda, asumiendo que tiene recursos del mismo tipo
-	void recursos_restar_recursos_a(matriz_recursos, matriz_recursos);
+// A la primera matriz le resta el contenido de la segunda, asumiendo que tienen recursos del mismo tipo y la diferencia resulta positiva
+	void recursos_restar_recursos_a(matriz_recursos aQuien, matriz_recursos cuales);
 
 // Retorna la diferencia entre la primera y la segunda
 	matriz_recursos recursos_matriz_diferencia(matriz_recursos, matriz_recursos);
+
+// Resta las componentes homologas y en caso de que resulte negativa, deja 0 - VER TODO
+	void recursos_resta_positiva_de_recursos_a(matriz_recursos aQuien, matriz_recursos cuales);
+
+// Resta las componentes homologas y en caso de que resulte negativa, deja 0 - VER TODO
+	matriz_recursos recursos_matriz_diferencia_positiva(matriz_recursos, matriz_recursos);
 
 // Retorna true si todos los recursos tienen 0 instancias
 	bool recursos_matriz_nula(matriz_recursos);
@@ -54,5 +60,8 @@ typedef especie_pokemon recurso;
 
 // Retorna true si la proveedora tiene mas instancias de cada recurso que la receptora
 	bool recursos_suficientes_para(matriz_recursos proveedora, matriz_recursos receptora);
+
+// Retorna una copia de la matriz que se ingresa por parametro
+	matriz_recursos recursos_duplicar(matriz_recursos);
 
 # endif

@@ -135,6 +135,18 @@ void* cr_list_remove_by_comparation(cr_list* unaLista, void*element, bool(*cmpTK
 	return elemento;
 }
 
+t_list* cr_list_remove_all(cr_list*unaLista){
+	pthread_mutex_lock(unaLista->mutex);
+	cr_list*duplicada = unaLista;
+	unaLista = cr_list_create();
+	pthread_mutex_unlock(unaLista->mutex);
+
+	t_list*elementosRemovidos = duplicada->lista;
+	cr_list_destroy(duplicada);
+
+	return elementosRemovidos;
+}
+
 cr_list* cr_list_filter(cr_list* unaLista, bool(*condition)(void*)){
 	pthread_mutex_lock(unaLista->mutex);
 	t_list*filtrada = list_filter(unaLista->lista, condition);

@@ -67,7 +67,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 				}
 
 				else{
-					unEntrenador->siguienteTarea = DEADLOCK;
+					unEntrenador->siguienteTarea = INTERCAMBIAR;
 					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_DEADLOCK, "Su inventario esta lleno y no cumplio sus objetivos");
 
 					printf("Objetivos: "); recursos_mostrar(unEntrenador->objetivos);puts("");
@@ -82,8 +82,17 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 				break;
 			}
 
-			case DEADLOCK: {
+			case INTERCAMBIAR: {
 				puts("Proximamente deadlock");
+//				entrenador*parejaDeIntercambio = par_intercambio_get(intercambiosPendientes, pid);
+//				entrenador_desplazarse_hacia(unEntrenador, parejaDeIntercambio->posicion);
+//
+//				while(entrenador_puede_intercambiar_con(unEntrenador, parejaDeIntercambio)){
+//					entrenador_intercambiar_con(unEntrenador, parejaDeIntercambio);
+//				}
+
+				//Repetir metodo de salida de CAUGHT
+
 				break;
 			}
 		}

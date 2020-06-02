@@ -4,7 +4,10 @@
 void broker_simulator(){
 	puts("Simulacro de recepcion de mensajes");
 
+	finDeProceso = false;
+
 	int i;
+	pthread_mutex_init(&MUTEX_FIN_DE_PROCESO_BORRARRRRRRRRRRRRRRRR, NULL);
 
 	for(i=0; PROCESO_ACTIVO; i= (i+1)%6){
 
@@ -94,6 +97,13 @@ void broker_simulator(){
 //		puts("Signal(mensaje hay mas mensajes)");
 		sleep(1);
 
+		pthread_mutex_lock(&MUTEX_FIN_DE_PROCESO_BORRARRRRRRRRRRRRRRRR);
+		if(finDeProceso){
+			pthread_mutex_unlock(&MUTEX_FIN_DE_PROCESO_BORRARRRRRRRRRRRRRRRR);
+			break;
+		} else{
+			pthread_mutex_unlock(&MUTEX_FIN_DE_PROCESO_BORRARRRRRRRRRRRRRRRR);
+		}
 	}
 
 	log_info(event_logger, "Finalizo hilo receptor de mensajes");

@@ -61,6 +61,9 @@ void* cr_list_get_by_condition(cr_list* unaLista, bool(*closure)(void*));
 //Remueve al primer elemento de la lista que cumpla la condicion y lo elimina
 void* cr_list_remove_by_condition(cr_list* unaLista, bool(*condicion)(void*));
 
+//Remueve todos los elementos de la lista y los retorna en una lista nueva
+t_list* cr_list_remove_all(cr_list*);
+
 //Retorna true si la lista esta vacia
 bool cr_list_is_empty(cr_list* unaLista);
 
