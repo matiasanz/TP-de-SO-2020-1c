@@ -70,3 +70,11 @@ char* mensaje_header_to_string(t_mensaje_header header, char* tipo) {
 
 	return string;
 }
+
+int error_conexion(int indicador_conexion) {
+	return indicador_conexion == ERROR_SOCKET;
+}
+
+int conexion_exitosa(int indicador_conexion) {
+	return !error_conexion(indicador_conexion);
+}

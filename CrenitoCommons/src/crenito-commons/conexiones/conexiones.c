@@ -10,7 +10,7 @@
 /*
  * Subscribe a los distintos procesos con el Broker.
  */
-static void subscribir(t_conexion_server* server, t_conexion_cliente* cliente);
+static int subscribir(t_conexion_server* server, t_conexion_cliente* cliente);
 /*
  * Envía un paquete usando el socket indicado por parámetro
  * y se queda a la espera una respuesta de tipo entero
@@ -27,6 +27,10 @@ static void recibir(int socket, void (*callback)(void*));
 int enviar(t_conexion_server* server, t_paquete* pqt) {
 
 	int socket = socket_crear_client(server->ip, server->puerto);
+
+	if (error_conexion(socket)){
+			return ERROR_SOCKET;
+	}
 
 	int id_mensaje = enviar_paquete(pqt, socket);
 
@@ -50,14 +54,17 @@ int enviar_paquete(t_paquete* pqt, int socket) {
 void subscribir_y_escuchar_cola(t_conexion* args) {
 
 	pthread_mutex_lock(&mutex_subscripcion);
-	subscribir(args->server, args->cliente);
+	int estado_subscripcion = subscribir(args->server, args->cliente);
 	pthread_mutex_unlock(&mutex_subscripcion);
+
+	//TO-DO reconectar
+	if (error_conexion(estado_subscripcion))
+		return;
 
 	t_conexion_cliente* cliente = args->cliente;
 	t_subscriptor* subscriptor = cliente->subscriptor;
 
 	while (1) {
-		//TO-DO reconectar
 		recibir(subscriptor->socket, cliente->callback);
 	}
 }
@@ -79,16 +86,25 @@ void conectar_y_escuchar_gameboy(t_conexion_host* gameboy) {
 	}
 
 }
-static void subscribir(t_conexion_server* server, t_conexion_cliente* cliente) {
+int subscribir(t_conexion_server* server, t_conexion_cliente* cliente) {
 
-	t_paquete_header pqt = paquete_header_crear(SUBSCRIPCION,
-			server->id_proceso, cliente->id_cola);
-
-	//TO-DO reconectar
 	cliente->subscriptor->socket = socket_crear_client(server->ip, server->puerto);
 
-	cliente->subscriptor->id_subcriptor = handshake(cliente->subscriptor->socket, &pqt,
-			sizeof(t_paquete_header));
+	//TO-DO reconectar
+	if (error_conexion(cliente->subscriptor->socket)) {
+		log_warning(event_logger,
+				"el %s está desconectado, cancelando subscripción %s",
+				BROKER_STRING, get_nombre_cola(cliente->id_cola));
+		return ERROR_SOCKET;
+	}
+
+	t_paquete_header pqt = paquete_header_crear(SUBSCRIPCION,
+					server->id_proceso, cliente->id_cola);
+
+	cliente->subscriptor->id_subcriptor = handshake(
+			cliente->subscriptor->socket, &pqt, sizeof(t_paquete_header));
+
+	return EXIT_SUCCESS;
 }
 
 static void recibir(int socket, void (*callback)(void*)) {

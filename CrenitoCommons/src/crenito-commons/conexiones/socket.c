@@ -19,11 +19,14 @@ void socket_bind(int socket, struct addrinfo* info) {
 	}
 }
 
-void socket_connect(int socket, struct addrinfo* info) {
+int socket_connect(int socket, struct addrinfo* info) {
 
 	if (connect(socket, info->ai_addr, info->ai_addrlen) == ERROR_SOCKET) {
 		manejar_error_socket(socket, "connect");
+		socket = ERROR_SOCKET;
 	}
+
+	return socket;
 }
 
 int socket_create(struct addrinfo* info) {
@@ -99,7 +102,9 @@ int socket_crear_client(char* ip, char* puerto) {
 	struct addrinfo *servinfo;
 	socket_configurar(ip, puerto, CLIENTE, &servinfo);
 	int socket = socket_create(servinfo);
-	socket_connect(socket, servinfo);
+	if (error_conexion(socket_connect(socket, servinfo))){
+		return ERROR_SOCKET;
+	}
 
 	freeaddrinfo(servinfo);
 
@@ -172,7 +177,7 @@ int static socket_error(int indicador_conexion) {
 
 void static manejar_error_socket(int socket, char* operacion) {
 
-	log_error(event_logger,
+	log_warning(event_logger,
 			"Error al realizar la operación %s, socket: %d", operacion, socket);
 	close(socket);
 }

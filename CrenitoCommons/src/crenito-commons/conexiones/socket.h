@@ -14,8 +14,6 @@
 #include<netdb.h>
 #include "paquete.h"
 
-#define ERROR_SOCKET -1
-
 typedef enum {
 	CLIENTE,
 	SERVIDOR
@@ -24,7 +22,7 @@ typedef enum {
 // Funciones de construcción de sockets
 void socket_listen(int socket);
 void socket_bind(int socket, struct addrinfo* info);
-void socket_connect(int socket, struct addrinfo* info);
+int socket_connect(int socket, struct addrinfo* info);
 int socket_create(struct addrinfo* info);
 void socket_configurar(char* ip, char* puerto, socket_type tipo, struct addrinfo **servinfo);
 

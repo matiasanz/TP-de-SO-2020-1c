@@ -23,6 +23,8 @@
 #include<commons/collections/queue.h>
 #include<commons/string.h>
 
+#define ERROR_SOCKET -1
+
 #define LOG_HEADER_MENSAJE_RECIBIDO "MENSAJE RECIBIDO"
 
 #define NEW_POKEMON_STRING "NEW_POKEMON"
@@ -75,5 +77,8 @@ char* get_nombre_cola(t_id_cola id_cola);
 
 char* get_separador_string(char* texto);
 char* mensaje_header_to_string(t_mensaje_header header, char* tipo);
+
+int conexion_exitosa(int indicador_conexion);
+int error_conexion(int indicador_conexion);
 
 #endif /* UTILS_H_ */

@@ -14,7 +14,9 @@
  * Funcion utilizada por los procesos GAME_BOY, GAME_CARD y GAME_BOY para
  * enviar mensajes a un servidor dados un IP y un PUERTO.
  * La funcion crea un socket cliente, envia el paquete y luego cierra el socket.
- * Esta funcion debe usarse desde GameBoyTeam, GameCard y Team,
+ * En caso de error devuelve ERROR_SOCKET
+ * Esta funcion debe usarse desde GameBoyTeam, GameCard y Team.
+ *
  */
 int enviar(t_conexion_server* server, t_paquete* pqt);
 
