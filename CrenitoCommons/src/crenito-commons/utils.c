@@ -26,7 +26,6 @@ char* get_nombre_proceso(t_id_proceso id_proceso) {
 		return TEAM_STRING;
 	default:
 		log_error(event_logger, "Id de proceso incorrecto: %d", id_proceso);
-		abort();
 		return NULL;
 	}
 }
@@ -47,39 +46,35 @@ char* get_nombre_cola(t_id_cola id_cola) {
 	case LOCALIZED_POKEMON:
 		return LOCALIZED_POKEMON_STRING;
 	default:
-		log_error(event_logger, "No existe el tipo de cola: %d",
-				id_cola);
-		abort();
+		log_error(event_logger, "No existe el tipo de cola: %d", 
+		id_cola);
 		return NULL;
 	}
 }
 
-int get_id_proceso(char* proceso){
-	if(strcmp(proceso,BROKER_STRING)==0){
-		return BROKER;
-	}
-	if(strcmp(proceso,TEAM_STRING)==0){
-		return TEAM;
-	}
-	if(strcmp(proceso,GAMECARD_STRING)==0){
-		return GAMECARD;
-	}
-}
-int get_id_mensaje(char* mensaje){
-	if(strcmp(mensaje,NEW_POKEMON_STRING)==0){
-			return NEW_POKEMON;
-	}
-	if(strcmp(mensaje,APPEARED_POKEMON_STRING)==0){
-			return APPEARED_POKEMON;
-	}
-	if(strcmp(mensaje,CATCH_POKEMON_STRING)==0){
-			return CATCH_POKEMON;
-	}
-	if(strcmp(mensaje,CAUGHT_POKEMON_STRING)==0){
-			return CAUGHT_POKEMON;
-	}
-	if(strcmp(mensaje,GET_POKEMON_STRING)==0){
-			return GET_POKEMON;
-	}
+char* get_separador_string(char* texto) {
 
+	return string_from_format(" \n *************   %s   ************* \n",
+			texto);
+}
+
+char* mensaje_header_to_string(t_mensaje_header header, char* tipo) {
+
+	char *string = string_new();
+
+	string_append_with_format(&string,
+			get_separador_string(LOG_HEADER_MENSAJE_RECIBIDO));
+	string_append_with_format(&string, " mensaje: %s \n", tipo);
+	string_append_with_format(&string, " id: %d, id_correlativo: %d \n",
+			header.id, header.id_correlativo);
+
+	return string;
+}
+
+int error_conexion(int indicador_conexion) {
+	return indicador_conexion == ERROR_SOCKET;
+}
+
+int conexion_exitosa(int indicador_conexion) {
+	return !error_conexion(indicador_conexion);
 }
