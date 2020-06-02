@@ -28,9 +28,9 @@ void mensaje_get_pokemon_destruir(t_mensaje_get_pokemon* get_pokemon) {
 
 t_buffer* mensaje_get_pokemon_serializar(t_mensaje_get_pokemon* get_pokemon) {
 
-	int size = sizeof(get_pokemon->mensaje_header) 
-	         + sizeof(get_pokemon->especie_lenght)
-			 + get_pokemon->especie_lenght;
+	int size = sizeof(get_pokemon->mensaje_header)
+			+ sizeof(get_pokemon->especie_lenght) 
+			+ get_pokemon->especie_lenght;
 
 	t_buffer* bfr = buffer_crear(size);
 	int desplazamiento = 0;
@@ -59,7 +59,8 @@ t_mensaje_get_pokemon* mensaje_get_pokemon_deserializar(void* stream) {
 	int desplazamiento = 0;
 
 	// header
-	memcpy(&msj->mensaje_header, stream + desplazamiento, sizeof(msj->mensaje_header));
+	memcpy(&msj->mensaje_header, stream + desplazamiento,
+			sizeof(msj->mensaje_header));
 	desplazamiento += sizeof(msj->mensaje_header);
 
 	//especie_lenght
@@ -76,15 +77,25 @@ t_mensaje_get_pokemon* mensaje_get_pokemon_deserializar(void* stream) {
 
 }
 
-void mensaje_get_pokemon_log(t_log* un_logger, t_mensaje_get_pokemon* get_pokemon){
+void mensaje_get_pokemon_log(t_log* un_logger,
+		t_mensaje_get_pokemon* get_pokemon) {
 
-	pthread_mutex_lock(&mutex_mensaje_recibido_log);
-	log_separador(un_logger, LOG_HEADER_MENSAJE_RECIBIDO);
-	log_info(un_logger, "mensaje: %s", GET_POKEMON_STRING);
-	mensaje_header_log(un_logger, get_pokemon->mensaje_header);
-	log_info(un_logger, "especie: %s", get_pokemon->especie);
-	pthread_mutex_unlock(&mutex_mensaje_recibido_log);
+	char* to_string = mensaje_get_pokemon_to_string(get_pokemon);
+	log_info(un_logger, to_string);
+	free(to_string);
+}
 
+char* mensaje_get_pokemon_to_string(t_mensaje_get_pokemon* get_pokemon) {
+
+	char *string = string_new();
+
+	string_append_with_format(&string,
+			mensaje_header_to_string(get_pokemon->mensaje_header,
+			GET_POKEMON_STRING));
+	string_append_with_format(&string, " especie: %s", get_pokemon->especie);
+	string_append(&string, "\n");
+
+	return string;
 }
 
 // Getters

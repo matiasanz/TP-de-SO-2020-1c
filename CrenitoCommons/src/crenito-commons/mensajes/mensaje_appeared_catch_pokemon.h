@@ -21,7 +21,7 @@ void mensaje_appeared_catch_pokemon_destruir(t_mensaje_appeared_catch_pokemon* a
 t_buffer* mensaje_appeared_catch_pokemon_serializar(t_mensaje_appeared_catch_pokemon* appeared_catch_pokemon);
 t_mensaje_appeared_catch_pokemon* mensaje_appeared_catch_pokemon_deserializar(void* stream);
 void mensaje_appeared_catch_pokemon_log(t_log* un_logger, t_mensaje_appeared_catch_pokemon* appeared_catch, char* tipo);
-
+char* mensaje_appeared_catch_pokemon_to_string(t_mensaje_appeared_catch_pokemon* appeared_catch, char* tipo);
 //Getters
 uint32_t mensaje_appeared_catch_pokemon_get_id(t_mensaje_appeared_catch_pokemon* msj);
 uint32_t mensaje_appeared_catch_pokemon_get_id_correlativo(t_mensaje_appeared_catch_pokemon* msj);

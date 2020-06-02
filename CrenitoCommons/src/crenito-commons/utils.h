@@ -21,6 +21,7 @@
 #include<commons/config.h>
 #include<commons/collections/list.h>
 #include<commons/collections/queue.h>
+#include<commons/string.h>
 
 #define LOG_HEADER_MENSAJE_RECIBIDO "MENSAJE RECIBIDO"
 
@@ -65,8 +66,6 @@ typedef enum {
 	TEAM = 4
 } t_id_proceso;
 
-pthread_mutex_t mutex_mensaje_recibido_log;
-
 // Inicializa los ids para prevenir errores con valgrind
 void mensaje_header_inicializar(t_mensaje_header* header);
 // dado un id de proceso devuelve el mismo representado por un string
@@ -74,7 +73,7 @@ char* get_nombre_proceso(t_id_proceso id_proceso);
 // dado un id de mensaje/nombre de cola el mismo representado por un string
 char* get_nombre_cola(t_id_cola id_cola);
 
-void log_separador(t_log*un_logger, char* texto);
-void mensaje_header_log(t_log* un_logger, t_mensaje_header header);
+char* get_separador_string(char* texto);
+char* mensaje_header_to_string(t_mensaje_header header, char* tipo);
 
 #endif /* UTILS_H_ */

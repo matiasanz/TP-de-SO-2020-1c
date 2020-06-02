@@ -24,7 +24,8 @@ t_mensaje_localized_pokemon* mensaje_localized_pokemon_crear(char* especie, t_li
 void mensaje_localized_pokemon_destruir(t_mensaje_localized_pokemon* localized_pokemon);
 t_buffer* mensaje_localized_pokemon_serializar(t_mensaje_localized_pokemon* localized_pokemon);
 t_mensaje_localized_pokemon* mensaje_localized_pokemon_deserializar(void* stream);
-void mensaje_localized_pokemon_log(t_log* un_logger, t_mensaje_localized_pokemon* caught_pokemon);
+void mensaje_localized_pokemon_log(t_log* un_logger, t_mensaje_localized_pokemon* localized_pokemon);
+char* mensaje_localized_pokemon_to_string(t_mensaje_localized_pokemon* localized_pokemon);
 
 //Getters
 uint32_t mensaje_localized_pokemon_get_id(t_mensaje_localized_pokemon* msj);

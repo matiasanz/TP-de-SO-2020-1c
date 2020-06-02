@@ -30,15 +30,21 @@ void posicion_destruir(t_posicion* posicion){
 	free(posicion);
 }
 
-void posicion_log(t_log* un_logger, t_posicion posicion){
+char* posicion_to_string(t_posicion posicion){
 
-	log_info(un_logger, "posición: (%d, %d)", posicion.pos_x, posicion.pos_y);
+	return string_from_format(" (%d, %d)", posicion.pos_x, posicion.pos_y);
 }
 
-void posicion_list_log(t_log* un_logger, t_list* posiciones){
+char* posicion_list_to_string(t_list* posiciones){
+
+	char *string = string_new();
+
+	string_append_with_format(&string, " posiciones: %d -->", list_size(posiciones));
 
 	for (int i = 0; i < list_size(posiciones); ++i) {
 		t_posicion* posicion = list_get(posiciones, i);
-		posicion_log(un_logger, *posicion);
+		string_append_with_format(&string, posicion_to_string(*posicion), " ");
 	}
+
+	return string;
 }

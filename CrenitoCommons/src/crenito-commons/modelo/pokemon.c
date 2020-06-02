@@ -71,9 +71,13 @@ t_pokemon pokemon_deserializar(void* stream, int* bytes_pokemon) {
 
 }
 
-void pokemon_log(t_log* un_logger, t_pokemon pokemon){
+char* pokemon_to_string(t_pokemon pokemon){
 
-	log_info(un_logger, "especie: %s", pokemon.especie);
-	posicion_log(un_logger, pokemon.posicion);
+	char *string = string_new();
 
+	string_append_with_format(&string, " especie: %s \n", pokemon.especie);
+	string_append_with_format(&string, " posición:");
+	string_append_with_format(&string, posicion_to_string(pokemon.posicion));
+
+	return string;
 }

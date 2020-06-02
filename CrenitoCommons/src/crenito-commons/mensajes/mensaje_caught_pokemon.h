@@ -22,6 +22,7 @@ void mensaje_caught_pokemon_destruir(t_mensaje_caught_pokemon* caught_pokemon);
 t_buffer* mensaje_caught_pokemon_serializar(t_mensaje_caught_pokemon* caught_pokemon);
 t_mensaje_caught_pokemon* mensaje_caught_pokemon_deserializar(void* stream);
 void mensaje_caught_pokemon_log(t_log* un_logger, t_mensaje_caught_pokemon* caught_pokemon);
+char* mensaje_caught_pokemon_to_string(t_mensaje_caught_pokemon* caught_pokemon);
 
 //Getters
 uint32_t mensaje_caught_pokemon_get_id(t_mensaje_caught_pokemon* msj);

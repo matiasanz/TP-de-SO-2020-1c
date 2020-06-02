@@ -46,18 +46,27 @@ char* get_nombre_cola(t_id_cola id_cola) {
 	case LOCALIZED_POKEMON:
 		return LOCALIZED_POKEMON_STRING;
 	default:
-		log_error(event_logger, "No existe el tipo de cola: %d",
-				id_cola);
+		log_error(event_logger, "No existe el tipo de cola: %d", 
+		id_cola);
 		return NULL;
 	}
 }
 
-void log_separador(t_log*un_logger, char* texto) {
+char* get_separador_string(char* texto) {
 
-	log_info(un_logger, "***** %s *****", texto);
+	return string_from_format(" \n *************   %s   ************* \n",
+			texto);
 }
 
-void mensaje_header_log(t_log* un_logger, t_mensaje_header header){
+char* mensaje_header_to_string(t_mensaje_header header, char* tipo) {
 
-	log_info(un_logger, "id: %d, id_correlativo: %d", header.id, header.id_correlativo);
+	char *string = string_new();
+
+	string_append_with_format(&string,
+			get_separador_string(LOG_HEADER_MENSAJE_RECIBIDO));
+	string_append_with_format(&string, " mensaje: %s \n", tipo);
+	string_append_with_format(&string, " id: %d, id_correlativo: %d \n",
+			header.id, header.id_correlativo);
+
+	return string;
 }

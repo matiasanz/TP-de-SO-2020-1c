@@ -44,7 +44,8 @@ t_buffer* mensaje_new_pokemon_serializar(t_mensaje_new_pokemon* new_pokemon) {
 	desplazamiento += sizeof(new_pokemon->mensaje_header);
 
 	// pokemon
-	void* pkm_serializado = pokemon_serializar(new_pokemon->pokemon, bytes_pokemon);
+	void* pkm_serializado = pokemon_serializar(new_pokemon->pokemon,
+			bytes_pokemon);
 	memcpy(bfr->stream + desplazamiento, pkm_serializado, bytes_pokemon);
 	free(pkm_serializado);
 	desplazamiento += bytes_pokemon;
@@ -63,17 +64,18 @@ t_mensaje_new_pokemon* mensaje_new_pokemon_deserializar(void* stream) {
 	int desplazamiento = 0;
 
 	// header
-	memcpy(&msj->mensaje_header, stream + desplazamiento, sizeof(msj->mensaje_header));
+	memcpy(&msj->mensaje_header, stream + desplazamiento,
+			sizeof(msj->mensaje_header));
 	desplazamiento += sizeof(msj->mensaje_header);
 
 	//pokemon
 	int bytes_pokemon = 0;
-	msj->pokemon = pokemon_deserializar(stream + desplazamiento, &bytes_pokemon);
+	msj->pokemon = pokemon_deserializar(stream + desplazamiento,
+			&bytes_pokemon);
 	desplazamiento += bytes_pokemon;
 
 	//cantidad
-	memcpy(&msj->cantidad, stream + desplazamiento, 
-			sizeof(msj->cantidad));
+	memcpy(&msj->cantidad, stream + desplazamiento, sizeof(msj->cantidad));
 	desplazamiento += sizeof(msj->cantidad);
 
 	return msj;
@@ -81,30 +83,41 @@ t_mensaje_new_pokemon* mensaje_new_pokemon_deserializar(void* stream) {
 
 void mensaje_new_pokemon_log(t_log* un_logger, t_mensaje_new_pokemon* new_pokemon) {
 
-	pthread_mutex_lock(&mutex_mensaje_recibido_log);
-	log_separador(un_logger, LOG_HEADER_MENSAJE_RECIBIDO);
-	log_info(un_logger, "mensaje: %s", NEW_POKEMON_STRING);
-	mensaje_header_log(un_logger, new_pokemon->mensaje_header);
-	pokemon_log(un_logger, new_pokemon->pokemon);
-	log_info(un_logger, "cantidad: %d", new_pokemon -> cantidad);
-	pthread_mutex_unlock(&mutex_mensaje_recibido_log);
+	char* to_string = mensaje_new_pokemon_to_string(new_pokemon);
+	log_info(un_logger, to_string);
+	free(to_string);
+}
 
+char* mensaje_new_pokemon_to_string(t_mensaje_new_pokemon* new_pokemon) {
+
+	char *string = string_new();
+
+	string_append_with_format(&string,
+			mensaje_header_to_string(new_pokemon->mensaje_header,
+			NEW_POKEMON_STRING));
+	string_append_with_format(&string, " cantidad: %d \n",
+				new_pokemon->cantidad);
+	string_append_with_format(&string, pokemon_to_string(new_pokemon->pokemon));
+	string_append(&string, "\n");
+
+	return string;
 }
 
 // Getters
-uint32_t mensaje_new_pokemon_get_id(t_mensaje_new_pokemon* msj){
+uint32_t mensaje_new_pokemon_get_id(t_mensaje_new_pokemon* msj) {
 	return msj->mensaje_header.id;
 }
 
-uint32_t mensaje_new_pokemon_get_id_correlativo(t_mensaje_new_pokemon* msj){
+uint32_t mensaje_new_pokemon_get_id_correlativo(t_mensaje_new_pokemon* msj) {
 	return msj->mensaje_header.id_correlativo;
 }
 
 //Setters
-void mensaje_new_pokemon_set_id(t_mensaje_new_pokemon* msj, uint32_t id){
+void mensaje_new_pokemon_set_id(t_mensaje_new_pokemon* msj, uint32_t id) {
 	msj->mensaje_header.id = id;
 }
 
-void mensaje_new_pokemon_set_id_correlativo(t_mensaje_new_pokemon* msj, uint32_t id_correlativo){
+void mensaje_new_pokemon_set_id_correlativo(t_mensaje_new_pokemon* msj,
+		uint32_t id_correlativo) {
 	msj->mensaje_header.id_correlativo = id_correlativo;
 }

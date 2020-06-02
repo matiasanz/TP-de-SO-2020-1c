@@ -39,7 +39,6 @@ void inicializar_conexiones() {
 			config_get_string_value(config, "PUERTO_BROKER"), GAMECARD);
 
 	pthread_mutex_init(&mutex_subscripcion, NULL);
-	pthread_mutex_init(&mutex_mensaje_recibido_log, NULL);
 
 	subscribir_y_escuchar_cola_catch_pokemon((void*) mensaje_recibido);
 	subscribir_y_escuchar_cola_get_pokemon((void*) mensaje_recibido);

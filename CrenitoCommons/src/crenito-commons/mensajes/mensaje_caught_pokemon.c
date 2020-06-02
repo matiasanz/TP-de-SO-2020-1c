@@ -8,7 +8,8 @@
 
 t_mensaje_caught_pokemon* mensaje_caught_pokemon_crear(uint32_t atrapado) {
 
-	t_mensaje_caught_pokemon* caught_pokemon = malloc(sizeof(t_mensaje_caught_pokemon));
+	t_mensaje_caught_pokemon* caught_pokemon = malloc(
+			sizeof(t_mensaje_caught_pokemon));
 
 	mensaje_header_inicializar(&caught_pokemon->mensaje_header);
 	caught_pokemon->atrapado = atrapado;
@@ -21,7 +22,8 @@ void mensaje_caught_pokemon_destruir(t_mensaje_caught_pokemon* caught_pokemon) {
 	free(caught_pokemon);
 }
 
-t_buffer* mensaje_caught_pokemon_serializar(t_mensaje_caught_pokemon* caught_pokemon) {
+t_buffer* mensaje_caught_pokemon_serializar(
+		t_mensaje_caught_pokemon* caught_pokemon) {
 
 	int size = sizeof(caught_pokemon->mensaje_header)
 			+ sizeof(caught_pokemon->atrapado);
@@ -48,42 +50,56 @@ t_mensaje_caught_pokemon* mensaje_caught_pokemon_deserializar(void* stream) {
 	int desplazamiento = 0;
 
 	// header
-	memcpy(&msj->mensaje_header, stream + desplazamiento, sizeof(msj->mensaje_header));
+	memcpy(&msj->mensaje_header, stream + desplazamiento,
+			sizeof(msj->mensaje_header));
 	desplazamiento += sizeof(msj->mensaje_header);
 
 	//atrapado
-	memcpy(&msj->atrapado, stream + desplazamiento, 
-			sizeof(msj->atrapado));
+	memcpy(&msj->atrapado, stream + desplazamiento, sizeof(msj->atrapado));
 	desplazamiento += sizeof(msj->atrapado);
 
 	return msj;
 }
 
-void mensaje_caught_pokemon_log(t_log* un_logger, t_mensaje_caught_pokemon* caught_pokemon) {
+void mensaje_caught_pokemon_log(t_log* un_logger,
+		t_mensaje_caught_pokemon* caught_pokemon) {
 
-	pthread_mutex_lock(&mutex_mensaje_recibido_log);
-	log_separador(un_logger, LOG_HEADER_MENSAJE_RECIBIDO);
-	log_info(un_logger, "mensaje: %s", CAUGHT_POKEMON_STRING);
-	mensaje_header_log(un_logger, caught_pokemon->mensaje_header);
-	log_info(un_logger, "atrapado: %d", caught_pokemon ->atrapado);
-	pthread_mutex_unlock(&mutex_mensaje_recibido_log);
+	char* to_string = mensaje_caught_pokemon_to_string(caught_pokemon);
+	log_info(un_logger, to_string);
+	free(to_string);
+}
 
+char* mensaje_caught_pokemon_to_string(t_mensaje_caught_pokemon* caught_pokemon) {
+
+	char *string = string_new();
+
+	string_append_with_format(&string,
+				mensaje_header_to_string(caught_pokemon->mensaje_header,
+				CAUGHT_POKEMON_STRING));
+	string_append_with_format(&string, " atrapado: %d",
+			caught_pokemon->atrapado);
+
+	string_append(&string, "\n");
+
+	return string;
 }
 
 // Getters
-uint32_t mensaje_caught_pokemon_get_id(t_mensaje_caught_pokemon* msj){
+uint32_t mensaje_caught_pokemon_get_id(t_mensaje_caught_pokemon* msj) {
 	return msj->mensaje_header.id;
 }
 
-uint32_t mensaje_caught_pokemon_get_id_correlativo(t_mensaje_caught_pokemon* msj){
+uint32_t mensaje_caught_pokemon_get_id_correlativo(
+		t_mensaje_caught_pokemon* msj) {
 	return msj->mensaje_header.id_correlativo;
 }
 
 //Setters
-void mensaje_caught_pokemon_set_id(t_mensaje_caught_pokemon* msj, uint32_t id){
+void mensaje_caught_pokemon_set_id(t_mensaje_caught_pokemon* msj, uint32_t id) {
 	msj->mensaje_header.id = id;
 }
 
-void mensaje_caught_pokemon_set_id_correlativo(t_mensaje_caught_pokemon* msj, uint32_t id_correlativo){
+void mensaje_caught_pokemon_set_id_correlativo(t_mensaje_caught_pokemon* msj,
+		uint32_t id_correlativo) {
 	msj->mensaje_header.id_correlativo = id_correlativo;
 }

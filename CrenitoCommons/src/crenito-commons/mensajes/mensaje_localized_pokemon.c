@@ -6,7 +6,8 @@
  */
 #include "mensaje_localized_pokemon.h"
 
-t_mensaje_localized_pokemon* mensaje_localized_pokemon_crear(char* especie, t_list* posiciones) {
+t_mensaje_localized_pokemon* mensaje_localized_pokemon_crear(char* especie,
+		t_list* posiciones) {
 
 	t_mensaje_localized_pokemon* localized_pokemon = malloc(
 			sizeof(t_mensaje_localized_pokemon));
@@ -25,20 +26,23 @@ t_mensaje_localized_pokemon* mensaje_localized_pokemon_crear(char* especie, t_li
 	return localized_pokemon;
 }
 
-void mensaje_localized_pokemon_destruir(t_mensaje_localized_pokemon* localized_pokemon) {
+void mensaje_localized_pokemon_destruir(
+		t_mensaje_localized_pokemon* localized_pokemon) {
 
 	free(localized_pokemon->especie);
-	list_destroy_and_destroy_elements(localized_pokemon->posiciones, (void*)posicion_destruir);
+	list_destroy_and_destroy_elements(localized_pokemon->posiciones,
+			(void*) posicion_destruir);
 	free(localized_pokemon);
 }
 
-t_buffer* mensaje_localized_pokemon_serializar(t_mensaje_localized_pokemon* localized_pokemon) {
+t_buffer* mensaje_localized_pokemon_serializar(
+		t_mensaje_localized_pokemon* localized_pokemon) {
 
 	int size = sizeof(localized_pokemon->mensaje_header)
 			+ sizeof(localized_pokemon->especie_lenght)
 			+ localized_pokemon->especie_lenght
 			+ sizeof(localized_pokemon->posiciones_lenght)
-			+ (sizeof(t_posicion)+1) * localized_pokemon->posiciones_lenght;
+			+ (sizeof(t_posicion) + 1) * localized_pokemon->posiciones_lenght;
 
 	t_buffer* bfr = buffer_crear(size);
 	int desplazamiento = 0;
@@ -69,19 +73,22 @@ t_buffer* mensaje_localized_pokemon_serializar(t_mensaje_localized_pokemon* loca
 
 		t_posicion* posicion = list_get(localized_pokemon->posiciones, i);
 		memcpy(bfr->stream + desplazamiento, posicion, sizeof(t_posicion));
-		desplazamiento += sizeof(t_posicion)+1;
+		desplazamiento += sizeof(t_posicion) + 1;
 	}
 
 	return bfr;
 }
 
-t_mensaje_localized_pokemon* mensaje_localized_pokemon_deserializar(void* stream) {
+t_mensaje_localized_pokemon* mensaje_localized_pokemon_deserializar(
+		void* stream) {
 
-	t_mensaje_localized_pokemon* msj = malloc(sizeof(t_mensaje_localized_pokemon));
+	t_mensaje_localized_pokemon* msj = malloc(
+			sizeof(t_mensaje_localized_pokemon));
 	int desplazamiento = 0;
 
 	// header
-	memcpy(&msj->mensaje_header, stream + desplazamiento, sizeof(msj->mensaje_header));
+	memcpy(&msj->mensaje_header, stream + desplazamiento,
+			sizeof(msj->mensaje_header));
 	desplazamiento += sizeof(msj->mensaje_header);
 
 	//especie_lenght
@@ -91,8 +98,8 @@ t_mensaje_localized_pokemon* mensaje_localized_pokemon_deserializar(void* stream
 
 	//especie
 	char* especie = strdup(stream + desplazamiento);
-	msj -> especie = especie;
-	desplazamiento += msj -> especie_lenght;
+	msj->especie = especie;
+	desplazamiento += msj->especie_lenght;
 
 	//posicion_lenght
 	memcpy(&msj->posiciones_lenght, stream + desplazamiento,
@@ -100,48 +107,62 @@ t_mensaje_localized_pokemon* mensaje_localized_pokemon_deserializar(void* stream
 	desplazamiento += sizeof(msj->posiciones_lenght);
 
 	//posiciones
-	msj ->posiciones = list_create();
+	msj->posiciones = list_create();
 	t_posicion* posicion;
 
 	int i = 0;
 	for (i = 0; i < msj->posiciones_lenght; ++i) {
 
-		t_posicion* posicion= malloc(sizeof(t_posicion));
+		t_posicion* posicion = malloc(sizeof(t_posicion));
 		memcpy(posicion, stream + desplazamiento, sizeof(t_posicion));
 		list_add(msj->posiciones, posicion);
-		desplazamiento += sizeof(t_posicion)+1;
+		desplazamiento += sizeof(t_posicion) + 1;
 	}
 
 	return msj;
 }
 
-void mensaje_localized_pokemon_log(t_log* un_logger,
-		t_mensaje_localized_pokemon* localized_pokemon) {
+void mensaje_localized_pokemon_log(t_log* un_logger, t_mensaje_localized_pokemon* localized_pokemon) {
 
-	pthread_mutex_lock(&mutex_mensaje_recibido_log);
-	log_separador(un_logger, LOG_HEADER_MENSAJE_RECIBIDO);
-	log_info(un_logger, "mensaje: %s", LOCALIZED_POKEMON_STRING);
-	mensaje_header_log(un_logger, localized_pokemon->mensaje_header);
-	log_info(un_logger, "especie: %s", localized_pokemon -> especie);
-	log_info(un_logger, "Posiciones: %d", localized_pokemon -> posiciones_lenght);
-	posicion_list_log(un_logger, localized_pokemon -> posiciones);
-	pthread_mutex_unlock(&mutex_mensaje_recibido_log);
+	char* to_string = mensaje_localized_pokemon_to_string(localized_pokemon);
+	log_info(un_logger, to_string);
+	free(to_string);
+}
+
+char* mensaje_localized_pokemon_to_string(t_mensaje_localized_pokemon* localized_pokemon) {
+
+	char *string = string_new();
+
+	string_append_with_format(&string,
+			mensaje_header_to_string(localized_pokemon->mensaje_header,
+			LOCALIZED_POKEMON_STRING));
+	string_append_with_format(&string, " especie: %s \n",
+			localized_pokemon->especie);
+	string_append_with_format(&string,
+			posicion_list_to_string(localized_pokemon->posiciones));
+	string_append(&string, "\n");
+
+	return string;
 
 }
+
 // Getters
-uint32_t mensaje_localized_pokemon_get_id(t_mensaje_localized_pokemon* msj){
+uint32_t mensaje_localized_pokemon_get_id(t_mensaje_localized_pokemon* msj) {
 	return msj->mensaje_header.id;
 }
 
-uint32_t mensaje_localized_pokemon_get_id_correlativo(t_mensaje_localized_pokemon* msj){
+uint32_t mensaje_localized_pokemon_get_id_correlativo(
+		t_mensaje_localized_pokemon* msj) {
 	return msj->mensaje_header.id_correlativo;
 }
 
 //Setters
-void mensaje_localized_pokemon_set_id(t_mensaje_localized_pokemon* msj, uint32_t id){
+void mensaje_localized_pokemon_set_id(t_mensaje_localized_pokemon* msj,
+		uint32_t id) {
 	msj->mensaje_header.id = id;
 }
 
-void mensaje_localized_pokemon_set_id_correlativo(t_mensaje_localized_pokemon* msj, uint32_t id_correlativo){
+void mensaje_localized_pokemon_set_id_correlativo(
+		t_mensaje_localized_pokemon* msj, uint32_t id_correlativo) {
 	msj->mensaje_header.id_correlativo = id_correlativo;
 }
