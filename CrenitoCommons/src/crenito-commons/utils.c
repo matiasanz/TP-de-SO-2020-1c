@@ -77,3 +77,4 @@ int error_conexion(int indicador_conexion) {
 
 int conexion_exitosa(int indicador_conexion) {
 	return !error_conexion(indicador_conexion);
+}
