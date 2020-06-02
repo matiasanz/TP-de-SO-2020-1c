@@ -1,6 +1,7 @@
 #ifndef _VALIDACIONES_GAMEBOY_
 #define _VALIDACIONES_GAMEBOY_
 
+#include "crenito-commons/conexiones/conexiones.h"
 
 void validar_proceso(char* proceso);
 void validar_mensaje(char* mensaje);
