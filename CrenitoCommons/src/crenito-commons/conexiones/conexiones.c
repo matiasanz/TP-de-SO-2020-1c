@@ -132,14 +132,7 @@ static int recibir(int socket, void (*callback)(t_id_cola, void*)) {
 	uint32_t ACK = 1;
 	socket_send(socket, &ACK, sizeof(ACK));
 
-//	t_buffer* bfr = buffer_crear(size);
-//	buffer_set_stream(bfr, msj);
-//
-//	t_paquete* pqt = paquete_crear(header, bfr);
-	
 	callback(header.id_cola, msj);
-
-//	paquete_destruir(pqt);
 
 	return EXIT_SUCCESS;
 }
