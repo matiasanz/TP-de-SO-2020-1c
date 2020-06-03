@@ -78,7 +78,7 @@ context (test_conexiones) {
 			int respuesta_recibir = recibir(socket_cliente, (void*) assert_mensaje_recibido);
 
 			should_int(1) be equal to (respuesta_enviar);
-			should_int(0) be equal to (respuesta_recibir);
+			should_bool(conexion_exitosa(respuesta_recibir)) be truthy;
 
 			//Free
 			mensaje_new_pokemon_destruir(mensaje_new_pokemon_esperado);
