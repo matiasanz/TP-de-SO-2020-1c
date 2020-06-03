@@ -5,7 +5,7 @@
  *      Author: utnso
  */
 
-#include "hilo_localized_pokemon.h"
+#include "../hilos_comunicacion/hilo_localized_pokemon.h"
 
 void subscribir_y_escuchar_cola_localized_pokemon(void(*callback)(void*)) {
 

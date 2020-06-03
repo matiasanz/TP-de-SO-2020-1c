@@ -5,7 +5,7 @@
  *      Author: utnso
  */
 
-#include "hilo_appeared_pokemon.h"
+#include "../hilos_comunicacion/hilo_appeared_pokemon.h"
 
 void subscribir_y_escuchar_cola_appeared_pokemon(void(*callback)(void*)) {
 
@@ -20,11 +20,12 @@ void subscribir_y_escuchar_cola_appeared_pokemon(void(*callback)(void*)) {
 			(void*) subscribir_y_escuchar_cola, args);
 
 	pthread_detach(hilo_appeared_pokemon);
-
 }
 
 void appeared_pokemon_recibido(t_mensaje_appeared_catch_pokemon* appeared_pokemon) {
 
 	//	Log pedido en el enunciado (no borrar)
 	mensaje_appeared_catch_pokemon_log(logger, appeared_pokemon, APPEARED_POKEMON_STRING);
+
+	cr_list_add_and_signal(mensajesAPPEARED, appeared_pokemon);
 }

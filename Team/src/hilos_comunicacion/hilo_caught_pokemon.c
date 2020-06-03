@@ -5,7 +5,7 @@
  *      Author: utnso
  */
 
-#include "hilo_caught_pokemon.h"
+#include "../hilos_comunicacion/hilo_caught_pokemon.h"
 
 void subscribir_y_escuchar_cola_caught_pokemon(void(*callback)(void*)) {
 
@@ -26,4 +26,5 @@ void caught_pokemon_recibido(t_mensaje_caught_pokemon* caught_pokemon) {
 
 	//	Log pedido en el enunciado (no borrar)
 	mensaje_caught_pokemon_log(logger, caught_pokemon);
+	cr_list_add_and_signal(mensajesCAUGHT, caught_pokemon);
 }
