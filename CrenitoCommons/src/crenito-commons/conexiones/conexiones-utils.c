@@ -7,7 +7,7 @@
 
 #include "conexiones-utils.h"
 
-t_conexion_host* conexion_host_crear(char* ip, char* puerto, void(*callback)(void*)) {
+t_conexion_host* conexion_host_crear(char* ip, char* puerto, void (*callback)(t_id_cola, void*)) {
 
 	t_conexion_host* host = malloc(sizeof(t_conexion_host));
 
@@ -29,7 +29,7 @@ t_conexion_server* conexion_server_crear(char* ip, char* puerto, t_id_proceso id
 	return server;
 }
 
-t_conexion_cliente* conexion_cliente_crear(t_id_cola id_cola , int segundos_reconexion, void(*callback)(void*)) {
+t_conexion_cliente* conexion_cliente_crear(t_id_cola id_cola , int segundos_reconexion, void (*callback)(t_id_cola, void*)) {
 
 	t_conexion_cliente* cliente = malloc(sizeof(t_conexion_cliente));
 
@@ -59,7 +59,7 @@ void conexion_destruir(t_conexion* conexion) {
 
 t_subscriptor* subscriptor_crear(uint32_t socket, uint32_t id_subscriptor) {
 
-	t_subscriptor* subscriptor = malloc(id_subscriptor);
+	t_subscriptor* subscriptor = malloc(sizeof(t_subscriptor));
 
 	subscriptor->id_subcriptor = id_subscriptor;
 	subscriptor->socket = socket;

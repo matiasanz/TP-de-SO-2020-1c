@@ -14,6 +14,8 @@
 #include "../hilos/hilo_gameboy.h"
 #include "../hilos/hilo_localized_pokemon.h"
 
-void mensaje_recibido(t_paquete* paquete);
+sem_t objetivos_team;
+
+void mensaje_recibido(t_id_cola id_cola, void* msj);
 
 #endif /* SRC_UTILS_MENSAJES_UTILS_H_ */

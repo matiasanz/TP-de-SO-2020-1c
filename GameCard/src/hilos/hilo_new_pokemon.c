@@ -7,7 +7,7 @@
 
 #include "hilo_new_pokemon.h"
 
-void subscribir_y_escuchar_cola_new_pokemon(void(*callback)(void*)) {
+void subscribir_y_escuchar_cola_new_pokemon(void (*callback)(t_id_cola, void*)) {
 
 	conexion_new_pokemon = conexion_cliente_crear(NEW_POKEMON,
 			config_get_int_value(config, "TIEMPO_DE_REINTENTO_CONEXION"),

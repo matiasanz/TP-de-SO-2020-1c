@@ -14,6 +14,8 @@
 #include "../hilos/hilo_get_pokemon.h"
 #include "../hilos/hilo_new_pokemon.h"
 
-void mensaje_recibido(t_paquete* paquete);
+sem_t objetivos_gamecard;
+
+void mensaje_recibido(t_id_cola id_cola, void* msj);
 
 #endif /* SRC_UTILS_MENSAJES_UTILS_H_ */

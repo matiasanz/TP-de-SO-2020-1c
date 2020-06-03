@@ -133,13 +133,11 @@ char* mensaje_localized_pokemon_to_string(t_mensaje_localized_pokemon* localized
 
 	char *string = string_new();
 
-	string_append_with_format(&string,
-			mensaje_header_to_string(localized_pokemon->mensaje_header,
-			LOCALIZED_POKEMON_STRING));
+	string_append_mensaje_header(&string,localized_pokemon->mensaje_header,
+			LOCALIZED_POKEMON_STRING);
 	string_append_with_format(&string, " especie: %s \n",
 			localized_pokemon->especie);
-	string_append_with_format(&string,
-			posicion_list_to_string(localized_pokemon->posiciones));
+	string_append_posicion_list(&string, localized_pokemon->posiciones);
 	string_append(&string, "\n");
 
 	return string;

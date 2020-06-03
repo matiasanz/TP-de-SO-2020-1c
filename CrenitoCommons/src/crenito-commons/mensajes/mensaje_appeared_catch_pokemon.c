@@ -87,11 +87,9 @@ char* mensaje_appeared_catch_pokemon_to_string(t_mensaje_appeared_catch_pokemon*
 
 	char *string = string_new();
 
-	string_append_with_format(&string,
-			mensaje_header_to_string(appeared_catch->mensaje_header,
-			tipo));
-	string_append_with_format(&string,
-			pokemon_to_string(appeared_catch->pokemon));
+	string_append_mensaje_header(&string,appeared_catch->mensaje_header,
+			tipo);
+	string_append_pokemon(&string, appeared_catch -> pokemon);
 
 	string_append(&string, "\n");
 

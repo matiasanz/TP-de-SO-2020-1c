@@ -7,7 +7,7 @@
 
 #include "hilo_caught_pokemon.h"
 
-void subscribir_y_escuchar_cola_caught_pokemon(void(*callback)(void*)) {
+void subscribir_y_escuchar_cola_caught_pokemon(void (*callback)(t_id_cola, void*)) {
 
 	conexion_caught_pokemon = conexion_cliente_crear(CAUGHT_POKEMON,
 			config_get_int_value(config, "TIEMPO_RECONEXION"),

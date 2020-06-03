@@ -23,7 +23,7 @@ static int handshake(int socket, void* pqt, int size);
  * que también recibe por parámetro.
  * Si se produce un error, retorna ERROR_SOCKET
  */
-static int recibir(int socket, void (*callback)(void*));
+static int recibir(int socket, void (*callback)(t_id_cola, void*));
 
 int enviar(t_conexion_server* server, t_paquete* pqt) {
 
@@ -114,7 +114,7 @@ int subscribir(t_conexion_server* server, t_conexion_cliente* cliente) {
 	return cliente->subscriptor->id_subcriptor;
 }
 
-static int recibir(int socket, void (*callback)(void*)) {
+static int recibir(int socket, void (*callback)(t_id_cola, void*)) {
 
 	t_paquete_header header = socket_recibir_header(socket);
 
@@ -132,10 +132,14 @@ static int recibir(int socket, void (*callback)(void*)) {
 	uint32_t ACK = 1;
 	socket_send(socket, &ACK, sizeof(ACK));
 
-	t_buffer* bfr = buffer_crear(size);
-	buffer_set_stream(bfr, msj);
+//	t_buffer* bfr = buffer_crear(size);
+//	buffer_set_stream(bfr, msj);
+//
+//	t_paquete* pqt = paquete_crear(header, bfr);
+	
+	callback(header.id_cola, msj);
 
-	callback(paquete_crear(header, bfr));
+//	paquete_destruir(pqt);
 
 	return EXIT_SUCCESS;
 }

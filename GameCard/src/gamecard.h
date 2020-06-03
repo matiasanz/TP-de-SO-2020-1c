@@ -11,8 +11,6 @@
 #include <crenito-commons/conexiones/conexiones.h>
 #include "utils/mensajes-utils.h"
 
-sem_t objetivos_gamecard;
-
 void inicializar();
 void inicializar_config();
 void inicializar_logs();

@@ -7,33 +7,32 @@
 
 #include "mensajes-utils.h"
 
-void mensaje_recibido(t_paquete* paquete) {
+void mensaje_recibido(t_id_cola id_cola, void* msj){
 
 	void* deserializado;
 
-	switch (paquete_get_id_cola(paquete)) {
+	switch (id_cola) {
 
 	case APPEARED_POKEMON:
-		deserializado = mensaje_appeared_catch_pokemon_deserializar(paquete_get_stream(paquete));
-		paquete_destruir(paquete);
+		deserializado = mensaje_appeared_catch_pokemon_deserializar(msj);
 		appeared_pokemon_recibido(deserializado);
 		break;
 
 	case CAUGHT_POKEMON:
-		deserializado =  mensaje_caught_pokemon_deserializar(paquete_get_stream(paquete));
-		paquete_destruir(paquete);
+		deserializado =  mensaje_caught_pokemon_deserializar(msj);
 		caught_pokemon_recibido(deserializado);
 		break;
 
 	case LOCALIZED_POKEMON:
-		deserializado =  mensaje_localized_pokemon_deserializar(paquete_get_stream(paquete));
-		paquete_destruir(paquete);
+		deserializado =  mensaje_localized_pokemon_deserializar(msj);
 		localized_pokemon_recibido(deserializado);
 		break;
 
 	default:
 		log_error(event_logger,
 				"El %s recibió un mensaje que no esperaba: (%s)",
-				TEAM_STRING, get_nombre_cola(paquete_get_id_cola(paquete)));
+				TEAM_STRING, get_nombre_cola(id_cola));
 	}
+
+	free(msj);
 }

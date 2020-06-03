@@ -16,7 +16,7 @@
 
 
 /*Variables Globales*/
-sem_t objetivos_team;
+
 
 /*--------------*/
 
