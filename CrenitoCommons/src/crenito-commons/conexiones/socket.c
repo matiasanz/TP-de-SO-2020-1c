@@ -26,6 +26,8 @@ int socket_connect(int socket, struct addrinfo* info) {
 		socket = ERROR_SOCKET;
 	}
 
+	freeaddrinfo(info);
+
 	return socket;
 }
 
@@ -105,8 +107,6 @@ int socket_crear_client(char* ip, char* puerto) {
 	if (error_conexion(socket_connect(socket, servinfo))) {
 		return ERROR_SOCKET;
 	}
-
-	freeaddrinfo(servinfo);
 
 	return socket;
 }

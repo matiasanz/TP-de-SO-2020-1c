@@ -16,6 +16,7 @@ context (test_conexiones) {
 	t_conexion_server* server;
 
 	t_paquete* crear_paquete_test() {
+
 		mensaje_new_pokemon_esperado = mensaje_new_pokemon_crear("pickachu", 4,
 				5, 6);
 		mensaje_new_pokemon_set_id(mensaje_new_pokemon_esperado, 5);
@@ -49,6 +50,12 @@ context (test_conexiones) {
 
 		}end
 
+		after {
+			log_destroy(logger);
+			log_destroy(event_logger);
+			conexion_server_destruir(server);
+		}end
+
 		it("Un cliente envia un paquete y un servidor lo recibe") {
 
 			//ARRANGE
@@ -74,7 +81,6 @@ context (test_conexiones) {
 			should_int(0) be equal to (respuesta_recibir);
 
 			//Free
-			conexion_server_destruir(server);
 			mensaje_new_pokemon_destruir(mensaje_new_pokemon_esperado);
 			paquete_destruir(pqt_test);
 
@@ -95,11 +101,6 @@ context (test_conexiones) {
 			//Free
 			mensaje_new_pokemon_destruir(mensaje_new_pokemon_esperado);
 			paquete_destruir(pqt_test);
-		}end
-
-		after {
-			log_destroy(logger);
-			log_destroy(event_logger);
 		}end
 
 	}end
