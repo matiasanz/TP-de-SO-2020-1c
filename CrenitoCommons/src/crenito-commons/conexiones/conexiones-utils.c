@@ -29,6 +29,11 @@ t_conexion_server* conexion_server_crear(char* ip, char* puerto, t_id_proceso id
 	return server;
 }
 
+void conexion_server_destruir(t_conexion_server* server) {
+
+	free(server);
+}
+
 t_conexion_cliente* conexion_cliente_crear(t_id_cola id_cola , int segundos_reconexion, void (*callback)(t_id_cola, void*)) {
 
 	t_conexion_cliente* cliente = malloc(sizeof(t_conexion_cliente));

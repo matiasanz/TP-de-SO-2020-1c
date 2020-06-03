@@ -2,20 +2,6 @@
 
 context (test_mensajes) {
 
-	void assert_mensaje_new_pokemon(t_mensaje_new_pokemon* esperado,
-			t_mensaje_new_pokemon* real) {
-
-		should_ptr(real) not be null;
-		should_int(mensaje_new_pokemon_get_id(real)) be equal to
-		(mensaje_new_pokemon_get_id(esperado));
-
-		should_int(mensaje_new_pokemon_get_id_correlativo(real)) be equal to
-		(mensaje_new_pokemon_get_id_correlativo(esperado));
-
-		should_int(real -> cantidad) be equal to (esperado -> cantidad);
-		should_pokemon(real->pokemon, esperado->pokemon);
-	}
-
 	void assert_mensaje_localized_pokemon(t_mensaje_localized_pokemon* esperado,
 			t_mensaje_localized_pokemon* real) {
 

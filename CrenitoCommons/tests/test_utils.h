@@ -19,7 +19,11 @@
 
 #include <cspecs/cspec.h>
 
+void inicializar_logs();
 void should_posicion(t_posicion esperado, t_posicion real);
 void should_pokemon(t_pokemon esperado, t_pokemon real);
+void assert_mensaje_new_pokemon(t_mensaje_new_pokemon* esperado, t_mensaje_new_pokemon* real);
+
+#include "../src/crenito-commons/conexiones/paquete.h"
 
 #endif /* TESTS_TEST_UTILS_H_ */

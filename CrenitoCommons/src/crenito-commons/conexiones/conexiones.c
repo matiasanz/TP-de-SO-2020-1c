@@ -17,13 +17,6 @@ static int subscribir(t_conexion_server* server, t_conexion_cliente* cliente);
  * la cual retorna
  */
 static int handshake(int socket, void* pqt, int size);
-/*
- * Recibe un paquete usando el socket indicado por parámetro.
- * Al recibirlo, ejeceuta la funcion de escucha
- * que también recibe por parámetro.
- * Si se produce un error, retorna ERROR_SOCKET
- */
-static int recibir(int socket, void (*callback)(t_id_cola, void*));
 
 int enviar(t_conexion_server* server, t_paquete* pqt) {
 
@@ -114,7 +107,7 @@ int subscribir(t_conexion_server* server, t_conexion_cliente* cliente) {
 	return cliente->subscriptor->id_subcriptor;
 }
 
-static int recibir(int socket, void (*callback)(t_id_cola, void*)) {
+int recibir(int socket, void (*callback)(t_id_cola, void*)) {
 
 	t_paquete_header header = socket_recibir_header(socket);
 

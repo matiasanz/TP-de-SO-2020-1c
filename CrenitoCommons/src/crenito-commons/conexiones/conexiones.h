@@ -47,5 +47,13 @@ void subscribir_y_escuchar_cola(t_conexion* args);
  * recibe por parámeetro llamada mensaje_recibido(...)
  */
 void conectar_y_escuchar_gameboy(t_conexion_host* gameboy);
-
+/*
+ * Recibe un paquete usando el socket indicado por parámetro.
+ * Al recibirlo, ejeceuta la funcion de escucha
+ * que también recibe por parámetro.
+ * Si se produce un error, retorna ERROR_SOCKET
+ * IMPORTANTE: Esta funcion no debe ser invocada desde los procesos ya
+ * que los hilos de escucha se encargan de ejecutarla
+ */
+int recibir(int socket, void (*callback)(t_id_cola, void*));
 #endif /* SRC_CRENITO_COMMONS_CONEXIONES_CONEXIONES_H_ */
