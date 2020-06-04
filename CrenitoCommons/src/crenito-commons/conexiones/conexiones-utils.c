@@ -46,6 +46,12 @@ t_conexion_cliente* conexion_cliente_crear(t_id_cola id_cola , int segundos_reco
 	return cliente;
 }
 
+void conexion_cliente_destruir(t_conexion_cliente* cliente) {
+
+	subscriptor_destruir(cliente ->subscriptor);
+	free(cliente);
+}
+
 t_conexion* conexion_crear(t_conexion_server* server, t_conexion_cliente* cliente) {
 
 	t_conexion* conexion = malloc(sizeof(t_conexion));
@@ -58,6 +64,8 @@ t_conexion* conexion_crear(t_conexion_server* server, t_conexion_cliente* client
 
 void conexion_destruir(t_conexion* conexion) {
 
+	conexion_server_destruir(conexion -> server);
+	conexion_cliente_destruir(conexion -> cliente);
 	free(conexion);
 }
 
@@ -70,6 +78,11 @@ t_subscriptor* subscriptor_crear(uint32_t socket, uint32_t id_subscriptor) {
 	subscriptor->socket = socket;
 
 	return subscriptor;
+}
+
+void subscriptor_destruir(t_subscriptor* subscriptor) {
+
+	free(subscriptor);
 }
 
 void* deserializar(void* msj, t_id_cola id_cola) {

@@ -76,11 +76,13 @@ t_conexion_server* conexion_server_crear(char* ip, char* puerto, t_id_proceso id
 void conexion_server_destruir(t_conexion_server* server);
 
 t_conexion_cliente* conexion_cliente_crear(t_id_cola id_cola, int segundos_reconexion, void (*callback)(t_id_cola, void*));
+void conexion_cliente_destruir(t_conexion_cliente* cliente);
 
 t_conexion* conexion_crear(t_conexion_server* server, t_conexion_cliente* cliente);
 void conexion_destruir(t_conexion* conexion);
 
 t_subscriptor* subscriptor_crear(uint32_t socket, uint32_t id_subscriptor);
+void subscriptor_destruir(t_subscriptor* subscriptor);
 
 t_buffer* serializar(void* msj, t_id_cola id_cola);
 void* deserializar(void* msj, t_id_cola id_cola);

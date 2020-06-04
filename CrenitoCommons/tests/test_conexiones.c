@@ -5,102 +5,293 @@
  *      Author: utnso
  */
 
-#include "../src/crenito-commons/conexiones/conexiones.h"
 #include "test_utils.h"
 
 context (test_conexiones) {
 
 	t_id_cola cola_esperada;
 	t_paquete* pqt_test;
-	t_mensaje_new_pokemon* mensaje_new_pokemon_esperado;
-	t_conexion_server* server;
-
-	t_paquete* crear_paquete_test() {
-
-		mensaje_new_pokemon_esperado = mensaje_new_pokemon_crear("pickachu", 4,
-				5, 6);
-		mensaje_new_pokemon_set_id(mensaje_new_pokemon_esperado, 5);
-		mensaje_new_pokemon_set_id_correlativo(mensaje_new_pokemon_esperado, 1);
-
-		return paquete_crear(
-				paquete_header_crear(MENSAJE, cola_esperada, NEW_POKEMON),
-				mensaje_new_pokemon_serializar(mensaje_new_pokemon_esperado));
-	}
-
-	void assert_mensaje_recibido(t_id_cola id_cola_real, void* serializado_real) {
-
-		should_int(id_cola_real) be equal to (pqt_test ->header.id_cola);
-
-		t_mensaje_new_pokemon* msj_real = mensaje_new_pokemon_deserializar(
-				serializado_real);
-
-		assert_mensaje_new_pokemon(mensaje_new_pokemon_esperado, msj_real);
-
-		free(serializado_real);
-		mensaje_new_pokemon_destruir(msj_real);
-	}
+	void* mensaje_esperado;
 
 	describe("tests de conexiones") {
 
 		before {
 
 			inicializar_logs();
-			server = conexion_server_crear("127.0.0.1", "3999", cola_esperada);
-			pqt_test = crear_paquete_test();
+			conexion_broker = conexion_server_crear("127.0.0.1", "3999", GAMEBOY);
 
 		}end
 
 		after {
+
 			log_destroy(logger);
 			log_destroy(event_logger);
-			conexion_server_destruir(server);
-		}end
-
-		it("Un cliente envia un paquete y un servidor lo recibe") {
-
-			//ARRANGE
-			cola_esperada = GAMEBOY;
-			//Socket server que escucha mensajes
-			int socket_server = socket_crear_listener(server -> ip, server -> puerto);
-			//Conexion al socket_server desde un cliente
-			int socket_enviar = socket_crear_client(server -> ip, server -> puerto);
-			//El server acepta la conexion y genera un socket con la referencia del cliente
-			int socket_cliente = socket_aceptar_conexion(socket_server);
-			/*simulamos que el envio que vamos a realizar va a tener este ACK
-			 para evitar que el test se quede clavado durante el handshake*/
-			int ack = 1;
-			socket_send(socket_cliente, &ack, sizeof(int));
-
-			//ACTION
-			// Enviamos el paquete desde el cliente
-			int respuesta_enviar = enviar_paquete(pqt_test, socket_enviar);
-			//recibimos el paquete desde la referencia del cliente que tiene el server
-			int respuesta_recibir = recibir(socket_cliente, (void*) assert_mensaje_recibido);
-
-			should_int(1) be equal to (respuesta_enviar);
-			should_bool(conexion_exitosa(respuesta_recibir)) be truthy;
-
-			//Free
-			mensaje_new_pokemon_destruir(mensaje_new_pokemon_esperado);
-			paquete_destruir(pqt_test);
-
-			//Cierre de sockets
-			socket_cerrar(socket_server);
-			socket_cerrar(socket_enviar);
-			socket_cerrar(socket_cliente);
 
 		}end
 
-		it("Si el BROKER está caido la función enviar devuelve el error esperado") {
+		describe ("Envío y recepción de mensajes") {
 
-			//ACTION
-			// Enviamos el paquete desde el cliente
-			int respuesta_enviar = enviar(server, pqt_test);
+			before {
 
-			should_bool(error_conexion(respuesta_enviar)) be truthy;
-			//Free
-			mensaje_new_pokemon_destruir(mensaje_new_pokemon_esperado);
-			paquete_destruir(pqt_test);
+				cola_esperada = NEW_POKEMON;
+				mensaje_esperado = mensaje_new_pokemon_test();
+				pqt_test = paquete_new_pokemon_test();
+
+			}end
+
+			after {
+
+				mensaje_new_pokemon_destruir(mensaje_esperado);
+				conexion_server_destruir(conexion_broker);
+				paquete_destruir(pqt_test);
+
+			}end
+
+			it("Un cliente envia un paquete y un servidor lo recibe") {
+
+				//ARRANGE
+				//Socket server que escucha mensajes
+				int socket_server = socket_crear_listener(conexion_broker -> ip, conexion_broker -> puerto);
+				//Conexion al socket_server desde un cliente
+				int socket_enviar = socket_crear_client(conexion_broker -> ip, conexion_broker -> puerto);
+				//El server acepta la conexion y genera un socket con la referencia del cliente
+				int socket_cliente = socket_aceptar_conexion(socket_server);
+				/*simulamos que el envio que vamos a realizar va a tener este ACK
+				 para evitar que el test se quede clavado durante el handshake*/
+				int ack = 1;
+				socket_send(socket_cliente, &ack, sizeof(int));
+
+				//ACTION
+				// Enviamos el paquete desde el cliente
+				int respuesta_enviar = enviar_paquete(pqt_test, socket_enviar);
+				//recibimos el paquete desde la referencia del cliente que tiene el server
+				int respuesta_recibir = recibir(socket_cliente, (void*) assert_mensaje_recibido);
+
+				should_int(1) be equal to (respuesta_enviar);
+				should_bool(conexion_exitosa(respuesta_recibir)) be truthy;
+
+				//Cierre de sockets
+				socket_cerrar(socket_server);
+				socket_cerrar(socket_enviar);
+				socket_cerrar(socket_cliente);
+			}end
+
+			it("Si el BROKER está caido la función enviar devuelve el error esperado") {
+
+				//ACTION
+				// Enviamos el paquete desde el cliente
+				int respuesta_enviar = enviar(conexion_broker, pqt_test);
+
+				should_bool(error_conexion(respuesta_enviar)) be truthy;
+
+			}end
+		}end
+
+		describe ("Subscripciones") {
+
+			int socket_server;
+			int socket_cliente;
+
+			before {
+
+				socket_server = socket_crear_listener(conexion_broker -> ip, conexion_broker -> puerto);
+			}end
+
+			after {
+
+				socket_cerrar(socket_server);
+				socket_cerrar(socket_cliente);
+				paquete_destruir(pqt_test);
+			}end
+
+			it("El GAME_CARD se subscribe a la cola CATCH_POKEMON y recibe un mensaje") {
+
+				pqt_test = paquete_appeared_catch_pokemon_test(CATCH_POKEMON);
+				//ARRANGE
+				cola_esperada = CATCH_POKEMON;
+
+				conexion_catch_pokemon = conexion_cliente_crear(cola_esperada,
+						0,
+						(void*)assert_mensaje_recibido_thread);
+
+				t_conexion* args = conexion_crear(conexion_broker,
+						conexion_catch_pokemon);
+				//ACTION:
+				//Subscribimos al proceso
+				pthread_create(&hilo_catch_pokemon, NULL,
+						(void*) subscribir_y_escuchar_cola, args);
+
+				pthread_detach(hilo_catch_pokemon);
+				/*simulamos que el envio que vamos a realizar va a tener este ACK
+				 para evitar que el test se quede clavado durante el handshake*/
+				socket_cliente = socket_aceptar_conexion(socket_server);
+				int ack = 1;
+				socket_send(socket_cliente, &ack, sizeof(int));
+
+				int respuesta_enviar = enviar_paquete(pqt_test, socket_cliente);
+
+				should_bool(conexion_exitosa(respuesta_enviar)) be truthy;
+
+			}end
+
+			it("El GAME_CARD se subscribe a la cola GET_POKEMON y recibe un mensaje") {
+
+				pqt_test = paquete_get_pokemon_test();
+				//ARRANGE
+				cola_esperada = GET_POKEMON;
+
+				conexion_get_pokemon = conexion_cliente_crear(cola_esperada,
+						0,
+						(void*)assert_mensaje_recibido_thread);
+
+				t_conexion* args = conexion_crear(conexion_broker,
+						conexion_get_pokemon);
+
+				//ACTION:
+				//Subscribimos al proceso
+				pthread_create(&hilo_get_pokemon, NULL,
+						(void*) subscribir_y_escuchar_cola, args);
+
+				pthread_detach(hilo_get_pokemon);
+				/*simulamos que el envio que vamos a realizar va a tener este ACK
+				 para evitar que el test se quede clavado durante el handshake*/
+				socket_cliente = socket_aceptar_conexion(socket_server);
+				int ack = 1;
+				socket_send(socket_cliente, &ack, sizeof(int));
+
+				int respuesta_enviar = enviar_paquete(pqt_test, socket_cliente);
+
+				should_bool(conexion_exitosa(respuesta_enviar)) be truthy;
+
+			}end
+
+			it("El GAME_CARD se subscribe a la cola NEW_POKEMON y recibe un mensaje") {
+
+				pqt_test = paquete_new_pokemon_test();
+				//ARRANGE
+				cola_esperada = NEW_POKEMON;
+
+				conexion_new_pokemon = conexion_cliente_crear(cola_esperada,
+						0,
+						(void*)assert_mensaje_recibido_thread);
+
+				t_conexion* args = conexion_crear(conexion_broker,
+						conexion_new_pokemon);
+
+				//ACTION:
+				//Subscribimos al proceso
+				pthread_create(&hilo_new_pokemon, NULL,
+						(void*) subscribir_y_escuchar_cola, args);
+
+				pthread_detach(hilo_new_pokemon);
+				/*simulamos que el envio que vamos a realizar va a tener este ACK
+				 para evitar que el test se quede clavado durante el handshake*/
+
+				socket_cliente = socket_aceptar_conexion(socket_server);
+				int ack = 1;
+				socket_send(socket_cliente, &ack, sizeof(int));
+
+				int respuesta_enviar = enviar_paquete(pqt_test, socket_cliente);
+
+				should_bool(conexion_exitosa(respuesta_enviar)) be truthy;
+
+			}end
+
+			it("El TEAM se subscribe a la cola APPEARED_POKEMON y recibe un mensaje") {
+
+				pqt_test = paquete_appeared_catch_pokemon_test(APPEARED_POKEMON);
+				//ARRANGE
+				cola_esperada = APPEARED_POKEMON;
+
+				conexion_appeared_pokemon = conexion_cliente_crear(cola_esperada,
+						0,
+						(void*)assert_mensaje_recibido_thread);
+
+				t_conexion* args = conexion_crear(conexion_broker,
+						conexion_appeared_pokemon);
+
+				//ACTION:
+				//Subscribimos al proceso
+				pthread_create(&hilo_appeared_pokemon, NULL,
+						(void*) subscribir_y_escuchar_cola, args);
+
+				pthread_detach(hilo_appeared_pokemon);
+				/*simulamos que el envio que vamos a realizar va a tener este ACK
+				 para evitar que el test se quede clavado durante el handshake*/
+				socket_cliente = socket_aceptar_conexion(socket_server);
+				int ack = 1;
+				socket_send(socket_cliente, &ack, sizeof(int));
+
+				int respuesta_enviar = enviar_paquete(pqt_test, socket_cliente);
+
+				should_bool(conexion_exitosa(respuesta_enviar)) be truthy;
+
+			}end
+
+			it("El TEAM se subscribe a la cola LOCALIZED_POKEMON y recibe un mensaje") {
+
+				pqt_test = paquete_localized_pokemon_test();
+				//ARRANGE
+				cola_esperada = LOCALIZED_POKEMON;
+
+				conexion_localized_pokemon = conexion_cliente_crear(cola_esperada,
+						0,
+						(void*)assert_mensaje_recibido_thread);
+
+				t_conexion* args = conexion_crear(conexion_broker,
+						conexion_localized_pokemon);
+
+				//ACTION:
+				//Subscribimos al proceso
+				pthread_create(&hilo_localized_pokemon, NULL,
+						(void*) subscribir_y_escuchar_cola, args);
+
+				pthread_detach(hilo_localized_pokemon);
+				/*simulamos que el envio que vamos a realizar va a tener este ACK
+				 para evitar que el test se quede clavado durante el handshake*/
+				socket_cliente = socket_aceptar_conexion(socket_server);
+				int ack = 1;
+				socket_send(socket_cliente, &ack, sizeof(int));
+
+				int respuesta_enviar = enviar_paquete(pqt_test, socket_cliente);
+
+				should_bool(conexion_exitosa(respuesta_enviar)) be truthy;
+
+			}end
+
+			it("El TEAM se subscribe a la cola CAUGHT y recibe un mensaje") {
+
+				pqt_test = paquete_caught_pokemon_test();
+				//ARRANGE
+				cola_esperada = CAUGHT_POKEMON;
+
+				conexion_caught_pokemon = conexion_cliente_crear(cola_esperada,
+						0,
+						(void*)assert_mensaje_recibido_thread);
+
+				t_conexion* args = conexion_crear(conexion_broker,
+						conexion_caught_pokemon);
+
+				//ACTION:
+				//Subscribimos al proceso
+				pthread_create(&hilo_caught_pokemon, NULL,
+						(void*) subscribir_y_escuchar_cola, args);
+
+				pthread_detach(hilo_caught_pokemon);
+				/*simulamos que el envio que vamos a realizar va a tener este ACK
+				 para evitar que el test se quede clavado durante el handshake*/
+				socket_cliente = socket_aceptar_conexion(socket_server);
+				int ack = 1;
+				socket_send(socket_cliente, &ack, sizeof(int));
+
+				int respuesta_enviar = enviar_paquete(pqt_test, socket_cliente);
+
+				should_bool(conexion_exitosa(respuesta_enviar)) be truthy;
+
+				conexion_destruir(args);
+
+			}end
+
 		}end
 
 	}end
