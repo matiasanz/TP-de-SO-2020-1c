@@ -20,9 +20,11 @@
 #include "../../GameCard/src/hilos/hilo_catch_pokemon.h"
 #include "../../GameCard/src/hilos/hilo_get_pokemon.h"
 #include "../../GameCard/src/hilos/hilo_new_pokemon.h"
+#include "../../GameCard/src/hilos/hilo_gameboy.h"
 #include "../../Team/src/hilos/hilo_appeared_pokemon.h"
 #include "../../Team/src/hilos/hilo_localized_pokemon.h"
 #include "../../Team/src/hilos/hilo_caught_pokemon.h"
+#include "../../Team/src/hilos/hilo_gameboy.h"
 #include "../src/crenito-commons/conexiones/paquete.h"
 #include <cspecs/cspec.h>
 

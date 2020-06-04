@@ -288,10 +288,40 @@ context (test_conexiones) {
 
 				should_bool(conexion_exitosa(respuesta_enviar)) be truthy;
 
-				conexion_destruir(args);
-
 			}end
 
+		}end
+
+		describe ("Conexion con GAME_BOY") {
+
+			it("El GAME_CARD y TEAM rciben mensajes del GAME_BOY") {
+
+				//ARRANGE
+				conexion_gameboy = conexion_host_crear("127.0.0.1", "3997", (void*)assert_mensaje_recibido_thread);
+
+				pqt_test = paquete_localized_pokemon_test(LOCALIZED_POKEMON);
+
+				cola_esperada = LOCALIZED_POKEMON;
+
+				pthread_create(&hilo_gameboy, NULL,
+						(void*) conectar_y_escuchar_gameboy, conexion_gameboy);
+
+				pthread_detach(hilo_gameboy);
+
+				sleep(1);
+				//Conexion al socket_server desde un cliente
+				int socket_enviar = socket_crear_client(conexion_gameboy -> ip, conexion_gameboy -> puerto);
+
+				//ACTION
+				int respuesta_enviar = enviar_paquete(pqt_test, socket_enviar);
+
+				//ASSERT
+				should_bool(conexion_exitosa(respuesta_enviar)) be truthy;
+
+				socket_cerrar(socket_enviar);
+				paquete_destruir(pqt_test);
+
+			}end
 		}end
 
 	}end
