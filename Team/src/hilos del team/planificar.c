@@ -10,7 +10,7 @@ void team_planificar(){
 
 	while(PROCESO_ACTIVO){
 		sem_wait(&HayTareasPendientes);
-		equipo_despertar_en_caso_de_APPEARD();
+		equipo_despertar_en_caso_de_APPEARED();
 
 		t_id* idProximoEntrenador = entrenadores_id_proximo_a_planificar(entrenadoresReady);
 
@@ -35,7 +35,7 @@ void team_planificar(){
 //Mensaje APPEARD
 
 // Despierta a los entrenadores dormidos hasta appeard, solamente si hay pokemones en el mapa
-void equipo_despertar_en_caso_de_APPEARD(){
+void equipo_despertar_en_caso_de_APPEARED(){
 
 	pthread_mutex_lock(pokemonesRequeridos->mutex);
 	if(list_is_empty(pokemonesRequeridos->lista)){
@@ -60,7 +60,7 @@ void equipo_despertar_en_caso_de_APPEARD(){
 void entrenadores_despertar_para_catch(entrenadores unEquipo, pokemon* unPokemon){
 
 	void entrenador_despertar(entrenador*unEntrenador){
-		if(entrenador_dormido_hasta_APPEARD(unEntrenador)){
+		if(entrenador_dormido_hasta_APPEARED(unEntrenador)){
 			entrenador_pasar_a(unEntrenador, READY, "Acaba de llegar un pokemon que puede cazar");
 			entrenador_agregar_a_cola(unEntrenador, entrenadoresReady);
 		}
@@ -80,9 +80,9 @@ void entrenadores_despertar_para_catch(entrenadores unEquipo, pokemon* unPokemon
 }
 
 // Retorna true si el entrenador se encuentra a la espera de la llegada de un pokemon
-bool entrenador_dormido_hasta_APPEARD(entrenador*unEntrenador){
+bool entrenador_dormido_hasta_APPEARED(entrenador*unEntrenador){
 	pthread_mutex_lock(&mutexEstadoEntrenador[unEntrenador->id]);
-	bool estaDormido = entrenador_en_estado(unEntrenador, LOCKED_HASTA_APPEARD) || entrenador_en_estado(unEntrenador, NEW);
+	bool estaDormido = entrenador_en_estado(unEntrenador, LOCKED_HASTA_APPEARED) || entrenador_en_estado(unEntrenador, NEW);
 	pthread_mutex_unlock(&mutexEstadoEntrenador[unEntrenador->id]);
 	return estaDormido;
 }

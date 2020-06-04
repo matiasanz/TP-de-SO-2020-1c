@@ -18,7 +18,6 @@ void team_suscriptor_cola_APPEARD(cr_list* mensajes){
 		pthread_mutex_unlock(&Mutex_AndoLoggeando);
 
 		registrar_pokemon(unPokemon);
-		sem_post(&HayTareasPendientes);
 	}
 
 	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
@@ -31,8 +30,9 @@ void team_suscriptor_cola_APPEARD(cr_list* mensajes){
 // Agrega los pokemones que van llegando al mapa en caso de ser requeridos
 void registrar_pokemon(pokemon*unPokemon){
 
-	if( pokemon_es_requerido(*unPokemon, objetivosGlobales) ){
+	if( pokemon_es_requerido(*unPokemon) ){
 		mapa_mapear_requerido(unPokemon);
+		sem_post(&HayTareasPendientes);
 	}
 
 	else{
@@ -41,7 +41,7 @@ void registrar_pokemon(pokemon*unPokemon){
 	}
 }
 
-bool pokemon_es_requerido(pokemon unPokemon, matriz_recursos objetivos){
+bool pokemon_es_requerido(pokemon unPokemon){
 	return objetivos_cantidad_requerida_de(unPokemon.especie);
 }
 

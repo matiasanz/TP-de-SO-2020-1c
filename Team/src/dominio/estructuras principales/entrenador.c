@@ -17,6 +17,11 @@ entrenador*entrenador_ptr_create(t_id id, matriz_recursos pokemonesEnInventario,
 	return nuevo;
 }
 
+//Constructor de entrenador al cual le puedo pasar las matrices como cadenas de caracteres
+entrenador*entrenador_ptr_crear(t_id id, char* asignados, char* pedidos, t_posicion unaPos){
+	return entrenador_ptr_create(id, recursos_from_string(asignados), recursos_from_string(pedidos), unaPos);
+}
+
 matriz_recursos entrenador_objetivos(entrenador*unEntrenador){
 	return unEntrenador->objetivos;
 }
@@ -86,6 +91,10 @@ entrenadores entrenadores_en_estado(entrenadores equipo, t_estado unEstado){
 	}
 
 	return list_filter(equipo, &esta_en_estado);
+}
+
+void entrenadores_disolver_equipo(entrenadores unEquipo){
+	list_destroy(unEquipo);
 }
 
 //Destructor de equipo

@@ -8,16 +8,17 @@ void team_suscriptor_cola_LOCALIZED(cr_list* mensajes){
 
 		mensaje_localized_pokemon* pokemonLocalizado = desempaquetar_localized(mensajeRecibido->serializado);
 
+		pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
 		log_info(logger, "LOCALIZED %s%s", pokemonLocalizado->especie, posiciones_to_string(pokemonLocalizado->posiciones));
+		pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 
 		if(especie_recibida_con_anterioridad(pokemonLocalizado->especie, historialDePokemones)){
 			printf("%s: figurita repetida se descarta\n", pokemonLocalizado->especie);
 		}
 
 		else{
-			numero instanciasRequeridas = objetivos_cantidad_requerida_de(pokemonLocalizado->especie); //TODO
-			posiciones posicionesMasCercanasAEquipo = posiciones_N_mas_cercanas_al_equipo(pokemonLocalizado->posiciones, instanciasRequeridas);
-			registrar_en_cada_posicion(pokemonLocalizado->especie, posicionesMasCercanasAEquipo);
+			posiciones_ordenar_por_cercania_al_equipo(pokemonLocalizado->posiciones);
+			registrar_en_cada_posicion(pokemonLocalizado->especie, pokemonLocalizado->posiciones);
 		}
 
 		//mensaje_localized_destroy(mensajeRecibido); //No tiene que quedar nada, ya que yo construyo nuevos pokemones con copia de la info
@@ -41,15 +42,12 @@ void registrar_en_cada_posicion(especie_pokemon unaEspecie, posiciones listaDePo
 	list_iterate(listaDePosiciones, (void(*)(void*)) registrarEnCadaPosicion);
 }
 
-posiciones posiciones_N_mas_cercanas_al_equipo(posiciones listaPosiciones, numero cantidadRequerida){
-
+void posiciones_ordenar_por_cercania_al_equipo(posiciones listaPosiciones){
 	bool cercaniaAEntrenadores(void*unaPos, void*otraPos){
 		return posicion_distancia_a_equipo(unaPos) >= posicion_distancia_a_equipo(otraPos);
 	}
 
 	list_sort(listaPosiciones, &cercaniaAEntrenadores);
-
-	return list_take(listaPosiciones, cantidadRequerida);
 }
 
 

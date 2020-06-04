@@ -35,7 +35,7 @@ void broker_simulator(){
 			}
 
 			case 4:{
-				pendiente*unPendiente = cr_list_get(capturasPendientes, 0);
+				captura_pendiente*unPendiente = cr_list_get(capturasPendientes, 0);
 
 				if(unPendiente){
 

@@ -6,7 +6,7 @@
 
 #include <cspecs/cspec.h>
 
-void assert_equals_pendiente(pendiente* mensajePendiente, pendiente esperado);
+void assert_equals_pendiente(captura_pendiente* mensajePendiente, captura_pendiente esperado);
 
 context(tests_team){
 	describe("posicion"){
@@ -100,8 +100,8 @@ context(tests_team){
 		}end
 
 		it("un entrenador se bloquea y pasa a estado <<LOCKED>>"){
-			entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARD, "");
-			should_int(unEntrenador->estado) be equal to(LOCKED_HASTA_APPEARD);
+			entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARED, "");
+			should_int(unEntrenador->estado) be equal to(LOCKED_HASTA_APPEARED);
 		}end
 	}end
 
@@ -193,7 +193,7 @@ context(tests_team){
 
 	describe("Respuesta pendiente"){
 		
-		pendiente respuestaPendiente;
+		captura_pendiente respuestaPendiente;
 		entrenador* unEntrenador;
 		pokemon*unPokemon;
 		
@@ -217,7 +217,7 @@ context(tests_team){
 	
 	describe("Pendientes"){
 		pendientes mensajesPendientes;
-		pendiente respuestaPendiente;
+		captura_pendiente respuestaPendiente;
 		entrenador* unEntrenador;
 		pokemon*unPokemon;
 		
@@ -238,19 +238,19 @@ context(tests_team){
 		}end
 		
 		it("un mensaje pendiente se agrega correctamente"){
-			pendiente* agregado = cr_list_remove_and_signal(mensajesPendientes, 0);
+			captura_pendiente* agregado = cr_list_remove_and_signal(mensajesPendientes, 0);
 			assert_equals_pendiente(agregado, respuestaPendiente);
 			pendiente_destroy(agregado);
 		}end
 		
 		it("un mensaje pendiente se obtiene a partir de su id"){
-			pendiente* agregado = pendientes_get(mensajesPendientes, respuestaPendiente.id);
+			captura_pendiente* agregado = pendientes_get(mensajesPendientes, respuestaPendiente.id);
 			assert_equals_pendiente(agregado, respuestaPendiente);
 			pendiente_destroy(agregado);
 		}end
 		
 		it("un mensaje pendiente se quita correctamente"){
-			pendiente* agregado = pendientes_get(mensajesPendientes, respuestaPendiente.id);
+			captura_pendiente* agregado = pendientes_get(mensajesPendientes, respuestaPendiente.id);
 			cr_list_is_empty(mensajesPendientes);
 			pendiente_destroy(agregado);
 		}end
@@ -262,7 +262,7 @@ context(tests_team){
 }
 
 //Funciones auxiliares
-void assert_equals_pendiente(pendiente* mensajePendiente, pendiente esperado){
+void assert_equals_pendiente(captura_pendiente* mensajePendiente, captura_pendiente esperado){
 		should_int(mensajePendiente->id) be equal to(esperado.id);
 		should_ptr(mensajePendiente->cazador) be equal to(esperado.cazador);
 		should_ptr(mensajePendiente->pokemonCatcheado) be equal to(esperado.pokemonCatcheado);

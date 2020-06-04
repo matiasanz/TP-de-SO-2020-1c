@@ -9,13 +9,13 @@ typedef struct Captura_pendiente{
 	t_id id;
 	entrenador*cazador;
 	pokemon*pokemonCatcheado;
-}pendiente;
+}captura_pendiente;
 
 //	Constructor
-	pendiente pendiente_create(t_id, entrenador*, pokemon*);
+	captura_pendiente pendiente_create(t_id, entrenador*, pokemon*);
 
 //	Destructor
-	void pendiente_destroy(pendiente*);
+	void pendiente_destroy(captura_pendiente*);
 
 //****************************************************************************
 
@@ -29,10 +29,10 @@ typedef cr_list* pendientes;
 	void agregar_pendiente(pendientes, t_id, entrenador*, pokemon*);
 
 // 	Obtener por id pendiente
-	pendiente* pendientes_get(pendientes mensajesPendientes, t_id idPendiente);
+	captura_pendiente* pendientes_get(pendientes mensajesPendientes, t_id idPendiente);
 
 // Retorna el pendiente correspondiente al id del entrenador y lo elimina de la lista
-	pendiente*pendientes_pendiente_del_entrenador(pendientes mensajesPendientes, t_id idEntrenador);
+	captura_pendiente*pendientes_pendiente_del_entrenador(pendientes mensajesPendientes, t_id idEntrenador);
 
 //	Destructor
 	void pendientes_destroy(pendientes);

@@ -60,18 +60,18 @@ void inicializar_hilos_entrenadores();
 void finalizar_hilos_entrenadores();
 
 //Planificador
-void equipo_despertar_en_caso_de_APPEARD();
-bool entrenador_dormido_hasta_APPEARD(entrenador*);
+void equipo_despertar_en_caso_de_APPEARED();
+bool entrenador_dormido_hasta_APPEARED(entrenador*);
 void entrenadores_despertar_para_catch(entrenadores, pokemon*);
 
 //auxiliares
 void registrar_pokemon(pokemon*);
-void registrar_en_cada_posicion(especie_pokemon, t_list*posiciones);
-bool pokemon_es_requerido(pokemon unPokemon, matriz_recursos objetivos);
+void registrar_en_cada_posicion(especie_pokemon, posiciones);
+bool pokemon_es_requerido(pokemon unPokemon);
 void mapa_mapear_requerido(pokemon*);
 numero objetivos_cantidad_requerida_de(especie_pokemon unaEspecie);
 void objetivos_actualizar_por_captura_de(especie_pokemon);
-//matriz_recursos recursos_objetivos_actuales();
-posiciones posiciones_N_mas_cercanas_al_equipo(posiciones, numero);
+void posiciones_ordenar_por_cercania_al_equipo(posiciones);
 numero posicion_distancia_a_equipo(t_posicion*);
 numero posicion_distancia_a_entrenadores(t_posicion*, entrenadores);
+void entrenador_bloquear_hasta_APPEARED(entrenador*);

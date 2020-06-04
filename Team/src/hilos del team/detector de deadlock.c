@@ -4,10 +4,6 @@
 
 #define TIEMPO_ENTRE_DETECCIONES 15 //segundos
 
-void entrenadores_disolver_equipo(entrenadores unEquipo){
-	list_destroy(unEquipo);
-}
-
 pares_intercambio intercambiosPendientes;
 
 //Es un gran TODO
@@ -25,6 +21,7 @@ void team_ejecutar_algoritmo_de_deteccion_de_deadlock_HARDCODEADO(){
 		bool hayDeadlock = algoritmo_detectar_deadlock(entrenadoresEnDeadlock);
 
 		algoritmo_procesar_deadlock(entrenadoresEnDeadlock);
+
 		entrenadores_disolver_equipo(entrenadoresEnDeadlock);
 
 		pthread_mutex_lock(&Mutex_AndoLoggeando);
@@ -41,10 +38,9 @@ bool algoritmo_detectar_deadlock_HARDCODEADO(entrenadores enDeadlock){
 
 	pthread_mutex_lock(&mutexEntrenadores);
 	enDeadlock = entrenadores_en_estado(equipo, LOCKED_HASTA_DEADLOCK);
-	//Problema del filter: puedo agarrar a alguno que justo esta en medio de un intercambio
-	//en lugar de hacer filter removerlos antes de aplicar el algoritmo de deteccion
 	pthread_mutex_unlock(&mutexEntrenadores);
-
+	//Problema del filter: puedo agarrar a alguno que justo esta en medio de un intercambio
+	//en lugar de hacer filter removerlos antes de aplicar el algoritmo de deteccion; Problema: Podria perder entrenadores. Tendria que pasarlos a una lista aparte
 	return true;
 }
 

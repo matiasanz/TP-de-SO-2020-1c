@@ -13,7 +13,8 @@
 
 //int mainDePruebaDeadlock();
 
-int main(void) {
+//int main(void) {
+int maiami(){
 
 //	return mainDePruebaDeadlock(); //Prueba deadlock;
 
@@ -153,7 +154,7 @@ void finalizar_hilos(){
 
 void inicializar_semaforos(){
 	sem_init(&HayTareasPendientes, 0, 0);
-	sem_init(&EntradaSalida_o_FinDeEjecucion, 0, 1);
+	sem_init(&EntradaSalida_o_FinDeEjecucion, 0, 0);
 
 	pthread_mutex_init(&Mutex_AndoLoggeando       , NULL);
 	pthread_mutex_init(&Mutex_AndoLoggeandoEventos, NULL);

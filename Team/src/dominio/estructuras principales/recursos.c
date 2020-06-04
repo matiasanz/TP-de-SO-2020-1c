@@ -24,8 +24,8 @@ matriz_recursos recursos_from_string(char*cadena){
 //    	printf("pos: (%u, %u)\n", pos.x, pos.y);
 //    }
 
-//    free(tokens);
     string_iterate_lines(tokens, (void*)free); //TODO ver antes rompia
+//    free(tokens);
 
     return recursosLeidos;
 }

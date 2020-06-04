@@ -7,7 +7,7 @@ void team_suscriptor_cola_CAUGHT(cr_list* mensajes){
 
 		mensaje* mensajeRecibido = cr_list_wait_and_remove(mensajes, 0);
 		resultado_captura* resultado = desempaquetar_resultado(mensajeRecibido->serializado);
-		pendiente* capturaPendiente = pendientes_get(capturasPendientes, resultado->idCaptura);
+		captura_pendiente* capturaPendiente = pendientes_get(capturasPendientes, resultado->idCaptura);
 
 		if(capturaPendiente) {
 			entrenador* unEntrenador = capturaPendiente->cazador;
@@ -23,7 +23,8 @@ void team_suscriptor_cola_CAUGHT(cr_list* mensajes){
 			}
 
 			else{
-				entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARD, "Fallo en capturar al pokemon pero puede seguir cazando mas");
+				entrenador_bloquear_hasta_APPEARED(unEntrenador);
+				printf("El entrenador N°%u Fallo en capturar al pokemon pero puede seguir cazando mas\n", unEntrenador->id);
 
 				pthread_mutex_lock(&mutexRecursosEnMapa);
 				recursos_quitar_instancia_de_recurso(recursosEnMapa, pokemonCatcheado->especie);
@@ -47,4 +48,11 @@ void team_suscriptor_cola_CAUGHT(cr_list* mensajes){
 	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
 	log_info(event_logger, "Finalizo suscripcion a cola CAUGHT"); //Ver TODO si pokemon localized hace esto. Ver como saltear esta parte.
 	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+}
+
+void entrenador_bloquear_hasta_APPEARED(entrenador*unEntrenador){
+	pthread_mutex_lock(&mutexEstadoEntrenador[unEntrenador->id]);
+	unEntrenador->estado = LOCKED_HASTA_APPEARED;  //Abstraer a funcion
+	pthread_mutex_unlock(&mutexEstadoEntrenador[unEntrenador->id]);
+	unEntrenador->siguienteTarea = CATCHEAR;
 }

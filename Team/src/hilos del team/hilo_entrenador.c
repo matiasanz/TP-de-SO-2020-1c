@@ -15,11 +15,10 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 			case CATCHEAR: {
 				pokemon*unPokemon = mapa_desmapear(pokemonesRequeridos);
 
-		//				pthread_mutex_lock(&mutexEntrenadorPosicion[pid]);
 				entrenador_desplazarse_hacia(unEntrenador, unPokemon->posicion);
 
 				if(entrenador_llego_a(unEntrenador, unPokemon->posicion)){
-		//					pthread_mutex_unlock(&mutexEntrenadorPosicion[pid]);
+
 					t_id id_mensaje_pendiente = Catch(unPokemon->especie);
 
 					agregar_pendiente(capturasPendientes, id_mensaje_pendiente, unEntrenador, unPokemon);
@@ -30,7 +29,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 				}
 
 				else{
-					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARD, "No llego a la posicion del pokemon");
+					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARED, "No llego a la posicion del pokemon");
 					mapa_mapear_pokemon(pokemonesRequeridos, unPokemon);
 				}
 
@@ -38,7 +37,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 			}
 
 			case CAPTURAR: {
-				pendiente* capturaPendiente = pendientes_pendiente_del_entrenador(capturasPendientes, pid);
+				captura_pendiente* capturaPendiente = pendientes_pendiente_del_entrenador(capturasPendientes, pid);
 
 				if(!capturaPendiente){
 					error_show("El id del entrenador N°%u no se corresponde con ningun mensaje pendiente\n", pid);
@@ -51,10 +50,11 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 
 				if(entrenador_puede_cazar_mas_pokemones(unEntrenador)){ //Ver si cambios de estado se pueden delegar al planificador
 					unEntrenador->siguienteTarea = CATCHEAR;
-					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARD, "Tuvo exito en la captura y todavia puede cazar mas pokemones");
+					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARED, "Tuvo exito en la captura y todavia puede cazar mas pokemones");
 				}
 
 				else if(entrenador_cumplio_sus_objetivos(unEntrenador)){
+					//Abstraer a una funcion para que INTERCAMBIAR haga lo mismo
 //					unEntrenador->siguienteTarea = FINALIZAR;
 
 					printf("Objetivos: "); recursos_mostrar(unEntrenador->objetivos);
@@ -84,16 +84,20 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 
 			case INTERCAMBIAR: {
 				puts("Proximamente deadlock");
-//				entrenador*parejaDeIntercambio = par_intercambio_get(intercambiosPendientes, pid);
+//				entrenador*parejaDeIntercambio = par_intercambio_remove(intercambiosPendientes, pid);
 //				entrenador_desplazarse_hacia(unEntrenador, parejaDeIntercambio->posicion);
 //
-//				while(entrenador_puede_intercambiar_con(unEntrenador, parejaDeIntercambio)){
-//					entrenador_intercambiar_con(unEntrenador, parejaDeIntercambio);
+//				if(entrenador_llego_a(unEntrenador, otroEntrenador->posicion)){
+	//				while(entrenador_puede_intercambiar_con(unEntrenador, parejaDeIntercambio)){
+	//					entrenador_intercambiar_con(unEntrenador, parejaDeIntercambio);
+	//				}
+
+
+					//Repetir metodo de salida de CAUGHT con ambos entrenadores
+					//Duda: deberia pasar al otro tambien a execute? Ahi tiene sentido la tarea SALIR, aunque no seria inmediato
+
+					break;
 //				}
-
-				//Repetir metodo de salida de CAUGHT
-
-				break;
 			}
 		}
 
@@ -108,7 +112,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 
 }
 
-/*************************************** Funciones Auxiliares ************************************************/
+/********************************** Funciones de Inicio y Finalizacion ******************************************/
 
 numero cantidadDeEntrenadores; //Me guarda el tamaño del array para cuando tenga que finalizar
 
@@ -139,8 +143,9 @@ void finalizar_hilos_entrenadores(){
 	}
 }
 
+/*************************************** Funciones Auxiliares ************************************************/
 
-
+//Cambia de estado al entrenador y lo loggea
 void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const char*motivo){
 	pthread_mutex_lock(&mutexEstadoEntrenador[unEntrenador->id]);
 	t_estado estadoActual = unEntrenador->estado;
@@ -152,6 +157,7 @@ void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const cha
 	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 }
 
+//Incrementa sus recursos y lo contabiliza como inventario global
 void entrenador_capturar(entrenador*entrenador, pokemon*victima){
 
 	recursos_agregar_recurso(entrenador->pokemonesCazados, victima->especie);
@@ -167,6 +173,7 @@ void entrenador_capturar(entrenador*entrenador, pokemon*victima){
 	pokemon_destroy(victima);
 }
 
+//Contabiliza la captura de un pokemon en mapa y en inventarios
 void objetivos_actualizar_por_captura_de(especie_pokemon unaEspecie){
 	pthread_mutex_lock(&mutexInventariosGlobales);
 	recursos_agregar_recurso(inventariosGlobales, unaEspecie);
@@ -177,6 +184,7 @@ void objetivos_actualizar_por_captura_de(especie_pokemon unaEspecie){
 	pthread_mutex_unlock(&mutexRecursosEnMapa);
 }
 
+//Remueve un entrenador de una lista
 entrenador* entrenadores_remover_del_equipo_a(entrenadores unEquipo, t_id id){
 	bool entrenador_cmpId(entrenador*unEntrenador){
 		return id == unEntrenador->id;
@@ -209,7 +217,7 @@ void entrenador_desplazarse_hacia(entrenador* unEntrenador, t_posicion posicionF
 }
 
 bool entrenador_llego_a(entrenador* unEntrenador, t_posicion posicion){
-//	pthread_mutex_lock(&mutexPosicionEntrenador[unEntrenador->id]);
+//	pthread_mutex_lock(&mutexPosicionEntrenador[unEntrenador->id]); //momentaneamente no hace falta ya que se pregunta despues de moverlo
 	t_posicion posDelEntrenador = unEntrenador->posicion;
 //	pthread_mutex_unlock(&mutexPosicionEntrenador[unEntrenador->id]);
 

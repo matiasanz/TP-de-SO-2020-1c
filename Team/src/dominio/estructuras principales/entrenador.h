@@ -4,7 +4,7 @@
 #include "posicion.h"
 #include "recursos.h"
 
-typedef enum{NEW,READY,	EXECUTE, LOCKED_HASTA_APPEARD, LOCKED_HASTA_DEADLOCK, LOCKED_HASTA_CAUGHT,	EXIT} t_estado; //VER cuales vale la pena conservar
+typedef enum{NEW,READY,	EXECUTE, LOCKED_HASTA_APPEARED, LOCKED_HASTA_DEADLOCK, LOCKED_HASTA_CAUGHT,	EXIT} t_estado; //VER cuales vale la pena conservar
 typedef enum{CATCHEAR, CAPTURAR, INTERCAMBIAR /*, FINALIZAR*/ } t_tarea;
 
 //TAD Entrenador
@@ -17,27 +17,31 @@ typedef struct pcb_Entrenador{
 	t_tarea siguienteTarea;
 } entrenador;
 
-//	Constructor; agregar lista infinita de objetivos
+//	Constructor
 	entrenador entrenador_create(t_id, matriz_recursos pokemonesEnInventario, matriz_recursos objetivos, t_posicion unaPos);
 
+// Constructor de puntero
 	entrenador*entrenador_ptr_create(t_id, matriz_recursos pokemonesEnInventario, matriz_recursos objetivos, t_posicion);
 
+//Constructor de entrenador al cual le puedo pasar los recursos como cadenas de caracteres. Ejemplo "Pikachu|Pidgey|Zapato"
+	entrenador*entrenador_ptr_crear(t_id id, char* asignados, char* pedidos, t_posicion);
+
 //	Desplaza un entrenador de una posicion a otra
+//  Definicion en hiloEntrenador
 	void entrenador_desplazarse_hacia(entrenador*, t_posicion);
 
 // Retorna true si la posicion del entrenador coincide con la dada
+//  Definicion en hiloEntrenador
 	bool entrenador_llego_a(entrenador*, t_posicion);
 
 // Retorna true si la cantidad de pokemones cazados no supera la cantidad permitida para ese entrenador
 	bool entrenador_puede_cazar_mas_pokemones(entrenador*);
 
-// Retorna true si todos los objetivos fueron cazados
-	bool entrenador_objetivos_cumplidos(entrenador*);
-
 // Retorna true si el entrenador se encuentra actualmente en dicho estado
 	bool entrenador_en_estado(entrenador* unEntrenador, t_estado ESTADO);
 
 //	Pasa entrenador a un estado y loggea el pasaje con el motivo
+//  Definida en hiloEntrenador
 	void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const char*motivo);
 
 // Retorna una cadena de caracteres con el estado
@@ -76,7 +80,10 @@ entrenador* entrenadores_remover_del_equipo_a(entrenadores, t_id);
 //Retorna true si los recursos que tiene en su inventario cubren sus objetivos
 	bool entrenador_cumplio_sus_objetivos(entrenador*unEntrenador);
 
-//Destructor
+//Destructor de equipo
+	void entrenadores_disolver_equipo(entrenadores unEquipo);
+
+//Destructor de equipo y de entrenadores
 	void entrenadores_destroy(entrenadores);
 
 //***************************************************************************************
