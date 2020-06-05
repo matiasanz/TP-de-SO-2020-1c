@@ -25,6 +25,7 @@ t_config* config_metadata;
 t_config* config_metadata_directorio_pokemon;
 
 int tiempo_de_reintento_operacion;
+int tiempo_retardo_operacion;
 char* punto_montaje_tallgrass;
 
 char* paths_estructuras[4]; //e_key_path_estructura
@@ -41,7 +42,8 @@ void subscribir_y_escuchar_cola_new_pokemon();
 
 
 void crearEstructuras();
-
-
+void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke);
+void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke);
+void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke);
 
 #endif /* SRC_GAMECARD_H_ */

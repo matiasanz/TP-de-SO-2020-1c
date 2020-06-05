@@ -9,6 +9,8 @@
 #define SRC_HILOS_HILO_NEW_POKEMON_H_
 
 #include <crenito-commons/conexiones/conexiones.h>
+#include "../gamecard.h"
+
 
 t_conexion_cliente* conexion_new_pokemon;
 pthread_t hilo_new_pokemon;

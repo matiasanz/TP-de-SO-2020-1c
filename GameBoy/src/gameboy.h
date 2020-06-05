@@ -10,7 +10,7 @@
 
 #include "crenito-commons/conexiones/conexiones.h"
 
-t_conexion_server conexion_broker;
+//t_conexion_server conexion_broker;
 
 void inicializar_logs();
 

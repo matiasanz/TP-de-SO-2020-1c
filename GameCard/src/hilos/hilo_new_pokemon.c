@@ -23,7 +23,9 @@ void subscribir_y_escuchar_cola_new_pokemon(void (*callback)(t_id_cola, void*)) 
 }
 
 void new_pokemon_recibido(t_mensaje_new_pokemon* new_pokemon) {
-
+	pthread_t unHilo;
+	pthread_create(&unHilo, NULL,(void*) gamecard_New_Pokemon, new_pokemon);
+	pthread_detach(unHilo);
 	// no borrar
 	mensaje_new_pokemon_log(logger, new_pokemon);
 }

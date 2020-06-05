@@ -59,6 +59,7 @@ void inicializar_logs() {
 void crearEstructuras(){
 
 	tiempo_de_reintento_operacion=config_get_int_value(config,"TIEMPO_DE_REINTENTO_OPERACION");
+	tiempo_retardo_operacion=config_get_int_value(config,"TIEMPO_RETARDO_OPERACION");
 	punto_montaje_tallgrass=config_get_string_value(config,"PUNTO_MONTAJE_TALLGRASS");
 
 	char* dir_metadata = string_new();
@@ -148,5 +149,20 @@ void crearEstructuras(){
 
 }
 
+void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
+	char* dir_unNuevoPokemon = string_new();
 
+	string_append(&dir_unNuevoPokemon,paths_estructuras[POKEMON]);
+	string_append(&dir_unNuevoPokemon,unMsjNewPoke->pokemon.especie);
+	mkdir(dir_unNuevoPokemon,0777);
+
+
+	log_info(event_logger,"pokemon guardado");
+}
+void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
+
+}
+void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
+
+}
 
