@@ -151,11 +151,39 @@ void crearEstructuras(){
 
 void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 	char* dir_unNuevoPokemon = string_new();
+	char* bin_metadata = string_new();
+
+	FILE* f_metadata;
+
+	t_config* config_metadata_pokemon;
 
 	string_append(&dir_unNuevoPokemon,paths_estructuras[POKEMON]);
 	string_append(&dir_unNuevoPokemon,unMsjNewPoke->pokemon.especie);
 	mkdir(dir_unNuevoPokemon,0777);
 
+	string_append(&bin_metadata,dir_unNuevoPokemon);
+	string_append(&bin_metadata,"/Metadata.bin");
+
+	if((f_metadata=fopen(bin_metadata,"r"))==NULL){ //si no existe el archivo metadata
+			f_metadata=fopen(bin_metadata,"wb+");
+			config_metadata_pokemon=config_create(bin_metadata);
+			config_set_value(config_metadata_pokemon,"DIRECTORY","N");
+			config_set_value(config_metadata_pokemon,"SIZE","0");
+			config_set_value(config_metadata_pokemon,"BLOCKS","[]");
+			config_set_value(config_metadata_pokemon,"OPEN","Y");
+			config_save(config_metadata_pokemon);
+		}else
+			config_metadata_pokemon=config_create(bin_metadata);
+		fclose(f_metadata);
+
+		//todo buscar en el bitmap los bloques libres
+
+
+
+
+		config_destroy(config_metadata_pokemon);
+		free(bin_metadata);
+		free(dir_unNuevoPokemon);
 
 	log_info(event_logger,"pokemon guardado");
 }
