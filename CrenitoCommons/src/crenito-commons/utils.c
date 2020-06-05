@@ -52,18 +52,31 @@ char* get_nombre_cola(t_id_cola id_cola) {
 	}
 }
 
+void string_append_separador(char** string, char* texto) {
+
+	char* string_separador = get_separador_string(texto);
+	string_append_with_format(string, string_separador);
+	free(string_separador);
+}
+
 char* get_separador_string(char* texto) {
 
 	return string_from_format(" \n *************   %s   ************* \n",
 			texto);
 }
 
+void string_append_mensaje_header(char** string, t_mensaje_header header, char* tipo){
+
+	char* string_header = mensaje_header_to_string(header, tipo);
+	string_append_with_format(string, string_header);
+	free(string_header);
+}
+
 char* mensaje_header_to_string(t_mensaje_header header, char* tipo) {
 
 	char *string = string_new();
 
-	string_append_with_format(&string,
-			get_separador_string(LOG_HEADER_MENSAJE_RECIBIDO));
+	string_append_separador(&string, LOG_HEADER_MENSAJE_RECIBIDO);
 	string_append_with_format(&string, " mensaje: %s \n", tipo);
 	string_append_with_format(&string, " id: %d, id_correlativo: %d \n",
 			header.id, header.id_correlativo);

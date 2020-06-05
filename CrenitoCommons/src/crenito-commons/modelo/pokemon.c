@@ -77,7 +77,14 @@ char* pokemon_to_string(t_pokemon pokemon){
 
 	string_append_with_format(&string, " especie: %s \n", pokemon.especie);
 	string_append_with_format(&string, " posición:");
-	string_append_with_format(&string, posicion_to_string(pokemon.posicion));
+	string_append_posicion(&string, pokemon.posicion);
 
 	return string;
+}
+
+void string_append_pokemon(char** string, t_pokemon pokemon){
+
+	char* string_pokemon = pokemon_to_string(pokemon);
+	string_append_with_format(string, string_pokemon);
+	free(string_pokemon);
 }

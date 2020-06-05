@@ -12,7 +12,7 @@
 
 pthread_t hilo_gameboy;
 
-void conectar_gameboy(void(*callback)(void*));
+void conectar_gameboy(void (*callback)(t_id_cola, void*));
 
 
 #endif /* SRC_HILOS_HILO_GAMEBOY_H_ */

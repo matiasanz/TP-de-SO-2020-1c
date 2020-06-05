@@ -7,7 +7,7 @@
 
 #include "../hilos_comunicacion/hilo_appeared_pokemon.h"
 
-void subscribir_y_escuchar_cola_appeared_pokemon(void(*callback)(void*)) {
+void subscribir_y_escuchar_cola_appeared_pokemon(void (*callback)(t_id_cola, void*)) {
 
 	conexion_appeared_pokemon = conexion_cliente_crear(APPEARED_POKEMON,
 			config_get_int_value(config, "TIEMPO_RECONEXION"),

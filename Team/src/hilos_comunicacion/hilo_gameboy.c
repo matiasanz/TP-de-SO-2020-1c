@@ -7,7 +7,7 @@
 
 #include "../hilos_comunicacion/hilo_gameboy.h"
 
-void conectar_gameboy(void(*callback)(void*)) {
+void conectar_gameboy(void (*callback)(t_id_cola, void*)) {
 
 	conexion_gameboy = conexion_host_crear(
 			config_get_string_value(config, "IP_TEAM"),

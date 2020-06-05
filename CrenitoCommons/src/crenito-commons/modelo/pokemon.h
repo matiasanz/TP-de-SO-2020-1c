@@ -24,5 +24,6 @@ void pokemon_destruir(t_pokemon pokemon);
 void* pokemon_serializar(t_pokemon pokemon, int bytes_pokemon);
 t_pokemon pokemon_deserializar(void* stream, int* bytes_pokemon);
 char* pokemon_to_string(t_pokemon pokemon);
+void string_append_pokemon(char** string, t_pokemon pokemon);
 
 #endif /* SRC_CRENITO_COMMONS_MODELO_POKEMON_H_ */

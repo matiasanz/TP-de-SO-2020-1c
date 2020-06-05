@@ -75,8 +75,11 @@ char* get_nombre_proceso(t_id_proceso id_proceso);
 // dado un id de mensaje/nombre de cola el mismo representado por un string
 char* get_nombre_cola(t_id_cola id_cola);
 
+void string_append_separador(char** string, char* texto);
 char* get_separador_string(char* texto);
+
 char* mensaje_header_to_string(t_mensaje_header header, char* tipo);
+void string_append_mensaje_header(char** string, t_mensaje_header header, char* tipo);
 
 int conexion_exitosa(int indicador_conexion);
 int error_conexion(int indicador_conexion);

@@ -92,12 +92,11 @@ char* mensaje_new_pokemon_to_string(t_mensaje_new_pokemon* new_pokemon) {
 
 	char *string = string_new();
 
-	string_append_with_format(&string,
-			mensaje_header_to_string(new_pokemon->mensaje_header,
-			NEW_POKEMON_STRING));
+	string_append_mensaje_header(&string,new_pokemon->mensaje_header,
+			NEW_POKEMON_STRING);
 	string_append_with_format(&string, " cantidad: %d \n",
 				new_pokemon->cantidad);
-	string_append_with_format(&string, pokemon_to_string(new_pokemon->pokemon));
+	string_append_pokemon(&string, new_pokemon->pokemon);
 	string_append(&string, "\n");
 
 	return string;

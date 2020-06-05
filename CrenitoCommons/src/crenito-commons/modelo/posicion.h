@@ -21,5 +21,7 @@ void posicion_destruir(t_posicion* posicion);
 
 char* posicion_to_string(t_posicion posicion);
 char* posicion_list_to_string(t_list* posiciones);
+void string_append_posicion(char** string, t_posicion posicion);
+void string_append_posicion_list(char** string, t_list* posiciones);
 
 #endif /* SRC_CRENITO_COMMONS_MODELO_POSICION_H_ */

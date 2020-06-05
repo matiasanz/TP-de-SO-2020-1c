@@ -7,7 +7,7 @@
 
 #include "conexiones-utils.h"
 
-t_conexion_host* conexion_host_crear(char* ip, char* puerto, void(*callback)(void*)) {
+t_conexion_host* conexion_host_crear(char* ip, char* puerto, void (*callback)(t_id_cola, void*)) {
 
 	t_conexion_host* host = malloc(sizeof(t_conexion_host));
 
@@ -29,7 +29,12 @@ t_conexion_server* conexion_server_crear(char* ip, char* puerto, t_id_proceso id
 	return server;
 }
 
-t_conexion_cliente* conexion_cliente_crear(t_id_cola id_cola , int segundos_reconexion, void(*callback)(void*)) {
+void conexion_server_destruir(t_conexion_server* server) {
+
+	free(server);
+}
+
+t_conexion_cliente* conexion_cliente_crear(t_id_cola id_cola , int segundos_reconexion, void (*callback)(t_id_cola, void*)) {
 
 	t_conexion_cliente* cliente = malloc(sizeof(t_conexion_cliente));
 
@@ -39,6 +44,12 @@ t_conexion_cliente* conexion_cliente_crear(t_id_cola id_cola , int segundos_reco
 	cliente -> callback = callback;
 
 	return cliente;
+}
+
+void conexion_cliente_destruir(t_conexion_cliente* cliente) {
+
+	subscriptor_destruir(cliente ->subscriptor);
+	free(cliente);
 }
 
 t_conexion* conexion_crear(t_conexion_server* server, t_conexion_cliente* cliente) {
@@ -53,18 +64,25 @@ t_conexion* conexion_crear(t_conexion_server* server, t_conexion_cliente* client
 
 void conexion_destruir(t_conexion* conexion) {
 
+	conexion_server_destruir(conexion -> server);
+	conexion_cliente_destruir(conexion -> cliente);
 	free(conexion);
 }
 
 
 t_subscriptor* subscriptor_crear(uint32_t socket, uint32_t id_subscriptor) {
 
-	t_subscriptor* subscriptor = malloc(id_subscriptor);
+	t_subscriptor* subscriptor = malloc(sizeof(t_subscriptor));
 
 	subscriptor->id_subcriptor = id_subscriptor;
 	subscriptor->socket = socket;
 
 	return subscriptor;
+}
+
+void subscriptor_destruir(t_subscriptor* subscriptor) {
+
+	free(subscriptor);
 }
 
 void* deserializar(void* msj, t_id_cola id_cola) {

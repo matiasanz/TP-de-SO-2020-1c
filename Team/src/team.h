@@ -18,6 +18,9 @@
 #include "header_global_team.h"
 #include <pthread.h>
 
+/*Constantes*/
+#define CONFIG_PATH "config/team.config"
+
 //funciones del team
 void team_inicializar();
 int team_exit();
@@ -25,16 +28,13 @@ int team_exit();
 //funciones auxiliares
 void inicializar_listas();
 void listas_destroy();
-
-void subscribpcion_colas(); //(?)
-
+void inicializar_conexiones();
 void inicializar_semaforos();
 void finalizar_semaforos();
 void inicializar_hilos();
 void finalizar_hilos();
 
-/*Constantes*/
-#define CONFIG_PATH "config/team.config"
+/*Variables Globales*/
 
 /*Mis Listas (son variables globales, para que puedan acceder todos los hilos)*/
 	entrenadores equipo;
@@ -49,13 +49,5 @@ void finalizar_hilos();
 	cr_list*mensajesAPPEARED;
 	cr_list*mensajesCAUGHT;
 	cr_list*mensajesLOCALIZED;
-
-
-int inicializar();
-void inicializar_conexiones();
-
-void exit_team();
-
-
 
 #endif /* SRC_TEAM_H_ */

@@ -89,9 +89,9 @@ char* mensaje_get_pokemon_to_string(t_mensaje_get_pokemon* get_pokemon) {
 
 	char *string = string_new();
 
-	string_append_with_format(&string,
-			mensaje_header_to_string(get_pokemon->mensaje_header,
-			GET_POKEMON_STRING));
+	string_append_mensaje_header(&string,get_pokemon->mensaje_header,
+			GET_POKEMON_STRING);
+
 	string_append_with_format(&string, " especie: %s", get_pokemon->especie);
 	string_append(&string, "\n");
 

@@ -25,26 +25,41 @@ t_posicion* posicion_crear_ptr(uint32_t pos_x, uint32_t pos_y) {
 	return posicion;
 }
 
-void posicion_destruir(t_posicion* posicion){
+void posicion_destruir(t_posicion* posicion) {
 
 	free(posicion);
 }
 
-char* posicion_to_string(t_posicion posicion){
+char* posicion_to_string(t_posicion posicion) {
 
 	return string_from_format(" (%d, %d)", posicion.pos_x, posicion.pos_y);
 }
 
-char* posicion_list_to_string(t_list* posiciones){
+char* posicion_list_to_string(t_list* posiciones) {
 
 	char *string = string_new();
 
-	string_append_with_format(&string, " posiciones: %d -->", list_size(posiciones));
+	string_append_with_format(&string, " posiciones: %d -->",
+			list_size(posiciones));
 
 	for (int i = 0; i < list_size(posiciones); ++i) {
 		t_posicion* posicion = list_get(posiciones, i);
-		string_append_with_format(&string, posicion_to_string(*posicion), " ");
+		string_append_posicion(&string, *posicion);
 	}
 
 	return string;
+}
+
+void string_append_posicion_list(char** string, t_list* posiciones){
+
+	char* string_pos_list = posicion_list_to_string(posiciones);
+	string_append_with_format(string, string_pos_list);
+	free(string_pos_list);
+}
+
+void string_append_posicion(char** string, t_posicion posicion) {
+
+	char * string_pos = string_from_format(" (%d, %d)", posicion.pos_x, posicion.pos_y);
+	string_append_with_format(string, string_pos);
+	free(string_pos);
 }

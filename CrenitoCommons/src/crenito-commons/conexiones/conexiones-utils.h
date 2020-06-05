@@ -46,7 +46,7 @@ typedef struct {
 	t_subscriptor* subscriptor;
 	t_id_cola id_cola; //cola a la que el cliente se subscribe
 	int segundos_reconexion;
-	void(*callback)(void*); //funcion a ejecutar cuando se recibe un mensaje (funcion escucha)
+	void (*callback)(t_id_cola, void*); //funcion a ejecutar cuando se recibe un mensaje (funcion escucha)
 } t_conexion_cliente;
 
 /* 
@@ -56,7 +56,7 @@ typedef struct {
 typedef struct {
 	char* ip;
 	char* puerto;
-	void(*callback)(void*); //funcion a ejecutar cuando se recibe un mensaje (funcion escucha)
+	void (*callback)(t_id_cola, void*); //funcion a ejecutar cuando se recibe un mensaje (funcion escucha)
 } t_conexion_host;
 
 typedef struct {
@@ -70,12 +70,19 @@ t_conexion_host* conexion_gameboy;
 pthread_mutex_t mutex_subscripcion;
 
 //Funciones auxiliares utilizadas por conexiones.h
-t_conexion_host* conexion_host_crear(char* ip, char* puerto, void(*callback)(void*));
+t_conexion_host* conexion_host_crear(char* ip, char* puerto, void (*callback)(t_id_cola, void*));
+
 t_conexion_server* conexion_server_crear(char* ip, char* puerto, t_id_proceso id_proceso);
-t_conexion_cliente* conexion_cliente_crear(t_id_cola id_cola, int segundos_reconexion, void(*callback)(void*));
+void conexion_server_destruir(t_conexion_server* server);
+
+t_conexion_cliente* conexion_cliente_crear(t_id_cola id_cola, int segundos_reconexion, void (*callback)(t_id_cola, void*));
+void conexion_cliente_destruir(t_conexion_cliente* cliente);
+
 t_conexion* conexion_crear(t_conexion_server* server, t_conexion_cliente* cliente);
 void conexion_destruir(t_conexion* conexion);
+
 t_subscriptor* subscriptor_crear(uint32_t socket, uint32_t id_subscriptor);
+void subscriptor_destruir(t_subscriptor* subscriptor);
 
 t_buffer* serializar(void* msj, t_id_cola id_cola);
 void* deserializar(void* msj, t_id_cola id_cola);
