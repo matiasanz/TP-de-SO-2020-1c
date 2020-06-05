@@ -43,6 +43,9 @@ typedef especie_pokemon recurso;
 // A la primera matriz le resta el contenido de la segunda, asumiendo que tienen recursos del mismo tipo y la diferencia resulta positiva
 	void recursos_restar_recursos_a(matriz_recursos aQuien, matriz_recursos cuales);
 
+// Retorna la suma de ambas matrices
+	matriz_recursos recursos_matriz_suma(matriz_recursos unaMatriz, matriz_recursos otra);
+
 // Retorna la diferencia entre la primera y la segunda
 	matriz_recursos recursos_matriz_diferencia(matriz_recursos, matriz_recursos);
 

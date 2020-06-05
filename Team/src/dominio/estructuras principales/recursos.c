@@ -161,6 +161,13 @@ matriz_recursos recursos_duplicar(matriz_recursos recursos){
 	return duplicada;
 }
 
+matriz_recursos recursos_matriz_suma(matriz_recursos unaMatriz, matriz_recursos otra){
+	matriz_recursos suma = recursos_duplicar(unaMatriz);
+	recursos_sumar_recursos_a(suma, otra);
+
+	return suma;
+}
+
 matriz_recursos recursos_matriz_diferencia(matriz_recursos unaMatriz, matriz_recursos otraMatriz){
 	matriz_recursos matrizDiferencia = recursos_duplicar(unaMatriz);
 	recursos_restar_recursos_a(matrizDiferencia, otraMatriz);
