@@ -17,7 +17,9 @@ pares_intercambio intercambiosPendientes;
 //Es un gran TODO
 void team_ejecutar_algoritmo_de_deteccion_de_deadlock(){
 
+//		sem_wait(&entrenador_dejo_de_ejecutar)xcantEntr; //Semaforo que hacen signal cada vez que un entrenador no puede cazar mas pkms
 	while(PROCESO_ACTIVO){
+
 		sleep(TIEMPO_ENTRE_DETECCIONES);
 
 		entrenadores entrenadoresEnDeadlock = entrenadores_create();
