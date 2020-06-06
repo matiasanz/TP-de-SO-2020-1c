@@ -17,18 +17,18 @@
 
 
 
-typedef enum{METADATA,FILES,BLOCKS,POKEMON} e_key_path_estructura;
+typedef enum{METADATA,FILES,BLOCKS} e_key_path_estructura;
 
 //---variables Globales-----------
 
 t_config* config_metadata;
-t_config* config_metadata_directorio_pokemon;
+t_config* config_metadata_directorio_files;
 
 int tiempo_de_reintento_operacion;
 int tiempo_retardo_operacion;
 char* punto_montaje_tallgrass;
 
-char* paths_estructuras[4]; //e_key_path_estructura
+char* paths_estructuras[3]; //e_key_path_estructura
 
 //-------------------------
 

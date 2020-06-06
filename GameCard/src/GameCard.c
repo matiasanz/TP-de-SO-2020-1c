@@ -67,9 +67,7 @@ void crearEstructuras(){
 	char* dir_blocks = string_new();
 	char* bin_metadata = string_new();
 	char* bin_bitmap = string_new();
-
-	char* dir_pokemon = string_new();
-	char* bin_metadataPokemon = string_new();
+	char* bin_metadataFiles = string_new();
 
 	FILE* f_metadata;
 
@@ -108,44 +106,41 @@ void crearEstructuras(){
 	log_info(event_logger,"Creado archivo Metadata.bin");
 
 	//-----------------------------------
+	FILE* f_bitmap;
 
 	string_append(&bin_bitmap,dir_metadata);
 	string_append(&bin_bitmap,"/Bitmap.bin");
-	/*
-	if(){
-		//todo creacion de bitmap
+
+	if((f_bitmap=fopen(bin_bitmap,"rb+"))==NULL){// si no existe archivo bitmap
+		f_bitmap=fopen(bin_bitmap,"wb+");
 	}
-	 */
+	//todo
+	fclose(f_bitmap);
+
 	//-----------------------------
 
-	string_append(&dir_pokemon,dir_files);
-	string_append(&dir_pokemon,"Pokemon/");
-	mkdir(dir_pokemon,0777);
-	log_info(event_logger,"Creada carpeta Pokemon");
-
-	string_append(&bin_metadataPokemon,dir_pokemon);
-	string_append(&bin_metadataPokemon,"/Metadata.bin");
-	if((f_metadata=fopen(bin_metadataPokemon,"r"))==NULL){ //si no existe el archivo metadata
-			f_metadata=fopen(bin_metadataPokemon,"wb+");
-			config_metadata_directorio_pokemon=config_create(bin_metadataPokemon);
-			config_set_value(config_metadata_directorio_pokemon,"DIRECTORY","Y");
-			config_save(config_metadata_directorio_pokemon);
+	string_append(&bin_metadataFiles,dir_files);
+	string_append(&bin_metadataFiles,"/Metadata.bin");
+	if((f_metadata=fopen(bin_metadataFiles,"r"))==NULL){ //si no existe el archivo metadata
+			f_metadata=fopen(bin_metadataFiles,"wb+");
+			config_metadata_directorio_files=config_create(bin_metadataFiles);
+			config_set_value(config_metadata_directorio_files,"DIRECTORY","Y");
+			config_save(config_metadata_directorio_files);
 		}else
-			config_metadata_directorio_pokemon=config_create(bin_metadata);
+			config_metadata_directorio_files=config_create(bin_metadataFiles);
 
 		fclose(f_metadata);
-		log_info(event_logger,"Creado archivo Metadata.bin de directorio Pokemon");
+		log_info(event_logger,"Creado archivo Metadata.bin de directorio Files");
 
 
 		paths_estructuras[METADATA] = dir_metadata;
 		paths_estructuras[FILES] = dir_files;
 		paths_estructuras[BLOCKS] = dir_blocks;
-		paths_estructuras[POKEMON] = dir_pokemon;
 
 	free(bin_metadata);
 	free(bin_bitmap);
-	free(bin_metadataPokemon);
-	config_destroy(config_metadata_directorio_pokemon);
+	free(bin_metadataFiles);
+	config_destroy(config_metadata_directorio_files);
 
 }
 
@@ -157,7 +152,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 	t_config* config_metadata_pokemon;
 
-	string_append(&dir_unNuevoPokemon,paths_estructuras[POKEMON]);
+	string_append(&dir_unNuevoPokemon,paths_estructuras[FILES]);
 	string_append(&dir_unNuevoPokemon,unMsjNewPoke->pokemon.especie);
 	mkdir(dir_unNuevoPokemon,0777);
 
