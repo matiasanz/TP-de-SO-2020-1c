@@ -16,6 +16,7 @@ pthread_t hiloPlanificador;
 pthread_t hiloMensajesAppeard;
 pthread_t hiloMensajesCAUGHT;
 pthread_t hiloMensajesLOCALIZED;
+pthread_t hiloDetectorDeDeadlock; //TODO
 
 //Semaforos
 
@@ -30,6 +31,7 @@ pthread_mutex_t*mutexEstadoEntrenador;
 pthread_mutex_t*mutexPosicionEntrenador;
 pthread_mutex_t mutexInventariosGlobales;
 pthread_mutex_t mutexRecursosEnMapa;
+pthread_mutex_t mutexCandidatosIntercambio; //TODO
 
 
 //HARDCODEOS ---------------------------------- ACORDARME DE BORRARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR

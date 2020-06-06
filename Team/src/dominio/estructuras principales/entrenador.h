@@ -75,7 +75,7 @@ entrenador* entrenadores_remover_del_equipo_a(entrenadores, t_id);
 	entrenadores entrenadores_en_estado(entrenadores, t_estado estado);
 
 //Retorna true si el entrenador requiere al menos una instancia de la especie
-	bool entrenador_necesita_recurso(entrenador*unEntrenador); //TODO
+	bool entrenador_necesita_recurso(entrenador*, especie_pokemon);//TODO
 
 //Retorna true si los recursos que tiene en su inventario cubren sus objetivos
 	bool entrenador_cumplio_sus_objetivos(entrenador*unEntrenador);
