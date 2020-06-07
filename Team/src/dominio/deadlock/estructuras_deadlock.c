@@ -21,7 +21,7 @@ bool candidato_puede_intercambiar_con(candidato_intercambio*unEntrenador, candid
 recurso candidato_recurso_que_le_entrega_a(candidato_intercambio* self, candidato_intercambio* aQuien){
 	recurso unRecurso = recursos_alguno_en_comun_con(self->sobrantes, aQuien->necesidad);
 
-	return unRecurso? unRecurso : recursos_cualquier_recurso(aQuien->sobrantes);
+	return unRecurso? unRecurso : recursos_cualquier_recurso(self->sobrantes);
 }
 
 void recursos_intercambiar_instancia_de(matriz_recursos recursos, recurso deQuien, recurso porQuien){
@@ -29,17 +29,19 @@ void recursos_intercambiar_instancia_de(matriz_recursos recursos, recurso deQuie
 	recursos_agregar_recurso(recursos, porQuien);
 }
 
-void candidato_actualizar_matrices_por_intercambio(candidato_intercambio* unCandidato, recurso cualDio, recurso porCual){
+void candidato_actualizar_matrices_por_intercambio(candidato_intercambio* unCandidato, recurso cualDio, recurso cualRecibio){
 	recursos_quitar_instancia_de_recurso(unCandidato->sobrantes, cualDio);
 
-	bool loEstafaron = !recursos_cantidad_de_instancias_de(unCandidato->necesidad, porCual);
+	bool loEstafaron = !recursos_cantidad_de_instancias_de(unCandidato->necesidad, cualRecibio);
 
-	recursos_agregar_recurso((loEstafaron? unCandidato->sobrantes: unCandidato->necesidad), porCual);
+	recursos_agregar_recurso((loEstafaron? unCandidato->sobrantes: unCandidato->necesidad), cualRecibio);
 }
 
 void candidato_intercambiar_con(candidato_intercambio* self, candidato_intercambio* parejaDeIntercambio){
 	recurso teDoyEste = candidato_recurso_que_le_entrega_a(self, parejaDeIntercambio);
 	recurso aCambioDeEste = candidato_recurso_que_le_entrega_a(parejaDeIntercambio, self);
+
+	printf("El Entrenador N°%u le intercambio al N°%u un %s por un %s", self->unEntrenador->id, parejaDeIntercambio->unEntrenador->id, teDoyEste, aCambioDeEste);
 
 	recursos_intercambiar_instancia_de(self->unEntrenador->pokemonesCazados, teDoyEste, aCambioDeEste);
 	recursos_intercambiar_instancia_de(parejaDeIntercambio->unEntrenador->pokemonesCazados, aCambioDeEste, teDoyEste);

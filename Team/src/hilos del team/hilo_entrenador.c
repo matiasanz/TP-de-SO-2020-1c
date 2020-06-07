@@ -15,8 +15,6 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 		switch(unEntrenador->siguienteTarea){
 			case CATCHEAR: {
 				pokemon*unPokemon = mapa_desmapear(pokemonesRequeridos);
-				//Si no tengo pokemones en mapa pero le toca ejecutar por criterio, tengo un overhead hasta que llegue alguno. En teoria siempre van a estar llegando pokemones
-				//Duda: que pasa cuando criterio no es fifo TODO
 
 				entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar y lo va a utilizar para intentar cachear");
 
@@ -65,7 +63,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 				candidato_intercambio*self = list_remove(potencialesDeadlock, 0);
 				candidato_intercambio*parejaDeIntercambio = candidatos_pareja_de_intercambio_para(potencialesDeadlock, self);
 
-				candidato_desplazarse_hacia_el_otro(self, parejaDeIntercambio); //Duda
+				candidato_desplazarse_hacia_el_otro(self, parejaDeIntercambio);
 
 				while(candidato_puede_intercambiar_con(self, parejaDeIntercambio)){
 					candidato_intercambiar_con(self, parejaDeIntercambio);

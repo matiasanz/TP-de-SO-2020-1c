@@ -2,6 +2,9 @@
 #include "hilos_team.h"
 #include<semaphore.h>
 
+/*TODO
+ * Agregar equipo_despertar_en_caso_de_DEADLOCK();
+ */
 void team_planificar(){
 	puts("**********************************************\nSe va a planificar");
 
