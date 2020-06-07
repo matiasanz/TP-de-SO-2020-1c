@@ -69,6 +69,8 @@ void crearEstructuras(){
 	char* bin_bitmap = string_new();
 	char* bin_metadataFiles = string_new();
 
+	char* bin_block = string_new();
+
 	FILE* f_metadata;
 
 	mkdir(punto_montaje_tallgrass,0777);
@@ -105,17 +107,33 @@ void crearEstructuras(){
 	fclose(f_metadata);
 	log_info(event_logger,"Creado archivo Metadata.bin");
 
-	//-----------------------------------
-	FILE* f_bitmap;
+	//---------------Creacion de Bitmap--------------------
 
 	string_append(&bin_bitmap,dir_metadata);
 	string_append(&bin_bitmap,"/Bitmap.bin");
 
 	if((f_bitmap=fopen(bin_bitmap,"rb+"))==NULL){// si no existe archivo bitmap
 		f_bitmap=fopen(bin_bitmap,"wb+");
+
+		char* bitarray_temp=malloc(tope(config_get_int_value(config_metadata,"BLOCKS"),8));
+		fwrite((void*)bitarray_temp,tope(config_get_int_value(config_metadata,"BLOCKS"),8),1,f_bitmap);
+		free(bitarray_temp);
+
 	}
-	//todo
-	fclose(f_bitmap);
+	fseek(f_bitmap, 0, SEEK_END);
+	int file_size = ftell(f_bitmap);
+	fseek(f_bitmap, 0, SEEK_SET);
+
+	char* bitarray_str=(char*)mmap(NULL,file_size,PROT_READ | PROT_WRITE | PROT_EXEC,MAP_SHARED,fileno(f_bitmap),0);
+
+	if(bitarray_str == (char*) -1) {
+			log_error(logger, "Fallo el mmap");
+	}
+
+	fread((void*) bitarray_str, sizeof(char), file_size, f_bitmap);
+	bitmap = bitarray_create_with_mode(bitarray_str, file_size, MSB_FIRST);
+	log_info(logger, "Creado el archivo Bitmap.bin");
+
 
 	//-----------------------------
 
@@ -130,9 +148,36 @@ void crearEstructuras(){
 			config_metadata_directorio_files=config_create(bin_metadataFiles);
 
 		fclose(f_metadata);
+		config_destroy(config_metadata_directorio_files);
 		log_info(event_logger,"Creado archivo Metadata.bin de directorio Files");
 
 
+	///---------------Verificacion y Creacion de bloques--------
+		FILE* f_block;
+
+		string_append(&bin_block,dir_blocks);
+		string_append(&bin_block,"/1.bin");
+
+		if((f_block=fopen(bin_block,"r"))==NULL){
+		free(bin_block);
+
+		int x;
+		for(x=1;x<=config_get_int_value(config_metadata,"BLOCKS");x++){
+			bin_block = string_new();
+			string_append(&bin_block,dir_blocks);
+			string_append(&bin_block,string_itoa(x));
+			string_append(&bin_block,".bin");
+			f_block=fopen(bin_block,"wb+");
+			fclose(f_block);
+			free(bin_block);
+		}
+		}else{
+			free(bin_block);
+			fclose(f_block);
+		}
+
+		log_info(event_logger,"Creado los bloques .bin");
+	//----------------------
 		paths_estructuras[METADATA] = dir_metadata;
 		paths_estructuras[FILES] = dir_files;
 		paths_estructuras[BLOCKS] = dir_blocks;
@@ -140,7 +185,6 @@ void crearEstructuras(){
 	free(bin_metadata);
 	free(bin_bitmap);
 	free(bin_metadataFiles);
-	config_destroy(config_metadata_directorio_files);
 
 }
 

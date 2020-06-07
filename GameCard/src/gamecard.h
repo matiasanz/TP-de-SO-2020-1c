@@ -13,9 +13,11 @@
 
 
 #include <commons/string.h>
+#include <commons/bitarray.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
 
-
+#define tope(x,y) (((x)+(y)-1)/(y))
 
 typedef enum{METADATA,FILES,BLOCKS} e_key_path_estructura;
 
@@ -27,6 +29,9 @@ t_config* config_metadata_directorio_files;
 int tiempo_de_reintento_operacion;
 int tiempo_retardo_operacion;
 char* punto_montaje_tallgrass;
+
+t_bitarray* bitmap;
+FILE* f_bitmap;
 
 char* paths_estructuras[3]; //e_key_path_estructura
 
