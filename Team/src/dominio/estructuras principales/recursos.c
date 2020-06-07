@@ -197,3 +197,20 @@ bool recursos_suficientes_para(matriz_recursos proveedora, matriz_recursos recep
 
 	return SiONo;
 }
+
+recurso recursos_alguno_en_comun_con(matriz_recursos quien, matriz_recursos conQuien){
+	bool enComun(recurso unRecurso, void*cantidad){
+		return *((int*) cantidad) && recursos_get(conQuien, unRecurso);
+	}
+
+	return dictionary_get_any_key(quien, &enComun);
+}
+
+recurso recursos_cualquier_recurso(matriz_recursos recursos){
+	bool cualquiera(recurso unRecurso, void* cantidad){
+		return *((int*)cantidad)>0;
+	}
+
+	return dictionary_get_any_key(recursos, &cualquiera);
+}
+

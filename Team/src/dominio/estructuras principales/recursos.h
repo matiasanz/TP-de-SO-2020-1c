@@ -64,6 +64,12 @@ typedef especie_pokemon recurso;
 // Retorna true si la proveedora tiene mas instancias de cada recurso que la receptora
 	bool recursos_suficientes_para(matriz_recursos proveedora, matriz_recursos receptora);
 
+// Retorna un recurso que tienen ambas
+	recurso recursos_alguno_en_comun_con(matriz_recursos quien, matriz_recursos conQuien);
+
+// Retorna un recurso aleatorio de los que posee la matriz
+	recurso recursos_cualquier_recurso(matriz_recursos);
+
 // Retorna una copia de la matriz que se ingresa por parametro
 	matriz_recursos recursos_duplicar(matriz_recursos);
 

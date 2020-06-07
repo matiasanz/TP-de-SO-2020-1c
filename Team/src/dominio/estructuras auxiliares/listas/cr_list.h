@@ -85,5 +85,10 @@ bool cr_list_contains_element(cr_list*, void* elemento, bool (*comparator)(void 
 //Retorna true si algun elemento de la lista coincide, segun el criterio dado
 bool list_contains_element(t_list*, void* elemento, bool (*comparator)(void *, void *));
 
+//****************************************************************************************
+#include <commons/collections/dictionary.h>
+
+//Retorna la key de algun elemento que cumpla la condicion
+	char* dictionary_get_any_key(t_dictionary* self, bool(*condition)(char*, void*));
 
 # endif

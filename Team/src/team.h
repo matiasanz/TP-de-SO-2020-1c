@@ -6,6 +6,8 @@
 #include "dominio/estructuras auxiliares/lector_config.h"
 #include "dominio/estructuras auxiliares/captura_pendiente.h"
 #include "dominio/estructuras auxiliares/mensajes.h"
+#include "dominio/deadlock/detector de deadlock.h"
+#include "dominio/deadlock/estructuras_deadlock.h"
 
 #include "dominio/header_global_team.h"
 
@@ -40,11 +42,10 @@ void finalizar_hilos();
 	matriz_recursos recursosEnMapa; //cambiar nombre por recursosPorAdquirir o algo mas representativo
 	pendientes capturasPendientes; //cambiar tipo de dato por capturas_pendientes
 	especies_pokemones historialDePokemones;
-
-//Colas de mensajes (BORRAR A FUTURO)
 	cr_list*mensajesAPPEARD;
 	cr_list*mensajesCAUGHT;
 	cr_list*mensajesLOCALIZED;
+	candidatos_intercambio potencialesDeadlock;
 
 /*--------------*/
 

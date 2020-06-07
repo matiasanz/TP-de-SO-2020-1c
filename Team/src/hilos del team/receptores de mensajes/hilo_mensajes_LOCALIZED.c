@@ -34,7 +34,6 @@ void team_suscriptor_cola_LOCALIZED(cr_list* mensajes){
 void registrar_en_cada_posicion(especie_pokemon unaEspecie, posiciones listaDePosiciones){
 
 	void registrarEnCadaPosicion(t_posicion* pos){
-		printf("----------------------------------------------------Localized %s\n", unaEspecie);
 		pokemon* unPokemon = pokemon_ptr_create(unaEspecie, pos->pos_x, pos->pos_y);
 		registrar_pokemon(unPokemon);
 	}

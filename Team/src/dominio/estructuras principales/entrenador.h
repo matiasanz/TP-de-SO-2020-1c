@@ -47,6 +47,12 @@ typedef struct pcb_Entrenador{
 // Retorna una cadena de caracteres con el estado
 	char*estadoFromEnum(t_estado);
 
+// Retorna una matriz con los recursos que capturo y no necesita
+	matriz_recursos entrenador_recursos_sobrantes(entrenador*);
+
+// Retorna una matriz con los objetivos que aun no logro capturar
+	matriz_recursos entrenador_recursos_pedidos(entrenador*);
+
 //Destructor
 	void entrenador_destroy(entrenador*);
 

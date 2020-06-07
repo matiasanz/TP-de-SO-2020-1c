@@ -30,6 +30,15 @@ bool entrenador_cumplio_sus_objetivos(entrenador*unEntrenador){
 	return recursos_suficientes_para(unEntrenador->pokemonesCazados, unEntrenador->objetivos);
 }
 
+matriz_recursos entrenador_recursos_sobrantes(entrenador*unEntrenador){
+	return recursos_matriz_diferencia_positiva(unEntrenador->pokemonesCazados, unEntrenador->objetivos);
+}
+
+//retorna los objetivos no cumplidos del entrenador, o sea, la "necesidad particular"
+matriz_recursos entrenador_recursos_pedidos(entrenador*unEntrenador){
+	return recursos_matriz_diferencia_positiva(unEntrenador->objetivos, unEntrenador->pokemonesCazados);
+}
+
 bool entrenador_puede_cazar_mas_pokemones(entrenador* unEntrenador){
 	return recursos_contar(unEntrenador->objetivos) > recursos_contar(unEntrenador->pokemonesCazados);
 }
@@ -83,6 +92,35 @@ matriz_recursos entrenadores_inventarios_globales(entrenadores unEquipo){ //Ver 
 
 }
 
+matriz_recursos entrenadores_pedidos_insatisfechos(entrenadores unEquipo){
+	matriz_recursos pedidos = recursos_create();
+
+	void sumarInsatisfechos(entrenador*unEntrenador){
+		matriz_recursos necesidad = entrenador_recursos_pedidos(unEntrenador); //Se va a ir con nueva estructura
+		recursos_sumar_recursos_a(pedidos, necesidad);
+		recursos_destroy(necesidad);
+	}
+
+	list_iterate(unEquipo, (void(*)(void*))&sumarInsatisfechos);
+
+	return pedidos;
+}
+
+matriz_recursos entrenadores_recursos_sobrantes(entrenadores unEquipo){
+	matriz_recursos sobrantes = recursos_create();
+
+	void sumarSobrantes(entrenador*unEntrenador){
+		matriz_recursos disponibles = entrenador_recursos_sobrantes(unEntrenador); //Se va a ir con nueva estructura
+		recursos_sumar_recursos_a(sobrantes, disponibles);
+		recursos_destroy(disponibles);
+	}
+
+	list_iterate(unEquipo, (void(*)(void*))&sumarSobrantes);
+
+	return sobrantes;
+
+}
+
 //
 entrenadores entrenadores_en_estado(entrenadores equipo, t_estado unEstado){
 	bool esta_en_estado(void* unEntrenador){
@@ -112,7 +150,7 @@ entrenador*entrenador_esperar_y_desencolar(cola_entrenadores cola){
 	return cr_list_wait_and_remove(cola, 0);
 }
 
-//Ver si poner CRITERIO, con enum
+//Ver si poner CRITERIO, con enum TODO pasar a planificador
 entrenador* entrenadores_proximo_a_planificar(cola_entrenadores colaDeReady){
 //	switch(criterio){
 //		case FIFO: {

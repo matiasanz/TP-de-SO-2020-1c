@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <semaphore.h>
-
 #include <commons/collections/list.h>
 #include "../dominio/estructuras principales/pokemon.h"
 
@@ -16,14 +15,15 @@ pthread_t hiloPlanificador;
 pthread_t hiloMensajesAppeard;
 pthread_t hiloMensajesCAUGHT;
 pthread_t hiloMensajesLOCALIZED;
-pthread_t hiloDetectorDeDeadlock; //TODO
 
 //Semaforos
 
 sem_t* EjecutarEntrenador;
+sem_t EquipoNoPuedaCazarMas;
 sem_t EntradaSalida_o_FinDeEjecucion;
 sem_t HayTareasPendientes;
 sem_t HayEntrenadores;
+sem_t finDeIntercambio;
 
 pthread_mutex_t mutexHistorialEspecies;
 pthread_mutex_t mutexEntrenadores;
@@ -31,8 +31,9 @@ pthread_mutex_t*mutexEstadoEntrenador;
 pthread_mutex_t*mutexPosicionEntrenador;
 pthread_mutex_t mutexInventariosGlobales;
 pthread_mutex_t mutexRecursosEnMapa;
-pthread_mutex_t mutexCandidatosIntercambio; //TODO
 
+//Variables globales
+numero cantidadDeEntrenadores; //Me guarda el tamaño del array para cuando tenga que finalizar
 
 //HARDCODEOS ---------------------------------- ACORDARME DE BORRARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
 pthread_mutex_t MUTEX_FIN_DE_PROCESO_BORRARRRRRRRRRRRRRRRR;

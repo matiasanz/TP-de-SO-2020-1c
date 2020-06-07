@@ -221,3 +221,23 @@ bool cr_list_contains_element(cr_list* unaLista, void* elemento, bool (*comparat
 	pthread_mutex_unlock(unaLista->mutex);
 	return siONo;
 }
+
+//******************************************************************************************
+
+char* dictionary_get_any_key(t_dictionary* self, bool(*condition)(char*, void*)){
+	int table_index;
+	for (table_index = 0; table_index < self->table_max_size; table_index++) {
+		t_hash_element *element = self->elements[table_index];
+
+		while (element != NULL) {
+
+			if(condition(element->key, element->data)){
+				return element->key;
+			}
+
+			element = element->next;
+		}
+	}
+
+	return NULL;
+}

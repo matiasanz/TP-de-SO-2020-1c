@@ -20,6 +20,7 @@ void team_suscriptor_cola_CAUGHT(cr_list* mensajes){
 			if(resultado->tuvoExito){
 				entrenador_pasar_a(unEntrenador, READY, "Se confirmo la captura del pokemon");
 				cr_list_add_and_signal(entrenadoresReady, unEntrenador);
+				sem_post(&HayTareasPendientes);
 			}
 
 			else{
@@ -34,7 +35,6 @@ void team_suscriptor_cola_CAUGHT(cr_list* mensajes){
 
 			free(resultado); //Se descarta el id
 
-			sem_post(&HayTareasPendientes);
 		}
 
 		else { //La idea es que esto despues no este

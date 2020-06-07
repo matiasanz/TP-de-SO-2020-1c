@@ -1,5 +1,8 @@
 #include "hilos_team.h"
+#include "../dominio/deadlock/estructuras_deadlock.h"
 #include "../team.h"
+
+bool entrenador_validar_objetivos(entrenador*unEntrenador);
 
 void team_hilo_entrenador(entrenador*unEntrenador){
 	printf("Entrenador N°%u en espera\n", unEntrenador->id);
@@ -9,10 +12,10 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 	while(hiloActivo){
 
 		sem_wait(&EjecutarEntrenador[pid]);
-		entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar");
-
 		switch(unEntrenador->siguienteTarea){
 			case CATCHEAR: {
+				entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar y lo va a utilizar para intentar cachear");
+
 				pokemon*unPokemon = mapa_desmapear(pokemonesRequeridos);
 
 				entrenador_desplazarse_hacia(unEntrenador, unPokemon->posicion);
@@ -37,6 +40,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 			}
 
 			case CAPTURAR: {
+				entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar y lo va a utilizar para capturar");
 				captura_pendiente* capturaPendiente = pendientes_pendiente_del_entrenador(capturasPendientes, pid);
 
 				if(!capturaPendiente){
@@ -53,51 +57,33 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARED, "Tuvo exito en la captura y todavia puede cazar mas pokemones");
 				}
 
-				else if(entrenador_cumplio_sus_objetivos(unEntrenador)){
-					//Abstraer a una funcion para que INTERCAMBIAR haga lo mismo
-//					unEntrenador->siguienteTarea = FINALIZAR;
-
-					printf("Objetivos: "); recursos_mostrar(unEntrenador->objetivos);
-					printf("Inventario: "); recursos_mostrar(unEntrenador->pokemonesCazados); puts("");
-
-					entrenador_pasar_a(unEntrenador, EXIT, "Ya logro cumplir sus objetivos");
-
-					entrenadores_remover_del_equipo_a(equipo, pid);
-					hiloActivo = false;
-				}
-
 				else{
-					unEntrenador->siguienteTarea = INTERCAMBIAR;
-					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_DEADLOCK, "Su inventario esta lleno y no cumplio sus objetivos");
-
-					printf("Objetivos: "); recursos_mostrar(unEntrenador->objetivos);puts("");
-					printf("Inventario: "); recursos_mostrar(unEntrenador->pokemonesCazados);puts("");
-
-					//TODO: Ver en que momento estos entrenadores vuelven a READY
-					entrenador_pasar_a(unEntrenador, EXIT, "Aun no esta implementado el algoritmo de deadlock");
-					entrenadores_remover_del_equipo_a(equipo, pid);
-					hiloActivo = false;
+					hiloActivo = !entrenador_validar_objetivos(unEntrenador);
 				}
 
 				break;
 			}
 
 			case INTERCAMBIAR: {
-				puts("Proximamente deadlock");
-//				entrenador*parejaDeIntercambio = par_intercambio_remove(intercambiosPendientes, pid);
-//				entrenador_desplazarse_hacia(unEntrenador, parejaDeIntercambio->posicion);
-//
-//				if(entrenador_llego_a(unEntrenador, otroEntrenador->posicion)){
-	//				while(entrenador_puede_intercambiar_con(unEntrenador, parejaDeIntercambio)){
-	//					entrenador_intercambiar_con(unEntrenador, parejaDeIntercambio);
-	//				}
+				entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar y lo va a utilizar para intercambiar");
 
+				candidato_intercambio*self = list_remove(potencialesDeadlock, 0);
+				candidato_intercambio*parejaDeIntercambio = candidatos_pareja_de_intercambio_para(potencialesDeadlock, self);
 
-					//Repetir metodo de salida de CAUGHT con ambos entrenadores
-					//Duda: deberia pasar al otro tambien a execute? Ahi tiene sentido la tarea SALIR, aunque no seria inmediato
+				candidato_desplazarse_hacia_el_otro(self, parejaDeIntercambio); //Duda
 
+				while(candidato_puede_intercambiar_con(self, parejaDeIntercambio)){
+					candidato_intercambiar_con(self, parejaDeIntercambio);
 					break;
-//				}
+				}
+
+				hiloActivo = !entrenador_validar_objetivos(unEntrenador);
+
+				entrenador_validar_objetivos(parejaDeIntercambio->unEntrenador);
+
+				sem_post(&finDeIntercambio);
+
+				break;
 			}
 		}
 
@@ -113,8 +99,6 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 }
 
 /********************************** Funciones de Inicio y Finalizacion ******************************************/
-
-numero cantidadDeEntrenadores; //Me guarda el tamaño del array para cuando tenga que finalizar
 
 void inicializar_hilos_entrenadores(){
 	cantidadDeEntrenadores = list_size(equipo);
@@ -138,6 +122,7 @@ void finalizar_hilos_entrenadores(){
 	int i=0;
 	for(i=0; i<cantidadDeEntrenadores; i++){
 		pthread_join(hilosEntrenadores[i], NULL);
+		sem_destroy(&EjecutarEntrenador[i]);
 		pthread_mutex_destroy(&mutexEstadoEntrenador[i]);
 		pthread_mutex_destroy(&mutexPosicionEntrenador[i]);
 	}
@@ -197,6 +182,10 @@ entrenador* entrenadores_remover_del_equipo_a(entrenadores unEquipo, t_id id){
 	return removido;
 }
 
+void candidato_desplazarse_hacia_el_otro(candidato_intercambio*unCandidato, candidato_intercambio*haciaQuien){
+	entrenador_desplazarse_hacia(unCandidato->unEntrenador, haciaQuien->unEntrenador->posicion);
+}
+
 void entrenador_desplazarse_hacia(entrenador* unEntrenador, t_posicion posicionFinal){
 	t_posicion posicionActual = unEntrenador->posicion;
 //	int i=QUANTUM; if(criterio == ROUND_ROBBIN && distancia>QUANTUM){}
@@ -222,4 +211,34 @@ bool entrenador_llego_a(entrenador* unEntrenador, t_posicion posicion){
 //	pthread_mutex_unlock(&mutexPosicionEntrenador[unEntrenador->id]);
 
 	return posicion_cmp(posDelEntrenador, posicion);
+}
+
+//************************************* Salida ********************************************/
+
+// Retorna true si el entrenador debe seguir ejecutando o false si es que ya puede finalizar
+bool entrenador_validar_objetivos(entrenador*unEntrenador){
+
+	bool cumplioObjetivos = entrenador_cumplio_sus_objetivos(unEntrenador);
+
+	if(cumplioObjetivos){
+		printf("Objetivos: "); recursos_mostrar(unEntrenador->objetivos);
+		printf("Inventario: "); recursos_mostrar(unEntrenador->pokemonesCazados); puts("");
+
+		entrenador_pasar_a(unEntrenador, EXIT, "Ya logro cumplir sus objetivos");
+
+		entrenadores_remover_del_equipo_a(equipo, unEntrenador->id);
+	}
+
+	else{
+		unEntrenador->siguienteTarea = INTERCAMBIAR;
+		entrenador_pasar_a(unEntrenador, LOCKED_HASTA_DEADLOCK, "Su inventario esta lleno y no cumplio sus objetivos");
+
+		printf("Objetivos: "); recursos_mostrar(unEntrenador->objetivos);puts("");
+		printf("Inventario: "); recursos_mostrar(unEntrenador->pokemonesCazados);puts("");
+
+		candidatos_agregar_entrenador(potencialesDeadlock, unEntrenador);
+	}
+
+	sem_post(&EquipoNoPuedaCazarMas);
+	return cumplioObjetivos;
 }

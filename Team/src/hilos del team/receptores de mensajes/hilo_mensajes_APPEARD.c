@@ -2,7 +2,7 @@
 #include "../../team.h"
 
 /*TODO
- * en registrar_pokemon no importa que ya lo tenga en mapa (o si? REVER), pero si tengo que
+ * en registrar_pokemon no importa que ya lo tenga en mapa, pero si tengo que
  * 							CONTROLAR QUE SE RESPETEN LOS OBJETIVOS (cambiar implementacion)
  */
 
@@ -60,6 +60,9 @@ numero objetivos_cantidad_requerida_de(especie_pokemon unaEspecie){
 }
 
 void mapa_mapear_requerido(pokemon*unPokemon){
+
+	printf("-----------------------------------------> se Mapeo un %s\n", unPokemon->especie);
+
 	mapa_mapear_pokemon(pokemonesRequeridos, unPokemon);
 
 	pthread_mutex_lock(&mutexRecursosEnMapa);

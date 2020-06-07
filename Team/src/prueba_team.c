@@ -11,12 +11,7 @@
 #include "hilos del team/hilos_team.h"
 //#include "tests/tests_team.o"
 
-//int mainDePruebaDeadlock();
-
-//int main(void) {
-int maiami(){
-
-//	return mainDePruebaDeadlock(); //Prueba deadlock;
+int main(void) {
 
 	team_inicializar();
 
@@ -25,21 +20,15 @@ int maiami(){
 	log_info(event_logger, "\n\n****************************************\n¡¡¡Jellou World Team!!!\n"); /* prints !!!Hello World!!! */
 	log_info(logger, "\n\n");
 
-		mensajesAPPEARD = cr_list_create();
-		mensajesCAUGHT = cr_list_create();
-		mensajesLOCALIZED = cr_list_create();
-
 	inicializar_hilos();
+
+	team_ejecutar_algoritmo_de_deteccion_de_deadlock();
 
 	finalizar_hilos();
 
 	finalizar_semaforos();
 
 	log_info(event_logger, "chau team\n****************************************");
-
-	cr_list_destroy(mensajesAPPEARD);
-	cr_list_destroy(mensajesCAUGHT);
-	cr_list_destroy(mensajesLOCALIZED);
 
 	return team_exit(); //Destruye listas, cierra config, cierra log
 }
@@ -98,15 +87,24 @@ void inicializar_listas() {
 	recursosEnMapa = recursos_create(); //TODO
 	pokemonesRequeridos = mapa_create();
 	capturasPendientes = pendientes_create();
-
+	potencialesDeadlock = candidatos_create();
 //Ver si vale la pena abstraer
 	historialDePokemones = list_create();
 
 	entrenadoresReady = cr_list_create();
+
+	mensajesAPPEARD   = cr_list_create();
+	mensajesCAUGHT    = cr_list_create();
+	mensajesLOCALIZED = cr_list_create();
+
 	//***************
 }
 
 void listas_destroy(){
+	cr_list_destroy(mensajesAPPEARD);
+	cr_list_destroy(mensajesCAUGHT);
+	cr_list_destroy(mensajesLOCALIZED);
+
 	entrenadores_destroy(equipo);
 	cr_list_destroy(entrenadoresReady);
 	mapa_destroy(pokemonesRequeridos);
@@ -114,6 +112,7 @@ void listas_destroy(){
 	recursos_destroy(objetivosGlobales);
 	recursos_destroy(inventariosGlobales);
 	recursos_destroy(recursosEnMapa);
+	candidatos_destroy(potencialesDeadlock);
 	list_destroy(historialDePokemones);
 }
 
@@ -139,10 +138,6 @@ void inicializar_hilos(){
 void finalizar_hilos(){
 	finalizar_hilos_entrenadores();
 
-	pthread_mutex_lock(&MUTEX_FIN_DE_PROCESO_BORRARRRRRRRRRRRRRRRR);
-	finDeProceso = true;
-	pthread_mutex_unlock(&MUTEX_FIN_DE_PROCESO_BORRARRRRRRRRRRRRRRRR);
-
 	pthread_join(hiloReceptorDeMensajes, NULL);
 	pthread_join(hiloPlanificador	   , NULL);
 	pthread_join(hiloMensajesAppeard   , NULL);
@@ -154,7 +149,9 @@ void finalizar_hilos(){
 
 void inicializar_semaforos(){
 	sem_init(&HayTareasPendientes, 0, 0);
+	sem_init(&EquipoNoPuedaCazarMas, 0, 0);
 	sem_init(&EntradaSalida_o_FinDeEjecucion, 0, 0);
+	sem_init(&finDeIntercambio, 0, 0);
 
 	pthread_mutex_init(&Mutex_AndoLoggeando       , NULL);
 	pthread_mutex_init(&Mutex_AndoLoggeandoEventos, NULL);
@@ -169,6 +166,7 @@ void inicializar_semaforos(){
 void finalizar_semaforos(){
 	sem_destroy(&HayTareasPendientes);
 	sem_destroy(&EntradaSalida_o_FinDeEjecucion);
+	sem_destroy(&finDeIntercambio);
 
 	pthread_mutex_destroy(&mutexEntrenadores);
 	pthread_mutex_destroy(&mutexInventariosGlobales);

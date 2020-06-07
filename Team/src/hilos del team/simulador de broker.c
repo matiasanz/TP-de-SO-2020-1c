@@ -87,14 +87,7 @@ void broker_simulator(){
 
 			default: break;
 		}
-//		puts("W(mutexMensaje)");
-//	pthread_mutex_lock(&mutexMensaje);
-//		list_add(mensajes, unMensaje);
-//	pthread_mutex_unlock(&mutexMensaje);
-//		puts("Signal(mutexMensaje)");
-//
-//		sem_post(&sem_HayMensajesRecibidos);
-//		puts("Signal(mensaje hay mas mensajes)");
+
 		sleep(1);
 
 		pthread_mutex_lock(&MUTEX_FIN_DE_PROCESO_BORRARRRRRRRRRRRRRRRR);
