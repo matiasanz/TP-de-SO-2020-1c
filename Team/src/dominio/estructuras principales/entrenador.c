@@ -131,6 +131,21 @@ entrenadores entrenadores_en_estado(entrenadores equipo, t_estado unEstado){
 	return list_filter(equipo, &esta_en_estado);
 }
 
+//retorna el entrenador mas cercano a una posicion
+	entrenador* entrenadores_mas_cercano(entrenadores unEquipo, t_posicion unaPosicion){
+
+		entrenador*entrenador_mas_cercano(entrenador*uno, entrenador*otro){
+			if(!uno){
+				return otro;
+			}
+
+			return posicion_distancia(uno->posicion, unaPosicion)>=posicion_distancia(otro->posicion, unaPosicion)? uno : otro;
+		}
+
+		return list_fold(unEquipo, NULL, (void*(*)(void*, void*))&entrenador_mas_cercano);
+
+	}
+
 void entrenadores_disolver_equipo(entrenadores unEquipo){
 	list_destroy(unEquipo);
 }

@@ -32,11 +32,12 @@ void registrar_pokemon(pokemon*unPokemon){
 
 	if( pokemon_es_requerido(*unPokemon) ){
 		mapa_mapear_requerido(unPokemon);
+		puts("\nsignal(cantTareas)");
 		sem_post(&HayTareasPendientes);
 	}
 
 	else{
-		printf("Se recibio un %s y pokemon que no es objetivo de nadie o que ya tengo en mapa, es cartera\n", unPokemon->especie);
+		printf("Se recibio un %s y se descarto al no ser requerido\n", unPokemon->especie);
 		pokemon_destroy(unPokemon); //"descartar al pokemon"
 	}
 }
@@ -45,18 +46,25 @@ bool pokemon_es_requerido(pokemon unPokemon){
 	return objetivos_cantidad_requerida_de(unPokemon.especie);
 }
 
-numero objetivos_cantidad_requerida_de(especie_pokemon unaEspecie){
+numero objetivos_cantidad_bruta_requerida_de(especie_pokemon unaEspecie){
 	numero instanciasTotales = recursos_cantidad_de_instancias_de(objetivosGlobales, unaEspecie);
 
 	pthread_mutex_lock(&mutexInventariosGlobales);
 	numero instanciasDisponibles = recursos_cantidad_de_instancias_de(inventariosGlobales, unaEspecie);
 	pthread_mutex_unlock(&mutexInventariosGlobales);
 
+	return instanciasTotales - instanciasDisponibles;
+}
+
+numero objetivos_cantidad_requerida_de(especie_pokemon unaEspecie){
+
+	numero instanciasBrutas = objetivos_cantidad_bruta_requerida_de(unaEspecie);
+
 	pthread_mutex_lock(&mutexRecursosEnMapa);
 	numero instanciasEnMapa = recursos_cantidad_de_instancias_de(recursosEnMapa, unaEspecie);
 	pthread_mutex_unlock(&mutexRecursosEnMapa);
 
-	return instanciasTotales - (instanciasDisponibles + instanciasEnMapa);
+	return instanciasBrutas - instanciasEnMapa;
 }
 
 void mapa_mapear_requerido(pokemon*unPokemon){
@@ -65,9 +73,6 @@ void mapa_mapear_requerido(pokemon*unPokemon){
 
 	mapa_mapear_pokemon(pokemonesRequeridos, unPokemon);
 
-	pthread_mutex_lock(&mutexRecursosEnMapa);
-	recursos_agregar_recurso(recursosEnMapa, unPokemon->especie);
-	pthread_mutex_unlock(&mutexRecursosEnMapa);
 }
 
 // Retorna true si la especie ya se encuentra en el registro de especies

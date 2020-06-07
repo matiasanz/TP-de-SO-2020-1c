@@ -14,27 +14,21 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 		sem_wait(&EjecutarEntrenador[pid]);
 		switch(unEntrenador->siguienteTarea){
 			case CATCHEAR: {
-				entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar y lo va a utilizar para intentar cachear");
-
 				pokemon*unPokemon = mapa_desmapear(pokemonesRequeridos);
+				//Si no tengo pokemones en mapa pero le toca ejecutar por criterio, tengo un overhead hasta que llegue alguno. En teoria siempre van a estar llegando pokemones
+				//Duda: que pasa cuando criterio no es fifo TODO
+
+				entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar y lo va a utilizar para intentar cachear");
 
 				entrenador_desplazarse_hacia(unEntrenador, unPokemon->posicion);
 
-				if(entrenador_llego_a(unEntrenador, unPokemon->posicion)){
+				t_id id_mensaje_pendiente = Catch(unPokemon->especie);
 
-					t_id id_mensaje_pendiente = Catch(unPokemon->especie);
+				agregar_pendiente(capturasPendientes, id_mensaje_pendiente, unEntrenador, unPokemon);
 
-					agregar_pendiente(capturasPendientes, id_mensaje_pendiente, unEntrenador, unPokemon);
+				unEntrenador->siguienteTarea = CAPTURAR;
 
-					unEntrenador->siguienteTarea = CAPTURAR;
-
-					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_CAUGHT, "Tiene una captura pendiente");
-				}
-
-				else{
-					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARED, "No llego a la posicion del pokemon");
-					mapa_mapear_pokemon(pokemonesRequeridos, unPokemon);
-				}
+				entrenador_pasar_a(unEntrenador, LOCKED_HASTA_CAUGHT, "Tiene una captura pendiente");
 
 				break;
 			}
@@ -55,6 +49,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 				if(entrenador_puede_cazar_mas_pokemones(unEntrenador)){ //Ver si cambios de estado se pueden delegar al planificador
 					unEntrenador->siguienteTarea = CATCHEAR;
 					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARED, "Tuvo exito en la captura y todavia puede cazar mas pokemones");
+					sem_post(&HayEntrenadoresDisponibles);
 				}
 
 				else{
@@ -115,6 +110,8 @@ void inicializar_hilos_entrenadores(){
 		pthread_mutex_init(&mutexEstadoEntrenador[i], NULL);
 		pthread_mutex_init(&mutexPosicionEntrenador[i], NULL);
 		pthread_create(&hilosEntrenadores[i], NULL, (void*) team_hilo_entrenador, list_get(equipo, i));
+
+		sem_post(&HayEntrenadoresDisponibles);
 	}
 }
 
@@ -188,13 +185,6 @@ void candidato_desplazarse_hacia_el_otro(candidato_intercambio*unCandidato, cand
 
 void entrenador_desplazarse_hacia(entrenador* unEntrenador, t_posicion posicionFinal){
 	t_posicion posicionActual = unEntrenador->posicion;
-//	int i=QUANTUM; if(criterio == ROUND_ROBBIN && distancia>QUANTUM){}
-
-//	numero distancia = posicion_distancia(unEntrenador->posicion, posicionFinal);
-
-//	pthread_mutex_t bloqueado;
-//	pthread_mutex_init(&bloqueado, ...); //Duda, vale la pena?
-//	sleep(distancia*tiempoPorDistancia);// VER alternativas para sleep... o un mutex?
 
 	pthread_mutex_lock(&mutexPosicionEntrenador[unEntrenador->id]);
 	unEntrenador->posicion = posicionFinal;

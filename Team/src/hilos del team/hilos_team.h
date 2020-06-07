@@ -3,7 +3,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <commons/collections/list.h>
-#include "../dominio/estructuras principales/pokemon.h"
+#include "../dominio/estructuras auxiliares/captura_pendiente.h"
 
 #define PROCESO_ACTIVO 1
 
@@ -22,7 +22,7 @@ sem_t* EjecutarEntrenador;
 sem_t EquipoNoPuedaCazarMas;
 sem_t EntradaSalida_o_FinDeEjecucion;
 sem_t HayTareasPendientes;
-sem_t HayEntrenadores;
+sem_t HayEntrenadoresDisponibles;
 sem_t finDeIntercambio;
 
 pthread_mutex_t mutexHistorialEspecies;
@@ -72,6 +72,8 @@ void registrar_pokemon(pokemon*);
 void registrar_en_cada_posicion(especie_pokemon, posiciones);
 bool pokemon_es_requerido(pokemon unPokemon);
 void mapa_mapear_requerido(pokemon*);
+bool captura_sigue_siendo_requerida(captura_pendiente*);
+numero objetivos_cantidad_bruta_requerida_de(especie_pokemon);
 numero objetivos_cantidad_requerida_de(especie_pokemon unaEspecie);
 void objetivos_actualizar_por_captura_de(especie_pokemon);
 void posiciones_ordenar_por_cercania_al_equipo(posiciones);

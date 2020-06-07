@@ -116,11 +116,6 @@ void listas_destroy(){
 	list_destroy(historialDePokemones);
 }
 
-//Colas
-void subscribpcion_colas(){
-	//TODO Gustavo// (?)
-}
-
 //Hilos
 void inicializar_hilos(){
 	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) broker_simulator, NULL); //Para pruebas sin broker
@@ -149,6 +144,7 @@ void finalizar_hilos(){
 
 void inicializar_semaforos(){
 	sem_init(&HayTareasPendientes, 0, 0);
+	sem_init(&HayEntrenadoresDisponibles, 0, 0);
 	sem_init(&EquipoNoPuedaCazarMas, 0, 0);
 	sem_init(&EntradaSalida_o_FinDeEjecucion, 0, 0);
 	sem_init(&finDeIntercambio, 0, 0);
@@ -165,6 +161,7 @@ void inicializar_semaforos(){
 
 void finalizar_semaforos(){
 	sem_destroy(&HayTareasPendientes);
+	sem_destroy(&HayEntrenadoresDisponibles);
 	sem_destroy(&EntradaSalida_o_FinDeEjecucion);
 	sem_destroy(&finDeIntercambio);
 

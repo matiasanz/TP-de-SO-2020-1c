@@ -17,20 +17,24 @@ void team_suscriptor_cola_CAUGHT(cr_list* mensajes){
 			log_info(logger, "CAUGHT %s: %s", pokemonCatcheado->especie, (resultado->tuvoExito? "Exitoso": "Fallido"));
 			pthread_mutex_unlock(&Mutex_AndoLoggeando);
 
-			if(resultado->tuvoExito){
+			pthread_mutex_lock(&mutexRecursosEnMapa);
+			if(resultado->tuvoExito && captura_sigue_siendo_requerida(capturaPendiente)){
+				recursos_agregar_recurso(recursosEnMapa, capturaPendiente->pokemonCatcheado->especie);
+				pthread_mutex_unlock(&mutexRecursosEnMapa);
+
 				entrenador_pasar_a(unEntrenador, READY, "Se confirmo la captura del pokemon");
 				cr_list_add_and_signal(entrenadoresReady, unEntrenador);
 				sem_post(&HayTareasPendientes);
+				sem_post(&HayEntrenadoresDisponibles);
 			}
 
 			else{
+				pthread_mutex_unlock(&mutexRecursosEnMapa);
 				entrenador_bloquear_hasta_APPEARED(unEntrenador);
 				printf("El entrenador N°%u Fallo en capturar al pokemon pero puede seguir cazando mas\n", unEntrenador->id);
-
-				pthread_mutex_lock(&mutexRecursosEnMapa);
-				recursos_quitar_instancia_de_recurso(recursosEnMapa, pokemonCatcheado->especie);
-				pthread_mutex_unlock(&mutexRecursosEnMapa);
 				pokemon_destroy(pokemonCatcheado);
+				cr_list_wait_and_remove(capturasPendientes, 0);
+				pendiente_destroy(capturaPendiente);
 			}
 
 			free(resultado); //Se descarta el id
@@ -51,8 +55,17 @@ void team_suscriptor_cola_CAUGHT(cr_list* mensajes){
 }
 
 void entrenador_bloquear_hasta_APPEARED(entrenador*unEntrenador){
+	unEntrenador->siguienteTarea = CATCHEAR;
 	pthread_mutex_lock(&mutexEstadoEntrenador[unEntrenador->id]);
 	unEntrenador->estado = LOCKED_HASTA_APPEARED;  //Abstraer a funcion
 	pthread_mutex_unlock(&mutexEstadoEntrenador[unEntrenador->id]);
-	unEntrenador->siguienteTarea = CATCHEAR;
+	sem_post(&HayEntrenadoresDisponibles);
+}
+
+bool captura_sigue_siendo_requerida(captura_pendiente*unaCaptura){
+	especie_pokemon especie = unaCaptura->pokemonCatcheado->especie;
+	numero cantidadBruta = objetivos_cantidad_bruta_requerida_de(especie);
+	numero instanciasEnMapa = recursos_cantidad_de_instancias_de(recursosEnMapa, especie);
+
+	return (cantidadBruta - instanciasEnMapa);
 }

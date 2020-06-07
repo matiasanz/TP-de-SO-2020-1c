@@ -18,7 +18,6 @@ void team_ejecutar_algoritmo_de_deteccion_de_deadlock(){
 		loggear_deadlock(hayDeadlock);
 		algoritmo_procesar_deadlock();
 		hayDeadlock = algoritmo_detectar_deadlock(equipo);
-
 	}
 
 	puts("no hay deadlock");
@@ -42,7 +41,7 @@ void loggear_deadlock(bool resultado){
 ////*************************************** Procesar ************************************************//
 
 void candidato_ejecutar(candidato_intercambio*unEntrenador){
-	sem_post(&EjecutarEntrenador[unEntrenador->unEntrenador->id]); //Por que falla?
+	sem_post(&EjecutarEntrenador[unEntrenador->unEntrenador->id]);
 }
 
 void algoritmo_procesar_deadlock(){
