@@ -11,6 +11,10 @@ int main(void) {
 	log_info(event_logger, "\n\n****************************************\n¡¡¡Jellou World Team!!!\n"); /* prints !!!Hello World!!! */
 	log_info(logger, "\n\n");
 
+
+	//Para pruebas sin los otros modulos
+//	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) broker_simulator, NULL); //Para pruebas sin broker
+
 	inicializar_hilos();
 
 	team_ejecutar_algoritmo_de_deteccion_de_deadlock();
@@ -109,8 +113,6 @@ void listas_destroy(){
 
 //Hilos
 void inicializar_hilos(){
-	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) broker_simulator, NULL); //Para pruebas sin broker
-
 	inicializar_hilos_entrenadores();
 
 	pthread_create(&hiloMensajesAppeard, NULL, (void*)team_suscriptor_cola_APPEARD, mensajesAPPEARED);

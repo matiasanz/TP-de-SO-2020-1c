@@ -5,8 +5,10 @@
 bool entrenador_validar_objetivos(entrenador*unEntrenador);
 
 void team_hilo_entrenador(entrenador*unEntrenador){
-	printf("Entrenador N°%u en espera\n", unEntrenador->id);
 	t_id pid = unEntrenador->id;
+	pthread_mutex_lock(&Mutex_AndoLoggeando);
+	log_info(logger, "Se creo al Entrenador N°%u en estado NEW", pid);
+	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 
 	bool hiloActivo = true;
 	while(hiloActivo){
