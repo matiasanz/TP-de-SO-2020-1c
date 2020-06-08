@@ -9,7 +9,7 @@ bool algoritmo_detectar_deadlock(entrenadores candidatos);
 
 void algoritmo_procesar_deadlock();
 
-void loggear_deadlock(bool resultado);
+void loggear_resultado(bool resultado);
 
 void esperar_que_equipo_no_pueda_cazar_mas();
 

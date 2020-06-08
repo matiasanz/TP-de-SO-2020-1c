@@ -15,42 +15,45 @@ void team_ejecutar_algoritmo_de_deteccion_de_deadlock(){
 	bool hayDeadlock = algoritmo_detectar_deadlock(equipo);
 
 	while(hayDeadlock){
-		loggear_deadlock(hayDeadlock);
+		loggear_resultado(hayDeadlock);
 		algoritmo_procesar_deadlock();
 		hayDeadlock = algoritmo_detectar_deadlock(equipo);
 	}
 
 	puts("no hay deadlock");
 
-	loggear_deadlock(hayDeadlock);
-
+	loggear_resultado(hayDeadlock);
 }
 
 ///*************************************** Detectar Deadlock ************************************************/
 
 bool algoritmo_detectar_deadlock(entrenadores unEquipo){
+	pthread_mutex_lock(&Mutex_AndoLoggeando);
+	log_info(logger, "Se ejecuto el algoritmo de deadlock");
+	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 	return !list_is_empty(unEquipo);
 }
 
-void loggear_deadlock(bool resultado){
+void loggear_resultado(bool resultado){
 	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	log_info(logger, "Se ejecuto el detector de deadlock, resultado: %s", ( resultado? "Positivo": "Negativo") );
+	log_info(logger, "Resultado de la deteccion: %s", ( resultado? "Positivo": "Negativo") );
 	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 }
 
 ////*************************************** Procesar ************************************************//
 
-void candidato_ejecutar(candidato_intercambio*unEntrenador){
-	sem_post(&EjecutarEntrenador[unEntrenador->unEntrenador->id]);
+void candidato_despertar(candidato_intercambio*unCandidato){
+	entrenador_pasar_a(unCandidato->unEntrenador, READY, "Ha sido seleccionado para intercambiar");
+	cr_list_add_and_signal(entrenadoresReady, unCandidato->unEntrenador);
+	sem_post(&HayEntrenadoresDisponibles);
+	sem_post(&HayTareasPendientes);
 }
 
 void algoritmo_procesar_deadlock(){
 
-	candidato_intercambio* unEntrenador = list_get(potencialesDeadlock, 0);
-	unEntrenador->unEntrenador->siguienteTarea = INTERCAMBIAR; //HARDCODEADO
-//	entrenador_pasar_a(unCandidato->unEntrenador, EXECUTE, "Ha sido seleccionado para intercambiar");
-	printf("Signal(Entrenador N°%d)\n", unEntrenador->unEntrenador->id);
-	candidato_ejecutar(unEntrenador);
+	candidato_intercambio* unCandidato = list_get(potencialesDeadlock, 0);
+
+	candidato_despertar(unCandidato);
 
 	sem_wait(&finDeIntercambio);
 }
