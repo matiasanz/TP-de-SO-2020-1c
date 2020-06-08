@@ -272,8 +272,53 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 			if(){
 				//todo buscar  espacio en sus bloques
 			}else{
-				//todo buscar en el bitmap los bloques libres
+			*/
+				//todo buscar en el bitmap los bloques libres, porque no hay espacio en los propios
 
+
+
+			int nrobloque=bloque_disponible(bitmap,config_get_int_value(config_metadata,"BLOCKS"));
+			bitarray_set_bit(bitmap,nrobloque);
+
+			char* bin_block = string_new();
+			string_append(&bin_block,paths_estructuras[BLOCKS]);
+			string_append(&bin_block,string_itoa(nrobloque));
+			string_append(&bin_block,".bin");
+
+
+
+			char* nuevalinea=crearLinea(unMsjNewPoke);
+			int longitud=string_length(nuevalinea)+1;
+
+			guardarLinea(bin_block,nuevalinea,longitud);
+
+			char* listaBloques=string_new();
+
+
+			int len_array=cant_elemetos_array(bloquesDelPokemon);
+			string_append(&listaBloques,"[");
+			for(int i=0;i<len_array;i++){
+				string_append(&listaBloques,bloquesDelPokemon[i]);
+				string_append(&listaBloques,",");
+			}
+
+			string_append(&listaBloques,string_itoa(nrobloque));
+			string_append(&listaBloques,"]");
+
+
+			int size=size_bloque(bin_block)+config_get_int_value(config_metadata_pokemon,"SIZE");
+
+			config_set_value(config_metadata_pokemon,"BLOCKS",listaBloques);
+			config_set_value(config_metadata_pokemon,"SIZE",string_itoa(size));
+			config_set_value(config_metadata_pokemon,"OPEN","N");
+			config_save(config_metadata_pokemon);
+
+			free(listaBloques);
+			free(nuevalinea);
+			free(bin_block);
+
+
+			/*
 			}
 			*/
 
