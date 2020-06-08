@@ -1,4 +1,4 @@
-#include "../algoritmos-de-planificacion/planificacion.h"
+#include "planificacion.h"
 
 #include "../team.h"
 

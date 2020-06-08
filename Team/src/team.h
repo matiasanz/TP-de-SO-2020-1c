@@ -12,7 +12,7 @@
 #include "deadlock/candidatos_intercambio.h"
 #include "deadlock/detector_de_deadlock.h"
 #include "estructuras-auxiliares/captura_pendiente.h"
-#include "estructuras-auxiliares/lector_config.h"
+#include "lector-config/lector_config.h"
 #include "estructuras-auxiliares/mensajes.h"
 #include "estructuras-principales/pokemon.h"
 
