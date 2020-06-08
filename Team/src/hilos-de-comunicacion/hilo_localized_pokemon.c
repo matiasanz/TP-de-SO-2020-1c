@@ -2,10 +2,11 @@
  * hilo_localized_pokemon.c
  *
  *  Created on: 31 may. 2020
- *      Author: utnso
+ *      Author: C-renito Casero
  */
 
-#include "hilo_localized_pokemon.h"
+#include "../hilos-de-comunicacion/hilo_localized_pokemon.h"
+#include "../team.h"
 
 void subscribir_y_escuchar_cola_localized_pokemon(void (*callback)(t_id_cola, void*)) {
 
@@ -26,4 +27,5 @@ void localized_pokemon_recibido(t_mensaje_localized_pokemon* localized_pokemon) 
 
 	//	Log pedido en el enunciado (no borrar)
 	mensaje_localized_pokemon_log(logger, localized_pokemon);
+	cr_list_add_and_signal(mensajesLOCALIZED, localized_pokemon);
 }

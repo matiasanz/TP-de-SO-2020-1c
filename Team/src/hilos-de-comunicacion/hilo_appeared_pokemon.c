@@ -2,10 +2,11 @@
  * hilo_appeared_pokemon.c
  *
  *  Created on: 31 may. 2020
- *      Author: utnso
+ *      Author: C-renito Casero
  */
 
-#include "hilo_appeared_pokemon.h"
+#include "../hilos-de-comunicacion/hilo_appeared_pokemon.h"
+#include "../team.h"
 
 void subscribir_y_escuchar_cola_appeared_pokemon(void (*callback)(t_id_cola, void*)) {
 
@@ -27,4 +28,6 @@ void appeared_pokemon_recibido(t_mensaje_appeared_catch_pokemon* appeared_pokemo
 
 	//	Log pedido en el enunciado (no borrar)
 	mensaje_appeared_catch_pokemon_log(logger, appeared_pokemon, APPEARED_POKEMON_STRING);
+
+	cr_list_add_and_signal(mensajesAPPEARED, appeared_pokemon);
 }

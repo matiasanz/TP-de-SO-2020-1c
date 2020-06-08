@@ -5,7 +5,7 @@
  *      Author: utnso
  */
 
-#include "hilo_gameboy.h"
+#include "../hilos-de-comunicacion/hilo_gameboy.h"
 
 void conectar_gameboy(void (*callback)(t_id_cola, void*)) {
 
