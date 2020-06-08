@@ -156,13 +156,13 @@ void crearEstructuras(){
 		FILE* f_block;
 
 		string_append(&bin_block,dir_blocks);
-		string_append(&bin_block,"/1.bin");
+		string_append(&bin_block,"/0.bin");
 
 		if((f_block=fopen(bin_block,"r"))==NULL){
 		free(bin_block);
 
 		int x;
-		for(x=1;x<=config_get_int_value(config_metadata,"BLOCKS");x++){
+		for(x=0;x<config_get_int_value(config_metadata,"BLOCKS");x++){
 			bin_block = string_new();
 			string_append(&bin_block,dir_blocks);
 			string_append(&bin_block,string_itoa(x));
@@ -209,17 +209,82 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 			config_set_value(config_metadata_pokemon,"DIRECTORY","N");
 			config_set_value(config_metadata_pokemon,"SIZE","0");
 			config_set_value(config_metadata_pokemon,"BLOCKS","[]");
-			config_set_value(config_metadata_pokemon,"OPEN","Y");
+			config_set_value(config_metadata_pokemon,"OPEN","N");
 			config_save(config_metadata_pokemon);
 		}else
 			config_metadata_pokemon=config_create(bin_metadata);
 		fclose(f_metadata);
 
-		//todo buscar en el bitmap los bloques libres
+
+		/*
+		if(strcmp(config_get_string_value(config_metadata_pokemon,"OPEN"),"Y")==0){
+			//todo  abro otro hilo con un sleep que volvera a atender al Mensaje
+
+			config_destroy(config_metadata_pokemon);
+			free(bin_metadata);
+			free(dir_unNuevoPokemon);
+			//y finalizo este hilo
+		}
+		 */
 
 
 
+		config_set_value(config_metadata_pokemon,"OPEN","Y");
+		config_save(config_metadata_pokemon);
+		char** bloquesDelPokemon=config_get_array_value(config_metadata_pokemon,"BLOCKS");
 
+		if(cant_elemetos_array(bloquesDelPokemon)==0){
+			//el bitarray cuenta desde 0
+			int nrobloque=bloque_disponible(bitmap,config_get_int_value(config_metadata,"BLOCKS"));
+			bitarray_set_bit(bitmap,nrobloque);
+
+			char* bin_block = string_new();
+			string_append(&bin_block,paths_estructuras[BLOCKS]);
+			string_append(&bin_block,string_itoa(nrobloque));
+			string_append(&bin_block,".bin");
+
+
+
+			char* nuevalinea=crearLinea(unMsjNewPoke);
+			int longitud=string_length(nuevalinea)+1;
+
+			guardarLinea(bin_block,nuevalinea,longitud);
+
+			char* listaBloques=string_new();
+			string_append(&listaBloques,"[");
+			string_append(&listaBloques,string_itoa(nrobloque));
+			string_append(&listaBloques,"]");
+
+
+			int size=size_bloque(bin_block);
+			config_set_value(config_metadata_pokemon,"BLOCKS",listaBloques);
+			config_set_value(config_metadata_pokemon,"SIZE",string_itoa(size));
+			config_set_value(config_metadata_pokemon,"OPEN","N");
+			config_save(config_metadata_pokemon);
+
+			free(listaBloques);
+			free(nuevalinea);
+			free(bin_block);
+
+			log_info(event_logger,"no posee bloques, se usara el bloque %i",nrobloque);
+		}else{
+			/*
+			if(){
+				//todo buscar  espacio en sus bloques
+			}else{
+				//todo buscar en el bitmap los bloques libres
+
+			}
+			*/
+
+			log_info(event_logger,"tiene bloques asignados");
+		}
+
+
+		//todo crea paquete appeared pokemon y enviarlo a Broker
+
+
+		split_liberar(bloquesDelPokemon);
 		config_destroy(config_metadata_pokemon);
 		free(bin_metadata);
 		free(dir_unNuevoPokemon);
@@ -232,4 +297,62 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
 
 }
+int cant_elemetos_array(char** array){
+	int i=0;
 
+	while(array[i]!=NULL){
+		i++;
+	}
+
+	return i;
+}
+void split_liberar(char** split){
+	unsigned int i = 0;
+	for(; split[i] != NULL;i++){
+		free(split[i]);
+	}
+	free(split);
+}
+
+int bloque_disponible(t_bitarray* bitmap,int totalBloques){
+
+	int i=0;
+	while(i<totalBloques && bitarray_test_bit(bitmap,i)){
+		i++;
+	}
+
+	return i;
+}
+void guardarLinea(char* path,char* nuevalinea,int len){
+	FILE* f_block;
+
+	f_block=fopen(path,"rb+");
+
+	fseek(f_block,0,SEEK_END);
+
+	fwrite(nuevalinea,sizeof(char),len,f_block);
+
+	fclose(f_block);
+
+}
+char* crearLinea(t_mensaje_new_pokemon* unMsjNewPoke ){
+	    char* unalinea=string_new();
+	    string_append(&unalinea,string_itoa(unMsjNewPoke->pokemon.posicion.pos_x));
+		string_append(&unalinea,"-");
+		string_append(&unalinea,string_itoa(unMsjNewPoke->pokemon.posicion.pos_y));
+		string_append(&unalinea,"=");
+		string_append(&unalinea,string_itoa(unMsjNewPoke->cantidad));
+		string_append(&unalinea,"\n");
+		return unalinea;
+}
+int size_bloque(char* path){
+	FILE* f_block;
+	f_block=fopen(path,"rb");
+	fseek(f_block, 0, SEEK_END);
+	int file_size = ftell(f_block);
+	fseek(f_block, 0, SEEK_SET);
+
+	fclose(f_block);
+
+	return file_size;
+}
