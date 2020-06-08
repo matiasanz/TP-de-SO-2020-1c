@@ -8,6 +8,7 @@
 #include "dominio/estructuras auxiliares/mensajes.h"
 #include "dominio/deadlock/detector de deadlock.h"
 #include "dominio/deadlock/estructuras_deadlock.h"
+#include "dominio/algoritmos de planificacion/planificacion.h"
 
 #include "dominio/header_global_team.h"
 
@@ -24,14 +25,16 @@ int team_exit();
 void inicializar_listas();
 void listas_destroy();
 
-void subscribpcion_colas(); //(?)
-
 void inicializar_semaforos();
 void finalizar_semaforos();
 
 void inicializar_hilos();
 void finalizar_hilos();
 
+
+//Variables globales
+	t_algoritmo ALGORITMO_PLANIFICACION;
+	numero RETARDO_CICLO_CPU;
 
 /*Mis Listas (son variables globales, para que puedan acceder todos los hilos)*/
 	entrenadores equipo;
@@ -40,13 +43,12 @@ void finalizar_hilos();
 	matriz_recursos objetivosGlobales;
 	matriz_recursos inventariosGlobales; //cambiar nombre por recursosDisponiblesGlobales
 	matriz_recursos recursosEnMapa; //cambiar nombre por recursosPorAdquirir o algo mas representativo
-	pendientes capturasPendientes; //cambiar tipo de dato por capturas_pendientes
+	capturas_pendientes capturasPendientes; //cambiar tipo de dato por capturas_pendientes
 	especies_pokemones historialDePokemones;
 	cr_list*mensajesAPPEARD;
 	cr_list*mensajesCAUGHT;
 	cr_list*mensajesLOCALIZED;
 	candidatos_intercambio potencialesDeadlock;
-
 /*--------------*/
 
 # endif

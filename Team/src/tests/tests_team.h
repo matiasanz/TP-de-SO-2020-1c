@@ -216,7 +216,7 @@ context(tests_team){
 	}end
 	
 	describe("Pendientes"){
-		pendientes mensajesPendientes;
+		capturas_pendientes mensajesPendientes;
 		captura_pendiente respuestaPendiente;
 		entrenador* unEntrenador;
 		pokemon*unPokemon;

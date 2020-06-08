@@ -24,15 +24,12 @@ int main(void) {
 
 	team_ejecutar_algoritmo_de_deteccion_de_deadlock();
 
-	finalizar_hilos();
-
-	finalizar_semaforos();
+	//team_mostrar_resultados();
 
 	log_info(event_logger, "chau team\n****************************************");
 
-	return team_exit(); //Destruye listas, cierra config, cierra log
+	return team_exit();
 }
-
 																/*Fin del main*/
 //**********************************************************************************
 
@@ -45,16 +42,13 @@ void team_inicializar(){
 
 	event_logger = log_create("log/team_event.log", "TEAM_EVENT", true, LOG_LEVEL_INFO);
 
-/*Gustavo*/
-//	subscribpcion_colas(); (?) Gustavo
-//	tiempo_reconexion=config_get_int_value(config,"TIEMPO_RECONEXION");
-//	retardo_ciclo_cpu=config_get_int_value(config,"RETARDO_CICLO_CPU");
-//	algoritmo_planificacion=config_get_string_value(config,"ALGORITMO_PLANIFICACION");
-//	quantum=config_get_int_value(config,"QUANTUM");
-//	estimacion_inicial=config_get_int_value(config,"ESTIMACION_INICIAL");
-/*-------*/
+	RETARDO_CICLO_CPU = config_get_int_value(config,"RETARDO_CICLO_CPU");
+
+	//no hace falta que algoritmo y los datos esten agrupados en misma estructura
+	ALGORITMO_PLANIFICACION = FIFO;//cargar_algoritmo_planificacion();
 
 	inicializar_listas();
+
  	inicializar_semaforos();
 
 //	inicializar_hilos();
@@ -68,10 +62,12 @@ void team_inicializar(){
 
 
 int team_exit(){
+
+	finalizar_hilos();
+	finalizar_semaforos();
 	log_destroy(logger);
 	log_destroy(event_logger);
 	config_destroy(config);
-
 	listas_destroy();
 
 	return EXIT_SUCCESS;

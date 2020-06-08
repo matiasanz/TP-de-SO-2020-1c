@@ -11,7 +11,7 @@ void team_planificar(){
 	while(PROCESO_ACTIVO){
 
 		sem_wait(&HayTareasPendientes);
-		sem_wait(&HayEntrenadoresDisponibles);//TODO
+		sem_wait(&HayEntrenadoresDisponibles);
 
 		equipo_despertar_en_caso_de_APPEARED();
 
