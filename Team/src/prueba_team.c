@@ -7,6 +7,7 @@
  Description : Pruebas del Proceso Team in C, Ansi-style
  ============================================================================
  */
+
 #include "team.h"
 #include "hilos del team/hilos_team.h"
 //#include "tests/tests_team.o"
@@ -38,7 +39,9 @@ int main(void) {
 void team_inicializar(){
 	config=config_create("config/team.config");
 
-	logger=log_create("log/team.log","TEAM",true,LOG_LEVEL_INFO);
+	char*TEAM_LOG_PATH = config_get_string_value(config,"LOG_FILE");
+
+	logger=log_create(TEAM_LOG_PATH,"TEAM",true,LOG_LEVEL_INFO);
 
 	event_logger = log_create("log/team_event.log", "TEAM_EVENT", true, LOG_LEVEL_INFO);
 

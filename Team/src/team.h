@@ -7,12 +7,12 @@
 #include "dominio/estructuras auxiliares/captura_pendiente.h"
 #include "dominio/estructuras auxiliares/mensajes.h"
 #include "dominio/deadlock/detector de deadlock.h"
-#include "dominio/deadlock/estructuras_deadlock.h"
 #include "dominio/algoritmos de planificacion/planificacion.h"
 
 #include "dominio/header_global_team.h"
 
 #include <pthread.h>
+#include "dominio/deadlock/candidatos_intercambio.h"
 
 //#include <crenito-commons/conexiones/conexiones.h>
 //#include <crenito-commons/utils.h>
@@ -31,9 +31,8 @@ void finalizar_semaforos();
 void inicializar_hilos();
 void finalizar_hilos();
 
-
 //Variables globales
-	t_algoritmo ALGORITMO_PLANIFICACION;
+	t_algoritmo_planificacion ALGORITMO_PLANIFICACION;
 	numero RETARDO_CICLO_CPU;
 
 /*Mis Listas (son variables globales, para que puedan acceder todos los hilos)*/

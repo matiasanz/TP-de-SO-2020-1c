@@ -1,5 +1,5 @@
+#include "../dominio/deadlock/candidatos_intercambio.h"
 #include "hilos_team.h"
-#include "../dominio/deadlock/estructuras_deadlock.h"
 #include "../team.h"
 
 bool entrenador_validar_objetivos(entrenador*unEntrenador);

@@ -3,7 +3,7 @@
 
 #include "../../hilos del team/hilos_team.h"
 
-typedef enum {FIFO, ROUND_ROBBIN, SJF_CD, SJF_SD} t_algoritmo;
+typedef enum {FIFO, ROUND_ROBBIN, SJF_CD, SJF_SD} t_algoritmo_planificacion;
 
 typedef struct{
 	numero* tiempo;
@@ -16,13 +16,8 @@ typedef union{
 	datos_sjf datos;
 } datos_algoritmo;
 
-typedef struct{
-	t_algoritmo algoritmo;
-	datos_algoritmo datos;
-}algoritmo_planificacion;
-
 //void cargar_algoritmo_planificacion(); //TODO
 
-bool puede_seguir_ejecutando_segun_algoritmo(entrenador*unEntrenador, numero tiempo, t_algoritmo);
+bool puede_seguir_ejecutando_segun_algoritmo(entrenador*unEntrenador, numero tiempo, t_algoritmo_planificacion);
 
 #endif

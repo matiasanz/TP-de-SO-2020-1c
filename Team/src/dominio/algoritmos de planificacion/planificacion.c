@@ -8,6 +8,17 @@ void entrenador_consumir_cpu(entrenador*unEntrenador){
 	sleep(RETARDO_CICLO_CPU);
 }//	sem_signal(&ConsumioCpu); se deberia hacer fuera de la funcion, despues de la actividad que tenia que hacer
 
+void entrenador_consumir_N_cpu(entrenador*unEntrenador, numero cantidad){
+	int i;
+	for(i=0 /*=1*/; i<cantidad; i++){
+		entrenador_consumir_cpu(unEntrenador);
+//		sem_post(&consumioCpu);
+	}
+//Ver si conviene hacer un signal(cpuConsumido) de menos para que lo haga despues de lo que tenga que hacer
+
+//	entrenador_consumir_cpu(unEntrenador);
+}
+
 bool entrenador_termino_de_ejecutar(entrenador*unEntrenador){
 	pthread_mutex_lock(&mutexEstadoEntrenador[unEntrenador->id]);
 	bool termino = !entrenador_en_estado(unEntrenador, EXECUTE);
@@ -17,19 +28,22 @@ bool entrenador_termino_de_ejecutar(entrenador*unEntrenador){
 }
 
 void ejecutar_entrenador(entrenador* unEntrenador){
-	numero tiempo=0;
-	sem_post(&EjecutarEntrenador[unEntrenador->id]);
-	for(tiempo=RETARDO_CICLO_CPU; puede_seguir_ejecutando_segun_algoritmo(unEntrenador, tiempo, ALGORITMO_PLANIFICACION); tiempo+=RETARDO_CICLO_CPU){
-//		sem_wait(&ConsumioCpu);
-		sem_post(&EjecutarEntrenador[unEntrenador->id]);
+	numero tiempo;
+	entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar");
 
-		if(entrenador_termino_de_ejecutar(unEntrenador)){
+	for(tiempo=0;!entrenador_termino_de_ejecutar(unEntrenador); tiempo+=RETARDO_CICLO_CPU){
+		if(!puede_seguir_ejecutando_segun_algoritmo(unEntrenador, tiempo, ALGORITMO_PLANIFICACION)){
+			entrenador_pasar_a(unEntrenador, READY, "Ya no puede seguir ejecutando segun algoritmo");
 			break;
 		}
+
+		sem_post(&EjecutarEntrenador[unEntrenador->id]);
+//		sem_wait(&ConsumioCpu);
 	}
 }
 
-bool puede_seguir_ejecutando_segun_algoritmo(entrenador*unEntrenador, numero tiempo, t_algoritmo algoritmo){
+//Ver si con orden superior se puede desarmar el switch
+bool puede_seguir_ejecutando_segun_algoritmo(entrenador*unEntrenador, numero tiempo, t_algoritmo_planificacion algoritmo){
 	switch(algoritmo){
 		case FIFO: ;
 		/*no break*/
@@ -37,12 +51,12 @@ bool puede_seguir_ejecutando_segun_algoritmo(entrenador*unEntrenador, numero tie
 			return true;
 
 //		case ROUND_ROBBIN: {
-//			return tiempo<QUANTUM
+//			return tiempo<datosAlgoritmo.QUANTUM
 //			break;
 //		}
 
 //		case SJF_CD{
-//			return tiempo <= menor_estimacion(entrenadores_ready);
+//			return tiempo <= menor_estimacion(entrenadores_ready); //resolver con fold
 //		}
 
 		default : {
@@ -76,8 +90,8 @@ bool puede_seguir_ejecutando_segun_algoritmo(entrenador*unEntrenador, numero tie
 //}
 
 //************************************************************************************
+//Ejemplo de uso del cpu
 
-////Ejemplo de uso del cpu
 void desplazar_unidimensional(coordenada* posicionInicial, coordenada posicionFinal);
 void entrenador_dar_un_paso_hacia(entrenador*unEntrenador, t_posicion posicionFinal);
 void entrenador_ir_hacia(entrenador* unEntrenador, t_posicion posicionFinal){
@@ -93,7 +107,7 @@ void entrenador_ir_hacia(entrenador* unEntrenador, t_posicion posicionFinal){
 }
 
 void desplazar_unidimensional(coordenada* posicionInicial, coordenada posicionFinal){
-	int desplazamiento = posicionFinal/abs(posicionFinal);
+	int desplazamiento = (posicionFinal > *posicionInicial) - (posicionFinal < *posicionInicial);
 	*posicionInicial += desplazamiento;
 }
 
@@ -116,36 +130,25 @@ void entrenador_dar_un_paso_hacia(entrenador*unEntrenador, t_posicion posicionFi
 }
 
 //**************************************************************
-//TODO
-//t_algoritmo cargar_algoritmo_planificacion(){ //TODO A FUTURO
-//
-//	char*algoritmoLeido = config_get_string_value(config,"ALGORITMO_PLANIFICACION");
-//	  //	hacer un switch del criterio
-//	  //	quantum=config_get_int_value(config,"QUANTUM");
-//	  //	estimacion_inicial=config_get_int_value(config,"ESTIMACION_INICIAL");
-//	/*-------*/
-//
-//
-//	if(string_equals_ignore_case(algoritmoLeido, "FIFO")){
-//
-//		return FIFO;
-//	}
-//
-//	if(string_equals_ignore_case(algoritmoLeido, "RR")){
-//
-//		return ROUND_ROBBIN;
-//	}
-//
-//	if(string_equals_ignore_case(algoritmoLeido, "SJF-CD")){
-//		return SJF_CD;
-//	}
-//
-//	if(string_equals_ignore_case(algoritmoLeido, "SJF-SD")){
-//		return SJF_SD;
-//	}
-//
-//	error_show("Se leyo un algoritmo de planificacion desconocido");
-//	exit(1);
-//
-//	return NULL;
-//}
+void cargar_algoritmo_planificacion(){ //TODO A FUTURO
+
+	char*algoritmoLeido = config_get_string_value(config,"ALGORITMO_PLANIFICACION");
+
+	if(string_equals_ignore_case(algoritmoLeido, "FIFO")){
+		ALGORITMO_PLANIFICACION = FIFO;
+	}
+
+	else if(string_equals_ignore_case(algoritmoLeido, "RR")){
+//  	datos_algoritmo.QUANTUM=config_get_int_value(config,"QUANTUM");
+		ALGORITMO_PLANIFICACION = ROUND_ROBBIN;
+	}
+
+	else{ //SJF //Sin desalojo va a leer lo mismo que con
+		ALGORITMO_PLANIFICACION = string_equals_ignore_case(algoritmoLeido, "SJF-CD")? SJF_CD: SJF_SD;
+		//	estimacion_inicial=config_get_int_value(config,"ESTIMACION_INICIAL");
+		//	alfa=config_get_int_value(config,"ALFA");
+		//  (...)
+	}
+
+	RETARDO_CICLO_CPU = config_get_int_value(config, "RETARDO_CICLO_CPU");
+}

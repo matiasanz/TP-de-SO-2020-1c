@@ -1,4 +1,4 @@
-#include "estructuras_deadlock.h"
+#include "candidatos_intercambio.h"
 
 //******************************************************
 
@@ -40,8 +40,6 @@ void candidato_actualizar_matrices_por_intercambio(candidato_intercambio* unCand
 void candidato_intercambiar_con(candidato_intercambio* self, candidato_intercambio* parejaDeIntercambio){
 	recurso teDoyEste = candidato_recurso_que_le_entrega_a(self, parejaDeIntercambio);
 	recurso aCambioDeEste = candidato_recurso_que_le_entrega_a(parejaDeIntercambio, self);
-
-	printf("El Entrenador N°%u le intercambio al N°%u un %s por un %s", self->unEntrenador->id, parejaDeIntercambio->unEntrenador->id, teDoyEste, aCambioDeEste);
 
 	recursos_intercambiar_instancia_de(self->unEntrenador->pokemonesCazados, teDoyEste, aCambioDeEste);
 	recursos_intercambiar_instancia_de(parejaDeIntercambio->unEntrenador->pokemonesCazados, aCambioDeEste, teDoyEste);
