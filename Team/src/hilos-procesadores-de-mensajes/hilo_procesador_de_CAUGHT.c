@@ -36,16 +36,16 @@ void team_procesador_cola_CAUGHT(cr_list* mensajes){
 			else{
 				pthread_mutex_unlock(&mutexRecursosEnMapa);
 				entrenador_bloquear_hasta_APPEARED(unEntrenador);
-				printf("El entrenador N°%u Fallo en capturar al pokemon pero puede seguir cazando mas\n", unEntrenador->id);
+				log_info(event_logger, ">> Se descarto a %s porque %s\n", pokemonCatcheado->especie, (resultado.idCaptura? "ya no es requerido": "fallo la captura"));
 				pokemon_destroy(pokemonCatcheado);
 				cr_list_wait_and_remove(capturasPendientes, 0);
 				pendiente_destroy(capturaPendiente);
 			}
 		}
 
-		else { //La idea es que esto despues no este
+		else {
 			pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-			log_info(event_logger, "Se recibio un resultado con id %u desconocido\n", resultado.idCaptura);
+			log_warning(event_logger, "Se recibio el resultado de una captura id %u desconocida\n", resultado.idCaptura);
 			pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 		}
 

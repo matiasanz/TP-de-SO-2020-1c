@@ -18,7 +18,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 			case CATCHEAR: {
 				pokemon*unPokemon = mapa_desmapear(pokemonesRequeridos);
 
-				entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar y lo va a utilizar para intentar cachear");
+				entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar y lo va a utilizar para intentar catchear");
 
 				entrenador_desplazarse_hacia(unEntrenador, unPokemon->posicion);
 
@@ -87,9 +87,9 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 
 	entrenador_destroy(unEntrenador);
 
-	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-	log_info(event_logger, "Finalizo un hilo entrenador");
-	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+//	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
+//	log_info(event_logger, "Finalizo un hilo entrenador");
+//	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 
 }
 

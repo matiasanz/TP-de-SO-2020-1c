@@ -37,7 +37,7 @@ pthread_mutex_t mutexRecursosEnMapa;
 numero cantidadDeEntrenadores; //Me guarda el tamaño del array para cuando tenga que finalizar
 
 //HARDCODEOS ---------------------------------- ACORDARME DE BORRARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
-pthread_mutex_t MUTEX_FIN_DE_PROCESO_BORRARRRRRRRRRRRRRRRR;
+pthread_mutex_t MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR;
 bool finDeProceso;
 
 /*----------------*/
