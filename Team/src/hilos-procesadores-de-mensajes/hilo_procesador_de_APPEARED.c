@@ -36,12 +36,12 @@ void registrar_pokemon(pokemon*unPokemon){
 
 	if( pokemon_es_requerido(*unPokemon) ){
 		mapa_mapear_requerido(unPokemon);
-		puts("\nsignal(cantTareas)");
+//		puts("\nsignal(cantTareas)");
 		sem_post(&HayTareasPendientes);
 	}
 
 	else{
-		printf("Se recibio un %s y se descarto al no ser requerido\n", unPokemon->especie);
+		log_info(event_logger, "Se recibio un %s y se descarto al no ser requerido\n", unPokemon->especie);
 		pokemon_destroy(unPokemon); //"descartar al pokemon"
 	}
 }
@@ -72,11 +72,8 @@ numero objetivos_cantidad_requerida_de(especie_pokemon unaEspecie){
 }
 
 void mapa_mapear_requerido(pokemon*unPokemon){
-
-	printf("-----------------------------------------> se Mapeo un %s\n", unPokemon->especie);
-
+//	printf("-----------------------------------------> se Mapeo un %s\n", unPokemon->especie);
 	mapa_mapear_pokemon(pokemonesRequeridos, unPokemon);
-
 }
 
 // Retorna true si la especie ya se encuentra en el registro de especies

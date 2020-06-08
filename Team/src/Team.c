@@ -8,8 +8,12 @@ int main(void) {
 
 	Get_pokemones(objetivosGlobales);
 
-	log_info(event_logger, "\n\n****************************************\n¡¡¡Jellou World Team!!!\n"); /* prints !!!Hello World!!! */
+	log_info(event_logger, "\n\n*************************************************************************\n"
+							   "                      Inicio del proceso Team\n"); /* prints !!!Hello World!!! */
 	log_info(logger, "\n\n");
+
+	//Para pruebas sin los otros modulos
+//	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) broker_simulator, NULL); //Para pruebas sin broker
 
 	inicializar_hilos();
 
@@ -17,7 +21,8 @@ int main(void) {
 
 	//team_mostrar_resultados();
 
-	log_info(event_logger, "chau team\n****************************************");
+	log_info(event_logger, "\n\n                              Fin del proceso Team\n"
+						      "****************************************************************************");
 
 	return team_exit();
 }
@@ -37,7 +42,6 @@ void team_inicializar(){
 
 	RETARDO_CICLO_CPU = config_get_int_value(config,"RETARDO_CICLO_CPU");
 
-	//no hace falta que algoritmo y los datos esten agrupados en misma estructura
 	ALGORITMO_PLANIFICACION = FIFO;//cargar_algoritmo_planificacion();
 
 	inicializar_listas();
@@ -48,7 +52,7 @@ void team_inicializar(){
 
 //	inicializar_hilos();
 
-	bool inicio_exitoso = config && event_logger ; //&& listas_iniciadas_correctamente;
+	bool inicio_exitoso = config && event_logger ;
 	if(!inicio_exitoso){
 		error_show("algo malio sal en el inicio :(");
 		exit(1);
@@ -109,8 +113,6 @@ void listas_destroy(){
 
 //Hilos
 void inicializar_hilos(){
-	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) broker_simulator, NULL); //Para pruebas sin broker
-
 	inicializar_hilos_entrenadores();
 
 	pthread_create(&hiloMensajesAppeard, NULL, (void*)team_suscriptor_cola_APPEARD, mensajesAPPEARED);

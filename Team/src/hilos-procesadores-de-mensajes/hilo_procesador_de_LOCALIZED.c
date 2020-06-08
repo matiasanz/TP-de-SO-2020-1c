@@ -12,7 +12,7 @@ void team_procesador_cola_LOCALIZED(cr_list* mensajes){
 		pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 
 		if(especie_recibida_con_anterioridad(pokemonLocalizado->especie, historialDePokemones)){
-			printf("%s: figurita repetida se descarta\n", pokemonLocalizado->especie);
+			log_info(event_logger, "Se descarto, ya que la especie %s habia sido recibida con anterioridad", pokemonLocalizado->especie);
 		}
 
 		else{

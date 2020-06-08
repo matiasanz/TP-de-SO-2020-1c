@@ -7,12 +7,11 @@ void team_ejecutar_algoritmo_de_deteccion_de_deadlock(){
 	esperar_que_equipo_no_pueda_cazar_mas();
 
 //******************************************************************** INICIO HARDCODEADO
-
-	pthread_mutex_lock(&MUTEX_FIN_DE_PROCESO_BORRARRRRRRRRRRRRRRRR);
+	pthread_mutex_lock(&MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR);
 	finDeProceso = true;
-	pthread_mutex_unlock(&MUTEX_FIN_DE_PROCESO_BORRARRRRRRRRRRRRRRRR);
-
+	pthread_mutex_unlock(&MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR);
 //******************************************************************** fin HARDCODEADO
+
 	bool hayDeadlock = algoritmo_detectar_deadlock(equipo);
 
 	while(hayDeadlock){
@@ -20,8 +19,6 @@ void team_ejecutar_algoritmo_de_deteccion_de_deadlock(){
 		algoritmo_procesar_deadlock();
 		hayDeadlock = algoritmo_detectar_deadlock(equipo);
 	}
-
-	puts("no hay deadlock");
 
 	loggear_resultado(hayDeadlock);
 }

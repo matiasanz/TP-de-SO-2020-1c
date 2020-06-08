@@ -12,7 +12,7 @@ void broker_simulator(){
 	finDeProceso = false;
 
 	int i;
-	pthread_mutex_init(&MUTEX_FIN_DE_PROCESO_BORRARRRRRRRRRRRRRRRR, NULL);
+	pthread_mutex_init(&MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR, NULL);
 
 	for(i=0; PROCESO_ACTIVO; i= (i+1)%6){
 
@@ -92,12 +92,12 @@ void broker_simulator(){
 
 		sleep(1);
 
-		pthread_mutex_lock(&MUTEX_FIN_DE_PROCESO_BORRARRRRRRRRRRRRRRRR);
+		pthread_mutex_lock(&MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR);
 		if(finDeProceso){
-			pthread_mutex_unlock(&MUTEX_FIN_DE_PROCESO_BORRARRRRRRRRRRRRRRRR);
+			pthread_mutex_unlock(&MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR);
 			break;
 		} else{
-			pthread_mutex_unlock(&MUTEX_FIN_DE_PROCESO_BORRARRRRRRRRRRRRRRRR);
+			pthread_mutex_unlock(&MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR);
 		}
 	}
 

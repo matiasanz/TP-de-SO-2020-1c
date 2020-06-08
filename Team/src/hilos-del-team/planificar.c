@@ -6,8 +6,6 @@
  * Agregar equipo_despertar_en_caso_de_DEADLOCK();
  */
 void team_planificar(){
-	puts("**********************************************\nSe va a planificar");
-
 	while(PROCESO_ACTIVO){
 
 		sem_wait(&HayTareasPendientes);
@@ -15,7 +13,7 @@ void team_planificar(){
 
 		equipo_despertar_en_caso_de_APPEARED();
 
-		puts("**********************************************************wait(proximoEnReady)");
+//		puts("**********************************************************wait(proximoEnReady)");
 		t_id* idProximoEntrenador = entrenadores_id_proximo_a_planificar(entrenadoresReady);
 
 		if(!idProximoEntrenador){
@@ -98,14 +96,14 @@ bool entrenador_en_estado(entrenador* unEntrenador, t_estado ESTADO){
 
 void mapa_limpiar_no_requeridos(){
 
-	puts("****************************voy a limpiar");
+//	puts("****************************voy a limpiar");
 
 	pokemon*unPokemon = list_get(pokemonesRequeridos->lista, 0);
 	while(unPokemon!=NULL && !pokemon_es_requerido(*unPokemon)){
 
-		puts("*************************estoy limpiando");
+//		puts("*************************estoy limpiando");
 
-		printf("\n\n>> Se limpio un %s\n\n", unPokemon->especie);
+		log_info(event_logger, "\n\n>> Se borro del mapa un %s al no ser mas requerido\n", unPokemon->especie);
 
 		sem_wait(&pokemonesRequeridos->hayMas);
 		list_remove(pokemonesRequeridos->lista, 0);
