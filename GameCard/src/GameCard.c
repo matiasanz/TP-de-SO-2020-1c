@@ -75,6 +75,7 @@ void crearEstructuras(){
 
 	mkdir(punto_montaje_tallgrass,0777);
 
+	//-------Crecion de Directorios
 	string_append(&dir_metadata,punto_montaje_tallgrass);
 	string_append(&dir_metadata,"Metadata/");
 	mkdir(dir_metadata,0777);
@@ -90,6 +91,7 @@ void crearEstructuras(){
 	mkdir(dir_blocks,0777);
 	log_info(event_logger,"Creada carpeta Blocks");
 
+	//-----Creacion del Metadata, si es que no existe
 	string_append(&bin_metadata,dir_metadata);
 	string_append(&bin_metadata,"/Metadata.bin");
 
@@ -117,6 +119,7 @@ void crearEstructuras(){
 
 		char* bitarray_temp=malloc(tope(config_get_int_value(config_metadata,"BLOCKS"),8));
 		fwrite((void*)bitarray_temp,tope(config_get_int_value(config_metadata,"BLOCKS"),8),1,f_bitmap);
+		fflush(f_bitmap);
 		free(bitarray_temp);
 
 	}
@@ -273,7 +276,8 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 				//todo buscar  espacio en sus bloques
 			}else{
 			*/
-				//todo buscar en el bitmap los bloques libres, porque no hay espacio en los propios
+				//no hay espacio en sus bloques,
+				//entonces buscar en el bitmap los bloques libres
 
 
 
@@ -325,17 +329,36 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 			log_info(event_logger,"tiene bloques asignados");
 		}
 
+		log_info(event_logger,"pokemon guardado");
 
-		//todo crea paquete appeared pokemon y enviarlo a Broker
+
+		//creacion de  paquete appeared pokemon y envio a Broker
+
+		t_mensaje_appeared_catch_pokemon* mensajeAEnviar=mensaje_appeared_catch_pokemon_crear(unMsjNewPoke->pokemon.especie,unMsjNewPoke->pokemon.posicion.pos_x,unMsjNewPoke->pokemon.posicion.pos_y);
+		mensaje_appeared_catch_pokemon_set_id_correlativo(mensajeAEnviar,unMsjNewPoke->mensaje_header.id);
+
+		t_paquete_header header=paquete_header_crear(MENSAJE,GAMECARD,APPEARED_POKEMON);
+		t_buffer* bufferDepaquete=mensaje_appeared_catch_pokemon_serializar(mensajeAEnviar);
+		t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
 
 
+		t_conexion_server* unaConexion=conexion_server_crear(
+					config_get_string_value(config, "IP_BROKER"),
+					config_get_string_value(config, "PUERTO_BROKER"), GAMECARD);
+
+		if(enviar(unaConexion,paqueteAEnviar)==ERROR_SOCKET){
+			log_warning(logger,"NO se puede realizar la conexion con el BROKER");
+		}
+
+
+		//------------------------
 		split_liberar(bloquesDelPokemon);
 		config_destroy(config_metadata_pokemon);
 		free(bin_metadata);
 		free(dir_unNuevoPokemon);
 
-	log_info(event_logger,"pokemon guardado");
 }
+
 void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 
 }
