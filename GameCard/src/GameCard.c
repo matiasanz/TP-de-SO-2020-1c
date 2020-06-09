@@ -221,7 +221,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 		//------Ver si el archivo esta abierto------------
 		if(strcmp(config_get_string_value(config_metadata_pokemon,"OPEN"),"Y")==0){
-			//todo  abro otro hilo con un sleep que volvera a atender al Mensaje
+			//abro otro hilo con un sleep que volvera a atender al Mensaje
 
 			config_destroy(config_metadata_pokemon);
 			free(bin_metadata);
@@ -244,11 +244,10 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 		}
 
 
-
-
 		config_set_value(config_metadata_pokemon,"OPEN","Y");
 		config_save(config_metadata_pokemon);
 		char** bloquesDelPokemon=config_get_array_value(config_metadata_pokemon,"BLOCKS");
+
 
 		//--------Comienzo a operar con el pokemon------------
 		if(cant_elemetos_array(bloquesDelPokemon)==0){
@@ -276,6 +275,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 			int size=size_bloque(bin_block);
 
+			//retardo para simular acceso a disco
 			sleep(tiempo_retardo_operacion);
 
 			config_set_value(config_metadata_pokemon,"BLOCKS",listaBloques);
@@ -287,17 +287,15 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 			free(nuevalinea);
 			free(bin_block);
 
-			log_info(event_logger,"no posee bloques, se usara el bloque %i",nrobloque);
+			log_info(event_logger,"no posee bloques, se usara el bloque vacio %i",nrobloque);
 		}else{
 			/*
 			if(){
 				//todo buscar  espacio en sus bloques
 			}else{
 			*/
-				//no hay espacio en sus bloques,
-				//entonces buscar en el bitmap los bloques libres
-
-
+			//no hay espacio en sus bloques,
+			//entonces buscar en el bitmap los bloques libres
 
 			int nrobloque=bloque_disponible(bitmap,config_get_int_value(config_metadata,"BLOCKS"));
 			bitarray_set_bit(bitmap,nrobloque);
@@ -308,7 +306,6 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 			string_append(&bin_block,".bin");
 
 
-
 			char* nuevalinea=crearLinea(unMsjNewPoke);
 			int longitud=string_length(nuevalinea)+1;
 
@@ -316,8 +313,8 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 			char* listaBloques=string_new();
 
-
 			int len_array=cant_elemetos_array(bloquesDelPokemon);
+
 			string_append(&listaBloques,"[");
 			for(int i=0;i<len_array;i++){
 				string_append(&listaBloques,bloquesDelPokemon[i]);
@@ -330,6 +327,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 			int size=size_bloque(bin_block)+config_get_int_value(config_metadata_pokemon,"SIZE");
 
+			//retardo para simular acceso a disco
 			sleep(tiempo_retardo_operacion);
 
 			config_set_value(config_metadata_pokemon,"BLOCKS",listaBloques);
@@ -346,7 +344,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 			}
 			*/
 
-			log_info(event_logger,"tiene bloques asignados");
+			log_info(event_logger,"ya tiene bloques asignados");
 		}
 
 		log_info(event_logger,"pokemon guardado:%s ::pos (%i,%i)::cant %i"
