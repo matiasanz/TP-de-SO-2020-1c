@@ -8,9 +8,9 @@
 #ifndef SRC_GAMEBOY_H_
 #define SRC_GAMEBOY_H_
 
-#include "crenito-commons/conexiones/conexiones.h"
-
-t_conexion_server conexion_broker;
+#include <crenito-commons/conexiones/conexiones.h>
+#include "validaciones_gameboy.h"
+#include "mensaje.h"
 
 void inicializar_logs();
 

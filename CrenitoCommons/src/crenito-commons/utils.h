@@ -38,6 +38,7 @@
 #define GAMEBOY_STRING "GAME_BOY"
 #define GAMECARD_STRING "GAME_CARD"
 #define TEAM_STRING "TEAM"
+#define SUSCRIPTOR_STRING "SUSCRIPTOR"
 
 t_config* config;
 
@@ -83,5 +84,7 @@ void string_append_mensaje_header(char** string, t_mensaje_header header, char* 
 
 int conexion_exitosa(int indicador_conexion);
 int error_conexion(int indicador_conexion);
+t_id_proceso get_id_proceso(char* proceso);
+t_id_cola get_id_mensaje(char* mensaje);
 
 #endif /* UTILS_H_ */

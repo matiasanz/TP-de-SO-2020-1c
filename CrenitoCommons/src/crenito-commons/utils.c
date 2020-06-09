@@ -91,3 +91,44 @@ int error_conexion(int indicador_conexion) {
 int conexion_exitosa(int indicador_conexion) {
 	return !error_conexion(indicador_conexion);
 }
+
+t_id_proceso get_id_proceso(char* proceso){
+	if(strcmp(proceso,BROKER_STRING)==0){
+		return BROKER;
+	}
+	if(strcmp(proceso,TEAM_STRING)==0){
+		return TEAM;
+	}
+	if(strcmp(proceso,GAMECARD_STRING)==0){
+		return GAMECARD;
+	}
+	if(strcmp(proceso,GAMEBOY_STRING)==0){
+		return GAMEBOY;
+	}
+	log_error(event_logger,"este proceso no es conocido %s",proceso);
+	return 0;
+}
+
+t_id_cola get_id_mensaje(char* mensaje){
+
+	if(strcmp(mensaje,NEW_POKEMON_STRING)==0){
+		return NEW_POKEMON;
+	}
+	if(strcmp(mensaje,APPEARED_POKEMON_STRING)==0){
+		return APPEARED_POKEMON;
+	}
+	if(strcmp(mensaje,CATCH_POKEMON_STRING)==0){
+		return CATCH_POKEMON;
+	}
+	if(strcmp(mensaje,CAUGHT_POKEMON_STRING)==0){
+		return CAUGHT_POKEMON;
+	}
+	if(strcmp(mensaje,GET_POKEMON_STRING)==0){
+		return GET_POKEMON;
+	}
+	if(strcmp(mensaje,LOCALIZED_POKEMON_STRING)==0){
+		return LOCALIZED_POKEMON;
+	}
+	log_error(event_logger,"este mensaje no es conocido %s",mensaje);
+	return 0;
+}
