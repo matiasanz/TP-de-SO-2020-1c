@@ -23,6 +23,9 @@ void team_inicializar();
 int team_exit();
 
 //funciones auxiliares
+void inicializar_logs_y_config();
+void finalizar_logs_y_config();
+
 void inicializar_listas();
 void listas_destroy();
 

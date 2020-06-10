@@ -22,9 +22,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 
 				entrenador_desplazarse_hacia(unEntrenador, unPokemon->posicion);
 
-				t_id id_mensaje_pendiente = Catch(unPokemon->especie);
-
-				agregar_pendiente(capturasPendientes, id_mensaje_pendiente, unEntrenador, unPokemon);
+				Catch(unEntrenador, unPokemon);
 
 				unEntrenador->siguienteTarea = CAPTURAR;
 
@@ -77,6 +75,8 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 				entrenador_validar_objetivos(parejaDeIntercambio->unEntrenador);
 
 				sem_post(&finDeIntercambio);
+				candidato_destroy(self);
+				candidato_destroy(parejaDeIntercambio);
 
 				break;
 			}

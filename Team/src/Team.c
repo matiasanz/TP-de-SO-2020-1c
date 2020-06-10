@@ -1,3 +1,12 @@
+/*
+ ============================================================================
+ Name        : Team.c
+ Author      : C-renito Casero
+ Version     : Checkpoint
+ Description : Proceso Team hasta hito 3
+ ============================================================================
+ */
+
 #include "team.h"
 #include "hilos-del-team/hilos_team.h"
 //#include "tests/tests_team.o"
@@ -32,18 +41,13 @@ int main(void) {
 						/*Implementacion de funciones*/
 
 void team_inicializar(){
-	config=config_create(CONFIG_PATH);
 
-	char*TEAM_LOG_PATH = config_get_string_value(config,"LOG_FILE");
+	inicializar_logs_y_config();
 
-	logger=log_create(TEAM_LOG_PATH,"TEAM",true,LOG_LEVEL_INFO);
-
-	event_logger = log_create("log/team_event.log", "TEAM_EVENT", true, LOG_LEVEL_INFO);
-
-	RETARDO_CICLO_CPU = config_get_int_value(config,"RETARDO_CICLO_CPU");
-
-	ALGORITMO_PLANIFICACION = FIFO;//cargar_algoritmo_planificacion();
-
+  //void inicializar planificacion{
+//	RETARDO_CICLO_CPU = config_get_int_value(config,"RETARDO_CICLO_CPU");
+//	ALGORITMO_PLANIFICACION = FIFO;//cargar_algoritmo_planificacion();
+ //}
 	inicializar_listas();
 
  	inicializar_semaforos();
@@ -64,15 +68,27 @@ int team_exit(){
 
 	finalizar_hilos();
 	finalizar_semaforos();
-	log_destroy(logger);
-	log_destroy(event_logger);
-	config_destroy(config);
+	finalizar_logs_y_config();
 	listas_destroy();
 
 	return EXIT_SUCCESS;
 }
 
 /***********************************Funciones auxiliares *************************************/
+
+//Logs y config
+void inicializar_logs_y_config(){
+	config=config_create(CONFIG_PATH);
+	char*TEAM_LOG_PATH = config_get_string_value(config,"LOG_FILE");
+	logger=log_create(TEAM_LOG_PATH,"TEAM",true,LOG_LEVEL_INFO);
+	event_logger = log_create("log/team_event.log", "TEAM_EVENT", true, LOG_LEVEL_INFO);
+}
+
+void finalizar_logs_y_config(){
+	config_destroy(config);
+	log_destroy(logger);
+	log_destroy(event_logger);
+}
 
 //Listas
 void inicializar_listas() {
@@ -83,7 +99,8 @@ void inicializar_listas() {
 	pokemonesRequeridos = mapa_create();
 	capturasPendientes = pendientes_create();
 	potencialesDeadlock = candidatos_create();
-//Ver si vale la pena abstraer
+
+	//Ver si vale la pena abstraer las listas
 	historialDePokemones = list_create();
 
 	entrenadoresReady = cr_list_create();
