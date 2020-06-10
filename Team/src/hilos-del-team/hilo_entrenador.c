@@ -221,7 +221,7 @@ bool entrenador_validar_objetivos(entrenador*unEntrenador){
 
 	else{
 		unEntrenador->siguienteTarea = INTERCAMBIAR;
-		entrenador_pasar_a(unEntrenador, LOCKED_HASTA_DEADLOCK, "Su inventario esta lleno y no cumplio sus objetivos");
+		if(!entrenador_en_estado(unEntrenador, LOCKED_HASTA_DEADLOCK)) entrenador_pasar_a(unEntrenador, LOCKED_HASTA_DEADLOCK, "Su inventario esta lleno y no cumplio sus objetivos");
 
 		printf("Objetivos: "); recursos_mostrar(unEntrenador->objetivos);puts("");
 		printf("Inventario: "); recursos_mostrar(unEntrenador->pokemonesCazados);puts("");

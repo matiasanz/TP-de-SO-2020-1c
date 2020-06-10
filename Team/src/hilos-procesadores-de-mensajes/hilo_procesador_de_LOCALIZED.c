@@ -12,7 +12,9 @@ void team_procesador_cola_LOCALIZED(cr_list* mensajes){
 		pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 
 		if(especie_recibida_con_anterioridad(pokemonLocalizado->especie, historialDePokemones)){
+			pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
 			log_info(event_logger, "Se descarto, ya que la especie %s habia sido recibida con anterioridad", pokemonLocalizado->especie);
+			pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 		}
 
 		else{

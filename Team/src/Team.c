@@ -9,11 +9,11 @@ int main(void) {
 	Get_pokemones(objetivosGlobales);
 
 	log_info(event_logger, "\n\n*************************************************************************\n"
-							   "                      Inicio del proceso Team\n"); /* prints !!!Hello World!!! */
+							   "                      Inicio del proceso Team\n");
 	log_info(logger, "\n\n");
 
 	//Para pruebas sin los otros modulos
-//	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) broker_simulator, NULL); //Para pruebas sin broker
+	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) broker_simulator, NULL); //Para pruebas sin broker
 
 	inicializar_hilos();
 
