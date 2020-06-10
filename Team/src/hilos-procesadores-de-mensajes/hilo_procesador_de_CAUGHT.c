@@ -3,7 +3,7 @@
 #include "../estructuras-auxiliares/mensajes.h"
 
 resultado_captura desempaquetar_resultado(t_mensaje_caught_pokemon*mensaje){
-	return (resultado_captura) {mensaje->mensaje_header.id_correlativo,  (bool) mensaje->atrapado};
+	return (resultado_captura) {mensaje->mensaje_header.id,  (bool) mensaje->atrapado};
 }
 
 void team_procesador_cola_CAUGHT(cr_list* mensajes){
