@@ -100,7 +100,5 @@ void broker_simulator(){
 			pthread_mutex_unlock(&MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR);
 		}
 	}
-
-	log_info(event_logger, "Finalizo hilo receptor de mensajes");
 }
 

@@ -1,4 +1,4 @@
-#include "../algoritmos-de-planificacion/planificacion.h"
+#include "planificacion.h"
 
 #include "../team.h"
 
@@ -52,12 +52,12 @@ bool puede_seguir_ejecutando_segun_algoritmo(entrenador*unEntrenador, numero tie
 			return true;
 
 //		case ROUND_ROBBIN: {
-//			return tiempo<datosAlgoritmo.QUANTUM
+//			return tiempo<datosAlgoritmo.QUANTUM || cr_list_is_empty(entrenadoresReady);
 //			break;
 //		}
 
 //		case SJF_CD{
-//			return tiempo <= menor_estimacion(entrenadores_ready); //resolver con fold
+//			return tiempo <= menor_estimacion(entrenadoresReady); //resolver con fold
 //		}
 
 		default : {
@@ -148,7 +148,8 @@ void cargar_algoritmo_planificacion(){ //TODO A FUTURO
 		ALGORITMO_PLANIFICACION = string_equals_ignore_case(algoritmoLeido, "SJF-CD")? SJF_CD: SJF_SD;
 		//	estimacion_inicial=config_get_int_value(config,"ESTIMACION_INICIAL");
 		//	alfa=config_get_int_value(config,"ALFA");
-		//  (...)
+		//  datosAlgoritmo.tiempo = malloc(sizeof(numero)*cantidadDeEntrenadores);
+		//  datosAlgoritmo.estimaciones = malloc(sizeof(numero)*cantidadDeEntrenadores);
 	}
 
 	RETARDO_CICLO_CPU = config_get_int_value(config, "RETARDO_CICLO_CPU");

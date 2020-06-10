@@ -85,7 +85,7 @@ bool especie_recibida_con_anterioridad(especie_pokemon especie, especies_pokemon
 
 	pthread_mutex_lock(&mutexHistorialEspecies);
 	bool siONo = list_any_satisfy(historial, &yaLaTengo);
-	if(!siONo) list_add(historial, especie);
+	if(!siONo) list_add(historial, string_duplicate(especie));
 	pthread_mutex_unlock(&mutexHistorialEspecies);
 
 	return siONo;
