@@ -38,22 +38,21 @@ void Catch(entrenador*unEntrenador, pokemon* pokemonCatcheado) {
 	t_paquete_header header=paquete_header_crear(MENSAJE,TEAM,CATCH_POKEMON);
 	t_buffer* bufferDepaquete=mensaje_appeared_catch_pokemon_serializar(mensajeCatch);
 	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
-	t_conexion_server* unaConexion=conexion_server_crear(conexion_broker->ip, conexion_broker->puerto, TEAM);
-	int resultadoDeEnvio = enviar(unaConexion,paqueteAEnviar);
+	/*int resultadoDeEnvio =*/ enviar(conexion_broker,paqueteAEnviar);
 
 	//Agrego a la lista de capturas pendientes
 	t_id idCapturaPendiente = mensaje_appeared_catch_pokemon_get_id(mensajeCatch);
 	agregar_pendiente(capturasPendientes, idCapturaPendiente, unEntrenador, pokemonCatcheado);
 
-	if(resultadoDeEnvio==ERROR_SOCKET){
-		pthread_mutex_lock(&Mutex_AndoLoggeando);
-		log_warning(logger,"No se ha podido realizar la conexion con el Broker" /*, se procedera a responder el mensaje por defecto"*/);
-		pthread_mutex_unlock(&Mutex_AndoLoggeando);
-
-//		t_mensaje_caught_pokemon* respuestaAutogenerada = mensaje_caught_pokemon_crear(true);
-//		mensaje_caught_pokemon_set_id_correlativo(respuestaAutogenerada, idCapturaPendiente);
-//		cr_list_add_and_signal(mensajesCAUGHT, respuestaAutogenerada);
-	}
+//	if(resultadoDeEnvio==ERROR_SOCKET){
+//		pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
+//		log_warning(event_logger,"Se procedera a responder el mensaje por defecto");
+//		pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+//
+////		t_mensaje_caught_pokemon* respuestaAutogenerada = mensaje_caught_pokemon_crear(true);
+////		mensaje_caught_pokemon_set_id_correlativo(respuestaAutogenerada, idCapturaPendiente);
+////		cr_list_add_and_signal(mensajesCAUGHT, respuestaAutogenerada);
+//	}
 
 	mensaje_appeared_catch_pokemon_destruir(mensajeCatch);
 	paquete_destruir(paqueteAEnviar);
