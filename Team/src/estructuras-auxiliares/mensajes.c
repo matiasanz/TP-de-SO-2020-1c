@@ -47,14 +47,15 @@ void Catch(entrenador*unEntrenador, pokemon* pokemonCatcheado) {
 
 	if(resultadoDeEnvio==ERROR_SOCKET){
 		pthread_mutex_lock(&Mutex_AndoLoggeando);
-		log_warning(logger,"No se pudo realizar la conexion con el Broker, se procedera a responder el mensaje por defecto");
+		log_warning(logger,"No se ha podido realizar la conexion con el Broker" /*, se procedera a responder el mensaje por defecto"*/);
 		pthread_mutex_unlock(&Mutex_AndoLoggeando);
 
-		t_mensaje_caught_pokemon* respuestaAutogenerada = mensaje_caught_pokemon_crear(true);
-		mensaje_caught_pokemon_set_id_correlativo(respuestaAutogenerada, idCapturaPendiente);
-
-		cr_list_add_and_signal(mensajesCAUGHT, respuestaAutogenerada);
+//		t_mensaje_caught_pokemon* respuestaAutogenerada = mensaje_caught_pokemon_crear(true);
+//		mensaje_caught_pokemon_set_id_correlativo(respuestaAutogenerada, idCapturaPendiente);
+//
+//		cr_list_add_and_signal(mensajesCAUGHT, respuestaAutogenerada);
 	}
 
-	//TODO Destroy
+	mensaje_appeared_catch_pokemon_destruir(mensajeCatch);
+	paquete_destruir(paqueteAEnviar);
 }
