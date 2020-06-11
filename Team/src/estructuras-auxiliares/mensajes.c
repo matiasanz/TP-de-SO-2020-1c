@@ -52,7 +52,6 @@ void Catch(entrenador*unEntrenador, pokemon* pokemonCatcheado) {
 
 //		t_mensaje_caught_pokemon* respuestaAutogenerada = mensaje_caught_pokemon_crear(true);
 //		mensaje_caught_pokemon_set_id_correlativo(respuestaAutogenerada, idCapturaPendiente);
-//
 //		cr_list_add_and_signal(mensajesCAUGHT, respuestaAutogenerada);
 	}
 
