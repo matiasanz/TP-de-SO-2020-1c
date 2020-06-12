@@ -6,8 +6,8 @@ matriz_recursos recursos_create(){
 
 matriz_recursos recursos_from_string(char*cadena){
 
-	if(!cadena){
-		error_show("E de Error de lectura (y de estupido)");
+	if(string_is_empty(cadena)){
+		return recursos_create();
 	}
 
 	matriz_recursos recursosLeidos = dictionary_create();

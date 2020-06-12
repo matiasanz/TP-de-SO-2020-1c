@@ -9,6 +9,7 @@ typedef struct Captura_pendiente{
 	t_id id;
 	entrenador*cazador;
 	pokemon*pokemonCatcheado;
+	bool respondido;
 }captura_pendiente;
 
 //	Constructor

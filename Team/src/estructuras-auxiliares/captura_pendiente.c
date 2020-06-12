@@ -2,7 +2,7 @@
 
 //Constructor
 captura_pendiente pendiente_create(t_id idMensaje, entrenador* unEntrenador, pokemon* unPokemon){
-	return (captura_pendiente) {idMensaje, unEntrenador, unPokemon};
+	return (captura_pendiente) {idMensaje, unEntrenador, unPokemon, false};
 }
 
 //Destructor
@@ -29,10 +29,13 @@ void agregar_pendiente(capturas_pendientes mensajesPendientes, t_id idMensaje, e
 //Obtener
 captura_pendiente* pendientes_get(capturas_pendientes mensajesPendientes, t_id idRespuesta){
 	bool cmp_pendiente_id(void* unPendiente){
-		return ((captura_pendiente*)unPendiente)->id == idRespuesta;
+		return ((captura_pendiente*)unPendiente)->id == idRespuesta && !((captura_pendiente*)unPendiente)->respondido;
 	}
 
-	return cr_list_get_by_condition(mensajesPendientes,  &cmp_pendiente_id);
+	captura_pendiente*esePendiente = cr_list_get_by_condition(mensajesPendientes,  &cmp_pendiente_id);
+	esePendiente->respondido = true;
+
+	return esePendiente;
 }
 
 //Remover segun id entrenador

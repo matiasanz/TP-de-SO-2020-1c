@@ -69,56 +69,6 @@ t_list* config_get_posiciones(){
 	return posiciones;
 }
 
-//************************************************* Implementacion vieja
-
-//especies_pokemones especies_from_string(char*cadena){
-//
-//	if(!cadena){
-//		error_show("E de Error de lectura (y de estupido)");
-//	}
-//
-//	especies_pokemones especies = list_create();
-//
-//		void _a_la_lista(especie_pokemon unaEspecie) {
-//			especies_agregar_validado(especies, unaEspecie);
-//		}
-//
-//    especie_pokemon*tokens = string_split(cadena, "|");
-//
-//    string_iterate_lines(tokens, _a_la_lista);
-//
-////    void mostrar(t_posicion pos){
-////    	printf("pos: (%u, %u)\n", pos.x, pos.y);
-////    }
-//
-//    free(tokens);
-////    string_array_destroy(tokens);
-//
-//    return especies;
-//}
-
-//void mostrarObjetivos(char**objsDelConfig){
-//	especies_pokemones objetivosLeidos;
-//
-//		void _separar(char* cadena) {
-//			objetivosLeidos = especies_from_string(cadena);
-//
-//			void mostrar(void *elemento) {
-//			    printf("El elemento: %s\n", (char *)elemento);
-//			}
-//
-//			list_iterate(objetivosLeidos, mostrar);
-//
-//			printf("hay %i pokemones\n",list_size(objetivosLeidos));
-//		 }
-//
-//	string_iterate_lines(objsDelConfig, _separar);
-//
-//	list_destroy(objetivosLeidos);
-//}
-
-//***************************************************************
-
 void string_array_destroy(char**stringArray){
 	void string_destroy(char*cadena_en_heap){ //solo para elementos de un arr de string
 		free(cadena_en_heap);
