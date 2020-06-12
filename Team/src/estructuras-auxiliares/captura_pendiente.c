@@ -7,7 +7,7 @@ captura_pendiente pendiente_create(t_id idMensaje, entrenador* unEntrenador, pok
 
 //Destructor
 void pendiente_destroy(captura_pendiente* mensajePendiente){
-	free (mensajePendiente);
+	free(mensajePendiente);
 }
 
 
@@ -33,7 +33,8 @@ captura_pendiente* pendientes_get(capturas_pendientes mensajesPendientes, t_id i
 	}
 
 	captura_pendiente*esePendiente = cr_list_get_by_condition(mensajesPendientes,  &cmp_pendiente_id);
-	esePendiente->respondido = true;
+
+	if(esePendiente) esePendiente->respondido = true;
 
 	return esePendiente;
 }

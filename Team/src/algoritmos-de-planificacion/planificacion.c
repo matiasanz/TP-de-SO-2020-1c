@@ -2,6 +2,29 @@
 
 #include "../team.h"
 
+void cargar_algoritmo_planificacion(){ //TODO A FUTURO
+
+//	char*algoritmoLeido = config_get_string_value(config,"ALGORITMO_PLANIFICACION");
+//
+//	if(string_equals_ignore_case(algoritmoLeido, "FIFO")){
+//		ALGORITMO_PLANIFICACION = FIFO;
+//	}
+//
+//	else if(string_equals_ignore_case(algoritmoLeido, "RR")){
+////  	datos_algoritmo.QUANTUM=config_get_int_value(config,"QUANTUM");
+//		ALGORITMO_PLANIFICACION = ROUND_ROBBIN;
+//	}
+//
+//	else{ //SJF //Sin desalojo va a leer lo mismo que con
+//		ALGORITMO_PLANIFICACION = string_equals_ignore_case(algoritmoLeido, "SJF-CD")? SJF_CD: SJF_SD;
+//		//	estimacion_inicial=config_get_int_value(config,"ESTIMACION_INICIAL");
+//		//	alfa=config_get_int_value(config,"ALFA");
+//		//  datosAlgoritmo.tiempo = malloc(sizeof(numero)*cantidadDeEntrenadores);
+//		//  datosAlgoritmo.estimaciones = malloc(sizeof(numero)*cantidadDeEntrenadores);
+//	}
+
+	RETARDO_CICLO_CPU = config_get_int_value(config, "RETARDO_CICLO_CPU");
+}
 
 //Usar en funciones que requieren cpu del entrenador. Ej ir a (Ver abajo de todo)
 void entrenador_consumir_cpu(entrenador*unEntrenador){
@@ -128,29 +151,4 @@ void entrenador_dar_un_paso_hacia(entrenador*unEntrenador, t_posicion posicionFi
 	log_info(logger, "El entrenador se desplazo a la posicion [%u %u]\n", unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
 //	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 
-}
-
-//**************************************************************
-void cargar_algoritmo_planificacion(){ //TODO A FUTURO
-
-	char*algoritmoLeido = config_get_string_value(config,"ALGORITMO_PLANIFICACION");
-
-	if(string_equals_ignore_case(algoritmoLeido, "FIFO")){
-		ALGORITMO_PLANIFICACION = FIFO;
-	}
-
-	else if(string_equals_ignore_case(algoritmoLeido, "RR")){
-//  	datos_algoritmo.QUANTUM=config_get_int_value(config,"QUANTUM");
-		ALGORITMO_PLANIFICACION = ROUND_ROBBIN;
-	}
-
-	else{ //SJF //Sin desalojo va a leer lo mismo que con
-		ALGORITMO_PLANIFICACION = string_equals_ignore_case(algoritmoLeido, "SJF-CD")? SJF_CD: SJF_SD;
-		//	estimacion_inicial=config_get_int_value(config,"ESTIMACION_INICIAL");
-		//	alfa=config_get_int_value(config,"ALFA");
-		//  datosAlgoritmo.tiempo = malloc(sizeof(numero)*cantidadDeEntrenadores);
-		//  datosAlgoritmo.estimaciones = malloc(sizeof(numero)*cantidadDeEntrenadores);
-	}
-
-	RETARDO_CICLO_CPU = config_get_int_value(config, "RETARDO_CICLO_CPU");
 }

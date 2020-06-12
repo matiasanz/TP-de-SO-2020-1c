@@ -45,11 +45,9 @@ void team_inicializar(){
 
 	inicializar_logs_y_config();
 
-  //void inicializar planificacion{
-//	RETARDO_CICLO_CPU = config_get_int_value(config,"RETARDO_CICLO_CPU");
-//	ALGORITMO_PLANIFICACION = FIFO;//cargar_algoritmo_planificacion();
- //}
 	inicializar_listas();
+
+	RETARDO_CICLO_CPU = config_get_int_value(config, "RETARDO_CICLO_CPU");	//	cargar_algoritmo_de_planificacion();
 
  	inicializar_semaforos();
 

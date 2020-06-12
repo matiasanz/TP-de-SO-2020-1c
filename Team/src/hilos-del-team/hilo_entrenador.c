@@ -24,10 +24,6 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 
 				Catch(unEntrenador, unPokemon);
 
-				unEntrenador->siguienteTarea = CAPTURAR;
-
-				entrenador_pasar_a(unEntrenador, LOCKED_HASTA_CAUGHT, "Tiene una captura pendiente");
-
 				break;
 			}
 

@@ -16,7 +16,7 @@ typedef union{
 	datos_sjf datos;
 } datos_algoritmo;
 
-//void cargar_algoritmo_planificacion(); //TODO
+void cargar_algoritmo_planificacion(); //TODO
 
 bool puede_seguir_ejecutando_segun_algoritmo(entrenador*unEntrenador, numero tiempo, t_algoritmo_planificacion);
 

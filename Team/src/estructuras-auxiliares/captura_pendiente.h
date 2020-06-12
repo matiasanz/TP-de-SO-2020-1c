@@ -38,9 +38,5 @@ typedef cr_list* capturas_pendientes;
 //	Destructor
 	void pendientes_destroy(capturas_pendientes);
 
-//	Si alguien lee esto... no digan como vivo
-//	Retorna el id de una captura pendiente si encuentra y sino -1
-	t_id idProximoPendienteHARDCODEADO();
-
 
 #endif
