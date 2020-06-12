@@ -36,6 +36,7 @@ FILE* f_bitmap;
 char* paths_estructuras[3]; //e_key_path_estructura
 
 pthread_mutex_t mutBitarray;
+t_dictionary* semaforosDePokemons; //key:char* especiePokemon, value: pthread_mutex_t* mutex
 //-------------------------
 
 void inicializar();

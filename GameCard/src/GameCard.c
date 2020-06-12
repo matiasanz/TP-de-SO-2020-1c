@@ -63,6 +63,7 @@ void crearEstructuras(){
 	punto_montaje_tallgrass=config_get_string_value(config,"PUNTO_MONTAJE_TALLGRASS");
 	// Inicializo semaforo
 	pthread_mutex_init(&mutBitarray, NULL);
+	semaforosDePokemons=dictionary_create();
 
 	char* dir_metadata = string_new();
 	char* dir_files = string_new();
@@ -210,19 +211,44 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 	if((f_metadata=fopen(bin_metadata,"r"))==NULL){ //si no existe el archivo metadata
 			f_metadata=fopen(bin_metadata,"wb+");
+
+			pthread_mutex_t* mutexMetadataPokemon=malloc(sizeof(pthread_mutex_t));
+			pthread_mutex_init(mutexMetadataPokemon, NULL);
+
+			dictionary_put(semaforosDePokemons,unMsjNewPoke->pokemon.especie,mutexMetadataPokemon);
+
 			config_metadata_pokemon=config_create(bin_metadata);
 			config_set_value(config_metadata_pokemon,"DIRECTORY","N");
 			config_set_value(config_metadata_pokemon,"SIZE","0");
 			config_set_value(config_metadata_pokemon,"BLOCKS","[]");
 			config_set_value(config_metadata_pokemon,"OPEN","N");
 			config_save(config_metadata_pokemon);
-		}else
+		}else{
+			//este if es para cuando ya existe el pokemon en disco, pero no su mutex
+			if(!dictionary_has_key(semaforosDePokemons,unMsjNewPoke->pokemon.especie)){
+
+				pthread_mutex_t* mutexMetadataPokemon=malloc(sizeof(pthread_mutex_t));
+				pthread_mutex_init(mutexMetadataPokemon, NULL);
+				dictionary_put(semaforosDePokemons,unMsjNewPoke->pokemon.especie,mutexMetadataPokemon);
+
+			}
+
+
+			pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+
 			config_metadata_pokemon=config_create(bin_metadata);
+
+			pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+
+		}
 		fclose(f_metadata);
 
+		pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+		char* estadoArchivo=config_get_string_value(config_metadata_pokemon,"OPEN");
+		pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 
 		//------Ver si el archivo esta abierto------------
-		if(strcmp(config_get_string_value(config_metadata_pokemon,"OPEN"),"Y")==0){
+		if(strcmp(estadoArchivo,"Y")==0){
 			//abro otro hilo con un sleep que volvera a atender al Mensaje
 
 			config_destroy(config_metadata_pokemon);
@@ -246,8 +272,12 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 		}
 
 
+		pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 		config_set_value(config_metadata_pokemon,"OPEN","Y");
 		config_save(config_metadata_pokemon);
+		pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+
+
 		char** bloquesDelPokemon=config_get_array_value(config_metadata_pokemon,"BLOCKS");
 
 
@@ -282,10 +312,15 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 			//retardo para simular acceso a disco
 			sleep(tiempo_retardo_operacion);
 
+			pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+
 			config_set_value(config_metadata_pokemon,"BLOCKS",listaBloques);
 			config_set_value(config_metadata_pokemon,"SIZE",string_itoa(size));
 			config_set_value(config_metadata_pokemon,"OPEN","N");
 			config_save(config_metadata_pokemon);
+
+			pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+
 
 			free(listaBloques);
 			free(nuevalinea);
@@ -335,10 +370,15 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 			//retardo para simular acceso a disco
 			sleep(tiempo_retardo_operacion);
 
+			pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+
 			config_set_value(config_metadata_pokemon,"BLOCKS",listaBloques);
 			config_set_value(config_metadata_pokemon,"SIZE",string_itoa(size));
 			config_set_value(config_metadata_pokemon,"OPEN","N");
 			config_save(config_metadata_pokemon);
+
+			pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+
 
 			free(listaBloques);
 			free(nuevalinea);
