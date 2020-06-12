@@ -15,7 +15,7 @@ int main(void) {
 
 	team_inicializar();
 
-	Get_pokemones(objetivosGlobales);
+	Get_pokemones(objetivosGlobales, inventariosGlobales);
 
 	log_info(event_logger, "\n\n*************************************************************************\n"
 							   "                      Inicio del proceso Team\n");

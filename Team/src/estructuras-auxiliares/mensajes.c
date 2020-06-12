@@ -30,14 +30,19 @@ void Get(void* especiePokemon) {
 }
 
 //Itera los objetivos, aplicando la funcion Get a cada uno. No editar esta funcion, sino la de arriba
-void Get_pokemones(matriz_recursos pokemones){
+void Get_pokemones(matriz_recursos objetivosTotales, matriz_recursos recursosDisponibles){
+
+	matriz_recursos necesidadDelEquipo = recursos_matriz_diferencia(objetivosTotales, recursosDisponibles);
 
 	void unGetPorPokemon(char* unaEspecie, void*cantidad){
-		sleep(RETARDO_CICLO_CPU); //Cada get consume 1 cpu
-		Get(unaEspecie);
+		if(*((numero*)cantidad) > 0){
+			sleep(RETARDO_CICLO_CPU); //Cada get consume 1 cpu
+			Get(unaEspecie);
+		}
 	}
 
-	dictionary_iterator(pokemones, unGetPorPokemon); puts("");
+	dictionary_iterator(necesidadDelEquipo, unGetPorPokemon); puts("");
+	recursos_destroy(necesidadDelEquipo);
 }
 
 //Envia mensaje al broker para ser replicado al gamecard, devuelve el id del mensaje pendiente por recibir

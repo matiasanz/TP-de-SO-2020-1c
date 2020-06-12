@@ -24,7 +24,7 @@ pokemon*desempaquetar_pokemon(t_mensaje_appeared_catch_pokemon*empaquetado);
 //mensajes entre modulos
 void* leer_mensaje_cuando_este_disponible(cr_list*);
 void Get(void* especiePokemon);
-void Get_pokemones(matriz_recursos);
+void Get_pokemones(matriz_recursos objetivos, matriz_recursos disponibles);
 void Catch(entrenador*, pokemon*); //momentaneamente (TODO) retorna el id del mensaje pendiente que crea
 
 # endif
