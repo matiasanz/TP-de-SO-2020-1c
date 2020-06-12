@@ -19,7 +19,7 @@ t_paquete* crearMensaje(char* argumentos[], int longitud) {
 	case NEW_POKEMON:
 		Tipomensaje = NEW_POKEMON;
 		validar_quien_conoce_newpokemon(process);
-		validar_que_es_numero(x);
+
 		validar_mayor_igual_a_cero(x);
 		validar_mayor_igual_a_cero(y);
 
@@ -33,9 +33,14 @@ t_paquete* crearMensaje(char* argumentos[], int longitud) {
 			mensaje_serializado = mensaje_new_pokemon_serializar(msj);
 
 		} else {
-			validar_cantidad_argumentos(longitud, 8);
-			id = argumentos[7];
-			validar_que_es_numero(id);
+			if (longitud == 8) {
+				id = argumentos[7];
+				// numero alto como se sugiere en https://github.com/sisoputnfrba/foro/issues/1673
+			} else {
+				id = "999";
+			}
+
+			//validar_que_es_numero(id);
 			cantidad = argumentos[6];
 			validar_mayor_a_cero(cantidad);
 			t_mensaje_new_pokemon* msj = mensaje_new_pokemon_crear(especie,
@@ -110,7 +115,7 @@ t_paquete* crearMensaje(char* argumentos[], int longitud) {
 		id_correlativo = argumentos[3];
 		validar_que_es_numero(id_correlativo);
 		validar_ok_fail(argumentos[4]);
-		if (string_equals_ignore_case(argumentos[4], "OK")) {
+		if (string_equals_ignore_case(argumentos[3], "OK")) {
 			atrapado = 1;
 		} else {
 			atrapado = 0;
@@ -141,7 +146,7 @@ t_paquete* crearMensaje(char* argumentos[], int longitud) {
 
 	default:
 		log_error(event_logger, "este mensaje no es conocido %s", mensaje);
-		abort();
+		exit(EXIT_FAILURE);
 		break;
 
 	}
