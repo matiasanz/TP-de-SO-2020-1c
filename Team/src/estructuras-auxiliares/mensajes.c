@@ -49,7 +49,7 @@ void Catch(entrenador*unEntrenador, pokemon* pokemonCatcheado) {
 	//TODO Consumir 1 CPU
 
 	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-	log_info(event_logger, ">> catch(%s)\n", pokemonCatcheado->especie);
+	log_info(event_logger, ">> catch(%s)", pokemonCatcheado->especie);
 	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 
 	//creacion de  paquete catch pokemon y envio a Broker

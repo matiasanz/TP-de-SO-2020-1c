@@ -10,7 +10,7 @@
 #include <pthread.h>
 #include <unistd.h>
 
-//#include <commons/string.h> //no deja correr tests en cspec (palabra reservada end)
+//#include <commons/string.h>
 #include <commons/error.h>
 #include <commons/collections/list.h>
 #include <commons/collections/dictionary.h>

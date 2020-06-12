@@ -44,7 +44,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 
 				entrenador_capturar(unEntrenador, pokemonCatcheado);
 
-				if(entrenador_puede_cazar_mas_pokemones(unEntrenador)){ //Ver si cambios de estado se pueden delegar al planificador
+				if(entrenador_puede_cazar_mas_pokemones(unEntrenador)){
 					unEntrenador->siguienteTarea = CATCHEAR;
 					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARED, "Tuvo exito en la captura y todavia puede cazar mas pokemones");
 					sem_post(&HayEntrenadoresDisponibles);

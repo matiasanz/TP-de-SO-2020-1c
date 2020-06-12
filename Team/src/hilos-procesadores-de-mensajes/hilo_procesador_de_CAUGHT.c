@@ -53,14 +53,14 @@ void team_procesador_cola_CAUGHT(cr_list* mensajes){
 	}
 
 	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-	log_info(event_logger, "Finalizo suscripcion a cola CAUGHT"); //Ver TODO si pokemon localized hace esto. Ver como saltear esta parte.
+	log_info(event_logger, "Finalizo suscripcion a cola CAUGHT");
 	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 }
 
 void entrenador_bloquear_hasta_APPEARED(entrenador*unEntrenador){
 	unEntrenador->siguienteTarea = CATCHEAR;
 	pthread_mutex_lock(&mutexEstadoEntrenador[unEntrenador->id]);
-	unEntrenador->estado = LOCKED_HASTA_APPEARED;  //Abstraer a funcion
+	unEntrenador->estado = LOCKED_HASTA_APPEARED;
 	pthread_mutex_unlock(&mutexEstadoEntrenador[unEntrenador->id]);
 	sem_post(&HayEntrenadoresDisponibles);
 }
