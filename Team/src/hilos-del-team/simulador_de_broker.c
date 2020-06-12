@@ -51,19 +51,8 @@ void broker_simulator(){
 			}
 
 			case 4:{
-//				captura_pendiente*unPendiente = cr_list_get(capturasPendientes, 0);
-//
-//				if(unPendiente){
-//					t_mensaje_caught_pokemon*mensaje = malloc(sizeof(t_mensaje_caught_pokemon));
-//											*mensaje = (t_mensaje_caught_pokemon){(t_mensaje_header){unPendiente->id, unPendiente->id}, 1};
-//					cr_list_add_and_signal(mensajesCAUGHT, mensaje);
-//				}
-//				else{
-//					puts("No hay capturas pendientes");
-					t_mensaje_appeared_catch_pokemon*mensaje = mensaje_appeared_catch_pokemon_crear("Bulbasaur", 3, 1);
-					cr_list_add_and_signal(mensajesAPPEARED, mensaje);
-//				}
-
+				t_mensaje_appeared_catch_pokemon*mensaje = mensaje_appeared_catch_pokemon_crear("Bulbasaur", 3, 1);
+				cr_list_add_and_signal(mensajesAPPEARED, mensaje);
 				break;
 			}
 

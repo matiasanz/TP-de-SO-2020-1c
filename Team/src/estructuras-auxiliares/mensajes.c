@@ -9,26 +9,26 @@ void Get(void* especiePokemon) {
 	//Envia mensaje al broker para ser replicado al gamecard
 	log_info(event_logger, ">> get(%s)", (especie_pokemon) especiePokemon);
 
-//	t_mensaje_get_pokemon* mensajeGet=mensaje_get_pokemon_crear(string_duplicate(especiePokemon));
-//
-//	t_paquete_header header=paquete_header_crear(MENSAJE,TEAM,GET_POKEMON);
-//	t_buffer* bufferDepaquete=mensaje_get_pokemon_serializar(mensajeGet);
-//	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
-//	int resultadoDeEnvio = enviar(conexion_broker,paqueteAEnviar);
-//
-////TODO t_id* idGet = malloc(sizeof(t_id)); *idGet = mensaje_get_pokemon_get_id(mensajeGet); list_add(getsPendientes, idGet); //y funcion que compare en localized
-//
-//	if(resultadoDeEnvio==ERROR_SOCKET){
-//		pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-//		log_warning(event_logger,"Se procedera a responder el mensaje GET por defecto");
-//		pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
-//
-//		t_mensaje_localized_pokemon* respuestaAutogenerada = mensaje_localized_pokemon_crear(string_duplicate(especiePokemon), list_create());
-//		cr_list_add_and_signal(mensajesLOCALIZED, respuestaAutogenerada);
-//	}
-//
-//	mensaje_get_pokemon_destruir(mensajeGet);
-//	paquete_destruir(paqueteAEnviar);
+	t_mensaje_get_pokemon* mensajeGet=mensaje_get_pokemon_crear(string_duplicate(especiePokemon));
+
+	t_paquete_header header=paquete_header_crear(MENSAJE,TEAM,GET_POKEMON);
+	t_buffer* bufferDepaquete=mensaje_get_pokemon_serializar(mensajeGet);
+	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
+	int resultadoDeEnvio = enviar(conexion_broker,paqueteAEnviar);
+
+//TODO t_id* idGet = malloc(sizeof(t_id)); *idGet = mensaje_get_pokemon_get_id(mensajeGet); list_add(getsPendientes, idGet); //y funcion que compare en localized
+
+	if(resultadoDeEnvio==ERROR_SOCKET){
+		pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
+		log_warning(event_logger,"Se procedera a responder el mensaje GET por defecto");
+		pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+
+		t_mensaje_localized_pokemon* respuestaAutogenerada = mensaje_localized_pokemon_crear(string_duplicate(especiePokemon), list_create());
+		cr_list_add_and_signal(mensajesLOCALIZED, respuestaAutogenerada);
+	}
+
+	mensaje_get_pokemon_destruir(mensajeGet);
+	paquete_destruir(paqueteAEnviar);
 }
 
 //Itera los objetivos, aplicando la funcion Get a cada uno. No editar esta funcion, sino la de arriba
