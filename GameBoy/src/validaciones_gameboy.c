@@ -73,7 +73,7 @@ void validar_quien_conoce_getpokemon(char* proceso) {
 }
 
 void validar_ok_fail(char* argumento) {
-	if (!strcmp(argumento, "OK") || !strcmp(argumento, "FAIL")) {
+	if (strcmp(argumento, "OK") && strcmp(argumento, "FAIL")) {
 		log_error(event_logger, "el ultimo argumento no existe, ingreso %s",
 				argumento);
 		exit(EXIT_FAILURE);
