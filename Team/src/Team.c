@@ -141,7 +141,6 @@ void inicializar_hilos(){
 void finalizar_hilos(){
 	finalizar_hilos_entrenadores();
 
-	pthread_join(hiloReceptorDeMensajes, NULL);
 	pthread_join(hiloPlanificador	   , NULL);
 	pthread_join(hiloMensajesAppeard   , NULL);
 	pthread_join(hiloMensajesCAUGHT	   , NULL);

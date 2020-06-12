@@ -62,7 +62,7 @@ void Catch(entrenador*unEntrenador, pokemon* pokemonCatcheado) {
 	agregar_pendiente(capturasPendientes, idCapturaPendiente, unEntrenador, pokemonCatcheado);
 
 	unEntrenador->siguienteTarea = CAPTURAR;
-	entrenador_pasar_a(unEntrenador, LOCKED_HASTA_CAUGHT, "Debebra esperar el resultado de la captura");
+	entrenador_pasar_a(unEntrenador, LOCKED_HASTA_CAUGHT, "Debera esperar a que este el resultado de la captura");
 
 	if(resultadoDeEnvio==ERROR_SOCKET){
 		pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);

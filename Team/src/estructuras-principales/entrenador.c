@@ -139,7 +139,7 @@ entrenadores entrenadores_en_estado(entrenadores equipo, t_estado unEstado){
 				return otro;
 			}
 
-			return posicion_distancia(uno->posicion, unaPosicion)>=posicion_distancia(otro->posicion, unaPosicion)? uno : otro;
+			return posicion_distancia(uno->posicion, unaPosicion)<=posicion_distancia(otro->posicion, unaPosicion)? uno : otro;
 		}
 
 		return list_fold(unEquipo, NULL, (void*(*)(void*, void*))&entrenador_mas_cercano);
