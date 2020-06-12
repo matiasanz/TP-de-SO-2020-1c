@@ -1,9 +1,6 @@
 # ifndef _TEAM_
 # define _TEAM_
 
-#include <crenito-commons/conexiones/conexiones.h>
-#include "utils/mensajes-utils.h"
-
 #include "header_global_team.h"
 
 #include <pthread.h>

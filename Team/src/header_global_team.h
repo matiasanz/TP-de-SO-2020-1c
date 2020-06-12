@@ -19,6 +19,9 @@
 
 #include "listas/cr_list.h"
 
+#include <crenito-commons/conexiones/conexiones.h>
+#include "utils/mensajes-utils.h"
+
 //#include <crenito-commons/mensajes/mensaje_new_pokemon.h>
 //#include <crenito-commons/prueba.h>
 //#include <crenito-commons/conexiones/conexiones.h>
@@ -30,10 +33,6 @@ typedef uint32_t numero;
 typedef numero t_id;
 
 /*Variables Globales*/
-
-	t_log* logger;
-	t_log* event_logger;
-	t_config* config;
 
 	pthread_mutex_t Mutex_AndoLoggeando;
 	pthread_mutex_t Mutex_AndoLoggeandoEventos;

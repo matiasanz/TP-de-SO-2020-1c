@@ -19,6 +19,7 @@ int main(void) {
 
 	log_info(event_logger, "\n\n*************************************************************************\n"
 							   "                      Inicio del proceso Team\n");
+
 	log_info(logger, "\n\n");
 
 	//Para pruebas sin los otros modulos//
