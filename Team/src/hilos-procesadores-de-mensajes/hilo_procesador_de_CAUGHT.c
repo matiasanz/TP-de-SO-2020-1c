@@ -11,11 +11,8 @@ void team_procesador_cola_CAUGHT(cr_list* mensajes){
 	while(PROCESO_ACTIVO){
 
 		t_mensaje_caught_pokemon* mensajeRecibido = leer_mensaje_cuando_este_disponible(mensajes);
-		puts("lei el mensaje");
 		resultado_captura resultado = desempaquetar_resultado(mensajeRecibido);
-		puts("desempaquete");
 		captura_pendiente* capturaPendiente = pendientes_get(capturasPendientes, resultado.idCaptura);
-		puts("tengo al captura");
 
 		if(capturaPendiente) {
 

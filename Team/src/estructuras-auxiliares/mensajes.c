@@ -7,8 +7,7 @@ void* leer_mensaje_cuando_este_disponible(cr_list* unaLista){
 
 void Get(void* especiePokemon) {
 	//Envia mensaje al broker para ser replicado al gamecard
-	log_info(event_logger, ">> get(%s)", (especie_pokemon) especiePokemon);
-
+	log_info(event_logger, ">> get(%s)\n", (especie_pokemon) especiePokemon);
 	t_mensaje_get_pokemon* mensajeGet=mensaje_get_pokemon_crear(string_duplicate(especiePokemon));
 
 	t_paquete_header header=paquete_header_crear(MENSAJE,TEAM,GET_POKEMON);
@@ -22,7 +21,6 @@ void Get(void* especiePokemon) {
 		pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
 		log_warning(event_logger,"Se procedera a responder el mensaje GET por defecto");
 		pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
-
 		t_mensaje_localized_pokemon* respuestaAutogenerada = mensaje_localized_pokemon_crear(string_duplicate(especiePokemon), list_create());
 		cr_list_add_and_signal(mensajesLOCALIZED, respuestaAutogenerada);
 	}
@@ -35,7 +33,7 @@ void Get(void* especiePokemon) {
 void Get_pokemones(matriz_recursos pokemones){
 
 	void unGetPorPokemon(char* unaEspecie, void*cantidad){
-		sleep(RETARDO_CICLO_CPU); //Cada get consume 1 cpu, contabilizar
+		sleep(RETARDO_CICLO_CPU); //Cada get consume 1 cpu
 		Get(unaEspecie);
 	}
 
@@ -59,13 +57,12 @@ void Catch(entrenador*unEntrenador, pokemon* pokemonCatcheado) {
 	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
 	int resultadoDeEnvio = enviar(conexion_broker,paqueteAEnviar);
 
-	unEntrenador->siguienteTarea = CAPTURAR;
-	entrenador_pasar_a(unEntrenador, LOCKED_HASTA_CAUGHT, "Debera esperar al resultado de la captura");
-
-
 	//Agrego a la lista de capturas pendientes
 	t_id idCapturaPendiente = mensaje_appeared_catch_pokemon_get_id(mensajeCatch);
 	agregar_pendiente(capturasPendientes, idCapturaPendiente, unEntrenador, pokemonCatcheado);
+
+	unEntrenador->siguienteTarea = CAPTURAR;
+	entrenador_pasar_a(unEntrenador, LOCKED_HASTA_CAUGHT, "Debebra esperar el resultado de la captura");
 
 	if(resultadoDeEnvio==ERROR_SOCKET){
 		pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
