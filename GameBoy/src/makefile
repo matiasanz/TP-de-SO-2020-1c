@@ -1,4 +1,4 @@
-TARGET = ../GameBoy
+TARGET = ../gameboy
 
 CRENITO-COMMONS-DIR = ../../CrenitoCommons
 CRENITO-COMMONS-BIN = $(CRENITO-COMMONS-DIR)/src/build
