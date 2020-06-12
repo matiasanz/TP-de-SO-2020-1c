@@ -61,6 +61,8 @@ void crearEstructuras(){
 	tiempo_de_reintento_operacion=config_get_int_value(config,"TIEMPO_DE_REINTENTO_OPERACION");
 	tiempo_retardo_operacion=config_get_int_value(config,"TIEMPO_RETARDO_OPERACION");
 	punto_montaje_tallgrass=config_get_string_value(config,"PUNTO_MONTAJE_TALLGRASS");
+	// Inicializo semaforo
+	pthread_mutex_init(&mutBitarray, NULL);
 
 	char* dir_metadata = string_new();
 	char* dir_files = string_new();
@@ -252,8 +254,10 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 		//--------Comienzo a operar con el pokemon------------
 		if(cant_elemetos_array(bloquesDelPokemon)==0){
 			//el bitarray cuenta desde 0
+			pthread_mutex_lock(&mutBitarray);
 			int nrobloque=bloque_disponible(bitmap,config_get_int_value(config_metadata,"BLOCKS"));
 			bitarray_set_bit(bitmap,nrobloque);
+			pthread_mutex_unlock(&mutBitarray);
 
 			char* bin_block = string_new();
 			string_append(&bin_block,paths_estructuras[BLOCKS]);
@@ -263,7 +267,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 
 			char* nuevalinea=crearLinea(unMsjNewPoke);
-			int longitud=string_length(nuevalinea)+1;
+			int longitud=string_length(nuevalinea);
 
 			guardarLinea(bin_block,nuevalinea,longitud);
 
@@ -296,9 +300,10 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 			*/
 			//no hay espacio en sus bloques,
 			//entonces buscar en el bitmap los bloques libres
-
+			pthread_mutex_lock(&mutBitarray);
 			int nrobloque=bloque_disponible(bitmap,config_get_int_value(config_metadata,"BLOCKS"));
 			bitarray_set_bit(bitmap,nrobloque);
+			pthread_mutex_unlock(&mutBitarray);
 
 			char* bin_block = string_new();
 			string_append(&bin_block,paths_estructuras[BLOCKS]);
@@ -307,7 +312,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 
 			char* nuevalinea=crearLinea(unMsjNewPoke);
-			int longitud=string_length(nuevalinea)+1;
+			int longitud=string_length(nuevalinea);
 
 			guardarLinea(bin_block,nuevalinea,longitud);
 
