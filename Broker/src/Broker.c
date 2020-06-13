@@ -47,7 +47,8 @@ void inicializar_config() {
 
 void inicializar_logs() {
 
-	logger = log_create("./log/broker.log", BROKER_STRING, 1, LOG_LEVEL_INFO);
+	char* ruta = config_get_string_value(config, "LOGGER");
+	logger = log_create(ruta, BROKER_STRING, 1, LOG_LEVEL_INFO);
 	event_logger = log_create("./log/broker_event.log", "BROKER_EVENT", 1,
 			LOG_LEVEL_INFO);
 }
@@ -90,8 +91,10 @@ static void validar_header(t_paquete_header header) {
 
 static void validar_socket(int socket_servidor) {
 
-	if(error_conexion(socket_servidor)){
-		log_info(event_logger, "Se produjo un error de conexion al iniciar el %s", BROKER_STRING);
+	if (error_conexion(socket_servidor)) {
+		log_info(event_logger,
+				"Se produjo un error de conexion al iniciar el %s",
+				BROKER_STRING);
 		exit(EXIT_FAILURE);
 	}
 
