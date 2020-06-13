@@ -83,7 +83,7 @@ static void validar_header(t_paquete_header header) {
 				"Error al recibir el header del mensaje, finalizando hilo \n");
 		pthread_exit(NULL);
 	} else {
-		log_info(logger, "El proceso %s se conectó correctamente al %s \n",
+		log_info(logger, "Un proceso %s se conectó correctamente al %s \n",
 				get_nombre_proceso(header.id_proceso), BROKER_STRING);
 	}
 }
