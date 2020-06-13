@@ -114,8 +114,13 @@ t_paquete* crearMensaje(char* argumentos[], int longitud) {
 		validar_cantidad_argumentos(longitud, 5);
 		id_correlativo = argumentos[3];
 		validar_que_es_numero(id_correlativo);
-		validar_ok_fail(argumentos[4]);
-		atrapado = string_equals_ignore_case(argumentos[4], "OK");
+		char* string_atrapado = string_duplicate(argumentos[4]);
+		string_trim_right(&string_atrapado);
+
+		validar_ok_fail(string_atrapado);
+		atrapado = string_equals_ignore_case(string_atrapado, "OK");
+
+		free(string_atrapado);
 		t_mensaje_caught_pokemon* msj = mensaje_caught_pokemon_crear(atrapado);
 		mensaje_caught_pokemon_set_id_correlativo(msj, atoi(id_correlativo));
 		mensaje_serializado = mensaje_caught_pokemon_serializar(msj);
