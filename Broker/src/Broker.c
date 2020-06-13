@@ -1,6 +1,7 @@
 #include "broker.h"
 
 static void validar_header(t_paquete_header header);
+static void validar_socket(int socket_servidor);
 
 int main(void) {
 
@@ -10,7 +11,7 @@ int main(void) {
 			config_get_string_value(config, "IP_BROKER"),
 			config_get_string_value(config, "PUERTO_BROKER"));
 
-	log_info(event_logger, "%s iniciado exitosamente \n", BROKER_STRING);
+	validar_socket(socket_servidor);
 
 	while (1) {
 
@@ -85,4 +86,14 @@ static void validar_header(t_paquete_header header) {
 		log_info(logger, "El proceso %s se conectó correctamente al %s \n",
 				get_nombre_proceso(header.id_proceso), BROKER_STRING);
 	}
+}
+
+static void validar_socket(int socket_servidor) {
+
+	if(error_conexion(socket_servidor)){
+		log_info(event_logger, "Se produjo un error de conexion al iniciar el %s", BROKER_STRING);
+		exit(EXIT_FAILURE);
+	}
+
+	log_info(event_logger, "%s iniciado exitosamente \n", BROKER_STRING);
 }

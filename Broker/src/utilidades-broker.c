@@ -48,7 +48,7 @@ void procesar_mensaje(int socket, t_paquete_header header) {
 	default:
 
 		log_error(event_logger,
-				"La cola destino %d enviada desde el socket: %d por el proceso %s es incorrecto. Finzalizando hilo \n",
+				"La cola destino %d enviada desde el socket: %d por un proceso %s es incorrecto. Finzalizando hilo \n",
 				header.id_cola, socket, get_nombre_proceso(header.id_proceso));
 		pthread_exit(NULL);
 	}
@@ -59,7 +59,7 @@ void procesar_subscripcion(int socket, t_paquete_header header) {
 	int id_subscriptor = subscribir_proceso(socket, header.id_cola);
 
 	log_info(logger,
-			"El proceso %s se subscribió a la cola %s. El id_subscriptor generado es: %d \n",
+			"Un proceso %s se subscribió a la cola %s. El id_subscriptor generado es: %d \n",
 			get_nombre_proceso(header.id_proceso),
 			get_nombre_cola(header.id_cola), id_subscriptor);
 
