@@ -1,5 +1,4 @@
 #include "planificacion.h"
-
 #include "../team.h"
 
 //Inicializar
@@ -8,22 +7,20 @@ void cargar_algoritmo_planificacion(){ //TODO A FUTURO
 	char*algoritmoLeido = config_get_string_value(config,"ALGORITMO_PLANIFICACION");
 
 	if(string_equals_ignore_case(algoritmoLeido, "FIFO")){
-		ALGORITMO_PLANIFICACION = FIFO;
-		proximo_a_ejecutar_segun_criterio = proximo_segun_fifo;
-		entrenador_puede_seguir_ejecutando_segun_algoritmo = puede_seguir_sin_desalojo;
+		inicializar_fifo();
 	}
 
 //	else if(string_equals_ignore_case(algoritmoLeido, "RR")){
-////  	datos_algoritmo.QUANTUM=config_get_int_value(config,"QUANTUM");
-//		ALGORITMO_PLANIFICACION = ROUND_ROBBIN;
 //	}
 //
-//	else{ //SJF //Sin desalojo va a leer lo mismo que con
-//		ALGORITMO_PLANIFICACION = string_equals_ignore_case(algoritmoLeido, "SJF-CD")? SJF_CD: SJF_SD;
-//		//	estimacion_inicial=config_get_int_value(config,"ESTIMACION_INICIAL");
-//		//	alfa=config_get_int_value(config,"ALFA");
-//		//  datosAlgoritmo.tiempo = malloc(sizeof(numero)*cantidadDeEntrenadores);
-//		//  datosAlgoritmo.estimaciones = malloc(sizeof(numero)*cantidadDeEntrenadores);
+//	else if(string_equals_ignore_case(algoritmoLeido, "SJF_SD")){ //SJF //Sin desalojo va a leer lo mismo que con
+//		inicializar_sjf();
+//		proximo_a_ejecutar_segun_criterio = proximo_segun_sjf;
+//		entrenador_puede_seguir_ejecutando_segun_algoritmo = puede_seguir_sin_desalojo;
+//	}
+
+//	else if(string_equals_ignore_case(algoritmoLeido, "SJF_CD")){
+//		inicializar_sjf();
 //	}
 
 	else{
@@ -32,15 +29,6 @@ void cargar_algoritmo_planificacion(){ //TODO A FUTURO
 	}
 
 	RETARDO_CICLO_CPU = config_get_int_value(config, "RETARDO_CICLO_CPU");
-}
-
-//Proximo a planificar
-entrenador*proximo_segun_fifo(cola_entrenadores colaReady){
-	return entrenador_esperar_y_desencolar(colaReady);
-}
-
-bool puede_seguir_sin_desalojo(){
-	return true;
 }
 
 void consumir_ciclo_cpu(){

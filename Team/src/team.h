@@ -37,6 +37,7 @@ void inicializar_conexiones();
 //Variables globales
 	t_algoritmo_planificacion ALGORITMO_PLANIFICACION;
 	numero RETARDO_CICLO_CPU;
+	datos_algoritmo DATOS_ALGORITMO;
 
 //Variables de orden superior
 	entrenador* (*proximo_a_ejecutar_segun_criterio)(cola_entrenadores);

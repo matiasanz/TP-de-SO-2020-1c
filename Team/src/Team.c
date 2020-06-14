@@ -64,10 +64,10 @@ void team_inicializar(){
 
 int team_exit(){
 
-	finalizar_hilos();
-	finalizar_semaforos();
 	finalizar_logs_y_config();
 	listas_destroy();
+	finalizar_hilos();
+	finalizar_semaforos();
 
 	return EXIT_SUCCESS;
 }
@@ -111,9 +111,9 @@ void inicializar_listas() {
 }
 
 void listas_destroy(){
-	cr_list_destroy(mensajesAPPEARED);
-	cr_list_destroy(mensajesCAUGHT);
-	cr_list_destroy(mensajesLOCALIZED);
+	list_destroy_and_destroy_elements(mensajesAPPEARED->lista, (void*) mensaje_appeared_catch_pokemon_destruir);
+	list_destroy_and_destroy_elements(mensajesCAUGHT->lista, (void*) mensaje_caught_pokemon_destruir);
+	list_destroy_and_destroy_elements(mensajesLOCALIZED->lista, (void*) mensaje_localized_pokemon_destruir);
 
 	cr_list_destroy(entrenadoresReady);
 	mapa_destroy(pokemonesRequeridos);
