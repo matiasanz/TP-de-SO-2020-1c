@@ -138,8 +138,13 @@ void crearEstructuras(){
 
 	fread((void*) bitarray_str, sizeof(char), file_size, f_bitmap);
 	bitmap = bitarray_create_with_mode(bitarray_str, file_size, MSB_FIRST);
-	log_info(logger, "Creado el archivo Bitmap.bin");
 
+	//seteo de bitmap
+	for(int i=0;i<config_get_int_value(config_metadata,"BLOCKS");i++){
+		bitarray_clean_bit(bitmap,i);
+	}
+
+	log_info(logger, "Creado el archivo Bitmap.bin");
 
 	//-----------------------------
 
