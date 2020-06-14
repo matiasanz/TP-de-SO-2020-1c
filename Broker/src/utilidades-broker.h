@@ -4,6 +4,8 @@
 #include "crenito-commons/conexiones/conexiones.h"
 
 pthread_t thread;
+pthread_mutex_t mutex_id_univoco;
+int id_univoco;
 
 //Estructura con la información solicitada por el tp en la parte "Administración de Mensajes"
 typedef struct {

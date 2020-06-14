@@ -3,9 +3,11 @@
 //Funciones privadas
 static int subscribir_proceso(int socket, t_id_cola id_cola);
 static t_cola_container* get_cola(t_id_cola id_cola);
-static int encolar_mensaje(t_cola_container* container, void* msj);
+static void encolar_mensaje(t_cola_container* container, void* msj);
 static void replicar_mensaje(t_cola_container* container, void* deserializado,
 		t_id_cola id_cola);
+static int generar_id_univoco();
+int mensaje_set_id_univoco(void* msj, t_id_cola id_cola);
 
 t_cola_container* cola_crear() {
 
@@ -26,32 +28,14 @@ void procesar_mensaje(int socket, t_paquete_header header) {
 
 	void* deserializado = deserializar(msj, header.id_cola);
 
-	int id_mensaje = encolar_mensaje(container, deserializado);
+	int id_mensaje = mensaje_set_id_univoco(deserializado, header.id_cola);
+
+	encolar_mensaje(container, deserializado);
 
 	socket_send(socket, &id_mensaje, sizeof(id_mensaje));
 
 	replicar_mensaje(container, deserializado, header.id_cola);
 
-	switch (header.id_cola) {
-	case NEW_POKEMON:
-		break;
-	case APPEARED_POKEMON:
-
-		break;
-	case CATCH_POKEMON:
-	case CAUGHT_POKEMON:
-	case GET_POKEMON:
-	case LOCALIZED_POKEMON: {
-
-		break;
-	}
-	default:
-
-		log_error(event_logger,
-				"La cola destino %d enviada desde el socket: %d por un proceso %s es incorrecto. Finzalizando hilo \n",
-				header.id_cola, socket, get_nombre_proceso(header.id_proceso));
-		pthread_exit(NULL);
-	}
 }
 
 void procesar_subscripcion(int socket, t_paquete_header header) {
@@ -104,19 +88,11 @@ static t_cola_container* get_cola(t_id_cola id_cola) {
 	}
 }
 
-static int encolar_mensaje(t_cola_container* container, void* msj) {
-
-	int id_mensaje = 0;
+static void encolar_mensaje(t_cola_container* container, void* msj) {
 
 	pthread_mutex_lock(&container->mutex);
-
-	id_mensaje = queue_size(container->cola) + 1;
-	mensaje_new_pokemon_set_id(msj, id_mensaje);
 	queue_push(container->cola, msj);
-
 	pthread_mutex_unlock(&container->mutex);
-
-	return id_mensaje;
 }
 
 static void replicar_mensaje(t_cola_container* container, void* deserializado,
@@ -126,7 +102,8 @@ static void replicar_mensaje(t_cola_container* container, void* deserializado,
 
 		t_subscriptor* subscriptor = list_get(container->subscriptores, i);
 
-		t_paquete* pqt = paquete_crear(paquete_header_crear(MENSAJE, BROKER, id_cola),
+		t_paquete* pqt = paquete_crear(
+				paquete_header_crear(MENSAJE, BROKER, id_cola),
 				serializar(deserializado, id_cola));
 
 		//TO-DO: registrar ACK
@@ -135,5 +112,46 @@ static void replicar_mensaje(t_cola_container* container, void* deserializado,
 		free(deserializado);
 		paquete_destruir(pqt);
 
+	}
+}
+
+static int generar_id_univoco() {
+
+	int id_mensaje = 0;
+
+	pthread_mutex_lock(&mutex_id_univoco);
+	id_univoco += 1;
+	id_mensaje = id_univoco;
+	pthread_mutex_unlock(&mutex_id_univoco);
+
+	return id_mensaje;
+}
+
+int mensaje_set_id_univoco(void* msj, t_id_cola id_cola) {
+
+	switch (id_cola) {
+	case NEW_POKEMON:
+		mensaje_new_pokemon_set_id(msj, generar_id_univoco());
+		return mensaje_new_pokemon_get_id(msj);
+	case APPEARED_POKEMON:
+	case CATCH_POKEMON:
+		mensaje_appeared_catch_pokemon_set_id(msj, generar_id_univoco());
+		return mensaje_appeared_catch_pokemon_get_id(msj);
+	case CAUGHT_POKEMON:
+		mensaje_caught_pokemon_set_id(msj, generar_id_univoco());
+		return mensaje_caught_pokemon_get_id(msj);
+	case GET_POKEMON:
+		mensaje_get_pokemon_set_id(msj, generar_id_univoco());
+		return mensaje_get_pokemon_get_id(msj);
+	case LOCALIZED_POKEMON: {
+		mensaje_localized_pokemon_set_id(msj, generar_id_univoco());
+		return mensaje_localized_pokemon_get_id(msj);
+	}
+	default:
+		log_error(event_logger,
+				"La cola destino %d es incorrecta. Finzalizando hilo \n",
+				id_cola);
+		pthread_exit(NULL);
+		return 0;
 	}
 }

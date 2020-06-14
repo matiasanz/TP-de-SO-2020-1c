@@ -25,6 +25,9 @@ int main(void) {
 
 void crear_colas() {
 
+	id_univoco = 0;
+	pthread_mutex_init(&mutex_id_univoco, NULL);
+
 	cola_new_pokemon = cola_crear();
 	cola_appeared_pokemon = cola_crear();
 	cola_catch_pokemon = cola_crear();
