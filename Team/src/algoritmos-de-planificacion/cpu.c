@@ -11,9 +11,12 @@ void cargar_algoritmo_planificacion(){ //TODO A FUTURO
 	}
 
 //	else if(string_equals_ignore_case(algoritmoLeido, "RR")){
+//		numero QUANTUM = config_get_int_value("QUANTUM");
+//		inicializar_rr(QUANTUM);
 //	}
 //
-//	else if(string_equals_ignore_case(algoritmoLeido, "SJF_SD")){ //SJF //Sin desalojo va a leer lo mismo que con
+	//TODO ver como no repetir codigo
+//	else if(string_equals_ignore_case(algoritmoLeido, "SJF_SD")){
 //		inicializar_sjf();
 //		proximo_a_ejecutar_segun_criterio = proximo_segun_sjf;
 //		entrenador_puede_seguir_ejecutando_segun_algoritmo = puede_seguir_sin_desalojo;
@@ -87,54 +90,8 @@ void ejecutar_entrenador(entrenador* unEntrenador){
 	}
 }
 
-//{
-//	switch(algoritmo){
-//		case FIFO: ;
-//		/*no break*/
-//		case SJF_SD: ;
-//			return true;
-//
-////		case ROUND_ROBBIN: {
-////			return tiempo<datosAlgoritmo.QUANTUM || cr_list_is_empty(entrenadoresReady);
-////			break;
-////		}
-//
-////		case SJF_CD{
-////			return tiempo <= menor_estimacion(entrenadoresReady); //resolver con fold
-////		}
-//
-//		default : {
-//			puts("El algoritmo leido no se encuentra implementado... aun! ;)");
-//			exit(1);
-//			return false;
-//		}
-//	}
-//}
-
-//TODO ver como usar orden superior y asignar una sola funcion al momento de setear algoritmo
-//entrenador* proximoAEjecutar(cola_entrenadores colaReady){ //volver a lista con mutex propio
-//
-//	entrenador*semilla = cr_list_wait_and_remove(colaReady, 0);
-//
-//	switch(ALGORITMO_PLANIFICACION){
-//		case FIFO: ;
-//		/*no break*/
-//		case ROUND_ROBBIN ;
-//			return semilla;
-//
-//		default: {
-//
-//			void*entrenador_con_menor_tiempo(entrenador*unEntrenador, entrenador*otro){
-//				return
-//			}
-//
-//			return cr_list_fold(colaReady, semilla, );
-//		}
-//	}
-//}
-
 //************************************************************************************
-//Ejemplo de uso del cpu
+//Ejemplo de uso del cpu, ya la estan usando. TODO Mover a otro archivo
 
 void desplazar_unidimensional(coordenada* posicionInicial, coordenada posicionFinal);
 void entrenador_dar_un_paso_hacia(entrenador*unEntrenador, t_posicion posicionFinal);
