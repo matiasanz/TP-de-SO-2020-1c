@@ -2,13 +2,14 @@
 # define _TAD_INTERCAMBIOS_
 
 #include "../estructuras-principales/entrenador.h"
+#include "../algoritmos-de-planificacion/planificacion.h"
 
 //TAD Candidatos de intercambio
 
 typedef t_list* candidatos_intercambio;
 
 typedef struct{
-	entrenador*unEntrenador;
+	entrenador*interesado;
 	matriz_recursos necesidad;
 	matriz_recursos sobrantes;
 }candidato_intercambio;

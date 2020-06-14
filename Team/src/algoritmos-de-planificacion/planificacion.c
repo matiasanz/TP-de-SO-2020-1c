@@ -2,19 +2,6 @@
 
 #include "../team.h"
 
-//Proximo a planificar
-entrenador*proximo_segun_fifo(cola_entrenadores colaReady){
-	return entrenador_esperar_y_desencolar(colaReady);
-}
-
-//Puede seguir
-bool puede_seguir_en_fifo(){
-	return true;
-}
-bool puede_seguir_en_sjf_sd(){
-	return true;
-}
-
 //Inicializar
 void cargar_algoritmo_planificacion(){ //TODO A FUTURO
 
@@ -23,7 +10,7 @@ void cargar_algoritmo_planificacion(){ //TODO A FUTURO
 	if(string_equals_ignore_case(algoritmoLeido, "FIFO")){
 		ALGORITMO_PLANIFICACION = FIFO;
 		proximo_a_ejecutar_segun_criterio = proximo_segun_fifo;
-		entrenador_puede_seguir_ejecutando_segun_algoritmo = puede_seguir_en_fifo;
+		entrenador_puede_seguir_ejecutando_segun_algoritmo = puede_seguir_sin_desalojo;
 	}
 
 //	else if(string_equals_ignore_case(algoritmoLeido, "RR")){
@@ -47,21 +34,35 @@ void cargar_algoritmo_planificacion(){ //TODO A FUTURO
 	RETARDO_CICLO_CPU = config_get_int_value(config, "RETARDO_CICLO_CPU");
 }
 
-//Usar en funciones que requieren cpu del entrenador. Ej ir a (Ver abajo de todo)
-void entrenador_consumir_cpu(entrenador*unEntrenador){
-	sem_wait(&EjecutarEntrenador[unEntrenador->id]);
+//Proximo a planificar
+entrenador*proximo_segun_fifo(cola_entrenadores colaReady){
+	return entrenador_esperar_y_desencolar(colaReady);
+}
+
+bool puede_seguir_sin_desalojo(){
+	return true;
+}
+
+void consumir_ciclo_cpu(){
 	sleep(RETARDO_CICLO_CPU);
+	//incrementar contador TODO
+}
+
+//Usar en funciones que requieren cpu del entrenador. Ej ir a (Ver abajo de todo)
+void entrenador_esperar_y_consumir_cpu(entrenador*unEntrenador){
+	sem_wait(&EjecutarEntrenador[unEntrenador->id]);
+	consumir_ciclo_cpu();
 }//	sem_signal(&ConsumioCpu); se deberia hacer fuera de la funcion, despues de la actividad que tenia que hacer
 
 void entrenador_consumir_N_cpu(entrenador*unEntrenador, numero cantidad){
 	int i;
-	for(i=0 /*=1*/; i<cantidad; i++){
-		entrenador_consumir_cpu(unEntrenador);
-//		sem_post(&consumioCpu);
+	for(i=1; i<cantidad; i++){
+		entrenador_esperar_y_consumir_cpu(unEntrenador);
+		consumir_ciclo_cpu();
+		sem_post(&FinDeCiclo_CPU);
 	}
-//Ver si conviene hacer un signal(cpuConsumido) de menos para que lo haga despues de lo que tenga que hacer
 
-//	entrenador_consumir_cpu(unEntrenador);
+	entrenador_esperar_y_consumir_cpu(unEntrenador);
 }
 
 bool entrenador_esta_ejecutando(entrenador*unEntrenador){
@@ -97,13 +98,6 @@ void ejecutar_entrenador(entrenador* unEntrenador){
 
 	}
 }
-
-//Ver si con orden superior se puede desarmar el switch
-bool HC_puede_seguir_ejecutando_segun_algoritmo(entrenador*unEntrenador, numero tiempo, t_algoritmo_planificacion algoritmo){
-	return true;
-}
-
-
 
 //{
 //	switch(algoritmo){
@@ -159,13 +153,22 @@ void entrenador_dar_un_paso_hacia(entrenador*unEntrenador, t_posicion posicionFi
 void entrenador_ir_hacia(entrenador* unEntrenador, t_posicion posicionFinal){
 	printf("El entrenador partio de la posicion [%u %u]\n", unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
 
-//	pthread_mutex_lock(&mutexPosicionEntrenador[unEntrenador->id]);
-	while(!entrenador_llego_a(unEntrenador, posicionFinal)){
-		entrenador_consumir_cpu(unEntrenador);
+	bool llegoALaPosicion = entrenador_llego_a(unEntrenador, posicionFinal);
+
+	do{
+		puts("**********voy a dar un paso");
+
+		pthread_mutex_lock(&mutexPosicionEntrenador[unEntrenador->id]);
 		entrenador_dar_un_paso_hacia(unEntrenador, posicionFinal);
-		//		sem_post(&ConsumioCPU);
-	}
-//	pthread_mutex_unlock(&mutexPosicionEntrenador[unEntrenador->id]);
+		llegoALaPosicion = entrenador_llego_a(unEntrenador, posicionFinal);
+		pthread_mutex_unlock(&mutexPosicionEntrenador[unEntrenador->id]);
+
+		puts("di un paso");
+
+		sem_post(&FinDeCiclo_CPU);
+		entrenador_esperar_y_consumir_cpu(unEntrenador);
+
+	}while (!llegoALaPosicion);
 }
 
 void desplazar_unidimensional(coordenada* posicionInicial, coordenada posicionFinal){
@@ -185,8 +188,8 @@ void entrenador_dar_un_paso_hacia(entrenador*unEntrenador, t_posicion posicionFi
 		desplazar_unidimensional(&posicionActual->pos_y, posicionFinal.pos_y);
 	}
 
-//	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	log_info(logger, "El entrenador se desplazo a la posicion [%u %u]\n", unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
-//	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+	pthread_mutex_lock(&Mutex_AndoLoggeando);
+	log_info(logger, "\nEl entrenador N°%u se desplazo a la posicion [%u %u]\n", unEntrenador->id, unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
+	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 
 }

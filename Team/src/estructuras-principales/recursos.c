@@ -200,7 +200,7 @@ bool recursos_suficientes_para(matriz_recursos proveedora, matriz_recursos recep
 
 recurso recursos_alguno_en_comun_con(matriz_recursos quien, matriz_recursos conQuien){
 	bool enComun(recurso unRecurso, void*cantidad){
-		return *((int*) cantidad) && recursos_get(conQuien, unRecurso);
+		return *((int*) cantidad) && recursos_cantidad_de_instancias_de(conQuien, unRecurso);
 	}
 
 	return dictionary_get_any_key(quien, &enComun);

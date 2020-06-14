@@ -36,7 +36,7 @@ void Get_pokemones(matriz_recursos objetivosTotales, matriz_recursos recursosDis
 
 	void unGetPorPokemon(char* unaEspecie, void*cantidad){
 		if(*((numero*)cantidad) > 0){
-			sleep(RETARDO_CICLO_CPU); //Cada get consume 1 cpu
+			consumir_ciclo_cpu();
 			Get(unaEspecie);
 		}
 	}
@@ -47,8 +47,6 @@ void Get_pokemones(matriz_recursos objetivosTotales, matriz_recursos recursosDis
 
 //Envia mensaje al broker para ser replicado al gamecard, devuelve el id del mensaje pendiente por recibir
 void Catch(entrenador*unEntrenador, pokemon* pokemonCatcheado) {
-
-	//TODO Consumir 1 CPU
 
 	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
 	log_info(event_logger, ">> catch(%s)", pokemonCatcheado->especie);

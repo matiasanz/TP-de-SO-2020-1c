@@ -38,13 +38,16 @@ void candidato_actualizar_matrices_por_intercambio(candidato_intercambio* unCand
 }
 
 void candidato_intercambiar_con(candidato_intercambio* self, candidato_intercambio* parejaDeIntercambio){
+
+//	entrenador_consumir_N_cpu(self->interesado, 5);
+
 	recurso teDoyEste = candidato_recurso_que_le_entrega_a(self, parejaDeIntercambio);
 	recurso aCambioDeEste = candidato_recurso_que_le_entrega_a(parejaDeIntercambio, self);
 
-	recursos_intercambiar_instancia_de(self->unEntrenador->pokemonesCazados, teDoyEste, aCambioDeEste);
-	recursos_intercambiar_instancia_de(parejaDeIntercambio->unEntrenador->pokemonesCazados, aCambioDeEste, teDoyEste);
+	recursos_intercambiar_instancia_de(self->interesado->pokemonesCazados, teDoyEste, aCambioDeEste);
+	recursos_intercambiar_instancia_de(parejaDeIntercambio->interesado->pokemonesCazados, aCambioDeEste, teDoyEste);
 
-	log_info(logger, "El Entrenador N°%u le intercambio al N°%u un %s por un %s", self->unEntrenador->id, parejaDeIntercambio->unEntrenador->id, teDoyEste, aCambioDeEste);
+	log_info(logger, "El Entrenador N°%u le intercambio al N°%u un %s por un %s", self->interesado->id, parejaDeIntercambio->interesado->id, teDoyEste, aCambioDeEste);
 
 	candidato_actualizar_matrices_por_intercambio(self, teDoyEste, aCambioDeEste);
 	candidato_actualizar_matrices_por_intercambio(parejaDeIntercambio, aCambioDeEste, teDoyEste);
@@ -68,7 +71,7 @@ void candidatos_agregar_candidato(candidatos_intercambio candidatos, candidato_i
 void candidatos_descandidatear_al_entrenador(candidatos_intercambio candidatos, entrenador*unEntrenador){
 
 	bool esEse(void*candidatoDeLista){
-		return ((candidato_intercambio*)candidatoDeLista)->unEntrenador->id == unEntrenador->id;
+		return ((candidato_intercambio*)candidatoDeLista)->interesado->id == unEntrenador->id;
 	}
 
 	candidato_intercambio* unCandidato = list_remove_by_condition(candidatos, &esEse);

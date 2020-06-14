@@ -36,6 +36,7 @@ bool pokemon_misma_especie(pokemon unPokemon, pokemon otroPokemon){
 
 //Destructor
 void pokemon_destroy(pokemon*destruido){
+//	free(destruido->especie);
 	free(destruido);
 }
 

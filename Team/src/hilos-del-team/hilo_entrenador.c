@@ -2,18 +2,19 @@
 #include "../hilos-del-team/hilos_team.h"
 #include "../team.h"
 
+void entrenador_ir_hacia(entrenador*, t_posicion);
 bool entrenador_validar_objetivos(entrenador*unEntrenador);
 
 void team_hilo_entrenador(entrenador*unEntrenador){
 	t_id pid = unEntrenador->id;
 	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	log_info(logger, "Se creo al Entrenador N°%u en estado NEW", pid);
+	log_info(logger, "Se cargo al Entrenador N°%u en estado NEW, en la posicion %s", pid, posicion_to_string(unEntrenador->posicion));
 	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 
 	bool hiloActivo = true;
 	while(hiloActivo){
 
-		sem_wait(&EjecutarEntrenador[pid]);
+		entrenador_esperar_y_consumir_cpu(unEntrenador);
 		switch(unEntrenador->siguienteTarea){
 			case CATCHEAR: {
 				pokemon*unPokemon = mapa_desmapear(pokemonesRequeridos);
@@ -22,13 +23,14 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 
 				Catch(unEntrenador, unPokemon); //TODO Descomentar conexiones
 
+				//Duerme al entrenador hasta que llegue el resultado
+
 				sem_post(&FinDeCiclo_CPU);
 
 				break;
 			}
 
 			case CAPTURAR: {
-				entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar y lo va a utilizar para capturar");
 				captura_pendiente* capturaPendiente = pendientes_pendiente_del_entrenador(capturasPendientes, pid);
 
 				if(!capturaPendiente){
@@ -46,9 +48,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 					sem_post(&HayEntrenadoresDisponibles);
 				}
 
-				else{
-					hiloActivo = !entrenador_validar_objetivos(unEntrenador);
-				}
+				else hiloActivo = !entrenador_validar_objetivos(unEntrenador);
 
 				sem_post(&FinDeCiclo_CPU);
 
@@ -56,23 +56,25 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 			}
 
 			case INTERCAMBIAR: {
-//				entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar y lo va a utilizar para intercambiar");
 
 				candidato_intercambio*self = list_remove(potencialesDeadlock, 0);
 				candidato_intercambio*parejaDeIntercambio = candidatos_pareja_de_intercambio_para(potencialesDeadlock, self);
 
 				candidato_desplazarse_hacia_el_otro(self, parejaDeIntercambio);
 
-				while(candidato_puede_intercambiar_con(self, parejaDeIntercambio)){
+				int cpuConsumidosPorIntercambio=1;
+				do{
+					sem_post(&FinDeCiclo_CPU);
+					entrenador_consumir_N_cpu(unEntrenador, 5-cpuConsumidosPorIntercambio);
 					candidato_intercambiar_con(self, parejaDeIntercambio);
-					break;
-				}
+					cpuConsumidosPorIntercambio=0;
+				} while(candidato_puede_intercambiar_con(self, parejaDeIntercambio));
 
 				hiloActivo = !entrenador_validar_objetivos(unEntrenador);
 				puts("********* signal(cpuConsumido)");
-				sem_post(&FinDeCiclo_CPU);
+				sem_post(&FinDeCiclo_CPU); //Consumi el ultimo ciclo
 
-				entrenador_validar_objetivos(parejaDeIntercambio->unEntrenador);
+				entrenador_validar_objetivos(parejaDeIntercambio->interesado);
 
 				sem_post(&finDeIntercambio);
 				candidato_destroy(self);
@@ -126,7 +128,7 @@ void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const cha
 	pthread_mutex_unlock(&mutexEstadoEntrenador[unEntrenador->id]);
 
 	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	log_info(logger, "El Entrenador N°%u se paso de la cola de %s a %s, Motivo: %s", unEntrenador->id, estadoFromEnum(estadoActual), estadoFromEnum(estadoFinal), motivo);
+	log_info(logger, "\n--------------- Cambio de Estado ---------------\n Proceso: Entrenador N°%u\n Estado Actual: %s\n Estado Anterior: %s\n Motivo: %s\n", unEntrenador->id, estadoFromEnum(estadoFinal), estadoFromEnum(estadoActual), motivo);
 	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 }
 
@@ -171,27 +173,26 @@ entrenador* entrenadores_remover_del_equipo_a(entrenadores unEquipo, t_id id){
 }
 
 void candidato_desplazarse_hacia_el_otro(candidato_intercambio*unCandidato, candidato_intercambio*haciaQuien){
-	entrenador_desplazarse_hacia(unCandidato->unEntrenador, haciaQuien->unEntrenador->posicion);
+	entrenador_desplazarse_hacia(unCandidato->interesado, haciaQuien->interesado->posicion);
 }
 
 void entrenador_desplazarse_hacia(entrenador* unEntrenador, t_posicion posicionFinal){
-	t_posicion posicionActual = unEntrenador->posicion;
+	entrenador_ir_hacia(unEntrenador, posicionFinal); //Verdadera implementacion
 
-	pthread_mutex_lock(&mutexPosicionEntrenador[unEntrenador->id]);
-	unEntrenador->posicion = posicionFinal;
-	pthread_mutex_unlock(&mutexPosicionEntrenador[unEntrenador->id]);
-
-	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	log_info(logger, "El Entrenador N°%u se desplazo desde [%u %u] hasta [%u %u]", unEntrenador->id, posicionActual.pos_x, posicionActual.pos_y, unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
-	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+//	//implementacion anterior
+//	t_posicion posicionActual = unEntrenador->posicion;
+//
+//	pthread_mutex_lock(&mutexPosicionEntrenador[unEntrenador->id]);
+//	unEntrenador->posicion = posicionFinal;
+//	pthread_mutex_unlock(&mutexPosicionEntrenador[unEntrenador->id]);
+//
+//	pthread_mutex_lock(&Mutex_AndoLoggeando);
+//	log_info(logger, "El Entrenador N°%u se desplazo desde [%u %u] hasta [%u %u]", unEntrenador->id, posicionActual.pos_x, posicionActual.pos_y, unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
+//	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 }
 
 bool entrenador_llego_a(entrenador* unEntrenador, t_posicion posicion){
-//	pthread_mutex_lock(&mutexPosicionEntrenador[unEntrenador->id]); //momentaneamente no hace falta ya que se pregunta despues de moverlo
-	t_posicion posDelEntrenador = unEntrenador->posicion;
-//	pthread_mutex_unlock(&mutexPosicionEntrenador[unEntrenador->id]);
-
-	return posicion_cmp(posDelEntrenador, posicion);
+	return posicion_cmp(unEntrenador->posicion, posicion);
 }
 
 //************************************* Salida ********************************************/
