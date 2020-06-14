@@ -38,6 +38,11 @@ void inicializar_conexiones();
 	t_algoritmo_planificacion ALGORITMO_PLANIFICACION;
 	numero RETARDO_CICLO_CPU;
 
+//Variables de orden superior
+	entrenador* (*proximo_a_ejecutar_segun_criterio)(cola_entrenadores);
+	bool (*entrenador_puede_seguir_ejecutando_segun_algoritmo)(entrenador*, numero);
+	void (*actualizar_datos_del_entrenador)(entrenador*unEntrenador);
+
 /*Mis Listas (son variables globales, para que puedan acceder todos los hilos)*/
 	entrenadores equipo;
 	cola_entrenadores entrenadoresReady;

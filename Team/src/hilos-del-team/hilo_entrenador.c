@@ -18,11 +18,11 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 			case CATCHEAR: {
 				pokemon*unPokemon = mapa_desmapear(pokemonesRequeridos);
 
-				entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar y lo va a utilizar para intentar catchear");
-
 				entrenador_desplazarse_hacia(unEntrenador, unPokemon->posicion);
 
-				Catch(unEntrenador, unPokemon);
+				Catch(unEntrenador, unPokemon); //TODO Descomentar conexiones
+
+				sem_post(&FinDeCiclo_CPU);
 
 				break;
 			}
@@ -50,11 +50,13 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 					hiloActivo = !entrenador_validar_objetivos(unEntrenador);
 				}
 
+				sem_post(&FinDeCiclo_CPU);
+
 				break;
 			}
 
 			case INTERCAMBIAR: {
-				entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar y lo va a utilizar para intercambiar");
+//				entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar y lo va a utilizar para intercambiar");
 
 				candidato_intercambio*self = list_remove(potencialesDeadlock, 0);
 				candidato_intercambio*parejaDeIntercambio = candidatos_pareja_de_intercambio_para(potencialesDeadlock, self);
@@ -67,6 +69,8 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 				}
 
 				hiloActivo = !entrenador_validar_objetivos(unEntrenador);
+				puts("********* signal(cpuConsumido)");
+				sem_post(&FinDeCiclo_CPU);
 
 				entrenador_validar_objetivos(parejaDeIntercambio->unEntrenador);
 
@@ -77,16 +81,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 				break;
 			}
 		}
-
-		sem_post(&EntradaSalida_o_FinDeEjecucion);
 	}
-
-	entrenador_destroy(unEntrenador);
-
-//	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-//	log_info(event_logger, "Finalizo un hilo entrenador");
-//	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
-
 }
 
 /********************************** Funciones de Inicio y Finalizacion ******************************************/
@@ -211,8 +206,6 @@ bool entrenador_validar_objetivos(entrenador*unEntrenador){
 		printf("Inventario: "); recursos_mostrar(unEntrenador->pokemonesCazados); puts("");
 
 		entrenador_pasar_a(unEntrenador, EXIT, "Ya logro cumplir sus objetivos");
-
-		entrenadores_remover_del_equipo_a(equipo, unEntrenador->id);
 	}
 
 	else{

@@ -12,12 +12,12 @@ void team_ejecutar_algoritmo_de_deteccion_de_deadlock(){
 	pthread_mutex_unlock(&MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR);
 //******************************************************************** fin HARDCODEADO
 
-	bool hayDeadlock = algoritmo_detectar_deadlock(equipo);
+	bool hayDeadlock = algoritmo_detectar_deadlock();
 
 	while(hayDeadlock){
 		loggear_resultado(hayDeadlock);
 		algoritmo_procesar_deadlock();
-		hayDeadlock = algoritmo_detectar_deadlock(equipo);
+		hayDeadlock = algoritmo_detectar_deadlock();
 	}
 
 	loggear_resultado(hayDeadlock);
@@ -25,11 +25,11 @@ void team_ejecutar_algoritmo_de_deteccion_de_deadlock(){
 
 ///*************************************** Detectar Deadlock ************************************************/
 
-bool algoritmo_detectar_deadlock(entrenadores unEquipo){
+bool algoritmo_detectar_deadlock(){
 	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	log_info(logger, "Se ejecuto el algoritmo de deadlock");
+	log_info(logger, "Se ejecuto el algoritmo de deteccion de deadlock");
 	pthread_mutex_unlock(&Mutex_AndoLoggeando);
-	return !list_is_empty(unEquipo);
+	return !list_is_empty(potencialesDeadlock);
 }
 
 void loggear_resultado(bool resultado){

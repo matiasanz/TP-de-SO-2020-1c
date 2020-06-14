@@ -56,7 +56,6 @@ char*estadoFromEnum(t_estado unEstado){
 void entrenador_destroy(entrenador* destruido){
 	recursos_destroy(destruido->objetivos);
 	recursos_destroy(destruido->pokemonesCazados);
-//	sem_destroy(destruido->SEMAFORO_IDENTIFICADOR);
 	free(destruido);
 }
 
@@ -163,26 +162,4 @@ void entrenador_agregar_a_cola(entrenador*unEntrenador, cola_entrenadores cola){
 
 entrenador*entrenador_esperar_y_desencolar(cola_entrenadores cola){
 	return cr_list_wait_and_remove(cola, 0);
-}
-
-//Ver si poner CRITERIO, con enum TODO pasar a planificador
-entrenador* entrenadores_proximo_a_planificar(cola_entrenadores colaDeReady){
-//	switch(criterio){
-//		case FIFO: {
-		entrenador*proximo = cr_list_wait_and_remove(colaDeReady, 0); //FIFO
-		return proximo;
-//		}
-//		default:
-//			error_show("Algoritmo de planificacion desconocido");
-//			exit(1);
-//			return NULL;
-}
-
-t_id* entrenadores_id_proximo_a_planificar(cola_entrenadores colaDeReady){
-	entrenador*proximo = entrenadores_proximo_a_planificar(colaDeReady);
-	if(!proximo){
-		return NULL; //quiere decir que no hay entrenadores disponibles. Deadlock?
-	}
-
-	return &proximo->id;
 }

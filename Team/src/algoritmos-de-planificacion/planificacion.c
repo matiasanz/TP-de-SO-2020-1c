@@ -2,14 +2,30 @@
 
 #include "../team.h"
 
+//Proximo a planificar
+entrenador*proximo_segun_fifo(cola_entrenadores colaReady){
+	return entrenador_esperar_y_desencolar(colaReady);
+}
+
+//Puede seguir
+bool puede_seguir_en_fifo(){
+	return true;
+}
+bool puede_seguir_en_sjf_sd(){
+	return true;
+}
+
+//Inicializar
 void cargar_algoritmo_planificacion(){ //TODO A FUTURO
 
-//	char*algoritmoLeido = config_get_string_value(config,"ALGORITMO_PLANIFICACION");
-//
-//	if(string_equals_ignore_case(algoritmoLeido, "FIFO")){
-//		ALGORITMO_PLANIFICACION = FIFO;
-//	}
-//
+	char*algoritmoLeido = config_get_string_value(config,"ALGORITMO_PLANIFICACION");
+
+	if(string_equals_ignore_case(algoritmoLeido, "FIFO")){
+		ALGORITMO_PLANIFICACION = FIFO;
+		proximo_a_ejecutar_segun_criterio = proximo_segun_fifo;
+		entrenador_puede_seguir_ejecutando_segun_algoritmo = puede_seguir_en_fifo;
+	}
+
 //	else if(string_equals_ignore_case(algoritmoLeido, "RR")){
 ////  	datos_algoritmo.QUANTUM=config_get_int_value(config,"QUANTUM");
 //		ALGORITMO_PLANIFICACION = ROUND_ROBBIN;
@@ -22,6 +38,11 @@ void cargar_algoritmo_planificacion(){ //TODO A FUTURO
 //		//  datosAlgoritmo.tiempo = malloc(sizeof(numero)*cantidadDeEntrenadores);
 //		//  datosAlgoritmo.estimaciones = malloc(sizeof(numero)*cantidadDeEntrenadores);
 //	}
+
+	else{
+		printf("El algoritmo %s no esta implementado... aun ;)", algoritmoLeido);
+		exit(1);
+	}
 
 	RETARDO_CICLO_CPU = config_get_int_value(config, "RETARDO_CICLO_CPU");
 }
@@ -43,11 +64,15 @@ void entrenador_consumir_N_cpu(entrenador*unEntrenador, numero cantidad){
 //	entrenador_consumir_cpu(unEntrenador);
 }
 
-bool entrenador_termino_de_ejecutar(entrenador*unEntrenador){
+bool entrenador_esta_ejecutando(entrenador*unEntrenador){
 	pthread_mutex_lock(&mutexEstadoEntrenador[unEntrenador->id]);
-	bool termino = !entrenador_en_estado(unEntrenador, EXECUTE);
+	bool estaEjecutando = entrenador_en_estado(unEntrenador, EXECUTE);
 	pthread_mutex_unlock(&mutexEstadoEntrenador[unEntrenador->id]);
+	return estaEjecutando;
+}
 
+bool entrenador_termino_de_ejecutar(entrenador*unEntrenador){
+	bool termino = unEntrenador && !entrenador_esta_ejecutando(unEntrenador);
 	return termino;
 }
 
@@ -55,41 +80,54 @@ void ejecutar_entrenador(entrenador* unEntrenador){
 	numero tiempo;
 	entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar");
 
-	for(tiempo=0;!entrenador_termino_de_ejecutar(unEntrenador); tiempo+=RETARDO_CICLO_CPU){
-		if(!puede_seguir_ejecutando_segun_algoritmo(unEntrenador, tiempo, ALGORITMO_PLANIFICACION)){
-			entrenador_pasar_a(unEntrenador, READY, "Ya no puede seguir ejecutando segun algoritmo");
+	for(tiempo=0; !entrenador_termino_de_ejecutar(unEntrenador); tiempo+=RETARDO_CICLO_CPU){
+
+		if(!entrenador_puede_seguir_ejecutando_segun_algoritmo(unEntrenador, tiempo)){
+			entrenador_pasar_a(unEntrenador, READY, "Ha sido desalojado por algoritmo de planificacion");
 			break;
 		}
 
+		puts("***************************************** LE DOY CPU");
 		sem_post(&EjecutarEntrenador[unEntrenador->id]);
-//		sem_wait(&ConsumioCpu);
+
+		puts("***************************************** ESPERO INTERESADOS");
+
+		sem_wait(&FinDeCiclo_CPU);//		sem_wait(&ConsumioCpu);
+		puts("***************************************** CONSUMIO CPU");
+
 	}
 }
 
 //Ver si con orden superior se puede desarmar el switch
-bool puede_seguir_ejecutando_segun_algoritmo(entrenador*unEntrenador, numero tiempo, t_algoritmo_planificacion algoritmo){
-	switch(algoritmo){
-		case FIFO: ;
-		/*no break*/
-		case SJF_SD: ;
-			return true;
-
-//		case ROUND_ROBBIN: {
-//			return tiempo<datosAlgoritmo.QUANTUM || cr_list_is_empty(entrenadoresReady);
-//			break;
-//		}
-
-//		case SJF_CD{
-//			return tiempo <= menor_estimacion(entrenadoresReady); //resolver con fold
-//		}
-
-		default : {
-			puts("El algoritmo leido no se encuentra implementado... aun! ;)");
-			exit(1);
-			return false;
-		}
-	}
+bool HC_puede_seguir_ejecutando_segun_algoritmo(entrenador*unEntrenador, numero tiempo, t_algoritmo_planificacion algoritmo){
+	return true;
 }
+
+
+
+//{
+//	switch(algoritmo){
+//		case FIFO: ;
+//		/*no break*/
+//		case SJF_SD: ;
+//			return true;
+//
+////		case ROUND_ROBBIN: {
+////			return tiempo<datosAlgoritmo.QUANTUM || cr_list_is_empty(entrenadoresReady);
+////			break;
+////		}
+//
+////		case SJF_CD{
+////			return tiempo <= menor_estimacion(entrenadoresReady); //resolver con fold
+////		}
+//
+//		default : {
+//			puts("El algoritmo leido no se encuentra implementado... aun! ;)");
+//			exit(1);
+//			return false;
+//		}
+//	}
+//}
 
 //TODO ver como usar orden superior y asignar una sola funcion al momento de setear algoritmo
 //entrenador* proximoAEjecutar(cola_entrenadores colaReady){ //volver a lista con mutex propio

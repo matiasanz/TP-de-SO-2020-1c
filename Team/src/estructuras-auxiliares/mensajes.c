@@ -60,7 +60,7 @@ void Catch(entrenador*unEntrenador, pokemon* pokemonCatcheado) {
 	t_paquete_header header=paquete_header_crear(MENSAJE,TEAM,CATCH_POKEMON);
 	t_buffer* bufferDepaquete=mensaje_appeared_catch_pokemon_serializar(mensajeCatch);
 	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
-	int resultadoDeEnvio = enviar(conexion_broker,paqueteAEnviar);
+	int resultadoDeEnvio = ERROR_SOCKET;//enviar(conexion_broker,paqueteAEnviar); //TODO DESCOMENTAR
 
 	//Agrego a la lista de capturas pendientes
 	t_id idCapturaPendiente = mensaje_appeared_catch_pokemon_get_id(mensajeCatch);

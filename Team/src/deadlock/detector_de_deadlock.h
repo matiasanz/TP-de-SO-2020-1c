@@ -5,7 +5,7 @@
 
 void team_ejecutar_algoritmo_de_deteccion_de_deadlock();
 
-bool algoritmo_detectar_deadlock(entrenadores candidatos);
+bool algoritmo_detectar_deadlock();
 
 void algoritmo_procesar_deadlock();
 

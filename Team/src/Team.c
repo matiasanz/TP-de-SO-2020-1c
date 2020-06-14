@@ -15,14 +15,14 @@ int main(void) {
 
 	team_inicializar();
 
-	Get_pokemones(objetivosGlobales, inventariosGlobales);
+//	Get_pokemones(objetivosGlobales, inventariosGlobales);
 
-	log_info(event_logger, "\n\n*************************************************************************\n"
+	log_info(logger, "\n\n*************************************************************************\n"
 							   "                      Inicio del proceso Team\n");
 	log_info(logger, "\n\n");
 
 	//Para pruebas sin los otros modulos//
-//	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) broker_simulator, NULL); //Para pruebas sin broker
+	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) broker_simulator, NULL); //Para pruebas sin broker
 
 	inicializar_hilos();
 
@@ -30,7 +30,7 @@ int main(void) {
 
 	//team_mostrar_resultados();
 
-	log_info(event_logger, "\n\n                              Fin del proceso Team\n"
+	log_info(logger, "\n\n                              Fin del proceso Team\n"
 						      "****************************************************************************");
 
 	return team_exit();
@@ -46,11 +46,11 @@ void team_inicializar(){
 
 	inicializar_listas();
 
-	RETARDO_CICLO_CPU = config_get_int_value(config, "RETARDO_CICLO_CPU");	//	cargar_algoritmo_de_planificacion();
+	cargar_algoritmo_planificacion();
 
  	inicializar_semaforos();
 
-	inicializar_conexiones();
+//	inicializar_conexiones();
 
 //	inicializar_hilos();
 
@@ -115,7 +115,6 @@ void listas_destroy(){
 	cr_list_destroy(mensajesCAUGHT);
 	cr_list_destroy(mensajesLOCALIZED);
 
-	entrenadores_destroy(equipo);
 	cr_list_destroy(entrenadoresReady);
 	mapa_destroy(pokemonesRequeridos);
 	pendientes_destroy(capturasPendientes);
@@ -130,8 +129,8 @@ void listas_destroy(){
 void inicializar_hilos(){
 	inicializar_hilos_entrenadores();
 
-	pthread_create(&hiloMensajesAppeard, NULL, (void*)team_suscriptor_cola_APPEARD, mensajesAPPEARED);
-	pthread_create(&hiloMensajesCAUGHT, NULL, (void*)team_procesador_cola_CAUGHT, mensajesCAUGHT);
+	pthread_create(&hiloMensajesAppeard  , NULL, (void*)team_suscriptor_cola_APPEARD  , mensajesAPPEARED);
+	pthread_create(&hiloMensajesCAUGHT   , NULL, (void*)team_procesador_cola_CAUGHT   , mensajesCAUGHT);
 	pthread_create(&hiloMensajesLOCALIZED, NULL, (void*)team_procesador_cola_LOCALIZED, mensajesLOCALIZED);
 
 	pthread_create(&hiloPlanificador, NULL, (void*) team_planificar, NULL);
@@ -150,11 +149,11 @@ void finalizar_hilos(){
 //Semaforos
 
 void inicializar_semaforos(){
-	sem_init(&HayTareasPendientes, 0, 0);
-	sem_init(&HayEntrenadoresDisponibles, 0, 0);
-	sem_init(&EquipoNoPuedaCazarMas, 0, 0);
-	sem_init(&EntradaSalida_o_FinDeEjecucion, 0, 0);
-	sem_init(&finDeIntercambio, 0, 0);
+	sem_init(&HayTareasPendientes           , 0, 0);
+	sem_init(&HayEntrenadoresDisponibles    , 0, 0);
+	sem_init(&EquipoNoPuedaCazarMas         , 0, 0);
+	sem_init(&FinDeCiclo_CPU, 0, 0);
+	sem_init(&finDeIntercambio              , 0, 0);
 
 	pthread_mutex_init(&Mutex_AndoLoggeando       , NULL);
 	pthread_mutex_init(&Mutex_AndoLoggeandoEventos, NULL);
@@ -169,7 +168,7 @@ void inicializar_semaforos(){
 void finalizar_semaforos(){
 	sem_destroy(&HayTareasPendientes);
 	sem_destroy(&HayEntrenadoresDisponibles);
-	sem_destroy(&EntradaSalida_o_FinDeEjecucion);
+	sem_destroy(&FinDeCiclo_CPU);
 	sem_destroy(&finDeIntercambio);
 
 	pthread_mutex_destroy(&mutexEntrenadores);

@@ -66,7 +66,7 @@ void broker_simulator(){
 				t_list*posiciones = list_create();
 				list_add(posiciones, posicion_ptr_create(3, 3));
 
-				t_mensaje_localized_pokemon*mensaje = mensaje_localized_pokemon_crear("Rodolfo", posiciones);
+				t_mensaje_localized_pokemon*mensaje = mensaje_localized_pokemon_crear("NADIE", posiciones);
 				cr_list_add_and_signal(mensajesLOCALIZED, mensaje);
 				break;
 			}

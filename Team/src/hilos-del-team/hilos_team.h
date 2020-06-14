@@ -21,7 +21,7 @@ pthread_t hiloMensajesLOCALIZED;
 
 sem_t* EjecutarEntrenador;
 sem_t EquipoNoPuedaCazarMas;
-sem_t EntradaSalida_o_FinDeEjecucion;
+sem_t FinDeCiclo_CPU;
 sem_t HayTareasPendientes;
 sem_t HayEntrenadoresDisponibles;
 sem_t finDeIntercambio;

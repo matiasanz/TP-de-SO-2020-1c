@@ -2,9 +2,8 @@
 #include<semaphore.h>
 #include "../hilos-del-team/hilos_team.h"
 
-/*TODO
- * Agregar equipo_despertar_en_caso_de_DEADLOCK();
- */
+void ejecutar_entrenador(entrenador*);
+
 void team_planificar(){
 	while(PROCESO_ACTIVO){
 
@@ -13,16 +12,17 @@ void team_planificar(){
 
 		equipo_despertar_en_caso_de_APPEARED();
 
-//		puts("**********************************************************wait(proximoEnReady)");
-		t_id* idProximoEntrenador = entrenadores_id_proximo_a_planificar(entrenadoresReady);
+		entrenador* proximoEntrenador = proximo_a_ejecutar_segun_criterio(entrenadoresReady);
+		//entrenadores_proximo_a_planificar(entrenadoresReady);
 
-		if(!idProximoEntrenador){
-			error_show("Se intento leer un id nulo");
+		if(!proximoEntrenador){
+			error_show("Se intento leer un entrenador nulo");
 			exit(1);
 		}
 
-		sem_post(&EjecutarEntrenador[*idProximoEntrenador]); //signal(id);
-		sem_wait(&EntradaSalida_o_FinDeEjecucion);
+		printf("signal(entrenador %d)\n", proximoEntrenador->id);
+		ejecutar_entrenador(proximoEntrenador);
+		puts("*************************************** termino de ejecutar");
 	}
 
 	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);

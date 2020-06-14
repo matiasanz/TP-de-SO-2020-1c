@@ -72,7 +72,7 @@ numero objetivos_cantidad_requerida_de(especie_pokemon unaEspecie){
 }
 
 void mapa_mapear_requerido(pokemon*unPokemon){
-//	printf("-----------------------------------------> se Mapeo un %s\n", unPokemon->especie);
+	printf("-----------------------------------------------------> se Mapeo un %s\n", unPokemon->especie);
 	mapa_mapear_pokemon(pokemonesRequeridos, unPokemon);
 }
 
