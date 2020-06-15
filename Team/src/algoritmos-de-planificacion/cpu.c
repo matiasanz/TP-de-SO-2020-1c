@@ -1,39 +1,6 @@
 #include "planificacion.h"
 #include "../team.h"
 
-//Inicializar
-void cargar_algoritmo_planificacion(){ //TODO A FUTURO
-
-	char*algoritmoLeido = config_get_string_value(config,"ALGORITMO_PLANIFICACION");
-
-	if(string_equals_ignore_case(algoritmoLeido, "FIFO")){
-		inicializar_fifo();
-	}
-
-//	else if(string_equals_ignore_case(algoritmoLeido, "RR")){
-//		numero QUANTUM = config_get_int_value("QUANTUM");
-//		inicializar_rr(QUANTUM);
-//	}
-//
-	//TODO ver como no repetir codigo
-//	else if(string_equals_ignore_case(algoritmoLeido, "SJF_SD")){
-//		inicializar_sjf();
-//		proximo_a_ejecutar_segun_criterio = proximo_segun_sjf;
-//		entrenador_puede_seguir_ejecutando_segun_algoritmo = puede_seguir_sin_desalojo;
-//	}
-
-//	else if(string_equals_ignore_case(algoritmoLeido, "SJF_CD")){
-//		inicializar_sjf();
-//	}
-
-	else{
-		printf("El algoritmo %s no esta implementado... aun ;)", algoritmoLeido);
-		exit(1);
-	}
-
-	RETARDO_CICLO_CPU = config_get_int_value(config, "RETARDO_CICLO_CPU");
-}
-
 void consumir_ciclo_cpu(){
 	sleep(RETARDO_CICLO_CPU);
 	//incrementar contador TODO
@@ -76,6 +43,9 @@ void ejecutar_entrenador(entrenador* unEntrenador){
 
 		if(!entrenador_puede_seguir_ejecutando_segun_algoritmo(unEntrenador, tiempo)){
 			entrenador_pasar_a(unEntrenador, READY, "Ha sido desalojado por algoritmo de planificacion");
+			cr_list_add_and_signal(entrenadoresReady, unEntrenador);
+			sem_post(&HayTareasPendientes);
+			sem_post(&HayEntrenadoresDisponibles);
 			break;
 		}
 
@@ -84,10 +54,13 @@ void ejecutar_entrenador(entrenador* unEntrenador){
 
 		puts("***************************************** ESPERO INTERESADOS");
 
-		sem_wait(&FinDeCiclo_CPU);//		sem_wait(&ConsumioCpu);
+		sem_wait(&FinDeCiclo_CPU);
 		puts("***************************************** CONSUMIO CPU");
 
 	}
+
+	actualizar_datos_del_entrenador(unEntrenador, tiempo);
+
 }
 
 //************************************************************************************
@@ -96,7 +69,9 @@ void ejecutar_entrenador(entrenador* unEntrenador){
 void desplazar_unidimensional(coordenada* posicionInicial, coordenada posicionFinal);
 void entrenador_dar_un_paso_hacia(entrenador*unEntrenador, t_posicion posicionFinal);
 void entrenador_ir_hacia(entrenador* unEntrenador, t_posicion posicionFinal){
-	printf("El entrenador partio de la posicion [%u %u]\n", unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
+	pthread_mutex_lock(&Mutex_AndoLoggeando);
+	log_info(logger, "El entrenador partio de la posicion [%u %u]\n", unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
+	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 
 	bool llegoALaPosicion = entrenador_llego_a(unEntrenador, posicionFinal);
 

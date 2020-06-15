@@ -32,6 +32,14 @@
 typedef uint32_t numero;
 typedef numero t_id;
 
+typedef struct{
+	numero ciclosCPU;
+	numero cambiosDeContexto;
+	numero*ciclosDelEntrenador;
+	numero deadlocksProducidos;
+	numero deadlocksResueltos;
+}estadisticas_team;
+
 /*Variables Globales*/
 
 	pthread_mutex_t Mutex_AndoLoggeando;

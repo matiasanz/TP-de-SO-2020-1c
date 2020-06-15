@@ -46,6 +46,10 @@ void team_inicializar(){
 
 	inicializar_listas();
 
+	cantidadDeEntrenadores = list_size(equipo);
+	//Abstraer
+//	Estadisticas = (estadisticas_team) {0,0,malloc(sizeof(numero)*cantidadDeEntrenadores), 0, 0};
+
 	cargar_algoritmo_planificacion();
 
  	inicializar_semaforos();
@@ -111,10 +115,6 @@ void inicializar_listas() {
 }
 
 void listas_destroy(){
-	list_destroy_and_destroy_elements(mensajesAPPEARED->lista, (void*) mensaje_appeared_catch_pokemon_destruir);
-	list_destroy_and_destroy_elements(mensajesCAUGHT->lista, (void*) mensaje_caught_pokemon_destruir);
-	list_destroy_and_destroy_elements(mensajesLOCALIZED->lista, (void*) mensaje_localized_pokemon_destruir);
-
 	cr_list_destroy(entrenadoresReady);
 	mapa_destroy(pokemonesRequeridos);
 	pendientes_destroy(capturasPendientes);
@@ -123,6 +123,10 @@ void listas_destroy(){
 	recursos_destroy(recursosEnMapa);
 	candidatos_destroy(potencialesDeadlock);
 	list_destroy(historialDePokemones);
+
+	list_destroy_and_destroy_elements(mensajesAPPEARED->lista, (void*) mensaje_appeared_catch_pokemon_destruir);
+	list_destroy_and_destroy_elements(mensajesCAUGHT->lista, (void*) mensaje_caught_pokemon_destruir);
+	list_destroy_and_destroy_elements(mensajesLOCALIZED->lista, (void*) mensaje_localized_pokemon_destruir);
 }
 
 //Hilos

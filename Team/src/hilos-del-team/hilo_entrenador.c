@@ -128,7 +128,7 @@ void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const cha
 	pthread_mutex_unlock(&mutexEstadoEntrenador[unEntrenador->id]);
 
 	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	log_info(logger, "\n--------------- Cambio de Estado ---------------\n Proceso: Entrenador N°%u\n Estado Actual: %s\n Estado Anterior: %s\n Motivo: %s\n", unEntrenador->id, estadoFromEnum(estadoFinal), estadoFromEnum(estadoActual), motivo);
+	log_info(logger, "\n--------------- Cambio de Estado ---------------\n Proceso: Entrenador N°%u\n Estado Inicial: %s\n Estado Final: %s\n Motivo: %s\n", unEntrenador->id, estadoFromEnum(estadoActual),  estadoFromEnum(estadoFinal), motivo);
 	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 }
 
@@ -179,7 +179,7 @@ void candidato_desplazarse_hacia_el_otro(candidato_intercambio*unCandidato, cand
 void entrenador_desplazarse_hacia(entrenador* unEntrenador, t_posicion posicionFinal){
 	entrenador_ir_hacia(unEntrenador, posicionFinal); //Verdadera implementacion
 
-//	//implementacion anterior
+//	//implementacion anterior, para pruebas rapidas
 //	t_posicion posicionActual = unEntrenador->posicion;
 //
 //	pthread_mutex_lock(&mutexPosicionEntrenador[unEntrenador->id]);

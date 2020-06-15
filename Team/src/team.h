@@ -35,6 +35,8 @@ void finalizar_hilos();
 void inicializar_conexiones();
 
 //Variables globales
+	estadisticas_team Estadisticas;
+
 	t_algoritmo_planificacion ALGORITMO_PLANIFICACION;
 	numero RETARDO_CICLO_CPU;
 	datos_algoritmo DATOS_ALGORITMO;
@@ -42,7 +44,7 @@ void inicializar_conexiones();
 //Variables de orden superior
 	entrenador* (*proximo_a_ejecutar_segun_criterio)(cola_entrenadores);
 	bool (*entrenador_puede_seguir_ejecutando_segun_algoritmo)(entrenador*, numero);
-	void (*actualizar_datos_del_entrenador)(entrenador*unEntrenador);
+	void (*actualizar_datos_del_entrenador)(entrenador*unEntrenador, numero tiempo);
 
 /*Mis Listas (son variables globales, para que puedan acceder todos los hilos)*/
 	entrenadores equipo;
