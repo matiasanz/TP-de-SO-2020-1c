@@ -63,5 +63,7 @@ void guardarLinea(char* path,char* nuevalinea,int len);
 char* crearLinea(t_mensaje_new_pokemon* unMsjNewPoke );
 int size_bloque(char* path);
 bool contiene_string_en_bloques(char* string, char**bloques);
+int espacioDisponibleEnBloque(char* path);
+int bloquesNecesarios(char* lineaNueva,int maxSizeBloque);
 
 #endif /* SRC_GAMECARD_H_ */
