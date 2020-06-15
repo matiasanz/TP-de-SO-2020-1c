@@ -76,6 +76,8 @@ void crearEstructuras(){
 
 	FILE* f_metadata;
 
+	bool esNuevoBitmap=false;
+
 	mkdir(punto_montaje_tallgrass,0777);
 
 	//-------Crecion de Directorios
@@ -124,6 +126,7 @@ void crearEstructuras(){
 		fwrite((void*)bitarray_temp,tope(config_get_int_value(config_metadata,"BLOCKS"),8),1,f_bitmap);
 		fflush(f_bitmap);
 		free(bitarray_temp);
+		esNuevoBitmap=true;
 
 	}
 	fseek(f_bitmap, 0, SEEK_END);
@@ -140,8 +143,10 @@ void crearEstructuras(){
 	bitmap = bitarray_create_with_mode(bitarray_str, file_size, MSB_FIRST);
 
 	//seteo de bitmap
-	for(int i=0;i<config_get_int_value(config_metadata,"BLOCKS");i++){
-		bitarray_clean_bit(bitmap,i);
+	if(esNuevoBitmap){
+		for(int i=0;i<config_get_int_value(config_metadata,"BLOCKS");i++){
+			bitarray_clean_bit(bitmap,i);
+		}
 	}
 
 	log_info(logger, "Creado el archivo Bitmap.bin");
@@ -287,6 +292,33 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 
 		//--------Comienzo a operar con el pokemon------------
+
+		char* cadenaABuscar=string_new();
+		string_append(&cadenaABuscar,string_itoa(unMsjNewPoke->pokemon.posicion.pos_x));
+		string_append(&cadenaABuscar,"-");
+		string_append(&cadenaABuscar,string_itoa(unMsjNewPoke->pokemon.posicion.pos_y));
+
+
+		if(contiene_string_en_bloques(cadenaABuscar,bloquesDelPokemon)){
+
+
+
+			//retardo para simular acceso a disco
+			sleep(tiempo_retardo_operacion);
+
+			pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+
+			config_set_value(config_metadata_pokemon,"OPEN","N");
+			config_save(config_metadata_pokemon);
+
+			pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+
+
+			log_info(event_logger,"La posicion ya existe");
+
+		}else{
+
+
 		if(cant_elemetos_array(bloquesDelPokemon)==0){
 			//el bitarray cuenta desde 0
 			pthread_mutex_lock(&mutBitarray);
@@ -397,6 +429,8 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 			log_info(event_logger,"ya tiene bloques asignados");
 		}
 
+		}
+
 		log_info(event_logger,"pokemon guardado:%s ::pos (%i,%i)::cant %i"
 				,unMsjNewPoke->pokemon.especie
 				,unMsjNewPoke->pokemon.posicion.pos_x
@@ -502,4 +536,54 @@ int size_bloque(char* path){
 	fclose(f_block);
 
 	return file_size;
+}
+//ejemplo ("1-2",["1","4","5","8",NULL])
+bool contiene_string_en_bloques(char* string, char**bloques){
+
+	char* cadenaCompleta=string_new();
+	FILE* archivo;
+	int file_size;
+	char* cadena;
+	bool result;
+	char* bin_block;
+
+
+	int cantbloques=cant_elemetos_array(bloques);
+
+	if(cantbloques>0){
+		for(int x=0;x<cantbloques;x++){
+
+				bin_block = string_new();
+				string_append(&bin_block,paths_estructuras[BLOCKS]);
+				string_append(&bin_block,bloques[x]);
+				string_append(&bin_block,".bin");
+
+
+				archivo=fopen(bin_block,"rb");
+
+				fseek(archivo, 0, SEEK_END);
+				file_size = ftell(archivo);
+				fseek(archivo, 0, SEEK_SET);
+
+				cadena=malloc(file_size);
+
+				fread(cadena,sizeof(char),file_size,archivo);
+
+				string_append(&cadenaCompleta,cadena);
+
+				fclose(archivo);
+				free(bin_block);
+				free(cadena);
+		}
+
+		result=string_contains(cadenaCompleta,string);
+
+		free(cadenaCompleta);
+
+		return result;
+
+	}
+
+	free(cadenaCompleta);
+	return false;
 }
