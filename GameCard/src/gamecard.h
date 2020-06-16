@@ -65,5 +65,6 @@ int size_bloque(char* path);
 bool contiene_string_en_bloques(char* string, char**bloques);
 int espacioDisponibleEnBloque(char* path);
 int bloquesNecesarios(char* lineaNueva,int maxSizeBloque);
+bool contienePosicionEnBloques(char* string, char**bloques);
 
 #endif /* SRC_GAMECARD_H_ */
