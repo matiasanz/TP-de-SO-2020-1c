@@ -834,44 +834,15 @@ int bloquesNecesarios(char* lineaNueva,int maxSizeBloque){
 //posString:: "x-y", ejem "1-2",["1","4","5","8",NULL]
 bool contienePosicionEnBloques(char* string, char**bloques){
 
-	char* cadenaCompleta=string_new();
-	FILE* archivo;
-	int file_size;
-	char* cadena;
 	bool result;
-	char* bin_block;
-
 
 	int cantbloques=cant_elemetos_array(bloques);
 
 	if(cantbloques>0){
-		for(int x=0;x<cantbloques;x++){
-
-				bin_block = string_new();
-				string_append(&bin_block,paths_estructuras[BLOCKS]);
-				string_append(&bin_block,bloques[x]);
-				string_append(&bin_block,".bin");
-
-
-				archivo=fopen(bin_block,"rb");
-
-				fseek(archivo, 0, SEEK_END);
-				file_size = ftell(archivo);
-				fseek(archivo, 0, SEEK_SET);
-
-				cadena=malloc(file_size);
-
-				fread(cadena,sizeof(char),file_size,archivo);
-
-				string_append(&cadenaCompleta,cadena);
-
-				fclose(archivo);
-				free(bin_block);
-				free(cadena);
-		}
+		char* lineasDeBloques=contenido_de_Bloques_con_mmap(bloques);
 
 		//----------compruebo si esta------
-		char** arrayLineasDelPokmeon=string_split(cadenaCompleta,"\n");
+		char** arrayLineasDelPokmeon=string_split(lineasDeBloques,"\n");
 
 
 		//a la posicion que me pasen le agrego un "=", para facilitar la busqueda
@@ -890,8 +861,6 @@ bool contienePosicionEnBloques(char* string, char**bloques){
 		}
 
 
-
-		free(cadenaCompleta);
 		free(stringPosAdaptado);
 		free(arrayLineasDelPokmeon);
 
@@ -899,7 +868,7 @@ bool contienePosicionEnBloques(char* string, char**bloques){
 
 	}
 
-	free(cadenaCompleta);
+
 	return false;
 }
 //DEPRECATED
