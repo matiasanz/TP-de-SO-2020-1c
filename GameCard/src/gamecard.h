@@ -65,8 +65,11 @@ int size_bloque(char* path);
 bool contiene_string_en_bloques(char* string, char**bloques);
 int espacioDisponibleEnBloque(char* path);
 int bloquesNecesarios(char* lineaNueva,int maxSizeBloque);
+//talvez cambiarlo para que funcione con mmap, por ahora funciona sin problemas con el fread
 bool contienePosicionEnBloques(char* string, char**bloques);
+//DEPRECATED
 char* contenidoDeBloques(char** bloques);
 void sobrescribirLineas(char* path,char* nuevalinea,int len);
+char* contenido_de_Bloques_con_mmap(char** bloques);
 
 #endif /* SRC_GAMECARD_H_ */

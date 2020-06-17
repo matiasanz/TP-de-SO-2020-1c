@@ -307,9 +307,9 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 			//modificacion de cantidad de pokemon en posicion existente
 
-			char* contenidoBloques=contenidoDeBloques(bloquesDelPokemon);
+			char* contenidoBloques=contenido_de_Bloques_con_mmap(bloquesDelPokemon);
 
-			log_info(event_logger,"contenido bloques:: %s",contenidoBloques);
+			//log_info(event_logger,"contenido bloques:: %s",contenidoBloques);
 
 			char** lineasDelPokemon=string_split(contenidoBloques,"\n");
 
@@ -830,6 +830,7 @@ int espacioDisponibleEnBloque(char* path){
 int bloquesNecesarios(char* lineaNueva,int maxSizeBloque){
 	return (int)((string_length(lineaNueva)+(maxSizeBloque-1))/(maxSizeBloque));
 }
+
 //posString:: "x-y", ejem "1-2",["1","4","5","8",NULL]
 bool contienePosicionEnBloques(char* string, char**bloques){
 
@@ -901,6 +902,7 @@ bool contienePosicionEnBloques(char* string, char**bloques){
 	free(cadenaCompleta);
 	return false;
 }
+//DEPRECATED
 char* contenidoDeBloques(char** bloques){
 		char* cadenaCompleta=string_new();
 		FILE* archivo;
@@ -950,4 +952,41 @@ void sobrescribirLineas(char* path,char* nuevalinea,int len){
 
 	fclose(f_block);
 
+}
+
+char* contenido_de_Bloques_con_mmap(char** bloques){
+	char* cadenaCompleta=string_new();
+			FILE* archivo;
+			int file_size;
+			char* cadena;
+			char* bin_block;
+
+			int cantbloques=cant_elemetos_array(bloques);
+
+				if(cantbloques>0){
+					for(int x=0;x<cantbloques;x++){
+
+					bin_block = string_new();
+					string_append(&bin_block,paths_estructuras[BLOCKS]);
+					string_append(&bin_block,bloques[x]);
+					string_append(&bin_block,".bin");
+
+					archivo=fopen(bin_block,"rb+");
+
+					fseek(archivo, 0, SEEK_END);
+					file_size = ftell(archivo);
+					fseek(archivo, 0, SEEK_SET);
+
+					cadena=(char*)mmap(NULL,sizeof(char)*file_size,PROT_READ | PROT_WRITE | PROT_EXEC,MAP_SHARED,fileno(archivo),0);
+
+					string_append(&cadenaCompleta,cadena);
+
+
+					munmap(cadena,file_size);
+					fclose(archivo);
+					free(bin_block);
+
+					}
+				}
+	return cadenaCompleta;
 }
