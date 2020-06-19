@@ -812,6 +812,8 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 				//aqui veo si es, el que hay que modificar
 				if(string_starts_with(lineasDelPokemon[i],stringPosAdaptado)){
 
+					pokemonAtrapado=1;
+
 					char** posYCant=string_split(lineasDelPokemon[i],"=");
 
 					int cantActual=atoi(posYCant[1]);
@@ -849,7 +851,80 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 
 			if(cantBloquesNecesarios<cant_elemetos_array(bloquesDelPokemon)){
 
-				//todo
+				//caso en el que necesito menos bloques de los que tenia
+				//int cantBloquesSobrantes=cant_elemetos_array(bloquesDelPokemon)-cantBloquesNecesarios;
+
+				char* nroDebloquesActualizado=string_new();
+
+				//armo el string de los bloques que usara
+				for(int x=0;x<cantBloquesNecesarios;x++){
+					if(cantBloquesNecesarios==(x+1)){
+						string_append(&nroDebloquesActualizado,bloquesDelPokemon[x]);
+					}else{
+						string_append(&nroDebloquesActualizado,bloquesDelPokemon[x]);
+						string_append(&nroDebloquesActualizado,",");
+					}
+				}
+
+				//limpieza de bitarray y de los bloques sobrantes
+				for(int j=cantBloquesNecesarios;j<cant_elemetos_array(bloquesDelPokemon);j++){
+					pthread_mutex_lock(&mutBitarray);
+					int nrobloque=atoi(bloquesDelPokemon[j]);
+
+					bitarray_clean_bit(bitmap,nrobloque);
+					//limpiar el bloque.bin correspondiente
+
+					char* clean_block = string_new();
+					string_append(&clean_block,paths_estructuras[BLOCKS]);
+					string_append(&clean_block,bloquesDelPokemon[j]);
+					string_append(&clean_block,".bin");
+					sobrescribirLineas(clean_block,"",0);
+					free(clean_block);
+					pthread_mutex_unlock(&mutBitarray);
+				}
+
+				char** arrayBloqueActualizado=string_split(nroDebloquesActualizado,",");
+
+				for(int y=0;y<cantBloquesNecesarios;y++){
+
+					char* bin_block = string_new();
+					string_append(&bin_block,paths_estructuras[BLOCKS]);
+					string_append(&bin_block,arrayBloqueActualizado[y]);
+					string_append(&bin_block,".bin");
+
+
+					if(cantBloquesNecesarios==(y+1)){
+						//esto seria el ultimo bloque necesario
+
+						char* ultimoAguardar=string_new();
+						string_append(&ultimoAguardar,string_substring_from(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE")));
+						int longitud=string_length(ultimoAguardar);
+						sobrescribirLineas(bin_block,ultimoAguardar,longitud);
+						free(ultimoAguardar);
+					}else{
+
+						char* cadenaAguardar=string_new();
+						string_append(&cadenaAguardar,string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE")));
+						int longitud=string_length(cadenaAguardar);
+						sobrescribirLineas(bin_block,cadenaAguardar,longitud);
+
+						free(cadenaAguardar);
+					}
+
+					free(bin_block);
+				}
+
+				size=string_length(contenidoActualizadoDeBloques);
+
+
+				string_append(&listaBloques,"[");
+				string_append(&listaBloques,nroDebloquesActualizado);
+				string_append(&listaBloques,"]");
+
+
+				split_liberar(arrayBloqueActualizado);
+				free(nroDebloquesActualizado);
+
 			}else{
 
 				//con los bloques asignados que tiene el pokemon bastan
@@ -912,7 +987,7 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 
 			free(listaBloques);
 
-			log_info(event_logger,"La posicion ya existe");
+			log_info(event_logger,"Un %s fue atrapado en la posicion: (%i,%i)",unMsjCatchPoke->pokemon.especie,unMsjCatchPoke->pokemon.posicion.pos_x,unMsjCatchPoke->pokemon.posicion.pos_y);
 
 
 
