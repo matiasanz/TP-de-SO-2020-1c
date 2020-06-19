@@ -5,9 +5,17 @@ void* leer_mensaje_cuando_este_disponible(cr_list* unaLista){
 	return cr_list_wait_and_remove(unaLista, 0);
 }
 
+void mensaje_get_registrar(t_mensaje_get_pokemon* mensajeGet){
+    t_id* idGet = malloc(sizeof(t_id));
+    	* idGet = mensaje_get_pokemon_get_id(mensajeGet);
+    list_add(registroDePedidos, idGet);
+}
+
 void Get(void* especiePokemon) {
 	//Envia mensaje al broker para ser replicado al gamecard
+	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
 	log_info(event_logger, ">> get(%s)\n", (especie_pokemon) especiePokemon);
+	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 	t_mensaje_get_pokemon* mensajeGet=mensaje_get_pokemon_crear(string_duplicate(especiePokemon));
 
 	t_paquete_header header=paquete_header_crear(MENSAJE,TEAM,GET_POKEMON);
@@ -15,7 +23,7 @@ void Get(void* especiePokemon) {
 	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
 	int resultadoDeEnvio = enviar(conexion_broker,paqueteAEnviar);
 
-//TODO t_id* idGet = malloc(sizeof(t_id)); *idGet = mensaje_get_pokemon_get_id(mensajeGet); list_add(getsPendientes, idGet); //y funcion que compare en localized
+	mensaje_get_registrar(mensajeGet);
 
 	if(resultadoDeEnvio==ERROR_SOCKET){
 		pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
@@ -66,6 +74,8 @@ void Catch(entrenador*unEntrenador, pokemon* pokemonCatcheado) {
 
 	unEntrenador->siguienteTarea = CAPTURAR;
 	entrenador_pasar_a(unEntrenador, LOCKED_HASTA_CAUGHT, "Debera esperar a que este el resultado de la captura");
+
+	sem_post(&FinDeCiclo_CPU);
 
 	if(resultadoDeEnvio==ERROR_SOCKET){
 		pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);

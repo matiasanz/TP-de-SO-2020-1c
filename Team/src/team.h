@@ -49,16 +49,24 @@ void inicializar_conexiones();
 /*Mis Listas (son variables globales, para que puedan acceder todos los hilos)*/
 	entrenadores equipo;
 	cola_entrenadores entrenadoresReady;
-	mapa_pokemones pokemonesRequeridos;
+	mapa_pokemones pokemonesRecibidos;
 	matriz_recursos objetivosGlobales;
 	matriz_recursos inventariosGlobales; //cambiar nombre por recursosDisponiblesGlobales
 	matriz_recursos recursosEnMapa; //cambiar nombre por recursosPorAdquirir o algo mas representativo
 	capturas_pendientes capturasPendientes; //cambiar tipo de dato por capturas_pendientes
 	especies_pokemones historialDePokemones;
+	candidatos_intercambio potencialesDeadlock;
+
+//En revision
 	cr_list*mensajesAPPEARED;
 	cr_list*mensajesCAUGHT;
 	cr_list*mensajesLOCALIZED;
-	candidatos_intercambio potencialesDeadlock;
+
+	pthread_mutex_t mutexRepuestos;
+	t_list* pokemonesDeRepuesto;
+
+	t_list* registroDePedidos; //Para mensajes get TODO
+	numero PROCESOS_SIN_FINALIZAR;
 
 /*--------------*/
 

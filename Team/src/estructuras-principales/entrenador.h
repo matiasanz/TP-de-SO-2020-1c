@@ -7,6 +7,12 @@
 typedef enum{NEW,READY,	EXECUTE, LOCKED_HASTA_APPEARED, LOCKED_HASTA_DEADLOCK, LOCKED_HASTA_CAUGHT,	EXIT} t_estado; //VER cuales vale la pena conservar
 typedef enum{CATCHEAR, CAPTURAR, INTERCAMBIAR /*, FINALIZAR*/ } t_tarea;
 
+//TAD Pokemon									 Pasar a commons
+typedef struct Pokemon{
+	especie_pokemon especie; //string
+	t_posicion posicion;
+}pokemon;
+
 //TAD Entrenador
 typedef struct pcb_Entrenador{
 	matriz_recursos objetivos; //especie de los pokemones
@@ -15,6 +21,7 @@ typedef struct pcb_Entrenador{
 	t_estado estado;
 	t_id id;
 	t_tarea siguienteTarea;
+	pokemon*pokemonEntreOjos;
 } entrenador;
 
 //	Constructor

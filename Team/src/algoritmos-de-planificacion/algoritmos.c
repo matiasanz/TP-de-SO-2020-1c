@@ -143,6 +143,8 @@ numero estimacion_del_entrenador(entrenador*unEntrenador){
 
 entrenador*cola_entrenador_con_menor_estimacion(cola_entrenadores colaReady){
 
+	sem_wait(&colaReady->hayMas);
+
 	void*entrenador_con_menor_estimacion(void*unEntrenador, void*otro){
 		if(!unEntrenador){
 			return otro;

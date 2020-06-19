@@ -32,7 +32,7 @@ captura_pendiente* pendientes_get(capturas_pendientes mensajesPendientes, t_id i
 		return ((captura_pendiente*)unPendiente)->id == idRespuesta && !((captura_pendiente*)unPendiente)->respondido;
 	}
 
-	captura_pendiente*esePendiente = cr_list_get_by_condition(mensajesPendientes,  &cmp_pendiente_id);
+	captura_pendiente*esePendiente = cr_list_remove_by_condition(mensajesPendientes,  &cmp_pendiente_id);
 
 	if(esePendiente) esePendiente->respondido = true;
 

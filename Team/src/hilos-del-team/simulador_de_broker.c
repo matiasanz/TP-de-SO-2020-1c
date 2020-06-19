@@ -43,6 +43,8 @@ void broker_simulator(){
 				t_list*posiciones = list_create();
 				list_add(posiciones, posicion_ptr_create(2, 7));
 				list_add(posiciones, posicion_ptr_create(8, 1));
+				list_add(posiciones, posicion_ptr_create(3, 5));
+				list_add(posiciones, posicion_ptr_create(4, 9));
 
 				t_mensaje_localized_pokemon*mensaje = mensaje_localized_pokemon_crear("Pidgey", posiciones);
 				cr_list_add_and_signal(mensajesLOCALIZED, mensaje);

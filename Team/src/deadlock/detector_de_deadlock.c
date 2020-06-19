@@ -40,18 +40,15 @@ void loggear_resultado(bool resultado){
 
 ////*************************************** Procesar ************************************************//
 
-void candidato_despertar(candidato_intercambio*unCandidato){
-	entrenador_pasar_a(unCandidato->interesado, READY, "Ha sido seleccionado para intercambiar");
-	cr_list_add_and_signal(entrenadoresReady, unCandidato->interesado);
-	sem_post(&HayEntrenadoresDisponibles);
-	sem_post(&HayTareasPendientes);
+void candidato_despertar_para_intercambio(candidato_intercambio*unCandidato){
+	entrenador_despertar(unCandidato->interesado, "Ha sido seleccionado para intercambiar");
 }
 
 void algoritmo_procesar_deadlock(){
 
 	candidato_intercambio* unCandidato = list_get(potencialesDeadlock, 0);
 
-	candidato_despertar(unCandidato);
+	candidato_despertar_para_intercambio(unCandidato);
 
 	sem_wait(&finDeIntercambio);
 }

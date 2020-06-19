@@ -76,8 +76,8 @@ char* mensaje_caught_pokemon_to_string(t_mensaje_caught_pokemon* caught_pokemon)
 	string_append_mensaje_header(&string,caught_pokemon->mensaje_header,
 			CAUGHT_POKEMON_STRING);
 
-	string_append_with_format(&string, " atrapado: %d",
-			caught_pokemon->atrapado);
+	string_append_with_format(&string, " atrapado: %s",
+			(caught_pokemon->atrapado? "OK": "FAIL"));
 
 	string_append(&string, "\n");
 

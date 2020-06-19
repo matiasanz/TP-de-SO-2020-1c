@@ -10,7 +10,9 @@ void consumir_ciclo_cpu(){
 void entrenador_esperar_y_consumir_cpu(entrenador*unEntrenador){
 	sem_wait(&EjecutarEntrenador[unEntrenador->id]);
 	consumir_ciclo_cpu();
-}//	sem_signal(&ConsumioCpu); se deberia hacer fuera de la funcion, despues de la actividad que tenia que hacer
+}
+
+//	sem_signal(&ConsumioCpu); se debe hacer despues de la actividad
 
 void entrenador_consumir_N_cpu(entrenador*unEntrenador, numero cantidad){
 	int i;
@@ -31,8 +33,7 @@ bool entrenador_esta_ejecutando(entrenador*unEntrenador){
 }
 
 bool entrenador_termino_de_ejecutar(entrenador*unEntrenador){
-	bool termino = unEntrenador && !entrenador_esta_ejecutando(unEntrenador);
-	return termino;
+	return !entrenador_esta_ejecutando(unEntrenador);
 }
 
 void ejecutar_entrenador(entrenador* unEntrenador){
@@ -42,10 +43,10 @@ void ejecutar_entrenador(entrenador* unEntrenador){
 	for(tiempo=0; !entrenador_termino_de_ejecutar(unEntrenador); tiempo+=RETARDO_CICLO_CPU){
 
 		if(!entrenador_puede_seguir_ejecutando_segun_algoritmo(unEntrenador, tiempo)){
-			entrenador_pasar_a(unEntrenador, READY, "Ha sido desalojado por algoritmo de planificacion");
+
+			entrenador_pasar_a(unEntrenador, READY, "Ha sido desalojado por algoritmo de planificacion"); //abstraer a desalojar()
 			cr_list_add_and_signal(entrenadoresReady, unEntrenador);
-			sem_post(&HayTareasPendientes);
-			sem_post(&HayEntrenadoresDisponibles);
+
 			break;
 		}
 
@@ -75,7 +76,7 @@ void entrenador_ir_hacia(entrenador* unEntrenador, t_posicion posicionFinal){
 
 	bool llegoALaPosicion = entrenador_llego_a(unEntrenador, posicionFinal);
 
-	do{
+	while(!llegoALaPosicion){
 		puts("**********voy a dar un paso");
 
 		pthread_mutex_lock(&mutexPosicionEntrenador[unEntrenador->id]);
@@ -87,8 +88,7 @@ void entrenador_ir_hacia(entrenador* unEntrenador, t_posicion posicionFinal){
 
 		sem_post(&FinDeCiclo_CPU);
 		entrenador_esperar_y_consumir_cpu(unEntrenador);
-
-	}while (!llegoALaPosicion);
+	}
 }
 
 void desplazar_unidimensional(coordenada* posicionInicial, coordenada posicionFinal){
@@ -104,7 +104,7 @@ void entrenador_dar_un_paso_hacia(entrenador*unEntrenador, t_posicion posicionFi
 		desplazar_unidimensional(&posicionActual->pos_x, posicionFinal.pos_x);
 	}
 
-	else if(posicionActual->pos_y != posicionFinal.pos_y){
+	else{
 		desplazar_unidimensional(&posicionActual->pos_y, posicionFinal.pos_y);
 	}
 

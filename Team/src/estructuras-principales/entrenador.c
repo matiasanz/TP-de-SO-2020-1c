@@ -8,6 +8,7 @@
 entrenador entrenador_create(t_id id, matriz_recursos pokemonesEnInventario, matriz_recursos objetivos, t_posicion unaPos){
 	entrenador nuevo = (entrenador) {objetivos, pokemonesEnInventario, unaPos, NEW, id, CATCHEAR};
 	nuevo.siguienteTarea = CATCHEAR; //determinarSiguienteObjetivo(entrenador);
+	nuevo.pokemonEntreOjos = NULL;
 	return nuevo;
 }
 
