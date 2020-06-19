@@ -54,7 +54,7 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke);
 void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke);
 
 void gamecard_New_Pokemon_ReIntento(t_mensaje_new_pokemon* unMsjNewPoke);
-
+void gamecard_Catch_Pokemon_ReIntento(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke);
 
 int cant_elemetos_array(char** array);
 void split_liberar(char** split);

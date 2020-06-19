@@ -703,6 +703,114 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 
+	int pokemonAtrapado;//0 o 1
+
+	char* bin_metadata = string_new();
+
+	FILE* f_metadata;
+
+	t_config* config_metadata_pokemon;
+
+	string_append(&bin_metadata,paths_estructuras[FILES]);
+	string_append(&bin_metadata,unMsjCatchPoke->pokemon.especie);
+
+	string_append(&bin_metadata,"/Metadata.bin");
+
+	if((f_metadata=fopen(bin_metadata,"r"))==NULL){ //si no existe el archivo metadata
+
+		pokemonAtrapado=0;
+		log_error(logger,"No existe el Pokemon: %s",unMsjCatchPoke->pokemon.especie);
+
+	}else{
+		log_info(event_logger,"Si existe el Pokemon: %s",unMsjCatchPoke->pokemon.especie);
+
+		//como existe el archivo, debo usar fclose, en caso contrario, no.
+		fclose(f_metadata);
+
+		//este if es para cuando ya existe el pokemon en disco, pero no su mutex
+		if(!dictionary_has_key(semaforosDePokemons,unMsjCatchPoke->pokemon.especie)){
+
+			pthread_mutex_t* mutexMetadataPokemon=malloc(sizeof(pthread_mutex_t));
+			pthread_mutex_init(mutexMetadataPokemon, NULL);
+			dictionary_put(semaforosDePokemons,unMsjCatchPoke->pokemon.especie,mutexMetadataPokemon);
+
+		}
+
+
+		pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
+
+		config_metadata_pokemon=config_create(bin_metadata);
+		char* estadoArchivo=config_get_string_value(config_metadata_pokemon,"OPEN");
+
+		if(strcmp(estadoArchivo,"N")==0){
+			config_set_value(config_metadata_pokemon,"OPEN","Y");
+			config_save(config_metadata_pokemon);
+		}
+
+		pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
+
+
+		//------Ver si el archivo esta abierto------------
+		if(strcmp(estadoArchivo,"Y")==0){
+			//abro otro hilo con un sleep que volvera a atender al Mensaje
+
+			config_destroy(config_metadata_pokemon);
+			free(bin_metadata);
+
+			log_info(event_logger,"Esta operacion se reintentara luego: Catch_Pokemon ::%s ::pos (%i,%i)"
+									,unMsjCatchPoke->pokemon.especie
+									,unMsjCatchPoke->pokemon.posicion.pos_x
+									,unMsjCatchPoke->pokemon.posicion.pos_y);
+			pthread_t unHilo;
+			pthread_create(&unHilo, NULL,(void*) gamecard_Catch_Pokemon_ReIntento, unMsjCatchPoke);
+			pthread_detach(unHilo);
+
+
+			//y finalizo este hilo
+			pthread_cancel(pthread_self());
+			log_info(event_logger,"no se corto el hilo");
+
+		}
+
+		char** bloquesDelPokemon=config_get_array_value(config_metadata_pokemon,"BLOCKS");
+
+
+		//--------comenzar a operar el pokmeon-------
+
+		char* cadenaABuscar=string_new();
+		string_append(&cadenaABuscar,string_itoa(unMsjCatchPoke->pokemon.posicion.pos_x));
+		string_append(&cadenaABuscar,"-");
+		string_append(&cadenaABuscar,string_itoa(unMsjCatchPoke->pokemon.posicion.pos_y));
+
+		//todo
+
+		free(cadenaABuscar);
+
+	}
+
+
+	//---------creacion del paquete caught_pokemon y envio a Broker---------
+
+	t_mensaje_caught_pokemon* mensajeAEnviar=mensaje_caught_pokemon_crear(pokemonAtrapado);
+	mensaje_caught_pokemon_set_id_correlativo(mensajeAEnviar,mensaje_appeared_catch_pokemon_get_id(unMsjCatchPoke));
+
+	t_paquete_header header=paquete_header_crear(MENSAJE,GAMECARD,CAUGHT_POKEMON);
+	t_buffer* bufferDepaquete=mensaje_caught_pokemon_serializar(mensajeAEnviar);
+	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
+
+
+	t_conexion_server* unaConexion=conexion_server_crear(
+						config_get_string_value(config, "IP_BROKER"),
+						config_get_string_value(config, "PUERTO_BROKER"), GAMECARD);
+
+	if(enviar(unaConexion,paqueteAEnviar)==ERROR_SOCKET){
+		log_warning(logger,"NO se puede realizar la conexion con el BROKER");
+	}
+
+	//----------------
+	free(bin_metadata);
+
+
 }
 void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
 
@@ -711,6 +819,11 @@ void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
 void gamecard_New_Pokemon_ReIntento(t_mensaje_new_pokemon* unMsjNewPoke){
 	sleep(tiempo_de_reintento_operacion);
 	gamecard_New_Pokemon(unMsjNewPoke);
+}
+
+void gamecard_Catch_Pokemon_ReIntento(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
+	sleep(tiempo_de_reintento_operacion);
+	gamecard_Catch_Pokemon(unMsjCatchPoke);
 }
 
 
