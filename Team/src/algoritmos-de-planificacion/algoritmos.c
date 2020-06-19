@@ -4,6 +4,8 @@
 //Inicializar
 void cargar_algoritmo_planificacion(){
 
+	PROCESOS_SIN_FINALIZAR = cantidadDeEntrenadores;
+
 	RETARDO_CICLO_CPU = config_get_int_value(config, "RETARDO_CICLO_CPU");
 	char*algoritmoLeido = config_get_string_value(config,"ALGORITMO_PLANIFICACION");
 

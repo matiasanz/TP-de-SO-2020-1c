@@ -3,13 +3,14 @@
 
 void consumir_ciclo_cpu(){
 	sleep(RETARDO_CICLO_CPU);
-	//incrementar contador TODO
+	Estadisticas.ciclosCPU++;
 }
 
 //Usar en funciones que requieren cpu del entrenador. Ej ir a (Ver abajo de todo)
 void entrenador_esperar_y_consumir_cpu(entrenador*unEntrenador){
 	sem_wait(&EjecutarEntrenador[unEntrenador->id]);
 	consumir_ciclo_cpu();
+	Estadisticas.ciclosDelEntrenador[unEntrenador->id]++; //TODO
 }
 
 //	sem_signal(&ConsumioCpu); se debe hacer despues de la actividad
@@ -18,7 +19,6 @@ void entrenador_consumir_N_cpu(entrenador*unEntrenador, numero cantidad){
 	int i;
 	for(i=1; i<cantidad; i++){
 		entrenador_esperar_y_consumir_cpu(unEntrenador);
-		consumir_ciclo_cpu();
 		sem_post(&FinDeCiclo_CPU);
 	}
 

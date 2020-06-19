@@ -118,6 +118,10 @@ void finalizar_hilos_entrenadores(){
 
 /*************************************** Funciones Auxiliares ************************************************/
 
+bool cambio_de_contexto(t_estado inicial, t_estado final){
+	return inicial==EXECUTE || final==EXECUTE;
+}
+
 //Cambia de estado al entrenador y lo loggea
 void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const char*motivo){
 	pthread_mutex_lock(&mutexEstadoEntrenador[unEntrenador->id]);
@@ -128,6 +132,10 @@ void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const cha
 	pthread_mutex_lock(&Mutex_AndoLoggeando);
 	log_info(logger, "\n--------------- Cambio de Estado ---------------\n Proceso: Entrenador N°%u\n Estado Inicial: %s\n Estado Final: %s\n Motivo: %s\n", unEntrenador->id, estadoFromEnum(estadoActual),  estadoFromEnum(estadoFinal), motivo);
 	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+
+	if(cambio_de_contexto(estadoActual, estadoFinal)){
+		Estadisticas.cambiosDeContexto++;
+	}
 }
 
 //Incrementa sus recursos y lo contabiliza como inventario global

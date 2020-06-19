@@ -16,6 +16,7 @@ pthread_t hiloPlanificador;
 pthread_t hiloMensajesAppeard;
 pthread_t hiloMensajesCAUGHT;
 pthread_t hiloMensajesLOCALIZED;
+pthread_t hiloProcesadorDePokemones;
 
 //Semaforos
 
@@ -55,11 +56,10 @@ void team_suscriptor_cola_APPEARD(cr_list* mensajes);
 void team_procesador_cola_CAUGHT(cr_list* mensajes);
 void team_procesador_cola_LOCALIZED(cr_list*mensajes);
 
-//Hilo que se encarga de reaccionar a cada mensaje recibido
-void team_procesar_mensajes();
-
 //inicializar
 void inicializar_hilos_entrenadores();
+
+void team_procesar_pokemones();
 
 //finalizar
 void finalizar_hilos_entrenadores();

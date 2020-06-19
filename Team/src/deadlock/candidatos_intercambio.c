@@ -39,8 +39,6 @@ void candidato_actualizar_matrices_por_intercambio(candidato_intercambio* unCand
 
 void candidato_intercambiar_con(candidato_intercambio* self, candidato_intercambio* parejaDeIntercambio){
 
-//	entrenador_consumir_N_cpu(self->interesado, 5);
-
 	recurso teDoyEste = candidato_recurso_que_le_entrega_a(self, parejaDeIntercambio);
 	recurso aCambioDeEste = candidato_recurso_que_le_entrega_a(parejaDeIntercambio, self);
 

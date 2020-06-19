@@ -15,12 +15,17 @@ void team_ejecutar_algoritmo_de_deteccion_de_deadlock(){
 	bool hayDeadlock = algoritmo_detectar_deadlock();
 
 	while(hayDeadlock){
-		loggear_resultado(hayDeadlock);
+		Estadisticas.deadlocksProducidos++;
+
+		loggear_resultado_de_deteccion(hayDeadlock);
 		algoritmo_procesar_deadlock();
+
+		Estadisticas.deadlocksResueltos++;
+
 		hayDeadlock = algoritmo_detectar_deadlock();
 	}
 
-	loggear_resultado(hayDeadlock);
+	loggear_resultado_de_deteccion(hayDeadlock);
 }
 
 ///*************************************** Detectar Deadlock ************************************************/
@@ -32,7 +37,7 @@ bool algoritmo_detectar_deadlock(){
 	return !list_is_empty(potencialesDeadlock);
 }
 
-void loggear_resultado(bool resultado){
+void loggear_resultado_de_deteccion(bool resultado){
 	pthread_mutex_lock(&Mutex_AndoLoggeando);
 	log_info(logger, "Resultado de la deteccion: %s", ( resultado? "Positivo": "Negativo") );
 	pthread_mutex_unlock(&Mutex_AndoLoggeando);

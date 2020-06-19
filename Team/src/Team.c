@@ -11,8 +11,18 @@
 #include "hilos-del-team/hilos_team.h"
 //#include "tests/tests_team.o"
 
-void team_procesar_pokemones();
-pthread_t hiloProcesadorDePokemones;
+//funciones team_log_info para logs importantes TODO
+
+void team_loggear_resultados(){
+
+	char*resultados = estadisticas_to_string(Estadisticas);
+
+	pthread_mutex_lock(&Mutex_AndoLoggeando);
+	log_info(logger, "\n*************** Resultados del Team ****************\n\n%s", resultados);
+	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+
+	free(resultados);
+}
 
 int main(void) {
 
@@ -32,9 +42,10 @@ int main(void) {
 
 	team_ejecutar_algoritmo_de_deteccion_de_deadlock();
 
+
 	sem_wait(&FinDePlanificacion);
 
-	//team_mostrar_resultados();
+	team_loggear_resultados();
 
 	log_info(logger, "\n\n                              Fin del proceso Team\n"
 						      "****************************************************************************");
@@ -47,6 +58,9 @@ int main(void) {
 
 						/*Implementacion de funciones*/
 
+void inicializar_estadisticas(numero cantidadDeProcesos);
+void finalizar_estadisticas(numero cantidadDeProcesos);
+
 void team_inicializar(){
 
 	inicializar_logs_y_config();
@@ -54,10 +68,8 @@ void team_inicializar(){
 	inicializar_listas();
 
 	cantidadDeEntrenadores = list_size(equipo);
-	PROCESOS_SIN_FINALIZAR = cantidadDeEntrenadores;
 
-	//Abstraer
-//	Estadisticas = (estadisticas_team) {0,0,malloc(sizeof(numero)*cantidadDeEntrenadores), 0, 0};
+	inicializar_estadisticas(cantidadDeEntrenadores);
 
 	cargar_algoritmo_planificacion();
 
@@ -74,9 +86,9 @@ void team_inicializar(){
 	}
 }
 
-
 int team_exit(){
 
+	finalizar_estadisticas(cantidadDeEntrenadores);
 	finalizar_logs_y_config();
 	listas_destroy();
 	finalizar_hilos();
@@ -101,6 +113,53 @@ void finalizar_logs_y_config(){
 	log_destroy(event_logger);
 }
 
+//Estadisticas
+void inicializar_estadisticas(numero cantidadDeProcesos){
+
+	numero*ciclosPorEntrenador = malloc(sizeof(numero)*cantidadDeProcesos);
+
+	int i=0;
+	for(i=0; i<cantidadDeProcesos; i++){
+		ciclosPorEntrenador[i]=0;
+	}
+
+	Estadisticas = (estadisticas_team) {0,0,ciclosPorEntrenador, 0, 0};
+}
+
+void finalizar_estadisticas(numero cantidadDeProcesos){
+	int i=0;
+//	for(i=0; i<cantidadDeProcesos; i++){
+//		free(&Estadisticas.ciclosDelEntrenador[i]); //TODO rompe
+//	}
+}
+
+char*estadisticas_to_string(estadisticas_team resultados){
+	char* string = string_new();
+
+	char*ciclosDeCadaEntrenador = num_array_to_string(Estadisticas.ciclosDelEntrenador, cantidadDeEntrenadores);
+
+	string_append_with_format(&string, ">> Total de Cambios de Contexto ..... %u\n", resultados.cambiosDeContexto);
+	string_append_with_format(&string, ">> Ciclos de CPU por entrenador:\n%s", ciclosDeCadaEntrenador);
+	string_append_with_format(&string, ">> Total de Ciclos de CPU ........... %u\n", resultados.ciclosCPU);
+	string_append_with_format(&string, ">> Deadlocks producidos ............. %u\n", resultados.deadlocksProducidos);
+	string_append_with_format(&string, ">> Deadlocks resueltos .............. %u\n", resultados.deadlocksResueltos);
+
+	free(ciclosDeCadaEntrenador);
+
+	return string;
+}
+
+char*num_array_to_string(numero*arreglo, int length){
+	char* stringFromArray = string_new();
+
+	numero i;
+	for(i=0; i<cantidadDeEntrenadores; i++){
+		string_append_with_format(&stringFromArray,"  . Entrenador N°%u .................. %u\n", i, arreglo[i]);
+	}
+
+	return stringFromArray;
+}
+
 //Listas
 void inicializar_listas() {
 	equipo = entrenadores_cargar();
@@ -113,12 +172,8 @@ void inicializar_listas() {
 
 	//Ver si vale la pena abstraer las listas
 	historialDePokemones = list_create();
-
-	pthread_mutex_init(&mutexRepuestos, NULL);  //TODO mover
 	pokemonesDeRepuesto = list_create();
-
 	entrenadoresReady = cr_list_create();
-
 	registroDePedidos = list_create();
 
 	mensajesAPPEARED   = cr_list_create();
@@ -145,6 +200,8 @@ void listas_destroy(){
 
 	list_destroy(registroDePedidos);
 
+//	list_destroy_and_destroy_elements(pokemonesDeRepuesto, free); //TODO
+	cr_list_clean_and_destroy_elements(pokemonesRecibidos, (void*) pokemon_destroy);
 	cr_list_clean_and_destroy_elements(mensajesAPPEARED , (void*) mensaje_appeared_catch_pokemon_destruir);
 	cr_list_clean_and_destroy_elements(mensajesCAUGHT   , (void*) mensaje_caught_pokemon_destruir);
 	cr_list_clean_and_destroy_elements(mensajesLOCALIZED, (void*) mensaje_localized_pokemon_destruir);
@@ -181,11 +238,13 @@ void inicializar_semaforos(){
 	sem_init(&finDeIntercambio              , 0, 0);
 	sem_init(&FinDePlanificacion, 0, 0);
 
+
 	pthread_mutex_init(&Mutex_AndoLoggeando       , NULL);
 	pthread_mutex_init(&Mutex_AndoLoggeandoEventos, NULL);
 
 	pthread_mutex_init(&mutexEntrenadores         , NULL);
 	pthread_mutex_init(&mutexHistorialEspecies    , NULL);
+	pthread_mutex_init(&mutexRepuestos            , NULL);
 	pthread_mutex_init(&mutexInventariosGlobales  , NULL);
 
 	pthread_mutex_init(&mutexRecursosDisponibles, NULL);
