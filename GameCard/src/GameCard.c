@@ -719,6 +719,10 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 	if((f_metadata=fopen(bin_metadata,"r"))==NULL){ //si no existe el archivo metadata
 
 		pokemonAtrapado=0;
+
+		//retardo para simular acceso a disco
+		sleep(tiempo_retardo_operacion);
+
 		log_error(logger,"No existe el Pokemon: %s",unMsjCatchPoke->pokemon.especie);
 
 	}else{
@@ -741,17 +745,18 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 
 		config_metadata_pokemon=config_create(bin_metadata);
 		char* estadoArchivo=config_get_string_value(config_metadata_pokemon,"OPEN");
-
+		bool abierto=true;
 		if(strcmp(estadoArchivo,"N")==0){
 			config_set_value(config_metadata_pokemon,"OPEN","Y");
 			config_save(config_metadata_pokemon);
+			abierto=false;
 		}
 
 		pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
 
 
 		//------Ver si el archivo esta abierto------------
-		if(strcmp(estadoArchivo,"Y")==0){
+		if(abierto){
 			//abro otro hilo con un sleep que volvera a atender al Mensaje
 
 			config_destroy(config_metadata_pokemon);
@@ -775,16 +780,163 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 		char** bloquesDelPokemon=config_get_array_value(config_metadata_pokemon,"BLOCKS");
 
 
-		//--------comenzar a operar el pokmeon-------
+		//--------comenzar a operar el pokemon-------
 
 		char* cadenaABuscar=string_new();
 		string_append(&cadenaABuscar,string_itoa(unMsjCatchPoke->pokemon.posicion.pos_x));
 		string_append(&cadenaABuscar,"-");
 		string_append(&cadenaABuscar,string_itoa(unMsjCatchPoke->pokemon.posicion.pos_y));
 
-		//todo
+		if(contienePosicionEnBloques(cadenaABuscar,bloquesDelPokemon)){
+			//rama el pokemon posee la posicion recibida
+
+			char* listaBloques=string_new();
+			int size;
+
+			//modificacion de cantidad de pokemon en posicion existente
+
+			char* contenidoBloques=contenido_de_Bloques_con_mmap(bloquesDelPokemon);
+
+			char** lineasDelPokemon=string_split(contenidoBloques,"\n");
+
+			//adapto el string de posicion, para facilitarme la busqueda con el "="
+			char* stringPosAdaptado=string_new();
+			string_append(&stringPosAdaptado,cadenaABuscar);
+			string_append(&stringPosAdaptado,"=");
+
+			char* contenidoActualizadoDeBloques=string_new();
+
+			for(int i=0;lineasDelPokemon[i]!=NULL;i++){
+				//este if es para verificar que no este algo distinto al formato "x-y=cant"
+				if(string_contains(lineasDelPokemon[i],"-") && string_contains(lineasDelPokemon[i],"=")){
+				//aqui veo si es, el que hay que modificar
+				if(string_starts_with(lineasDelPokemon[i],stringPosAdaptado)){
+
+					char** posYCant=string_split(lineasDelPokemon[i],"=");
+
+					int cantActual=atoi(posYCant[1]);
+
+					//hago la resta, porque atrapo al pokemon, hay 1 menos en esa posicion
+					int cantidadFinal=cantActual - 1;
+					if(cantidadFinal>0){
+					string_append(&contenidoActualizadoDeBloques,posYCant[0]);
+					string_append(&contenidoActualizadoDeBloques,"=");
+					string_append(&contenidoActualizadoDeBloques,string_itoa(cantidadFinal));
+					string_append(&contenidoActualizadoDeBloques,"\n");
+					}
+
+					split_liberar(posYCant);
+
+				}else{
+
+				string_append(&contenidoActualizadoDeBloques,lineasDelPokemon[i]);
+				string_append(&contenidoActualizadoDeBloques,"\n");
+
+				}
+				}
+				free(lineasDelPokemon[i]);
+			}
+
+			free(stringPosAdaptado);
+			free(lineasDelPokemon);
+			free(contenidoBloques);
+
+
+			//---------comienzo a guardar los datos actualizados--------
+
+			int cantBloquesNecesarios=bloquesNecesarios(contenidoActualizadoDeBloques,config_get_int_value(config_metadata,"BLOCK_SIZE"));
+
+
+			if(cantBloquesNecesarios<cant_elemetos_array(bloquesDelPokemon)){
+
+				//todo
+			}else{
+
+				//con los bloques asignados que tiene el pokemon bastan
+
+				for(int y=0;y<cantBloquesNecesarios;y++){
+
+					char* bin_block = string_new();
+					string_append(&bin_block,paths_estructuras[BLOCKS]);
+					string_append(&bin_block,bloquesDelPokemon[y]);
+					string_append(&bin_block,".bin");
+
+
+					if(cantBloquesNecesarios==(y+1)){
+						//esto seria el ultimo bloque necesario
+
+						char* ultimoAguardar=string_new();
+
+						//primer Alternativa
+						string_append(&ultimoAguardar,string_substring_from(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE")));
+						int longitud=string_length(ultimoAguardar);
+
+						//segunda alternativa
+						//int longitud=string_length(contenidoActualizadoDeBloques)-(y*config_get_int_value(config_metadata,"BLOCK_SIZE"));
+						//string_append(&ultimoAguardar,string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),longitud));
+
+						sobrescribirLineas(bin_block,ultimoAguardar,longitud);
+						free(ultimoAguardar);
+					}else{
+
+						char* cadenaAguardar=string_new();
+						string_append(&cadenaAguardar,string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE")));
+						int longitud=string_length(cadenaAguardar);
+						sobrescribirLineas(bin_block,cadenaAguardar,longitud);
+
+						free(cadenaAguardar);
+					}
+
+					free(bin_block);
+				}
+
+				size=string_length(contenidoActualizadoDeBloques);
+				string_append(&listaBloques,config_get_string_value(config_metadata_pokemon,"BLOCKS"));
+
+
+			}
+
+			free(contenidoActualizadoDeBloques);
+
+			//retardo para simular acceso a disco
+			sleep(tiempo_retardo_operacion);
+
+			pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
+
+			config_set_value(config_metadata_pokemon,"BLOCKS",listaBloques);
+			config_set_value(config_metadata_pokemon,"SIZE",string_itoa(size));
+			config_set_value(config_metadata_pokemon,"OPEN","N");
+			config_save(config_metadata_pokemon);
+
+			pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
+
+			free(listaBloques);
+
+			log_info(event_logger,"La posicion ya existe");
+
+
+
+		}else{
+			//rama en donde la posicion recibida no se encuentra el pokemon
+			pokemonAtrapado=0;
+
+			//retardo para simular acceso a disco
+			sleep(tiempo_retardo_operacion);
+
+			pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
+
+			config_set_value(config_metadata_pokemon,"OPEN","N");
+			config_save(config_metadata_pokemon);
+
+			pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
+
+			log_error(logger,"No se encuentra la posicion: (%i,%i), para el Pokemon: %s",unMsjCatchPoke->pokemon.posicion.pos_x,unMsjCatchPoke->pokemon.posicion.pos_y,unMsjCatchPoke->pokemon.especie);
+
+		}
 
 		free(cadenaABuscar);
+		split_liberar(bloquesDelPokemon);
+		config_destroy(config_metadata_pokemon);
 
 	}
 
@@ -808,7 +960,9 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 	}
 
 	//----------------
+
 	free(bin_metadata);
+
 
 
 }
