@@ -18,6 +18,9 @@ pokemon* pokemon_ptr_create(especie_pokemon, t_posicion);
 //Destructor
 void pokemon_destroy(pokemon*);
 
+//Destruye el pokemon y la especie
+void pokemon_destroy_hard(pokemon*);
+
 //  Captura un pokemon - ver donde lo puedo poner; problema de ponerlo en entrenador: entrenador no reconoce pokemon y poke incluye entrenador
 	void entrenador_capturar(entrenador*entrenador, pokemon*victima);
 

@@ -36,6 +36,8 @@ void team_procesar_pokemones(){
 				log_info(event_logger, "Se recibio un %s y se descarto al no ser requerido\n", unPokemon->especie);
 				pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 
+				free(unPokemon->especie);
+
 				pokemon_destroy(unPokemon);
 			}
 

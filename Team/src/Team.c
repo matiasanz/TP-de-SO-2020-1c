@@ -13,17 +13,6 @@
 
 //funciones team_log_info para logs importantes TODO
 
-void team_loggear_resultados(){
-
-	char*resultados = estadisticas_to_string(Estadisticas);
-
-	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	log_info(logger, "\n*************** Resultados del Team ****************\n\n%s", resultados);
-	pthread_mutex_unlock(&Mutex_AndoLoggeando);
-
-	free(resultados);
-}
-
 int main(void) {
 
 	team_inicializar();
@@ -31,7 +20,7 @@ int main(void) {
 	Get_pokemones(objetivosGlobales, inventariosGlobales);
 
 	//Para pruebas sin los otros modulos//
-//	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) broker_simulator, NULL); //Para pruebas sin broker
+//	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) broker_simulator, NULL);
 
 	inicializar_hilos();
 
@@ -101,6 +90,17 @@ void inicializar_logs_y_config(){
 	event_logger = log_create("log/team_event.log", "TEAM_EVENT", true, LOG_LEVEL_INFO);
 }
 
+void team_loggear_resultados(){
+
+	char*resultados = estadisticas_to_string(Estadisticas);
+
+	pthread_mutex_lock(&Mutex_AndoLoggeando);
+	log_info(logger, "\n*************** Resultados del Team ****************\n\n%s", resultados);
+	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+
+	free(resultados);
+}
+
 void finalizar_logs_y_config(){
 	config_destroy(config);
 	log_destroy(logger);
@@ -167,7 +167,6 @@ void inicializar_listas() {
 	entrenadoresReady = cr_list_create();
 	registroDePedidos = list_create();
 
-	mensajesAPPEARED   = cr_list_create();
 	mensajesCAUGHT    = cr_list_create();
 	mensajesLOCALIZED = cr_list_create();
 
@@ -189,22 +188,20 @@ void listas_destroy(){
 	list_clean_and_destroy_elements(historialDePokemones, free);
 	pthread_mutex_unlock(&mutexHistorialEspecies);
 
-	//TODO posible condicion de carrera
-	list_destroy_and_destroy_elements(registroDePedidos, free);
+	pthread_mutex_lock(&mutexPedidos);
+	list_clean_and_destroy_elements(registroDePedidos, free);
+	pthread_mutex_unlock(&mutexPedidos);
 
-	//TODO ni idea
-//	list_destroy_and_destroy_elements(pokemonesDeRepuesto, free); //TODO
+	list_destroy_and_destroy_elements(pokemonesDeRepuesto, (void*) pokemon_destroy_hard);
 	cr_list_clean_and_destroy_elements(pokemonesRecibidos, (void*) pokemon_destroy);
-	cr_list_clean_and_destroy_elements(mensajesAPPEARED , (void*) mensaje_appeared_catch_pokemon_destruir);
-	cr_list_clean_and_destroy_elements(mensajesCAUGHT   , (void*) mensaje_caught_pokemon_destruir);
-	cr_list_clean_and_destroy_elements(mensajesLOCALIZED, (void*) mensaje_localized_pokemon_destruir);
+	cr_list_clean_and_destroy_elements(mensajesCAUGHT    , (void*) mensaje_caught_pokemon_destruir);
+	cr_list_clean_and_destroy_elements(mensajesLOCALIZED , (void*) mensaje_localized_pokemon_destruir);
 }
 
 //Hilos
 void inicializar_hilos(){
 	inicializar_hilos_entrenadores();
 
-	pthread_create(&hiloMensajesAppeard  , NULL, (void*)team_suscriptor_cola_APPEARD  , mensajesAPPEARED);
 	pthread_create(&hiloMensajesCAUGHT   , NULL, (void*)team_procesador_cola_CAUGHT   , mensajesCAUGHT);
 	pthread_create(&hiloMensajesLOCALIZED, NULL, (void*)team_procesador_cola_LOCALIZED, mensajesLOCALIZED);
 
@@ -225,12 +222,12 @@ void finalizar_hilos(){
 //Semaforos
 
 void inicializar_semaforos(){
-	sem_init(&HayTareasPendientes           , 0, 0);
-	sem_init(&HayEntrenadoresDisponibles    , 0, 0);
-	sem_init(&EquipoNoPuedaCazarMas         , 0, 0);
-	sem_init(&FinDeCiclo_CPU, 0, 0);
-	sem_init(&finDeIntercambio              , 0, 0);
-	sem_init(&FinDePlanificacion, 0, 0);
+	sem_init(&HayTareasPendientes       , 0, 0);
+	sem_init(&HayEntrenadoresDisponibles, 0, 0);
+	sem_init(&EquipoNoPuedaCazarMas     , 0, 0);
+	sem_init(&FinDeCiclo_CPU            , 0, 0);
+	sem_init(&finDeIntercambio          , 0, 0);
+	sem_init(&FinDePlanificacion        , 0, 0);
 
 
 	pthread_mutex_init(&Mutex_AndoLoggeando       , NULL);
@@ -241,7 +238,8 @@ void inicializar_semaforos(){
 	pthread_mutex_init(&mutexRepuestos            , NULL);
 	pthread_mutex_init(&mutexInventariosGlobales  , NULL);
 
-	pthread_mutex_init(&mutexRecursosDisponibles, NULL);
+	pthread_mutex_init(&mutexRecursosDisponibles  , NULL);
+	pthread_mutex_init(&mutexPedidos              , NULL);
 }
 
 void finalizar_semaforos(){

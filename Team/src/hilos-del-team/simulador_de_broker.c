@@ -9,10 +9,10 @@
 void broker_simulator(){
 	puts("Simulacro de recepcion de mensajes");
 
-	finDeProceso = false;
+	FIN_PSEUDOBROKER = false;
 
 	int i;
-	pthread_mutex_init(&MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR, NULL);
+	pthread_mutex_init(&mutex_PSEUDOBROKER, NULL);
 
 	for(i=0; PROCESO_ACTIVO; i= (i+1)%6){
 
@@ -23,19 +23,20 @@ void broker_simulator(){
 				list_add(posiciones, posicion_ptr_create(1, 4));
 
 				t_mensaje_localized_pokemon*mensaje = mensaje_localized_pokemon_crear("Pikachu", posiciones);
-				cr_list_add_and_signal(mensajesLOCALIZED, mensaje);
+				localized_pokemon_recibido(mensaje);
 				break;
 			}
 
 			case 1: {
 				t_mensaje_appeared_catch_pokemon*mensaje = mensaje_appeared_catch_pokemon_crear("Charmander", 2, 9);
-				cr_list_add_and_signal(mensajesAPPEARED, mensaje);
+				appeared_pokemon_recibido(mensaje);
+
 				break;
 			}
 
 			case 2: {
 				t_mensaje_appeared_catch_pokemon*mensaje = mensaje_appeared_catch_pokemon_crear("Pikachu", 7, 4);
-				cr_list_add_and_signal(mensajesAPPEARED, mensaje);
+				appeared_pokemon_recibido(mensaje);
 				break;
 			}
 
@@ -50,20 +51,20 @@ void broker_simulator(){
 
 				mensaje_localized_pokemon_set_id(mensaje, 1);
 
-				cr_list_add_and_signal(mensajesLOCALIZED, mensaje);
+				localized_pokemon_recibido(mensaje);
 				break;
 
 			}
 
 			case 4:{
 				t_mensaje_appeared_catch_pokemon*mensaje = mensaje_appeared_catch_pokemon_crear("Bulbasaur", 3, 1);
-				cr_list_add_and_signal(mensajesAPPEARED, mensaje);
+				appeared_pokemon_recibido(mensaje);
 				break;
 			}
 
 			case 5:{
 				t_mensaje_appeared_catch_pokemon*mensaje = mensaje_appeared_catch_pokemon_crear("Squirtle", 3, 1);
-				cr_list_add_and_signal(mensajesAPPEARED, mensaje);
+				appeared_pokemon_recibido(mensaje);
 				break;
 			}
 
@@ -72,16 +73,15 @@ void broker_simulator(){
 				list_add(posiciones, posicion_ptr_create(3, 3));
 
 				t_mensaje_localized_pokemon*mensaje = mensaje_localized_pokemon_crear("Fruta", posiciones);
-				cr_list_add_and_signal(mensajesLOCALIZED, mensaje);
-
 				mensaje_localized_pokemon_set_id(mensaje, 1);
+				localized_pokemon_recibido(mensaje);
 
 				break;
 			}
 
 			default:{
 				t_mensaje_appeared_catch_pokemon*mensaje = mensaje_appeared_catch_pokemon_crear("Zapato", 2500, 3);
-				cr_list_add_and_signal(mensajesAPPEARED, mensaje);
+				appeared_pokemon_recibido(mensaje);
 				break;
 			}
 		}
@@ -89,13 +89,14 @@ void broker_simulator(){
 
 		sleep(1);
 
-		pthread_mutex_lock(&MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR);
-		if(finDeProceso){
-			pthread_mutex_unlock(&MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR);
+		pthread_mutex_lock(&mutex_PSEUDOBROKER);
+		if(FIN_PSEUDOBROKER){
+			pthread_mutex_unlock(&mutex_PSEUDOBROKER);
 			break;
 		} else{
-			pthread_mutex_unlock(&MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR);
+			pthread_mutex_unlock(&mutex_PSEUDOBROKER);
 		}
 	}
 }
+
 

@@ -11,15 +11,12 @@ void cargar_algoritmo_planificacion(){
 
 	if(string_equals_ignore_case(algoritmoLeido, "FIFO")){
 		inicializar_fifo();
-		actualizar_datos_del_entrenador = no_operation;
 	}
 
 	else if(string_equals_ignore_case(algoritmoLeido, "RR")){
 		numero QUANTUM = config_get_int_value(config, "QUANTUM");
-		validar_quantum(QUANTUM);
 
 		inicializar_rr(QUANTUM);
-		actualizar_datos_del_entrenador = no_operation;
 	}
 
 	else{
@@ -57,6 +54,7 @@ void inicializar_fifo(){
 	ALGORITMO_PLANIFICACION = FIFO;
 	proximo_a_ejecutar_segun_criterio = proximo_segun_fifo;
 	entrenador_puede_seguir_ejecutando_segun_algoritmo = puede_seguir_sin_desalojo;
+	actualizar_datos_del_entrenador = no_operation;
 }
 
 //Proximo a planificar
@@ -78,6 +76,7 @@ void inicializar_rr(numero QUANTUM){
 	DATOS_ALGORITMO.QUANTUM=config_get_int_value(config,"QUANTUM");
 	proximo_a_ejecutar_segun_criterio = proximo_segun_rr;
 	entrenador_puede_seguir_ejecutando_segun_algoritmo = puede_seguir_en_RR;
+	actualizar_datos_del_entrenador = no_operation;
 }
 
 entrenador*proximo_segun_rr(cola_entrenadores colaReady){
@@ -86,16 +85,7 @@ entrenador*proximo_segun_rr(cola_entrenadores colaReady){
 
 //Desalojo
 bool puede_seguir_en_RR(entrenador*unEntrenador, numero tiempo){
-	return tiempo<=DATOS_ALGORITMO.QUANTUM || cr_list_is_empty(entrenadoresReady);
-}
-
-void validar_quantum(numero QUANTUM){
-	if(QUANTUM < RETARDO_CICLO_CPU){
-		pthread_mutex_lock(&Mutex_AndoLoggeando);
-		log_error(logger, "Se ha leido un Quantum menor al tiempo de cada ciclo de CPU");
-		pthread_mutex_unlock(&Mutex_AndoLoggeando);
-		exit(1);
-	}
+	return (tiempo/RETARDO_CICLO_CPU) <=DATOS_ALGORITMO.QUANTUM || cr_list_is_empty(entrenadoresReady);
 }
 
 //************************************************************************************

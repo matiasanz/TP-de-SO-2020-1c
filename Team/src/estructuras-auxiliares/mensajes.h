@@ -8,18 +8,7 @@
 #include <crenito-commons/mensajes/mensaje_caught_pokemon.h>
 #include <crenito-commons/mensajes/mensaje_appeared_catch_pokemon.h>
 
-//Prueba
-entrenador*entrenador_de_prueba();
-
-typedef struct{
-	t_id idCaptura;
-	bool tuvoExito;
-}resultado_captura;
-
-//funciones de desempaquetado
-pokemon*desempaquetar_pokemon(t_mensaje_appeared_catch_pokemon*empaquetado);
-//Realizan copia del contenido que me sirve del mensaje antes de destruirse
-//resultado desempaquetar_resultado(t_mensaje_caught_pokemon*empaquetado);
+typedef t_mensaje_appeared_catch_pokemon t_mensaje_appeared_pokemon;
 
 //mensajes entre modulos
 void* leer_mensaje_cuando_este_disponible(cr_list*);

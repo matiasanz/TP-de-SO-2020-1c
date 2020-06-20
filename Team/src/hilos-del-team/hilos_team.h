@@ -4,6 +4,7 @@
 #include <semaphore.h>
 #include <commons/collections/list.h>
 
+#include "../estructuras-auxiliares/mensajes.h"
 #include "../estructuras-auxiliares/captura_pendiente.h"
 
 #define PROCESO_ACTIVO 1
@@ -33,13 +34,14 @@ pthread_mutex_t*mutexEstadoEntrenador;
 pthread_mutex_t*mutexPosicionEntrenador;
 pthread_mutex_t mutexInventariosGlobales;
 pthread_mutex_t mutexRecursosDisponibles;
+pthread_mutex_t mutexPedidos;
 
 //Variables globales
 numero cantidadDeEntrenadores;
 
 //HARDCODEOS ---------------------------------- ACORDARME DE BORRARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
-pthread_mutex_t MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR;
-bool finDeProceso;
+pthread_mutex_t mutex_PSEUDOBROKER;
+bool FIN_PSEUDOBROKER;
 
 /*----------------*/
 
@@ -51,7 +53,6 @@ void team_planificar();
 
 //Hilo que se encarga de recibir los mensajes
 void broker_simulator();
-void team_suscriptor_cola_APPEARD(cr_list* mensajes);
 void team_procesador_cola_CAUGHT(cr_list* mensajes);
 void team_procesador_cola_LOCALIZED(cr_list*mensajes);
 void team_procesar_pokemones();
@@ -85,7 +86,16 @@ void objetivos_actualizar_por_captura_de(especie_pokemon);
 void validar_captura(captura_pendiente*);
 
 //Otras
+pokemon*leer_pokemon(t_mensaje_appeared_pokemon*);
+bool mensaje_appeared_responde_a_mi_pedido(t_mensaje_appeared_pokemon*);
+
+
+bool mensaje_localized_me_sirve(t_mensaje_localized_pokemon* mensaje);
+bool mensaje_localized_es_para_mi(t_mensaje_localized_pokemon* unMensaje);
+bool id_responde_a_mi_pedido(t_id idCorrelativo);
+
 void posiciones_ordenar_por_cercania_al_equipo(posiciones);
 numero posicion_distancia_a_equipo(t_posicion*);
 numero posicion_distancia_a_entrenadores(t_posicion*, entrenadores);
+
 

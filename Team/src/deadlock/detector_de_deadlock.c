@@ -3,9 +3,9 @@
 
 void finalizar_suscripcion_a_colas(){ //TODO ver si vale la pena aplicar a los hilos reales
 	//******************************************************************** INICIO HARDCODEADO
-	pthread_mutex_lock(&MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR);
-	finDeProceso = true;
-	pthread_mutex_unlock(&MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR);
+	pthread_mutex_lock(&mutex_PSEUDOBROKER);
+	FIN_PSEUDOBROKER = true;
+	pthread_mutex_unlock(&mutex_PSEUDOBROKER);
 	//******************************************************************** fin HARDCODEADO
 }
 
