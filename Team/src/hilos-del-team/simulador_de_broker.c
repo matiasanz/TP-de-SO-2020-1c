@@ -47,6 +47,9 @@ void broker_simulator(){
 				list_add(posiciones, posicion_ptr_create(4, 9));
 
 				t_mensaje_localized_pokemon*mensaje = mensaje_localized_pokemon_crear("Pidgey", posiciones);
+
+				mensaje_localized_pokemon_set_id(mensaje, 1);
+
 				cr_list_add_and_signal(mensajesLOCALIZED, mensaje);
 				break;
 
@@ -70,6 +73,9 @@ void broker_simulator(){
 
 				t_mensaje_localized_pokemon*mensaje = mensaje_localized_pokemon_crear("Fruta", posiciones);
 				cr_list_add_and_signal(mensajesLOCALIZED, mensaje);
+
+				mensaje_localized_pokemon_set_id(mensaje, 1);
+
 				break;
 			}
 

@@ -8,7 +8,6 @@
 
 #define PROCESO_ACTIVO 1
 
-
 //Hilos
 pthread_t* hilosEntrenadores;
 pthread_t hiloReceptorDeMensajes;
@@ -36,7 +35,7 @@ pthread_mutex_t mutexInventariosGlobales;
 pthread_mutex_t mutexRecursosDisponibles;
 
 //Variables globales
-numero cantidadDeEntrenadores; //Me guarda el tamaño del array para cuando tenga que finalizar
+numero cantidadDeEntrenadores;
 
 //HARDCODEOS ---------------------------------- ACORDARME DE BORRARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
 pthread_mutex_t MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR;
@@ -55,31 +54,38 @@ void broker_simulator();
 void team_suscriptor_cola_APPEARD(cr_list* mensajes);
 void team_procesador_cola_CAUGHT(cr_list* mensajes);
 void team_procesador_cola_LOCALIZED(cr_list*mensajes);
+void team_procesar_pokemones();
 
 //inicializar
 void inicializar_hilos_entrenadores();
 
-void team_procesar_pokemones();
-
 //finalizar
 void finalizar_hilos_entrenadores();
 
-//Planificador
+//Entrenadores
 void entrenador_despertar(entrenador*unEntrenador, char* motivo);
-bool entrenador_dormido_hasta_APPEARED(entrenador*);
 void entrenadores_despertar_por_llegada_de(entrenadores, pokemon*);
+void entrenador_dormir_hasta_llegada_de_pokemon(entrenador*);
+bool entrenador_dormido_hasta_llegada_de_pokemon(entrenador*unEntrenador);
+bool entrenador_verificar_objetivos(entrenador*unEntrenador);
+void entrenador_dar_un_paso_hacia(entrenador*unEntrenador, t_posicion posicionFinal);
+void desplazar_unidimensional(coordenada* posicionInicial, coordenada posicionFinal);
 
-//auxiliares
+//Pokemones
 void registrar_pokemon(pokemon*);
 void registrar_en_cada_posicion(especie_pokemon, posiciones);
 bool pokemon_es_requerido(pokemon unPokemon);
 bool pokemon_en_tramite(pokemon*unPokemon);
 pokemon* pokemones_esperar_y_leer();
-void validar_captura(captura_pendiente*);
+
+//Objetivos
 numero objetivos_cantidad_bruta_requerida_de(especie_pokemon);
 numero objetivos_cantidad_requerida_de(especie_pokemon unaEspecie);
 void objetivos_actualizar_por_captura_de(especie_pokemon);
+void validar_captura(captura_pendiente*);
+
+//Otras
 void posiciones_ordenar_por_cercania_al_equipo(posiciones);
 numero posicion_distancia_a_equipo(t_posicion*);
 numero posicion_distancia_a_entrenadores(t_posicion*, entrenadores);
-void entrenador_dormir_hasta_llegada_de_pokemon(entrenador*);
+

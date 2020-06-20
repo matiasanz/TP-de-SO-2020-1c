@@ -20,8 +20,8 @@ matriz_recursos recursos_from_string(char*cadena){
 
     string_iterate_lines(tokens, _a_la_matriz);
 
-    string_iterate_lines(tokens, (void*)free); //TODO ver antes rompia
-//    free(tokens);
+    string_iterate_lines(tokens, (void*)free);
+    free(tokens);
 
     return recursosLeidos;
 }

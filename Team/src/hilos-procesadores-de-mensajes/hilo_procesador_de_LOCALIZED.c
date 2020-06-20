@@ -3,19 +3,19 @@
 #include <crenito-commons/mensajes/mensaje_localized_pokemon.h>
 #include "../estructuras-auxiliares/mensajes.h"
 
-//bool mensaje_localized_es_para_mi(t_mensaje_localized_pokemon* unMensaje){ TODO
-//	t_id idCorrelativo = mensaje_localized_pokemon_get_id_correlativo(unMensaje);
-//
-//	bool cmp(void*unId, void*otroId){
-//		return *((numero*)unId) == *((numero*)otroId);
-//	}
-//
-//	t_id* idGet = list_remove_by_comparation(registroDePedidos, &idCorrelativo, &cmp);
-//
-//	if(idGet) free(idGet);
-//
-//	return idGet;
-//}
+bool mensaje_localized_es_para_mi(t_mensaje_localized_pokemon* unMensaje){ //TODO
+	t_id idCorrelativo = mensaje_localized_pokemon_get_id_correlativo(unMensaje);
+
+	bool cmp(void*unId, void*otroId){
+		return *((numero*)unId) == *((numero*)otroId);
+	}
+
+	t_id* idGet = list_remove_by_comparation(registroDePedidos, &idCorrelativo, &cmp);
+
+	if(idGet) free(idGet);
+
+	return idGet;
+}
 
 bool mensaje_localized_me_sirve(t_mensaje_localized_pokemon* mensaje){
 	return /*mensaje_localized_es_para_mi(pokemonLocalizado) &&*/ !especie_recibida_con_anterioridad(mensaje->especie, historialDePokemones);

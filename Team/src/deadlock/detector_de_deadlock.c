@@ -1,16 +1,19 @@
 #include "detector_de_deadlock.h"
-
 #include "../team.h"
+
+void finalizar_suscripcion_a_colas(){ //TODO ver si vale la pena aplicar a los hilos reales
+	//******************************************************************** INICIO HARDCODEADO
+	pthread_mutex_lock(&MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR);
+	finDeProceso = true;
+	pthread_mutex_unlock(&MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR);
+	//******************************************************************** fin HARDCODEADO
+}
 
 void team_ejecutar_algoritmo_de_deteccion_de_deadlock(){
 
 	esperar_que_equipo_no_pueda_cazar_mas();
 
-//******************************************************************** INICIO HARDCODEADO
-	pthread_mutex_lock(&MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR);
-	finDeProceso = true;
-	pthread_mutex_unlock(&MUTEX_FIN_DE_PROCESO_Para_que_pseudo_broker_deje_de_mandarme_mensajes_BORRAR);
-//******************************************************************** fin HARDCODEADO
+	finalizar_suscripcion_a_colas();
 
 	bool hayDeadlock = algoritmo_detectar_deadlock();
 

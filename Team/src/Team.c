@@ -28,17 +28,12 @@ int main(void) {
 
 	team_inicializar();
 
-//	Get_pokemones(objetivosGlobales, inventariosGlobales);
-
-	log_info(logger, "\n\n*************************************************************************\n"
-							   "                      Inicio del proceso Team\n\n");
+	Get_pokemones(objetivosGlobales, inventariosGlobales);
 
 	//Para pruebas sin los otros modulos//
-	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) broker_simulator, NULL); //Para pruebas sin broker
+//	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) broker_simulator, NULL); //Para pruebas sin broker
 
 	inicializar_hilos();
-
-	pthread_create(&hiloProcesadorDePokemones, NULL, (void*) team_procesar_pokemones, NULL);
 
 	team_ejecutar_algoritmo_de_deteccion_de_deadlock();
 
@@ -50,16 +45,12 @@ int main(void) {
 	log_info(logger, "\n\n                              Fin del proceso Team\n"
 						      "****************************************************************************");
 
-
 	return team_exit();
 }
 																/*Fin del main*/
 //**********************************************************************************
 
 						/*Implementacion de funciones*/
-
-void inicializar_estadisticas(numero cantidadDeProcesos);
-void finalizar_estadisticas(numero cantidadDeProcesos);
 
 void team_inicializar(){
 
@@ -75,7 +66,10 @@ void team_inicializar(){
 
  	inicializar_semaforos();
 
-//	inicializar_conexiones();
+	log_info(logger, "\n\n*************************************************************************\n"
+         		     "                        Inicio del proceso Team\n\n");
+
+	inicializar_conexiones();
 
 //	inicializar_hilos();
 
@@ -88,7 +82,7 @@ void team_inicializar(){
 
 int team_exit(){
 
-	finalizar_estadisticas(cantidadDeEntrenadores);
+	finalizar_estadisticas();
 	finalizar_logs_y_config();
 	listas_destroy();
 	finalizar_hilos();
@@ -126,11 +120,8 @@ void inicializar_estadisticas(numero cantidadDeProcesos){
 	Estadisticas = (estadisticas_team) {0,0,ciclosPorEntrenador, 0, 0};
 }
 
-void finalizar_estadisticas(numero cantidadDeProcesos){
-	int i=0;
-//	for(i=0; i<cantidadDeProcesos; i++){
-//		free(&Estadisticas.ciclosDelEntrenador[i]); //TODO rompe
-//	}
+void finalizar_estadisticas(){
+	free(Estadisticas.ciclosDelEntrenador);
 }
 
 char*estadisticas_to_string(estadisticas_team resultados){
@@ -198,8 +189,10 @@ void listas_destroy(){
 	list_clean_and_destroy_elements(historialDePokemones, free);
 	pthread_mutex_unlock(&mutexHistorialEspecies);
 
-	list_destroy(registroDePedidos);
+	//TODO posible condicion de carrera
+	list_destroy_and_destroy_elements(registroDePedidos, free);
 
+	//TODO ni idea
 //	list_destroy_and_destroy_elements(pokemonesDeRepuesto, free); //TODO
 	cr_list_clean_and_destroy_elements(pokemonesRecibidos, (void*) pokemon_destroy);
 	cr_list_clean_and_destroy_elements(mensajesAPPEARED , (void*) mensaje_appeared_catch_pokemon_destruir);
@@ -217,6 +210,7 @@ void inicializar_hilos(){
 
 	pthread_create(&hiloPlanificador, NULL, (void*) team_planificar, NULL);
 
+	pthread_create(&hiloProcesadorDePokemones, NULL, (void*) team_procesar_pokemones, NULL);
 }
 
 void finalizar_hilos(){

@@ -2,8 +2,9 @@
 #include "../hilos-del-team/hilos_team.h"
 #include "../team.h"
 
-//void entrenador_ir_hacia(entrenador*, t_posicion);
-bool entrenador_verificar_objetivos(entrenador*unEntrenador);
+pokemon* entrenador_get_proxima_presa(entrenador*unEntrenador){
+	return unEntrenador->pokemonEntreOjos;
+}
 
 void team_hilo_entrenador(entrenador*unEntrenador){
 	t_id pid = unEntrenador->id;
@@ -18,7 +19,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 		switch(unEntrenador->siguienteTarea){
 			case CATCHEAR: {
 
-				pokemon*unPokemon = unEntrenador->pokemonEntreOjos;
+				pokemon*unPokemon = entrenador_get_proxima_presa(unEntrenador);
 
 				entrenador_desplazarse_hacia(unEntrenador, unPokemon->posicion);
 
@@ -31,7 +32,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 
 			case CAPTURAR: {
 
-				pokemon*pokemonCatcheado = unEntrenador->pokemonEntreOjos;
+				pokemon*pokemonCatcheado = entrenador_get_proxima_presa(unEntrenador);
 
 				if(!pokemonCatcheado){
 					error_show("El entrenador N°%u intento capturar un pokemon nulo\n", pid);
@@ -172,9 +173,53 @@ void candidato_desplazarse_hacia_el_otro(candidato_intercambio*unCandidato, cand
 }
 
 void entrenador_desplazarse_hacia(entrenador* unEntrenador, t_posicion posicionFinal){
-//	entrenador_ir_hacia(unEntrenador, posicionFinal); //Verdadera implementacion
+	pthread_mutex_lock(&Mutex_AndoLoggeando);
+	log_info(logger, "El entrenador N°%u partio de la posicion [%u %u]\n", unEntrenador->id, unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
+	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 
-	//implementacion anterior, para pruebas rapidas
+	bool llegoALaPosicion = entrenador_llego_a(unEntrenador, posicionFinal);
+
+	while(!llegoALaPosicion){
+
+		pthread_mutex_lock(&mutexPosicionEntrenador[unEntrenador->id]);
+		entrenador_dar_un_paso_hacia(unEntrenador, posicionFinal);
+		llegoALaPosicion = entrenador_llego_a(unEntrenador, posicionFinal);
+		pthread_mutex_unlock(&mutexPosicionEntrenador[unEntrenador->id]);
+
+		sem_post(&FinDeCiclo_CPU);
+		entrenador_esperar_y_consumir_cpu(unEntrenador);
+	}
+}
+
+void desplazar_unidimensional(coordenada* posicionInicial, coordenada posicionFinal){
+	int desplazamiento = (posicionFinal > *posicionInicial) - (posicionFinal < *posicionInicial);
+	*posicionInicial += desplazamiento;
+}
+
+void entrenador_dar_un_paso_hacia(entrenador*unEntrenador, t_posicion posicionFinal){
+
+	t_posicion* posicionActual = &unEntrenador->posicion;
+
+	if(posicionActual->pos_x != posicionFinal.pos_x){
+		desplazar_unidimensional(&posicionActual->pos_x, posicionFinal.pos_x);
+	}
+
+	else{
+		desplazar_unidimensional(&posicionActual->pos_y, posicionFinal.pos_y);
+	}
+
+	pthread_mutex_lock(&Mutex_AndoLoggeando);
+	log_info(logger, "\nEl entrenador N°%u se desplazo a la posicion [%u %u]\n", unEntrenador->id, unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
+	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+
+}
+
+bool entrenador_llego_a(entrenador* unEntrenador, t_posicion posicion){
+	return posicion_cmp(unEntrenador->posicion, posicion);
+}
+
+void entrenador_teletransportarte_a(entrenador*unEntrenador, t_posicion posicionFinal){
+//	//implementacion anterior, para pruebas rapidas
 	t_posicion posicionActual = unEntrenador->posicion;
 
 	pthread_mutex_lock(&mutexPosicionEntrenador[unEntrenador->id]);
@@ -184,10 +229,6 @@ void entrenador_desplazarse_hacia(entrenador* unEntrenador, t_posicion posicionF
 	pthread_mutex_lock(&Mutex_AndoLoggeando);
 	log_info(logger, "El Entrenador N°%u se desplazo desde [%u %u] hasta [%u %u]", unEntrenador->id, posicionActual.pos_x, posicionActual.pos_y, unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
 	pthread_mutex_unlock(&Mutex_AndoLoggeando);
-}
-
-bool entrenador_llego_a(entrenador* unEntrenador, t_posicion posicion){
-	return posicion_cmp(unEntrenador->posicion, posicion);
 }
 
 //************************************* Salida ********************************************/

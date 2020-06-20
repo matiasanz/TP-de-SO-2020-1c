@@ -65,7 +65,7 @@ void entrenador_despertar(entrenador*unEntrenador, char* motivo){
 void entrenadores_despertar_por_llegada_de(entrenadores unEquipo, pokemon* unPokemon){
 
 	pthread_mutex_lock(&mutexEntrenadores);
-	entrenadores dormidos = list_filter(unEquipo, (bool(*)(void*)) &entrenador_dormido_hasta_APPEARED);
+	entrenadores dormidos = list_filter(unEquipo, (bool(*)(void*)) &entrenador_dormido_hasta_llegada_de_pokemon);
 	pthread_mutex_unlock(&mutexEntrenadores);
 
 	entrenador*unEntrenador = entrenadores_mas_cercano(dormidos, unPokemon->posicion);
@@ -82,7 +82,7 @@ void entrenadores_despertar_por_llegada_de(entrenadores unEquipo, pokemon* unPok
 }
 
 // Retorna true si el entrenador se encuentra a la espera de la llegada de un pokemon
-bool entrenador_dormido_hasta_APPEARED(entrenador*unEntrenador){
+bool entrenador_dormido_hasta_llegada_de_pokemon(entrenador*unEntrenador){
 	pthread_mutex_lock(&mutexEstadoEntrenador[unEntrenador->id]);
 	bool estaDormido = entrenador_en_estado(unEntrenador, LOCKED_HASTA_APPEARED) || entrenador_en_estado(unEntrenador, NEW);
 	pthread_mutex_unlock(&mutexEstadoEntrenador[unEntrenador->id]);

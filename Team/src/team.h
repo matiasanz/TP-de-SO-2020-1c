@@ -36,7 +36,7 @@ void inicializar_conexiones();
 
 //Estadisticas
 void inicializar_estadisticas(numero);
-void finalizar_estadisticas(numero);
+void finalizar_estadisticas();
 char*estadisticas_to_string(estadisticas_team resultados);
 void team_loggear_resultados();
 char*num_array_to_string(numero*arreglo, int length);
