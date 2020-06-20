@@ -184,13 +184,13 @@ void listas_destroy(){
 	candidatos_destroy(potencialesDeadlock);
 	entrenadores_destroy(equipo);
 
-	pthread_mutex_lock(&mutexHistorialEspecies);
-	list_clean_and_destroy_elements(historialDePokemones, free);
-	pthread_mutex_unlock(&mutexHistorialEspecies);
-
 	pthread_mutex_lock(&mutexPedidos);
 	list_clean_and_destroy_elements(registroDePedidos, free);
 	pthread_mutex_unlock(&mutexPedidos);
+
+	pthread_mutex_lock(&mutexHistorialEspecies);
+	list_clean_and_destroy_elements(historialDePokemones, free);
+	pthread_mutex_unlock(&mutexHistorialEspecies);
 
 	list_destroy_and_destroy_elements(pokemonesDeRepuesto, (void*) pokemon_destroy_hard);
 	cr_list_clean_and_destroy_elements(pokemonesRecibidos, (void*) pokemon_destroy);

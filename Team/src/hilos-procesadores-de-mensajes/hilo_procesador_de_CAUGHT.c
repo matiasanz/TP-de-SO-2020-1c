@@ -2,10 +2,6 @@
 #include "../team.h"
 #include "../estructuras-auxiliares/mensajes.h"
 
-bool mensaje_caught_pokemon_get_resultado(t_mensaje_caught_pokemon*);
-void captura_procesar_fallo(captura_pendiente*capturaFallida);
-void procesar_resultado_de_captura(captura_pendiente*, bool fueExitosa);
-
 void team_procesador_cola_CAUGHT(cr_list* mensajes){
 
 	while(PROCESO_ACTIVO){
@@ -17,6 +13,10 @@ void team_procesador_cola_CAUGHT(cr_list* mensajes){
 		captura_pendiente* capturaPendiente = pendientes_get(capturasPendientes, idCaptura);
 
 		if(capturaPendiente) {
+
+			pthread_mutex_lock(&Mutex_AndoLoggeando);
+			mensaje_caught_pokemon_log(mensajeRecibido);
+			pthread_mutex_unlock(&Mutex_AndoLoggeando);
 
 			validar_captura(capturaPendiente);
 
@@ -39,7 +39,7 @@ void team_procesador_cola_CAUGHT(cr_list* mensajes){
 
 void entrenador_dormir_hasta_llegada_de_pokemon(entrenador*unEntrenador){
 	unEntrenador->siguienteTarea = CATCHEAR;
-	unEntrenador->pokemonEntreOjos = NULL;
+	unEntrenador->proximaPresa = NULL;
 	pthread_mutex_lock(&mutexEstadoEntrenador[unEntrenador->id]);
 	unEntrenador->estado = LOCKED_HASTA_APPEARED;
 	pthread_mutex_unlock(&mutexEstadoEntrenador[unEntrenador->id]);

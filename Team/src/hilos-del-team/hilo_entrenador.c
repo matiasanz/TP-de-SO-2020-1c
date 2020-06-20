@@ -3,7 +3,7 @@
 #include "../team.h"
 
 pokemon* entrenador_get_proxima_presa(entrenador*unEntrenador){
-	return unEntrenador->pokemonEntreOjos;
+	return unEntrenador->proximaPresa;
 }
 
 void team_hilo_entrenador(entrenador*unEntrenador){

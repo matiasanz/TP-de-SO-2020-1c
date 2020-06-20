@@ -21,7 +21,7 @@ typedef struct pcb_Entrenador{
 	t_estado estado;
 	t_id id;
 	t_tarea siguienteTarea;
-	pokemon*pokemonEntreOjos;
+	pokemon*proximaPresa;
 } entrenador;
 
 //	Constructor

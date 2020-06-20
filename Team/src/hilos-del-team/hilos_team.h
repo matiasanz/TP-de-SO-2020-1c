@@ -89,6 +89,9 @@ void validar_captura(captura_pendiente*);
 pokemon*leer_pokemon(t_mensaje_appeared_pokemon*);
 bool mensaje_appeared_responde_a_mi_pedido(t_mensaje_appeared_pokemon*);
 
+bool mensaje_caught_pokemon_get_resultado(t_mensaje_caught_pokemon*);
+void procesar_resultado_de_captura(captura_pendiente*, bool fueExitosa);
+void captura_procesar_fallo(captura_pendiente*capturaFallida);
 
 bool mensaje_localized_me_sirve(t_mensaje_localized_pokemon* mensaje);
 bool mensaje_localized_es_para_mi(t_mensaje_localized_pokemon* unMensaje);

@@ -75,6 +75,9 @@ t_paquete* crearMensaje(char* argumentos[], int longitud) {
 			t_mensaje_appeared_catch_pokemon* msj =
 					mensaje_appeared_catch_pokemon_crear(especie, atoi(x),
 							atoi(y));
+
+			mensaje_appeared_catch_pokemon_set_id(msj, 999); //Para que el team reconozca que el mensaje viene del gameboy
+
 			mensaje_serializado = mensaje_appeared_catch_pokemon_serializar(
 					msj);
 

@@ -1,6 +1,5 @@
 #include "../hilos-del-team/hilos_team.h"
 #include "../team.h"
-#include <crenito-commons/mensajes/mensaje_localized_pokemon.h>
 #include "../estructuras-auxiliares/mensajes.h"
 
 void team_procesador_cola_LOCALIZED(cr_list* mensajes){
@@ -13,7 +12,7 @@ void team_procesador_cola_LOCALIZED(cr_list* mensajes){
 		mensaje_localized_pokemon_log(logger, pokemonLocalizado);
 		pthread_mutex_unlock(&Mutex_AndoLoggeando);
 
-		if(mensaje_localized_me_sirve(pokemonLocalizado)){
+		if(!especie_recibida_con_anterioridad(pokemonLocalizado->especie, historialDePokemones)){
 			especie_pokemon especie = string_duplicate(pokemonLocalizado->especie);
 			posiciones_ordenar_por_cercania_al_equipo(pokemonLocalizado->posiciones);
 			registrar_en_cada_posicion(especie, pokemonLocalizado->posiciones);
@@ -24,10 +23,9 @@ void team_procesador_cola_LOCALIZED(cr_list* mensajes){
 			pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
 			log_info(event_logger, "Se descarto, ya que la especie %s habia sido recibida con anterioridad o el id no se corresponde con un get enviado", pokemonLocalizado->especie);
 			pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
-
 		}
 
-		mensaje_localized_pokemon_destruir(pokemonLocalizado); //No tiene que quedar nada, ya que yo construyo nuevos pokemones con copia de la info
+		mensaje_localized_pokemon_destruir(pokemonLocalizado);
 	}
 }
 
@@ -101,11 +99,7 @@ bool especie_recibida_con_anterioridad(especie_pokemon especie, especies_pokemon
 	return siONo;
 }
 
-bool mensaje_localized_me_sirve(t_mensaje_localized_pokemon* mensaje){
-	return mensaje_localized_es_para_mi(mensaje) && !especie_recibida_con_anterioridad(mensaje->especie, historialDePokemones);
-}
-
-bool mensaje_localized_es_para_mi(t_mensaje_localized_pokemon* unMensaje){ //TODO
+bool mensaje_localized_es_para_mi(t_mensaje_localized_pokemon* unMensaje){
 	t_id idCorrelativo = mensaje_localized_pokemon_get_id_correlativo(unMensaje);
 	return id_responde_a_mi_pedido(idCorrelativo);
 }

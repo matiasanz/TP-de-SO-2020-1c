@@ -77,7 +77,7 @@ void entrenadores_despertar_por_llegada_de(entrenadores unEquipo, pokemon* unPok
 		exit(1);
 	}
 
-	unEntrenador->pokemonEntreOjos = unPokemon;
+	unEntrenador->proximaPresa = unPokemon;
 	entrenador_despertar(unEntrenador, "Acaba de llegar un pokemon que puede cazar");
 
 	entrenadores_disolver_equipo(dormidos);
