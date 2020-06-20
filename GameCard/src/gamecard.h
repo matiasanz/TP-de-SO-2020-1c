@@ -54,7 +54,8 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke);
 void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke);
 
 void gamecard_New_Pokemon_ReIntento(t_mensaje_new_pokemon* unMsjNewPoke);
-
+void gamecard_Catch_Pokemon_ReIntento(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke);
+void gamecard_Get_Pokemon_ReIntento(t_mensaje_get_pokemon* unMsjGetPoke);
 
 int cant_elemetos_array(char** array);
 void split_liberar(char** split);
@@ -62,5 +63,13 @@ int bloque_disponible(t_bitarray* bitmap,int totalBloques);
 void guardarLinea(char* path,char* nuevalinea,int len);
 char* crearLinea(t_mensaje_new_pokemon* unMsjNewPoke );
 int size_bloque(char* path);
+bool contiene_string_en_bloques(char* string, char**bloques);
+int espacioDisponibleEnBloque(char* path);
+int bloquesNecesarios(char* lineaNueva,int maxSizeBloque);
+bool contienePosicionEnBloques(char* string, char**bloques);
+//DEPRECATED
+char* contenidoDeBloques(char** bloques);
+void sobrescribirLineas(char* path,char* nuevalinea,int len);
+char* contenido_de_Bloques_con_mmap(char** bloques);
 
 #endif /* SRC_GAMECARD_H_ */
