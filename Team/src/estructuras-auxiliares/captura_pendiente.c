@@ -26,8 +26,12 @@ void agregar_pendiente(capturas_pendientes mensajesPendientes, t_id idMensaje, e
     cr_list_add_and_signal(mensajesPendientes, nuevoMensaje);
 }
 
+bool pendiente_cmp(captura_pendiente* unaCaptura, captura_pendiente* otra){
+	return unaCaptura->id == otra->id;
+}
+
 //Obtener
-captura_pendiente* pendientes_get(capturas_pendientes mensajesPendientes, t_id idRespuesta){
+captura_pendiente* pendientes_remove_by_id(capturas_pendientes mensajesPendientes, t_id idRespuesta){
 	bool cmp_pendiente_id(void* unPendiente){
 		return ((captura_pendiente*)unPendiente)->id == idRespuesta && !((captura_pendiente*)unPendiente)->respondido;
 	}
@@ -53,4 +57,13 @@ captura_pendiente*pendientes_pendiente_del_entrenador(capturas_pendientes mensaj
 //Destructor
 void pendientes_destroy(capturas_pendientes pendientes){
 	cr_list_destroy_and_destroy_elements(pendientes, (void(*)(void*))&pendiente_destroy);
+}
+
+
+bool pendiente_coincide_id(t_id* id, captura_pendiente*captura){
+	return captura->id==*id;
+}
+
+bool pendientes_reconocer_id(capturas_pendientes pendientes, t_id idCaptura){
+	return cr_list_contains_element(pendientes, &idCaptura, (bool(*)(void*, void*))pendiente_coincide_id);
 }

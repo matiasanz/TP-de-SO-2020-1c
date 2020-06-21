@@ -8,10 +8,6 @@ void team_procesador_cola_LOCALIZED(cr_list* mensajes){
 
 		t_mensaje_localized_pokemon* pokemonLocalizado = leer_mensaje_cuando_este_disponible(mensajes);
 
-		pthread_mutex_lock(&Mutex_AndoLoggeando);
-		mensaje_localized_pokemon_log(logger, pokemonLocalizado);
-		pthread_mutex_unlock(&Mutex_AndoLoggeando);
-
 		if(!especie_recibida_con_anterioridad(pokemonLocalizado->especie, historialDePokemones)){
 			especie_pokemon especie = string_duplicate(pokemonLocalizado->especie);
 			posiciones_ordenar_por_cercania_al_equipo(pokemonLocalizado->posiciones);
@@ -111,9 +107,10 @@ bool id_responde_a_mi_pedido(t_id idCorrelativo){
 	}
 
 	pthread_mutex_lock(&mutexPedidos);
-	t_id* idGet = list_get_by_comparation(registroDePedidos, &idCorrelativo, &cmp);
+	t_id* idGet = list_remove_by_comparation(registroDePedidos, &idCorrelativo, &cmp);
 	pthread_mutex_unlock(&mutexPedidos);
 
+	if(idGet) free(idGet);
 
 	return idGet;
 }

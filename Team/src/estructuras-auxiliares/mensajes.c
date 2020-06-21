@@ -8,7 +8,10 @@ void* leer_mensaje_cuando_este_disponible(cr_list* unaLista){
 void mensaje_get_registrar(t_mensaje_get_pokemon* mensajeGet){
     t_id* idGet = malloc(sizeof(t_id));
     	* idGet = mensaje_get_pokemon_get_id(mensajeGet);
+
+    pthread_mutex_lock(&mutexPedidos);
     list_add(registroDePedidos, idGet);
+    pthread_mutex_unlock(&mutexPedidos);
 }
 
 void Get(void* especiePokemon) {
@@ -16,6 +19,7 @@ void Get(void* especiePokemon) {
 	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
 	log_info(event_logger, ">> get(%s)\n", (especie_pokemon) especiePokemon);
 	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+
 	t_mensaje_get_pokemon* mensajeGet=mensaje_get_pokemon_crear(string_duplicate(especiePokemon));
 
 	t_paquete_header header=paquete_header_crear(MENSAJE,TEAM,GET_POKEMON);
@@ -29,8 +33,10 @@ void Get(void* especiePokemon) {
 		pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
 		log_warning(event_logger,"Se procedera a responder el mensaje GET por defecto");
 		pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+
 		t_mensaje_localized_pokemon* respuestaAutogenerada = mensaje_localized_pokemon_crear(string_duplicate(especiePokemon), list_create());
-		cr_list_add_and_signal(mensajesLOCALIZED, respuestaAutogenerada);
+		mensaje_localized_pokemon_set_id_correlativo(respuestaAutogenerada, mensaje_get_pokemon_get_id(mensajeGet));
+		localized_pokemon_recibido(respuestaAutogenerada);
 	}
 
 	mensaje_get_pokemon_destruir(mensajeGet);
@@ -66,7 +72,7 @@ void Catch(entrenador*unEntrenador, pokemon* pokemonCatcheado) {
 	t_paquete_header header=paquete_header_crear(MENSAJE,TEAM,CATCH_POKEMON);
 	t_buffer* bufferDepaquete=mensaje_appeared_catch_pokemon_serializar(mensajeCatch);
 	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
-	int resultadoDeEnvio = ERROR_SOCKET;//enviar(conexion_broker,paqueteAEnviar); //TODO DESCOMENTAR
+	int resultadoDeEnvio = enviar(conexion_broker,paqueteAEnviar);
 
 	//Agrego a la lista de capturas pendientes
 	t_id idCapturaPendiente = mensaje_appeared_catch_pokemon_get_id(mensajeCatch);
@@ -84,7 +90,8 @@ void Catch(entrenador*unEntrenador, pokemon* pokemonCatcheado) {
 
 		t_mensaje_caught_pokemon* respuestaAutogenerada = mensaje_caught_pokemon_crear(true);
 		mensaje_caught_pokemon_set_id_correlativo(respuestaAutogenerada, idCapturaPendiente);
-		cr_list_add_and_signal(mensajesCAUGHT, respuestaAutogenerada);
+
+		caught_pokemon_recibido(respuestaAutogenerada);
 	}
 
 	mensaje_appeared_catch_pokemon_destruir(mensajeCatch);

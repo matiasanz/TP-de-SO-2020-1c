@@ -1,7 +1,6 @@
 
 #include "../hilos-de-comunicacion/hilo_appeared_pokemon.h"
 #include "../team.h"
-#define ID_GAMEBOY 999
 
 void subscribir_y_escuchar_cola_appeared_pokemon(void (*callback)(t_id_cola, void*)) {
 
@@ -21,34 +20,15 @@ void subscribir_y_escuchar_cola_appeared_pokemon(void (*callback)(t_id_cola, voi
 
 void appeared_pokemon_recibido(t_mensaje_appeared_pokemon* appeared_pokemon) {
 
+	pthread_mutex_lock(&Mutex_AndoLoggeando);
 	mensaje_appeared_catch_pokemon_log(logger, appeared_pokemon, APPEARED_POKEMON_STRING);
+	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 
+	pokemon*pokemonRecibido = leer_pokemon(appeared_pokemon);
 
-
-	if(mensaje_appeared_responde_a_mi_pedido(appeared_pokemon)){
-
-		pokemon*pokemonRecibido = leer_pokemon(appeared_pokemon);
-
-		registrar_pokemon(pokemonRecibido);
-	}
-
-	else{
-		pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-		log_info(event_logger, "Se descarto el mensaje APPEARED ya que el id no coincide con un get");
-		pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
-	}
+	registrar_pokemon(pokemonRecibido);
 
 	mensaje_appeared_catch_pokemon_destruir(appeared_pokemon);
-}
-
-bool mensaje_appeared_viene_del_gameboy(t_mensaje_appeared_pokemon*unMensaje){
-	t_id idMensaje = mensaje_appeared_catch_pokemon_get_id(unMensaje);
-	return idMensaje == ID_GAMEBOY;
-}
-
-bool mensaje_appeared_responde_a_mi_pedido(t_mensaje_appeared_pokemon*unMensaje){
-	t_id idCorrelativo = mensaje_appeared_catch_pokemon_get_id_correlativo(unMensaje);
-	return id_responde_a_mi_pedido(idCorrelativo);
 }
 
 pokemon*leer_pokemon(t_mensaje_appeared_pokemon*unMensaje){

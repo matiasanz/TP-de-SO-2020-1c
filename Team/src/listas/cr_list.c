@@ -29,6 +29,7 @@ void cr_list_destroy(cr_list* unaLista){
 	list_destroy(unaLista->lista);
 	sem_destroy(&unaLista->hayMas);
 	pthread_mutex_destroy(unaLista->mutex);
+	free(unaLista->mutex);
 	free(unaLista);
 }
 

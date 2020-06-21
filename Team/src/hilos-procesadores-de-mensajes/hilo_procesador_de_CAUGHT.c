@@ -10,12 +10,12 @@ void team_procesador_cola_CAUGHT(cr_list* mensajes){
 
 		t_id idCaptura = mensaje_caught_pokemon_get_id_correlativo(mensajeRecibido);
 
-		captura_pendiente* capturaPendiente = pendientes_get(capturasPendientes, idCaptura);
+		captura_pendiente* capturaPendiente = pendientes_remove_by_id(capturasPendientes, idCaptura);
 
 		if(capturaPendiente) {
 
 			pthread_mutex_lock(&Mutex_AndoLoggeando);
-			mensaje_caught_pokemon_log(mensajeRecibido);
+			mensaje_caught_pokemon_log(logger, mensajeRecibido);
 			pthread_mutex_unlock(&Mutex_AndoLoggeando);
 
 			validar_captura(capturaPendiente);
