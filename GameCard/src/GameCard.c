@@ -63,6 +63,8 @@ void crearEstructuras(){
 	punto_montaje_tallgrass=config_get_string_value(config,"PUNTO_MONTAJE_TALLGRASS");
 	// Inicializo semaforo
 	pthread_mutex_init(&mutBitarray, NULL);
+	pthread_mutex_init(&mutDiccionarioSemaforos, NULL);
+
 	semaforosDePokemons=dictionary_create();
 
 	char* dir_metadata = string_new();
@@ -225,7 +227,11 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 			pthread_mutex_t* mutexMetadataPokemon=malloc(sizeof(pthread_mutex_t));
 			pthread_mutex_init(mutexMetadataPokemon, NULL);
 
+			pthread_mutex_lock(&mutDiccionarioSemaforos);
+
 			dictionary_put(semaforosDePokemons,unMsjNewPoke->pokemon.especie,mutexMetadataPokemon);
+
+			pthread_mutex_unlock(&mutDiccionarioSemaforos);
 
 			config_metadata_pokemon=config_create(bin_metadata);
 			config_set_value(config_metadata_pokemon,"DIRECTORY","N");
@@ -234,6 +240,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 			config_set_value(config_metadata_pokemon,"OPEN","N");
 			config_save(config_metadata_pokemon);
 		}else{
+			pthread_mutex_lock(&mutDiccionarioSemaforos);
 			//este if es para cuando ya existe el pokemon en disco, pero no su mutex
 			if(!dictionary_has_key(semaforosDePokemons,unMsjNewPoke->pokemon.especie)){
 
@@ -242,7 +249,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 				dictionary_put(semaforosDePokemons,unMsjNewPoke->pokemon.especie,mutexMetadataPokemon);
 
 			}
-
+			pthread_mutex_unlock(&mutDiccionarioSemaforos);
 
 			pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 
@@ -698,6 +705,8 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 		config_destroy(config_metadata_pokemon);
 		free(bin_metadata);
 		free(dir_unNuevoPokemon);
+		mensaje_new_pokemon_destruir(unMsjNewPoke);
+		mensaje_appeared_catch_pokemon_destruir(mensajeAEnviar);
 
 }
 
@@ -731,6 +740,7 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 		//como existe el archivo, debo usar fclose, en caso contrario, no.
 		fclose(f_metadata);
 
+		pthread_mutex_lock(&mutDiccionarioSemaforos);
 		//este if es para cuando ya existe el pokemon en disco, pero no su mutex
 		if(!dictionary_has_key(semaforosDePokemons,unMsjCatchPoke->pokemon.especie)){
 
@@ -739,7 +749,7 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 			dictionary_put(semaforosDePokemons,unMsjCatchPoke->pokemon.especie,mutexMetadataPokemon);
 
 		}
-
+		pthread_mutex_unlock(&mutDiccionarioSemaforos);
 
 		pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
 
@@ -1037,6 +1047,8 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 	//----------------
 
 	free(bin_metadata);
+	mensaje_appeared_catch_pokemon_destruir(unMsjCatchPoke);
+	mensaje_caught_pokemon_destruir(mensajeAEnviar);
 
 
 
@@ -1066,6 +1078,7 @@ void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
 
 		fclose(f_metadata);
 
+		pthread_mutex_lock(&mutDiccionarioSemaforos);
 		//este if es para cuando ya existe el pokemon en disco, pero no su mutex
 		if(!dictionary_has_key(semaforosDePokemons,unMsjGetPoke->especie)){
 
@@ -1074,6 +1087,8 @@ void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
 			dictionary_put(semaforosDePokemons,unMsjGetPoke->especie,mutexMetadataPokemon);
 
 		}
+		pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
 
 		pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjGetPoke->especie));
 
