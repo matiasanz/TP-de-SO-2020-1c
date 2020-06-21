@@ -29,28 +29,11 @@ void procesar_mensaje(int socket, t_paquete_header header) {
 
 static void replicar_mensaje(t_cola_container* container, t_mensaje_cache* mensaje_cache, t_id_cola id_cola) {
 
-	//TODO: crear un hilo por cada llamado a la funcion enviar
-	void* deserializado = restaurar_mensaje_desde_cache(mensaje_cache);
-
 	for (int i = 0; i < list_size(container->suscriptores); ++i) {
 
 		t_suscriptor* suscriptor = list_get(container->suscriptores, i);
 
-		t_paquete* pqt = paquete_crear(paquete_header_crear(MENSAJE, BROKER, id_cola),
-								serializar(deserializado, id_cola));
-
-		//TODO: registrar correctamente envio + ACK
-		uint32_t ack = enviar_paquete(pqt, suscriptor->socket);
-		list_add(mensaje_cache->metadata->suscriptores_enviados, suscriptor);
-
-		if (conexion_exitosa(ack)) {
-			list_add(mensaje_cache->metadata->suscriptores_confirmados, suscriptor);
-		}
-		//TODO: si no confirman, hay que avisar en otro hilo para que reintente.
-
-		free(deserializado);
-		paquete_destruir(pqt);
-
+		enviar_mensaje_a_suscriptor(mensaje_cache, suscriptor);
 	}
 }
 

@@ -30,11 +30,11 @@ bool equals_from_id(t_mensaje_cache* msj, uint32_t id_buscado) {
 }
 
 uint32_t mensaje_cache_get_id(t_mensaje_cache* msj) {
-	return msj->particion->id_mensaje;
+	return particion_get_id_mensaje(msj -> particion);
 }
 
 t_id_cola mensaje_cache_get_id_cola(t_mensaje_cache* msj) {
-	return msj->particion->id_cola;
+	return particion_get_id_cola(msj -> particion);
 }
 
 uint32_t mensaje_cache_get_tamanio_contenido(t_mensaje_cache* msj) {
@@ -43,6 +43,14 @@ uint32_t mensaje_cache_get_tamanio_contenido(t_mensaje_cache* msj) {
 
 void mensaje_cache_set_particion(t_mensaje_cache* msj, t_particion* particion) {
 	msj->particion = particion;
+}
+
+void mensaje_cache_set_suscriptor_confirmado(t_mensaje_cache* msj, t_suscriptor* suscriptor) {
+	list_add(msj->metadata->suscriptores_confirmados, suscriptor);
+}
+
+void mensaje_cache_set_suscriptor_enviado(t_mensaje_cache* msj, t_suscriptor* suscriptor) {
+	list_add(msj->metadata->suscriptores_enviados, suscriptor);
 }
 
 t_mensaje_header mensaje_header_restaurar_desde_cache(t_mensaje_cache* msj) {

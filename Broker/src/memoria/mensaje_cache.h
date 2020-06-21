@@ -27,5 +27,7 @@ t_id_cola mensaje_cache_get_id_cola(t_mensaje_cache* msj);
 uint32_t mensaje_cache_get_tamanio_contenido(t_mensaje_cache* msj);
 
 void mensaje_cache_set_particion(t_mensaje_cache* msj, t_particion* particion);
+void mensaje_cache_set_suscriptor_confirmado(t_mensaje_cache* msj, t_suscriptor* suscriptor);
+void mensaje_cache_set_suscriptor_enviado(t_mensaje_cache* msj, t_suscriptor* suscriptor);
 
 #endif /* SRC_MEMORIA_MENSAJE_CACHE_H_ */
