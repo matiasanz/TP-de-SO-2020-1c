@@ -20,7 +20,6 @@
 #include<commons/log.h>
 #include<commons/config.h>
 #include<commons/collections/list.h>
-#include<commons/collections/queue.h>
 #include<commons/string.h>
 
 #define ERROR_SOCKET -1
@@ -47,12 +46,6 @@ t_log* logger;
 //Logger para grabar informacion adicional/errores
 t_log* event_logger;
 
-//Estructura administrativa para ids de mensajes
-typedef struct {
-	uint32_t id;
-	uint32_t id_correlativo;
-} t_mensaje_header;
-
 typedef enum {
 	NEW_POKEMON = 1,
 	APPEARED_POKEMON = 2,
@@ -69,8 +62,6 @@ typedef enum {
 	TEAM = 4
 } t_id_proceso;
 
-// Inicializa los ids para prevenir errores con valgrind
-void mensaje_header_inicializar(t_mensaje_header* header);
 // dado un id de proceso devuelve el mismo representado por un string
 char* get_nombre_proceso(t_id_proceso id_proceso);
 // dado un id de mensaje/nombre de cola el mismo representado por un string
@@ -78,9 +69,6 @@ char* get_nombre_cola(t_id_cola id_cola);
 
 void string_append_separador(char** string, char* texto);
 char* get_separador_string(char* texto);
-
-char* mensaje_header_to_string(t_mensaje_header header, char* tipo);
-void string_append_mensaje_header(char** string, t_mensaje_header header, char* tipo);
 
 int conexion_exitosa(int indicador_conexion);
 int error_conexion(int indicador_conexion);

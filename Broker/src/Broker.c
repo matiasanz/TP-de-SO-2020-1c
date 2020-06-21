@@ -7,23 +7,18 @@ int main(void) {
 
 	inicializar();
 
-	int socket_servidor = socket_crear_listener(
-			config_get_string_value(config, "IP_BROKER"),
-			config_get_string_value(config, "PUERTO_BROKER"));
-
-	validar_socket(socket_servidor);
-
-	while (1) {
+	while (true) {
 
 		int socket_cliente = socket_aceptar_conexion(socket_servidor);
-		pthread_create(&thread, NULL, (void*) atender_cliente, &socket_cliente);
-		pthread_detach(thread);
+
+		pthread_create(&hilo_receptor_mensajes, NULL, (void*) atender_cliente, &socket_cliente);
+		pthread_detach(hilo_receptor_mensajes);
 	}
 
 	return EXIT_SUCCESS;
 }
 
-void crear_colas() {
+void inicializar_colas() {
 
 	id_univoco = 0;
 	pthread_mutex_init(&mutex_id_univoco, NULL);
@@ -40,7 +35,9 @@ void inicializar(void) {
 
 	inicializar_config();
 	inicializar_logs();
-	crear_colas();
+	inicializar_colas();
+	inicializar_memoria();
+	inicializar_servidor();
 }
 
 void inicializar_config() {
@@ -52,8 +49,7 @@ void inicializar_logs() {
 
 	char* ruta = config_get_string_value(config, "LOGGER");
 	logger = log_create(ruta, BROKER_STRING, 1, LOG_LEVEL_INFO);
-	event_logger = log_create("./log/broker_event.log", "BROKER_EVENT", 1,
-			LOG_LEVEL_INFO);
+	event_logger = log_create("./log/broker_event.log", "BROKER_EVENT", 1, LOG_LEVEL_INFO);
 }
 
 void atender_cliente(int* socket) {
@@ -67,37 +63,41 @@ void atender_cliente(int* socket) {
 		break;
 	}
 	case SUBSCRIPCION: {
-		procesar_subscripcion(*socket, header);
+		procesar_suscripcion(*socket, header);
 		break;
 	}
 	default:
 		log_error(event_logger,
 				"El codigo de operacion %d recibido desde el socket: %d por el proceso %s es incorrecto \n",
-				header.codigo_operacion, *socket,
-				get_nombre_proceso(header.id_proceso));
+				header.codigo_operacion, *socket, get_nombre_proceso(header.id_proceso));
 	}
 
 	pthread_exit(NULL);
 }
 
+void inicializar_servidor() {
+
+	socket_servidor = socket_crear_listener(config_get_string_value(config, "IP_BROKER"),
+			config_get_string_value(config, "PUERTO_BROKER"));
+
+	validar_socket(socket_servidor);
+}
+
 static void validar_header(t_paquete_header header) {
 
 	if (header.codigo_operacion == ERROR_SOCKET) {
-		log_error(event_logger,
-				"Error al recibir el header del mensaje, finalizando hilo \n");
+		log_error(event_logger, "Error al recibir el header del mensaje, finalizando hilo \n");
 		pthread_exit(NULL);
 	} else {
-		log_info(logger, "Un proceso %s se conectó correctamente al %s \n",
-				get_nombre_proceso(header.id_proceso), BROKER_STRING);
+		log_info(logger, "Un proceso %s se conectó correctamente al %s \n", get_nombre_proceso(header.id_proceso),
+		BROKER_STRING);
 	}
 }
 
 static void validar_socket(int socket_servidor) {
 
 	if (error_conexion(socket_servidor)) {
-		log_info(event_logger,
-				"Se produjo un error de conexion al iniciar el %s",
-				BROKER_STRING);
+		log_error(event_logger, "Se produjo un error de conexion al iniciar el %s", BROKER_STRING);
 		exit(EXIT_FAILURE);
 	}
 
