@@ -16,7 +16,7 @@ typedef struct {
 	t_id_cola id_cola;
 	uint32_t base;
 	uint32_t limite;
-	uint32_t en_uso;
+	bool en_uso;
 	struct timeval creacion;
 	struct timeval ultimo_acceso;
 } t_particion;
@@ -55,9 +55,10 @@ uint32_t particion_get_base(t_particion* particion);
 uint32_t particion_get_id_mensaje(t_particion* particion);
 uint32_t particion_get_id_cola(t_particion* particion);
 void* particion_get_direccion_contenido(t_particion* particion);
-
+bool particion_en_uso(t_particion* particion);
 //Setters
 void particion_set_uso(t_particion* particion);
+void particion_actualizar_acceso(t_particion* particion);
 void particion_set_id_cola(t_particion* particion, t_id_cola id_cola);
 void particion_set_id_mensaje(t_particion* particion);
 

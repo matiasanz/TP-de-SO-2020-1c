@@ -139,6 +139,7 @@ void* compactar_contenido_mensaje(void* msj_recibido, t_mensaje_cache_metadata* 
 	switch (id_cola) {
 	case NEW_POKEMON:
 		return mensaje_new_pokemon_formato_cache(msj_recibido, metadata);
+	case APPEARED_POKEMON:
 	case CATCH_POKEMON:
 		return mensaje_appeared_catch_pokemon_formato_cache(msj_recibido, metadata);
 	case CAUGHT_POKEMON:

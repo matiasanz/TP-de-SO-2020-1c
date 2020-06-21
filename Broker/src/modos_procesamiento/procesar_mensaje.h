@@ -10,7 +10,7 @@
 
 #include "../colas.h"
 #include "../memoria/mmu.h"
-
+#include "procesar_suscripcion.h"
 // Punto de entrada para cuando se detecta que un proceso envia un mensaje
 void procesar_mensaje(int socket, t_paquete_header header);
 

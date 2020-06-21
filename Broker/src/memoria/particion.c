@@ -174,11 +174,25 @@ void* particion_get_direccion_contenido(t_particion* particion) {
 	return memoria_principal + particion_get_base(particion);
 }
 
+bool particion_en_uso(t_particion* particion){
+//	TODO: sincronizar
+//	pthread_mutex_lock(&mutex_acceso_memoria);
+	return particion -> en_uso;
+//	pthread_mutex_unlock(&mutex_acceso_memoria);
+}
+
 void particion_set_uso(t_particion* particion) {
 
 	particion->en_uso = 1;
 	gettimeofday(&particion->creacion, NULL);
 	particion->ultimo_acceso = particion->creacion;
+}
+
+void particion_actualizar_acceso(t_particion* particion) {
+	//	TODO: sincronizar
+//	pthread_mutex_lock(&mutex_acceso_memoria);
+	gettimeofday(&particion->ultimo_acceso, NULL);
+//	pthread_mutex_unlock(&mutex_acceso_memoria);
 }
 
 void particion_set_id_cola(t_particion* particion, t_id_cola id_cola) {
