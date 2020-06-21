@@ -9,6 +9,7 @@
 #define SRC_HILOS_HILO_CATCH_POKEMON_H_
 
 #include <crenito-commons/conexiones/conexiones.h>
+#include "../gamecard.h"
 
 t_conexion_cliente* conexion_catch_pokemon;
 pthread_t hilo_catch_pokemon;
