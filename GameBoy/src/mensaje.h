@@ -5,6 +5,6 @@
 #include <crenito-commons/utils.h>
 #include "mensaje.h"
 
-t_paquete* crearMensaje(char* argumentos[], int longitud);
+t_paquete* crear_mensaje(char* argumentos[], int longitud);
 
 #endif

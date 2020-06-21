@@ -43,7 +43,7 @@ int main(int argc, char*argv[]) {
 			break;
 		}
 
-		t_paquete* pqt = crearMensaje(argv, argc);
+		t_paquete* pqt = crear_mensaje(argv, argc);
 
 		int respuesta = enviar(conexion, pqt);
 		log_info(logger, "El proceso gameboy se conecto con el proceso %s",
