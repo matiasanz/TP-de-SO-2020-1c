@@ -44,7 +44,8 @@ void cola_eliminar_mensaje(uint32_t id_mensaje, t_id_cola id_cola) {
 	t_cola_container* container = get_cola(id_cola);
 	bool found = false;
 	uint32_t index;
-
+	//TODO sincronizar correctamente
+	pthread_mutex_lock(&container->mutex);
 	for (int i = 0; i < list_size(container->cola); ++i) {
 
 		t_mensaje_cache* candidato = list_get(container->cola, i);
@@ -56,10 +57,9 @@ void cola_eliminar_mensaje(uint32_t id_mensaje, t_id_cola id_cola) {
 	}
 
 	if (found) {
-		pthread_mutex_lock(&container->mutex);
 		list_remove_and_destroy_element(container->cola, index, (void*) mensaje_cache_destruir);
-		pthread_mutex_unlock(&container->mutex);
 	}
+	pthread_mutex_unlock(&container->mutex);
 }
 
 void encolar_mensaje(t_cola_container* container, t_mensaje_cache* msj) {

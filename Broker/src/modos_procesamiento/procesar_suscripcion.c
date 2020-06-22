@@ -17,8 +17,7 @@ void procesar_suscripcion(int socket, t_paquete_header header) {
 	t_cola_container* container = get_cola(header.id_cola);
 	t_suscriptor* suscriptor = suscribir_proceso(socket, container);
 
-
-	uint32_t id_suscriptor = suscriptor -> id_subcriptor;
+	uint32_t id_suscriptor = suscriptor->id_subcriptor;
 	log_info(logger, "Un proceso %s se suscribió a la cola %s. El id_subscriptor generado es: %d \n",
 			get_nombre_proceso(header.id_proceso), get_nombre_cola(header.id_cola), id_suscriptor);
 
@@ -31,7 +30,7 @@ static t_suscriptor* suscribir_proceso(int socket, t_cola_container* container) 
 
 	pthread_mutex_lock(&container->mutex);
 	/*TODO en lugar de generar el id de suscriptor deberia recibirse
-	* y estar definido en el config file de cada proceso */
+	 * y estar definido en el config file de cada proceso */
 	t_suscriptor* suscriptor = suscriptor_crear(socket, list_size(container->suscriptores) + 1);
 	list_add(container->suscriptores, suscriptor);
 	pthread_mutex_unlock(&container->mutex);
@@ -41,19 +40,18 @@ static t_suscriptor* suscribir_proceso(int socket, t_cola_container* container) 
 
 static void enviar_mensajes_cacheados(t_cola_container* container, t_suscriptor* suscriptor) {
 
+	//TODO sincronizar correctamente
 	pthread_mutex_lock(&container->mutex);
+	for (int i = 0; i < list_size(container->cola); ++i) {
 
-	for (int i = 0; i < list_size(container -> cola); ++i) {
+		t_mensaje_cache* msj = list_get(container->cola, i);
 
-		t_mensaje_cache* msj = list_get(container -> cola, i);
-
-		//TODO: hay que usar multihreading y sincronizar
-		if(particion_en_uso(msj -> particion)){
-			particion_actualizar_acceso(msj -> particion);
+		//TODO: hay que usar multihreading
+		if (particion_en_uso(msj->particion)) {
+			particion_actualizar_acceso(msj->particion);
 			enviar_mensaje_a_suscriptor(msj, suscriptor);
 		}
 	}
-
 	pthread_mutex_unlock(&container->mutex);
 }
 

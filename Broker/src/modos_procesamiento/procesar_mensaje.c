@@ -32,8 +32,10 @@ static void replicar_mensaje(t_cola_container* container, t_mensaje_cache* mensa
 	for (int i = 0; i < list_size(container->suscriptores); ++i) {
 
 		t_suscriptor* suscriptor = list_get(container->suscriptores, i);
-
+		//TODO sincronizar correctamente
+		pthread_mutex_lock(&container ->mutex);
 		enviar_mensaje_a_suscriptor(mensaje_cache, suscriptor);
+		pthread_mutex_lock(&container -> mutex);
 	}
 }
 
