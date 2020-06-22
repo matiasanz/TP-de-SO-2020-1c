@@ -72,7 +72,6 @@ void enviar_mensaje_a_suscriptor(t_mensaje_cache* msj_cache, t_suscriptor* suscr
 	}
 	//TODO: si no confirman, hay que avisar en otro hilo para que reintente.
 
-	free(msj_cache);
 	paquete_destruir(pqt);
 
 }
