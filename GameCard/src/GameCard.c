@@ -505,6 +505,57 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 			if(cant_elemetos_array(bloquesDelPokemon)==0){
 				//rama en donde el pokemon no tiene ningun bloque asignado
 
+				char* listaBloques=string_new();
+				int size;
+				char* nuevalinea=crearLinea(unMsjNewPoke);
+				int longitud=string_length(nuevalinea);
+
+				int cantBloquesNecesarios=bloquesNecesarios(nuevalinea,config_get_int_value(config_metadata,"BLOCK_SIZE"));
+
+				string_append(&listaBloques,"[");
+
+				for(int y=0;y<cantBloquesNecesarios;y++){
+
+					pthread_mutex_lock(&mutBitarray);
+					int nrobloque=bloque_disponible(bitmap,config_get_int_value(config_metadata,"BLOCKS"));
+					bitarray_set_bit(bitmap,nrobloque);
+					pthread_mutex_unlock(&mutBitarray);
+
+					char* bin_block = string_new();
+					string_append(&bin_block,paths_estructuras[BLOCKS]);
+					string_append(&bin_block,string_itoa(nrobloque));
+					string_append(&bin_block,".bin");
+
+
+					if(cantBloquesNecesarios==(y+1)){
+						//esto seria el ultimo bloque necesario
+
+						char* ultimoAguardar=string_new();
+						string_append(&ultimoAguardar,string_substring_from(nuevalinea,y*config_get_int_value(config_metadata,"BLOCK_SIZE")));
+						int longitud=string_length(ultimoAguardar);
+						guardarLinea(bin_block,ultimoAguardar,longitud);
+
+						string_append(&listaBloques,string_itoa(nrobloque));
+						free(ultimoAguardar);
+					}else{
+
+						char* cadenaAguardar=string_new();
+						string_append(&cadenaAguardar,string_substring(nuevalinea,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE")));
+						int longitud=string_length(cadenaAguardar);
+						guardarLinea(bin_block,cadenaAguardar,longitud);
+
+						string_append(&listaBloques,string_itoa(nrobloque));
+						string_append(&listaBloques,",");
+						free(cadenaAguardar);
+					}
+
+
+					free(bin_block);
+				}
+
+
+
+				/*
 
 				//el bitarray cuenta desde 0
 				pthread_mutex_lock(&mutBitarray);
@@ -519,18 +570,17 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 
 
-				char* nuevalinea=crearLinea(unMsjNewPoke);
-				int longitud=string_length(nuevalinea);
+
 
 				guardarLinea(bin_block,nuevalinea,longitud);
 
 				char* listaBloques=string_new();
 				string_append(&listaBloques,"[");
 				string_append(&listaBloques,string_itoa(nrobloque));
+				string_append(&listaBloques,"]");*/
+
 				string_append(&listaBloques,"]");
-
-
-				int size=size_bloque(bin_block);
+				size=longitud;
 
 				//retardo para simular acceso a disco
 				sleep(tiempo_retardo_operacion);
@@ -545,11 +595,12 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 				pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 
 
+				log_info(event_logger,"no posee bloques, se usaran los bloques vacios nro:%s",listaBloques);
+
 				free(listaBloques);
 				free(nuevalinea);
-				free(bin_block);
 
-				log_info(event_logger,"no posee bloques, se usara el bloque vacio %i",nrobloque);
+
 			}else{
 				//rama en donde el pokemon tiene bloques asignados
 
