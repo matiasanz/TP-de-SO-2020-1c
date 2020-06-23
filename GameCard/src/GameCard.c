@@ -848,9 +848,13 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 		//--------comenzar a operar el pokemon-------
 
 		char* cadenaABuscar=string_new();
-		string_append(&cadenaABuscar,string_itoa(unMsjCatchPoke->pokemon.posicion.pos_x));
+		char* stringPosX=string_itoa(unMsjCatchPoke->pokemon.posicion.pos_x);
+		char* stringPosY=string_itoa(unMsjCatchPoke->pokemon.posicion.pos_y);
+
+		string_append(&cadenaABuscar,stringPosX);
 		string_append(&cadenaABuscar,"-");
-		string_append(&cadenaABuscar,string_itoa(unMsjCatchPoke->pokemon.posicion.pos_y));
+		string_append(&cadenaABuscar,stringPosY);
+
 
 		if(contienePosicionEnBloques(cadenaABuscar,bloquesDelPokemon)){
 			//rama el pokemon posee la posicion recibida
@@ -886,10 +890,12 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 					//hago la resta, porque atrapo al pokemon, hay 1 menos en esa posicion
 					int cantidadFinal=cantActual - 1;
 					if(cantidadFinal>0){
+					char* stringCantidadFinal=string_itoa(cantidadFinal);
 					string_append(&contenidoActualizadoDeBloques,posYCant[0]);
 					string_append(&contenidoActualizadoDeBloques,"=");
-					string_append(&contenidoActualizadoDeBloques,string_itoa(cantidadFinal));
+					string_append(&contenidoActualizadoDeBloques,stringCantidadFinal);
 					string_append(&contenidoActualizadoDeBloques,"\n");
+					free(stringCantidadFinal);
 					}
 
 					split_liberar(posYCant);
@@ -962,18 +968,23 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 						//esto seria el ultimo bloque necesario
 
 						char* ultimoAguardar=string_new();
-						string_append(&ultimoAguardar,string_substring_from(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE")));
+						char* stringFinal=string_substring_from(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"));
+
+						string_append(&ultimoAguardar,stringFinal);
 						int longitud=string_length(ultimoAguardar);
 						sobrescribirLineas(bin_block,ultimoAguardar,longitud);
 						free(ultimoAguardar);
+						free(stringFinal);
 					}else{
 
 						char* cadenaAguardar=string_new();
-						string_append(&cadenaAguardar,string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE")));
+						char* stringRecorte=string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE"));
+						string_append(&cadenaAguardar,stringRecorte);
 						int longitud=string_length(cadenaAguardar);
 						sobrescribirLineas(bin_block,cadenaAguardar,longitud);
 
 						free(cadenaAguardar);
+						free(stringRecorte);
 					}
 
 					free(bin_block);
@@ -1007,8 +1018,10 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 
 						char* ultimoAguardar=string_new();
 
+						char* stringFinal=string_substring_from(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"));
+
 						//primer Alternativa
-						string_append(&ultimoAguardar,string_substring_from(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE")));
+						string_append(&ultimoAguardar,stringFinal);
 						int longitud=string_length(ultimoAguardar);
 
 						//segunda alternativa
@@ -1017,14 +1030,18 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 
 						sobrescribirLineas(bin_block,ultimoAguardar,longitud);
 						free(ultimoAguardar);
+						free(stringFinal);
 					}else{
 
 						char* cadenaAguardar=string_new();
-						string_append(&cadenaAguardar,string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE")));
+						char* stringRecorte=string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE"));
+
+						string_append(&cadenaAguardar,stringRecorte);
 						int longitud=string_length(cadenaAguardar);
 						sobrescribirLineas(bin_block,cadenaAguardar,longitud);
 
 						free(cadenaAguardar);
+						free(stringRecorte);
 					}
 
 					free(bin_block);
@@ -1038,19 +1055,22 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 
 			free(contenidoActualizadoDeBloques);
 
+			char* stringSize=string_itoa(size);
+
 			//retardo para simular acceso a disco
 			sleep(tiempo_retardo_operacion);
 
 			pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
 
 			config_set_value(config_metadata_pokemon,"BLOCKS",listaBloques);
-			config_set_value(config_metadata_pokemon,"SIZE",string_itoa(size));
+			config_set_value(config_metadata_pokemon,"SIZE",stringSize);
 			config_set_value(config_metadata_pokemon,"OPEN","N");
 			config_save(config_metadata_pokemon);
 
 			pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
 
 			free(listaBloques);
+			free(stringSize);
 
 			log_info(event_logger,"Un %s fue atrapado en la posicion: (%i,%i)",unMsjCatchPoke->pokemon.especie,unMsjCatchPoke->pokemon.posicion.pos_x,unMsjCatchPoke->pokemon.posicion.pos_y);
 
@@ -1075,6 +1095,8 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 		}
 
 		free(cadenaABuscar);
+		free(stringPosX);
+		free(stringPosY);
 		split_liberar(bloquesDelPokemon);
 		config_destroy(config_metadata_pokemon);
 
@@ -1104,8 +1126,8 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 	free(bin_metadata);
 	mensaje_appeared_catch_pokemon_destruir(unMsjCatchPoke);
 	mensaje_caught_pokemon_destruir(mensajeAEnviar);
-
-
+	conexion_server_destruir(unaConexion);
+	paquete_destruir(paqueteAEnviar);
 
 }
 void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
@@ -1433,6 +1455,7 @@ bool contienePosicionEnBloques(char* string, char**bloques){
 
 		free(stringPosAdaptado);
 		free(arrayLineasDelPokmeon);
+		free(lineasDeBloques);
 
 		return result;
 
