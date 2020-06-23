@@ -221,51 +221,55 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 	string_append(&bin_metadata,dir_unNuevoPokemon);
 	string_append(&bin_metadata,"/Metadata.bin");
 
+	pthread_mutex_lock(&mutDiccionarioSemaforos);
+	//este if es para ver si ya existe el semaforo para el pokemon que esta llegando
+	if(!dictionary_has_key(semaforosDePokemons,unMsjNewPoke->pokemon.especie)){
+
+		pthread_mutex_t* mutexMetadataPokemon=malloc(sizeof(pthread_mutex_t));
+		pthread_mutex_init(mutexMetadataPokemon, NULL);
+		dictionary_put(semaforosDePokemons,unMsjNewPoke->pokemon.especie,mutexMetadataPokemon);
+
+	}
+	pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+
+	//hay un mutex porque aqui se crea el archivo metadata del pokemon si no existe,
+	//y a la vez mientras se completa el archivo otro hilo con el mismo pokemon podria abrirlo para leerlo,
+	//o talvez dos o mas hilos con el mismo pokemon intente abrir el archivo al mismo tiempo
+	//y les de NULL asi que podrian entran al if
+	pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 	if((f_metadata=fopen(bin_metadata,"r"))==NULL){ //si no existe el archivo metadata
 			f_metadata=fopen(bin_metadata,"wb+");
 
-			pthread_mutex_t* mutexMetadataPokemon=malloc(sizeof(pthread_mutex_t));
-			pthread_mutex_init(mutexMetadataPokemon, NULL);
-
-			pthread_mutex_lock(&mutDiccionarioSemaforos);
-
-			dictionary_put(semaforosDePokemons,unMsjNewPoke->pokemon.especie,mutexMetadataPokemon);
-
-			pthread_mutex_unlock(&mutDiccionarioSemaforos);
-
-			config_metadata_pokemon=config_create(bin_metadata);
-			config_set_value(config_metadata_pokemon,"DIRECTORY","N");
-			config_set_value(config_metadata_pokemon,"SIZE","0");
-			config_set_value(config_metadata_pokemon,"BLOCKS","[]");
-			config_set_value(config_metadata_pokemon,"OPEN","N");
-			config_save(config_metadata_pokemon);
-		}else{
-			pthread_mutex_lock(&mutDiccionarioSemaforos);
-			//este if es para cuando ya existe el pokemon en disco, pero no su mutex
-			if(!dictionary_has_key(semaforosDePokemons,unMsjNewPoke->pokemon.especie)){
-
-				pthread_mutex_t* mutexMetadataPokemon=malloc(sizeof(pthread_mutex_t));
-				pthread_mutex_init(mutexMetadataPokemon, NULL);
-				dictionary_put(semaforosDePokemons,unMsjNewPoke->pokemon.especie,mutexMetadataPokemon);
-
-			}
-			pthread_mutex_unlock(&mutDiccionarioSemaforos);
-
-			pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
-
-			config_metadata_pokemon=config_create(bin_metadata);
-
-			pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
-
+			t_config* config_temp=config_create(bin_metadata);
+			config_set_value(config_temp,"DIRECTORY","N");
+			config_set_value(config_temp,"SIZE","0");
+			config_set_value(config_temp,"BLOCKS","[]");
+			config_set_value(config_temp,"OPEN","N");
+			config_save(config_temp);
+			config_destroy(config_temp);
 		}
-		fclose(f_metadata);
 
+
+	fclose(f_metadata);
+	pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+
+	//este mutex me sirve para que de a uno vayan abriendo los hilos que tiene el mismo pokemon,
+	//el metadata.bin correspondiente, que ya tiene todas las keys necesarias (Directory,size,blocks,open)
 		pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+
+		config_metadata_pokemon=config_create(bin_metadata);
 		char* estadoArchivo=config_get_string_value(config_metadata_pokemon,"OPEN");
+		bool abierto=true;
+		if(strcmp(estadoArchivo,"N")==0){
+			abierto=false;
+			config_set_value(config_metadata_pokemon,"OPEN","Y");
+			config_save(config_metadata_pokemon);
+		}
 		pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 
 		//------Ver si el archivo esta abierto------------
-		if(strcmp(estadoArchivo,"Y")==0){
+		if(abierto){
 			//abro otro hilo con un sleep que volvera a atender al Mensaje
 
 			config_destroy(config_metadata_pokemon);
@@ -288,12 +292,12 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 		}
 
-
+/*
 		pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 		config_set_value(config_metadata_pokemon,"OPEN","Y");
 		config_save(config_metadata_pokemon);
 		pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
-
+*/
 
 		char** bloquesDelPokemon=config_get_array_value(config_metadata_pokemon,"BLOCKS");
 
