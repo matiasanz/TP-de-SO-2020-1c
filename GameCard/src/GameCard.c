@@ -1227,9 +1227,11 @@ void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
 
 		pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjGetPoke->especie));
 
+		char* posicionesString=posicion_list_to_string(listaDePosiciones);
+		log_info(event_logger,"Mensaje:%s, se localizaron %i posiciones para %s,->>>: %s",GET_POKEMON_STRING,list_size(listaDePosiciones),unMsjGetPoke->especie,posicionesString);
 
-		log_info(event_logger,"Mensaje:%s, se localizaron %i posiciones para %s,->>>: %s",GET_POKEMON_STRING,list_size(listaDePosiciones),unMsjGetPoke->especie,posicion_list_to_string(listaDePosiciones));
-
+		free(posicionesString);
+		split_liberar(bloquesDelPokemon);
 	}
 
 
@@ -1256,6 +1258,13 @@ void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
 	free(bin_metadata);
 	mensaje_get_pokemon_destruir(unMsjGetPoke);
 	mensaje_localized_pokemon_destruir(mensajeAEnviar);
+	conexion_server_destruir(unaConexion);
+	paquete_destruir(paqueteAEnviar);
+	config_destroy(config_metadata_pokemon);
+	//si uso list_destroy_and_destroy_elements(listaDePosiciones, (void*) posicion_destruir)
+	//me dice en valgrind, free invalidos, puede que las posiciones
+	//hayan sido libereadas en el mensaje_localized_pokemon_destruir()
+	list_destroy(listaDePosiciones);
 
 
 }
