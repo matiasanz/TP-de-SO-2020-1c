@@ -182,12 +182,15 @@ void crearEstructuras(){
 		int x;
 		for(x=0;x<config_get_int_value(config_metadata,"BLOCKS");x++){
 			bin_block = string_new();
+			char* nroBloque=string_itoa(x);
+
 			string_append(&bin_block,dir_blocks);
-			string_append(&bin_block,string_itoa(x));
+			string_append(&bin_block,nroBloque);
 			string_append(&bin_block,".bin");
 			f_block=fopen(bin_block,"wb+");
 			fclose(f_block);
 			free(bin_block);
+			free(nroBloque);
 		}
 		}else{
 			free(bin_block);
@@ -288,7 +291,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 			//y finalizo este hilo
 			pthread_cancel(pthread_self());
-			log_info(event_logger,"no se corto el hilo");
+			//log_info(event_logger,"no se corto el hilo");
 
 		}
 
@@ -305,9 +308,12 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 		//--------Comienzo a operar con el pokemon------------
 
 		char* cadenaABuscar=string_new();
-		string_append(&cadenaABuscar,string_itoa(unMsjNewPoke->pokemon.posicion.pos_x));
+		char* stringPosX=string_itoa(unMsjNewPoke->pokemon.posicion.pos_x);
+		char* stringPosY=string_itoa(unMsjNewPoke->pokemon.posicion.pos_y);
+
+		string_append(&cadenaABuscar,stringPosX);
 		string_append(&cadenaABuscar,"-");
-		string_append(&cadenaABuscar,string_itoa(unMsjNewPoke->pokemon.posicion.pos_y));
+		string_append(&cadenaABuscar,stringPosY);
 
 
 		if(contienePosicionEnBloques(cadenaABuscar,bloquesDelPokemon)){
@@ -341,13 +347,14 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 					int cantActual=atoi(posYCant[1]);
 
 					int cantidadFinal=cantActual+unMsjNewPoke->cantidad;
+					char* stringCantFinal=string_itoa(cantidadFinal);
 
 					string_append(&contenidoActualizadoDeBloques,posYCant[0]);
 					string_append(&contenidoActualizadoDeBloques,"=");
-					string_append(&contenidoActualizadoDeBloques,string_itoa(cantidadFinal));
+					string_append(&contenidoActualizadoDeBloques,stringCantFinal);
 					string_append(&contenidoActualizadoDeBloques,"\n");
 
-
+					free(stringCantFinal);
 					split_liberar(posYCant);
 
 				}else{
@@ -386,12 +393,16 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 				bitarray_set_bit(bitmap,nrobloque);
 				pthread_mutex_unlock(&mutBitarray);
 
+
+				char* stringNroBloque=string_itoa(nrobloque);
 					if(cantBloquesFaltantes==(b+1)){
-						string_append(&nroDebloquesActualizado,string_itoa(nrobloque));
+						string_append(&nroDebloquesActualizado,stringNroBloque);
 					}else{
-						string_append(&nroDebloquesActualizado,string_itoa(nrobloque));
+						string_append(&nroDebloquesActualizado,stringNroBloque);
 						string_append(&nroDebloquesActualizado,",");
 					}
+
+				free(stringNroBloque);
 				}
 
 				char** arrayBloqueActualizado=string_split(nroDebloquesActualizado,",");
@@ -409,18 +420,23 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 					//esto seria el ultimo bloque necesario
 
 					char* ultimoAguardar=string_new();
-					string_append(&ultimoAguardar,string_substring_from(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE")));
+					char* stringFinal=string_substring_from(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"));
+
+					string_append(&ultimoAguardar,stringFinal);
 					int longitud=string_length(ultimoAguardar);
 					sobrescribirLineas(bin_block,ultimoAguardar,longitud);
 					free(ultimoAguardar);
+					free(stringFinal);
 				}else{
 
 					char* cadenaAguardar=string_new();
-					string_append(&cadenaAguardar,string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE")));
+					char* stringRecorte=string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE"));
+					string_append(&cadenaAguardar,stringRecorte);
 					int longitud=string_length(cadenaAguardar);
 					sobrescribirLineas(bin_block,cadenaAguardar,longitud);
 
 					free(cadenaAguardar);
+					free(stringRecorte);
 				}
 
 				free(bin_block);
@@ -452,9 +468,9 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 						//esto seria el ultimo bloque necesario
 
 						char* ultimoAguardar=string_new();
-
+						char* stringFinal=string_substring_from(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"));
 						//primer Alternativa
-						string_append(&ultimoAguardar,string_substring_from(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE")));
+						string_append(&ultimoAguardar,stringFinal);
 						int longitud=string_length(ultimoAguardar);
 
 						//segunda alternativa
@@ -463,14 +479,17 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 						sobrescribirLineas(bin_block,ultimoAguardar,longitud);
 						free(ultimoAguardar);
+						free(stringFinal);
 					}else{
 
 						char* cadenaAguardar=string_new();
-						string_append(&cadenaAguardar,string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE")));
+						char* stringRecorte=string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE"));
+						string_append(&cadenaAguardar,stringRecorte);
 						int longitud=string_length(cadenaAguardar);
 						sobrescribirLineas(bin_block,cadenaAguardar,longitud);
 
 						free(cadenaAguardar);
+						free(stringRecorte);
 					}
 
 					free(bin_block);
@@ -484,20 +503,21 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 			free(contenidoActualizadoDeBloques);
 
-
+			char* stringSize=string_itoa(size);
 			//retardo para simular acceso a disco
 			sleep(tiempo_retardo_operacion);
 
 			pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 
 			config_set_value(config_metadata_pokemon,"BLOCKS",listaBloques);
-			config_set_value(config_metadata_pokemon,"SIZE",string_itoa(size));
+			config_set_value(config_metadata_pokemon,"SIZE",stringSize);
 			config_set_value(config_metadata_pokemon,"OPEN","N");
 			config_save(config_metadata_pokemon);
 
 			pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 
 			free(listaBloques);
+			free(stringSize);
 
 			log_info(event_logger,"La posicion ya existe");
 
@@ -526,8 +546,10 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 					pthread_mutex_unlock(&mutBitarray);
 
 					char* bin_block = string_new();
+					char* stringNrobloque=string_itoa(nrobloque);
+
 					string_append(&bin_block,paths_estructuras[BLOCKS]);
-					string_append(&bin_block,string_itoa(nrobloque));
+					string_append(&bin_block,stringNrobloque);
 					string_append(&bin_block,".bin");
 
 
@@ -535,26 +557,33 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 						//esto seria el ultimo bloque necesario
 
 						char* ultimoAguardar=string_new();
-						string_append(&ultimoAguardar,string_substring_from(nuevalinea,y*config_get_int_value(config_metadata,"BLOCK_SIZE")));
+						char* stringFinal=string_substring_from(nuevalinea,y*config_get_int_value(config_metadata,"BLOCK_SIZE"));
+
+						string_append(&ultimoAguardar,stringFinal);
 						int longitud=string_length(ultimoAguardar);
 						guardarLinea(bin_block,ultimoAguardar,longitud);
 
-						string_append(&listaBloques,string_itoa(nrobloque));
+						string_append(&listaBloques,stringNrobloque);
 						free(ultimoAguardar);
+						free(stringFinal);
 					}else{
 
 						char* cadenaAguardar=string_new();
-						string_append(&cadenaAguardar,string_substring(nuevalinea,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE")));
+						char* stringRecorte=string_substring(nuevalinea,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE"));
+
+						string_append(&cadenaAguardar,stringRecorte);
 						int longitud=string_length(cadenaAguardar);
 						guardarLinea(bin_block,cadenaAguardar,longitud);
 
-						string_append(&listaBloques,string_itoa(nrobloque));
+						string_append(&listaBloques,stringNrobloque);
 						string_append(&listaBloques,",");
 						free(cadenaAguardar);
+						free(stringRecorte);
 					}
 
 
 					free(bin_block);
+					free(stringNrobloque);
 				}
 
 
@@ -585,6 +614,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 				string_append(&listaBloques,"]");
 				size=longitud;
+				char* stringSize=string_itoa(size);
 
 				//retardo para simular acceso a disco
 				sleep(tiempo_retardo_operacion);
@@ -592,7 +622,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 				pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 
 				config_set_value(config_metadata_pokemon,"BLOCKS",listaBloques);
-				config_set_value(config_metadata_pokemon,"SIZE",string_itoa(size));
+				config_set_value(config_metadata_pokemon,"SIZE",stringSize);
 				config_set_value(config_metadata_pokemon,"OPEN","N");
 				config_save(config_metadata_pokemon);
 
@@ -603,6 +633,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 				free(listaBloques);
 				free(nuevalinea);
+				free(stringSize);
 
 
 			}else{
@@ -646,18 +677,21 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 							//-----recorto y guardo, lo que entre de la linea en el ultimo bloque asignado que tiene el pokemon
 							int espacioDisponibleEnUltimoBloque=espacioDisponibleEnBloque(pathBloque);
 							char* headlineaRecortada=string_new();
+							char* recorteHasta=string_substring_until(nuevalinea,espacioDisponibleEnUltimoBloque);
 
-							string_append(&headlineaRecortada,string_substring_until(nuevalinea,espacioDisponibleEnUltimoBloque));
+							string_append(&headlineaRecortada,recorteHasta);
 
 							guardarLinea(pathBloque,headlineaRecortada,espacioDisponibleEnUltimoBloque);
 
 							free(headlineaRecortada);
+							free(recorteHasta);
 
 							//---------guardo el resto de la linea--------
 
 
 							char* tailLineaRecortada=string_new();
-							string_append(&tailLineaRecortada,string_substring_from(nuevalinea,espacioDisponibleEnUltimoBloque));
+							char* recorteDesde=string_substring_from(nuevalinea,espacioDisponibleEnUltimoBloque);
+							string_append(&tailLineaRecortada,recorteDesde);
 
 							int cantBloquesNecesarios=bloquesNecesarios(tailLineaRecortada,config_get_int_value(config_metadata,"BLOCK_SIZE"));
 
@@ -669,8 +703,9 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 								pthread_mutex_unlock(&mutBitarray);
 
 								char* bin_block = string_new();
+								char* stringNrobloque=string_itoa(nrobloque);
 								string_append(&bin_block,paths_estructuras[BLOCKS]);
-								string_append(&bin_block,string_itoa(nrobloque));
+								string_append(&bin_block,stringNrobloque);
 								string_append(&bin_block,".bin");
 
 
@@ -678,40 +713,49 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 									//esto seria el ultimo bloque necesario
 
 									char* ultimoAguardar=string_new();
-									string_append(&ultimoAguardar,string_substring_from(tailLineaRecortada,y*config_get_int_value(config_metadata,"BLOCK_SIZE")));
+									char* stringFinal=string_substring_from(tailLineaRecortada,y*config_get_int_value(config_metadata,"BLOCK_SIZE"));
+
+									string_append(&ultimoAguardar,stringFinal);
 									int longitud=string_length(ultimoAguardar);
 									guardarLinea(bin_block,ultimoAguardar,longitud);
 
-									string_append(&listaBloques,string_itoa(nrobloque));
+									string_append(&listaBloques,stringNrobloque);
 									free(ultimoAguardar);
+									free(stringFinal);
 								}else{
 
 									char* cadenaAguardar=string_new();
-									string_append(&cadenaAguardar,string_substring(tailLineaRecortada,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE")));
+									char* stringRecorte=string_substring(tailLineaRecortada,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE"));
+									string_append(&cadenaAguardar,stringRecorte);
 									int longitud=string_length(cadenaAguardar);
 									guardarLinea(bin_block,cadenaAguardar,longitud);
 
-									string_append(&listaBloques,string_itoa(nrobloque));
+									string_append(&listaBloques,stringNrobloque);
 									string_append(&listaBloques,",");
 									free(cadenaAguardar);
+									free(stringRecorte);
 								}
 
 
 								free(bin_block);
+								free(stringNrobloque);
 							}
 
 							string_append(&listaBloques,"]");
 							free(tailLineaRecortada);
+							free(recorteDesde);
 						}
 
 				size=longitudCadenaNueva+config_get_int_value(config_metadata_pokemon,"SIZE");
+				char* stringSize=string_itoa(size);
+
 				//retardo para simular acceso a disco
 				sleep(tiempo_retardo_operacion);
 
 				pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 
 				config_set_value(config_metadata_pokemon,"BLOCKS",listaBloques);
-				config_set_value(config_metadata_pokemon,"SIZE",string_itoa(size));
+				config_set_value(config_metadata_pokemon,"SIZE",stringSize);
 				config_set_value(config_metadata_pokemon,"OPEN","N");
 				config_save(config_metadata_pokemon);
 
@@ -720,6 +764,8 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 				free(listaBloques);
 				free(nuevalinea);
+				free(stringSize);
+				free(pathBloque);
 
 				log_info(event_logger,"ya tiene bloques asignados");
 			}
@@ -727,6 +773,8 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 		}
 
 		free(cadenaABuscar);
+		free(stringPosX);
+		free(stringPosY);
 
 
 		log_info(event_logger,"pokemon guardado:%s ::pos (%i,%i)::cant %i"
@@ -739,7 +787,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 		//creacion de  paquete appeared pokemon y envio a Broker
 
 		t_mensaje_appeared_catch_pokemon* mensajeAEnviar=mensaje_appeared_catch_pokemon_crear(unMsjNewPoke->pokemon.especie,unMsjNewPoke->pokemon.posicion.pos_x,unMsjNewPoke->pokemon.posicion.pos_y);
-		mensaje_appeared_catch_pokemon_set_id_correlativo(mensajeAEnviar,unMsjNewPoke->mensaje_header.id);
+		mensaje_appeared_catch_pokemon_set_id_correlativo(mensajeAEnviar,mensaje_new_pokemon_get_id(unMsjNewPoke));
 
 		t_paquete_header header=paquete_header_crear(MENSAJE,GAMECARD,APPEARED_POKEMON);
 		t_buffer* bufferDepaquete=mensaje_appeared_catch_pokemon_serializar(mensajeAEnviar);
@@ -762,6 +810,8 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 		free(dir_unNuevoPokemon);
 		mensaje_new_pokemon_destruir(unMsjNewPoke);
 		mensaje_appeared_catch_pokemon_destruir(mensajeAEnviar);
+		conexion_server_destruir(unaConexion);
+		paquete_destruir(paqueteAEnviar);
 
 }
 
@@ -1346,12 +1396,21 @@ void guardarLinea(char* path,char* nuevalinea,int len){
 }
 char* crearLinea(t_mensaje_new_pokemon* unMsjNewPoke ){
 	    char* unalinea=string_new();
-	    string_append(&unalinea,string_itoa(unMsjNewPoke->pokemon.posicion.pos_x));
+	    char* stringPosX=string_itoa(unMsjNewPoke->pokemon.posicion.pos_x);
+	    char* stringPosY=string_itoa(unMsjNewPoke->pokemon.posicion.pos_y);
+	    char* stringCant=string_itoa(unMsjNewPoke->cantidad);
+
+	    string_append(&unalinea,stringPosX);
 		string_append(&unalinea,"-");
-		string_append(&unalinea,string_itoa(unMsjNewPoke->pokemon.posicion.pos_y));
+		string_append(&unalinea,stringPosY);
 		string_append(&unalinea,"=");
-		string_append(&unalinea,string_itoa(unMsjNewPoke->cantidad));
+		string_append(&unalinea,stringCant);
 		string_append(&unalinea,"\n");
+
+		free(stringPosX);
+		free(stringPosY);
+		free(stringCant);
+
 		return unalinea;
 }
 int size_bloque(char* path){
