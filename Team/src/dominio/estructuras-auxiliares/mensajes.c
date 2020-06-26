@@ -1,13 +1,13 @@
 #include "mensajes.h"
-#include "../team.h"
+#include "../../team.h"
 
 void* leer_mensaje_cuando_este_disponible(cr_list* unaLista){
 	return cr_list_wait_and_remove(unaLista, 0);
 }
 
-void mensaje_get_registrar(t_mensaje_get_pokemon* mensajeGet){
+void mensaje_get_registrar(t_id idMensaje){
     t_id* idGet = malloc(sizeof(t_id));
-    	* idGet = mensaje_get_pokemon_get_id(mensajeGet);
+    	* idGet = idMensaje;
 
     pthread_mutex_lock(&mutexPedidos);
     list_add(registroDePedidos, idGet);
@@ -15,7 +15,7 @@ void mensaje_get_registrar(t_mensaje_get_pokemon* mensajeGet){
 }
 
 void Get(void* especiePokemon) {
-	//Envia mensaje al broker para ser replicado al gamecard
+
 	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
 	log_info(event_logger, ">> get(%s)\n", (especie_pokemon) especiePokemon);
 	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
@@ -25,17 +25,17 @@ void Get(void* especiePokemon) {
 	t_paquete_header header=paquete_header_crear(MENSAJE,TEAM,GET_POKEMON);
 	t_buffer* bufferDepaquete=mensaje_get_pokemon_serializar(mensajeGet);
 	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
-	int resultadoDeEnvio = enviar(conexion_broker,paqueteAEnviar);
+	int idMensajeEnviado = enviar(conexion_broker,paqueteAEnviar);
 
-	mensaje_get_registrar(mensajeGet);
+	mensaje_get_registrar(idMensajeEnviado);
 
-	if(resultadoDeEnvio==ERROR_SOCKET){
+	if(error_conexion(idMensajeEnviado)){
 		pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
 		log_warning(event_logger,"Se procedera a responder el mensaje GET por defecto");
 		pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 
 		t_mensaje_localized_pokemon* respuestaAutogenerada = mensaje_localized_pokemon_crear(string_duplicate(especiePokemon), list_create());
-		mensaje_localized_pokemon_set_id_correlativo(respuestaAutogenerada, mensaje_get_pokemon_get_id(mensajeGet));
+		mensaje_localized_pokemon_set_id_correlativo(respuestaAutogenerada, idMensajeEnviado);
 		localized_pokemon_recibido(respuestaAutogenerada);
 	}
 
@@ -46,7 +46,9 @@ void Get(void* especiePokemon) {
 //Itera los objetivos, aplicando la funcion Get a cada uno. No editar esta funcion, sino la de arriba
 void Get_pokemones(matriz_recursos objetivosTotales, matriz_recursos recursosDisponibles){
 
+	pthread_mutex_lock(&mutexRecursosDisponibles);
 	matriz_recursos necesidadDelEquipo = recursos_matriz_diferencia(objetivosTotales, recursosDisponibles);
+	pthread_mutex_unlock(&mutexRecursosDisponibles);
 
 	void unGetPorPokemon(char* unaEspecie, void*cantidad){
 		if(*((numero*)cantidad) > 0){
@@ -55,7 +57,7 @@ void Get_pokemones(matriz_recursos objetivosTotales, matriz_recursos recursosDis
 		}
 	}
 
-	dictionary_iterator(necesidadDelEquipo, unGetPorPokemon); puts("");
+	dictionary_iterator(necesidadDelEquipo, unGetPorPokemon);
 	recursos_destroy(necesidadDelEquipo);
 }
 

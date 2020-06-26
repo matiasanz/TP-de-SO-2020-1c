@@ -1,5 +1,5 @@
-#include "../deadlock/candidatos_intercambio.h"
-#include "../hilos-del-team/hilos_team.h"
+#include "deadlock/candidatos_intercambio.h"
+#include "hilos_team.h"
 #include "../team.h"
 
 pokemon* entrenador_get_proxima_presa(entrenador*unEntrenador){
@@ -23,9 +23,9 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 
 				entrenador_desplazarse_hacia(unEntrenador, unPokemon->posicion);
 
-				Catch(unEntrenador, unPokemon); //TODO Descomentar conexiones
+				Catch(unEntrenador, unPokemon);
 
-				//Duerme al entrenador hasta que llegue el resultado y consume 1 ciclo de cpu
+				//Al hacer catch, el entrenador consume 1 ciclo de CPU y queda dormido hasta que llegue el resultado
 
 				break;
 			}
@@ -72,7 +72,6 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 				hiloActivo = !entrenador_verificar_objetivos(unEntrenador);
 				entrenador_verificar_objetivos(parejaDeIntercambio->interesado);
 
-				puts("********* signal(cpuConsumido)");
 				sem_post(&FinDeCiclo_CPU); //Consumi el ultimo ciclo
 
 				sem_post(&finDeIntercambio);

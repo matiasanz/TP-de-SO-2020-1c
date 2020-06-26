@@ -1,7 +1,7 @@
 # ifndef _ALGORITMOS_PLANIFICACION_
 # define _ALGORITMOS_PLANIFICACION_
 
-#include "../hilos-del-team/hilos_team.h"
+#include "../../hilos-del-team/hilos_team.h"
 
 //******************************** Algoritmos de planificacion **********************************
 
@@ -33,9 +33,9 @@ typedef union{
 	entrenador*proximo_segun_sjf(cola_entrenadores);
 
   //Desalojo
-	bool puede_seguir_sin_desalojo();
-	bool puede_seguir_en_RR(entrenador*, numero tiempo);
-	bool puede_seguir_en_sjf_cd(entrenador*unEntrenador, numero tiempoQueLlevaEjecutando);
+	bool sin_desalojo();
+	bool desalojo_en_RR(entrenador*, numero tiempo);
+	bool desalojo_en_sjf_cd(entrenador*unEntrenador, numero tiempoQueLlevaEjecutando);
 
   //Actualizar datos
 	void actualizar_datos_sjf(entrenador*unEntrenador, numero tiempoUltimaEjecucion);
@@ -53,6 +53,6 @@ typedef union{
 	void no_operation();
 	numero estimacion_del_entrenador(entrenador*);
 	entrenador*cola_entrenador_con_menor_estimacion(cola_entrenadores);
-	void validar_quantum(numero QUANTUM);
+	bool entrenador_termino_de_ejecutar(entrenador*unEntrenador);
 
 	#endif

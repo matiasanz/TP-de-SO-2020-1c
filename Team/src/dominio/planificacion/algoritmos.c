@@ -1,5 +1,5 @@
-#include "planificacion.h"
-#include "../team.h"
+#include "../planificacion/planificacion.h"
+#include "../../team.h"
 
 //Inicializar
 void cargar_algoritmo_planificacion(){
@@ -23,17 +23,20 @@ void cargar_algoritmo_planificacion(){
 		double ALFA = config_get_double_value(config, "ALFA");
 
 		numero ESTIMACION_INICIAL = config_get_int_value(config, "ESTIMACION_INICIAL");
-		printf("Lei estimacion inicial %d", ESTIMACION_INICIAL);
+
+		pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
+		log_info(event_logger, "Lei estimacion inicial %d", ESTIMACION_INICIAL);
+		pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 
 		inicializar_sjf(ALFA, ESTIMACION_INICIAL, cantidadDeEntrenadores); //Ver cuando tiene valor
 
 		actualizar_datos_del_entrenador = actualizar_datos_sjf;
 
 		if(string_equals_ignore_case(algoritmoLeido, "SJF_CD")){
-			entrenador_puede_seguir_ejecutando_segun_algoritmo = puede_seguir_en_sjf_cd;
+			criterio_de_desalojo = desalojo_en_sjf_cd;
 		}
 		else if(string_equals_ignore_case(algoritmoLeido, "SJF_SD")){
-			entrenador_puede_seguir_ejecutando_segun_algoritmo = puede_seguir_sin_desalojo;
+			criterio_de_desalojo = sin_desalojo;
 		}
 
 		else{
@@ -53,7 +56,7 @@ void cargar_algoritmo_planificacion(){
 void inicializar_fifo(){
 	ALGORITMO_PLANIFICACION = FIFO;
 	proximo_a_ejecutar_segun_criterio = proximo_segun_fifo;
-	entrenador_puede_seguir_ejecutando_segun_algoritmo = puede_seguir_sin_desalojo;
+	criterio_de_desalojo = sin_desalojo;
 	actualizar_datos_del_entrenador = no_operation;
 }
 
@@ -63,8 +66,8 @@ entrenador*proximo_segun_fifo(cola_entrenadores colaReady){
 }
 
 //Criterio de desalojo
-bool puede_seguir_sin_desalojo(){ //aplica tambien a sjf s/d
-	return true;
+bool sin_desalojo(){ //aplica tambien a sjf s/d
+	return false;
 }
 
 //************************************************************************************
@@ -75,7 +78,7 @@ void inicializar_rr(numero QUANTUM){
 	ALGORITMO_PLANIFICACION = ROUND_ROBBIN;
 	DATOS_ALGORITMO.QUANTUM=config_get_int_value(config,"QUANTUM");
 	proximo_a_ejecutar_segun_criterio = proximo_segun_rr;
-	entrenador_puede_seguir_ejecutando_segun_algoritmo = puede_seguir_en_RR;
+	criterio_de_desalojo = desalojo_en_RR;
 	actualizar_datos_del_entrenador = no_operation;
 }
 
@@ -84,8 +87,8 @@ entrenador*proximo_segun_rr(cola_entrenadores colaReady){
 }
 
 //Desalojo
-bool puede_seguir_en_RR(entrenador*unEntrenador, numero tiempo){
-	return (tiempo/RETARDO_CICLO_CPU) <=DATOS_ALGORITMO.QUANTUM || cr_list_is_empty(entrenadoresReady);
+bool desalojo_en_RR(entrenador*unEntrenador, numero tiempo){
+	return (tiempo/RETARDO_CICLO_CPU) > DATOS_ALGORITMO.QUANTUM && !cr_list_is_empty(entrenadoresReady);
 }
 
 //************************************************************************************
@@ -110,13 +113,13 @@ entrenador*proximo_segun_sjf(cola_entrenadores colaReady){
 }
 
 //Desalojo
-bool puede_seguir_en_sjf_cd(entrenador*unEntrenador, numero tiempoQueLlevaEjecutando){
+bool desalojo_en_sjf_cd(entrenador*unEntrenador, numero tiempoQueLlevaEjecutando){
 
 	bool menorEstimacionQueTodos(void*otro){
 		return DATOS_ALGORITMO.sjf.estimaciones[((entrenador*)otro)->id] > tiempoQueLlevaEjecutando;
 	}
 
-	return cr_list_all(entrenadoresReady, menorEstimacionQueTodos);
+	return !cr_list_all(entrenadoresReady, menorEstimacionQueTodos);
 }
 
 void actualizar_datos_sjf(entrenador*unEntrenador, numero tiempoUltimaEjecucion){
@@ -142,7 +145,7 @@ entrenador*cola_entrenador_con_menor_estimacion(cola_entrenadores colaReady){
 			return otro;
 		}
 
-		printf("\n %d <= %d\n", estimacion_del_entrenador(unEntrenador), estimacion_del_entrenador(otro));
+		printf("\n Debo desalojar si %d <= %d\n", estimacion_del_entrenador(unEntrenador), estimacion_del_entrenador(otro));
 		return estimacion_del_entrenador(unEntrenador) <= estimacion_del_entrenador(otro)? unEntrenador: otro;
 	}
 

@@ -4,8 +4,8 @@
 #include <semaphore.h>
 #include <commons/collections/list.h>
 
-#include "../estructuras-auxiliares/mensajes.h"
-#include "../estructuras-auxiliares/captura_pendiente.h"
+#include "../dominio/estructuras-auxiliares/mensajes.h"
+#include "../dominio/estructuras-auxiliares/captura_pendiente.h"
 
 #define PROCESO_ACTIVO 1
 
@@ -32,7 +32,7 @@ pthread_mutex_t mutexHistorialEspecies;
 pthread_mutex_t mutexEntrenadores;
 pthread_mutex_t*mutexEstadoEntrenador;
 pthread_mutex_t*mutexPosicionEntrenador;
-pthread_mutex_t mutexInventariosGlobales;
+//pthread_mutex_t mutexInventariosGlobales;
 pthread_mutex_t mutexRecursosDisponibles;
 pthread_mutex_t mutexPedidos;
 

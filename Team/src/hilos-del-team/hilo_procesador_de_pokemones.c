@@ -1,6 +1,6 @@
 #include "hilos_team.h"
 #include "../team.h"
-#include "../header_global_team.h"
+#include "../dominio/header_global_team.h"
 
 void team_procesar_pokemones(){
 	while(PROCESO_ACTIVO){
@@ -101,10 +101,7 @@ bool pokemon_es_requerido(pokemon unPokemon){
 
 numero objetivos_cantidad_bruta_requerida_de(especie_pokemon unaEspecie){
 	numero instanciasTotales = recursos_cantidad_de_instancias_de(objetivosGlobales, unaEspecie);
-
-	pthread_mutex_lock(&mutexInventariosGlobales);
 	numero instanciasDisponibles = recursos_cantidad_de_instancias_de(inventariosGlobales, unaEspecie);
-	pthread_mutex_unlock(&mutexInventariosGlobales);
 
 	return instanciasTotales - instanciasDisponibles;
 }

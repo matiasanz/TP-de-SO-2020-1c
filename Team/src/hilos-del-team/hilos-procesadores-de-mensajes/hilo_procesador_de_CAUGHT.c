@@ -1,6 +1,6 @@
-#include "../hilos-del-team/hilos_team.h"
-#include "../team.h"
-#include "../estructuras-auxiliares/mensajes.h"
+#include "../hilos_team.h"
+#include "../../team.h"
+#include "../../dominio/estructuras-auxiliares/mensajes.h"
 
 void team_procesador_cola_CAUGHT(cr_list* mensajes){
 
@@ -68,9 +68,9 @@ void objetivos_actualizar_por_captura_de(especie_pokemon unaEspecie){
 
 	pthread_mutex_lock(&mutexRecursosDisponibles);
 
-	pthread_mutex_lock(&mutexInventariosGlobales);
+//	pthread_mutex_lock(&mutexRecursosDisponibles);
 	recursos_agregar_recurso(inventariosGlobales, unaEspecie);
-	pthread_mutex_unlock(&mutexInventariosGlobales);
+//	pthread_mutex_unlock(&mutexRecursosDisponibles);
 
 	recursos_quitar_instancia_de_recurso(recursosEnMapa, unaEspecie);
 	pthread_mutex_unlock(&mutexRecursosDisponibles);

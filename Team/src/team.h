@@ -1,17 +1,17 @@
 # ifndef _TEAM_
 # define _TEAM_
 
-#include "header_global_team.h"
+#include "dominio/header_global_team.h"
 
 #include <pthread.h>
 
-#include "algoritmos-de-planificacion/planificacion.h"
-#include "deadlock/candidatos_intercambio.h"
-#include "deadlock/detector_de_deadlock.h"
-#include "estructuras-auxiliares/captura_pendiente.h"
-#include "lector-config/lector_config.h"
-#include "estructuras-auxiliares/mensajes.h"
-#include "estructuras-principales/pokemon.h"
+#include "hilos-del-team/deadlock/candidatos_intercambio.h"
+#include "hilos-del-team/deadlock/detector_de_deadlock.h"
+#include "dominio/estructuras-auxiliares/captura_pendiente.h"
+#include "dominio/estructuras-auxiliares/lector_config.h"
+#include "dominio/estructuras-auxiliares/mensajes.h"
+#include "dominio/estructuras-principales/pokemon.h"
+#include "dominio/planificacion/planificacion.h"
 
 #define CONFIG_PATH "config/team.config"
 
@@ -49,9 +49,8 @@ char*num_array_to_string(numero*arreglo, int length);
 	numero RETARDO_CICLO_CPU;
 	datos_algoritmo DATOS_ALGORITMO;
 
-//Variables de orden superior
 	entrenador* (*proximo_a_ejecutar_segun_criterio)(cola_entrenadores);
-	bool (*entrenador_puede_seguir_ejecutando_segun_algoritmo)(entrenador*, numero);
+	bool (*criterio_de_desalojo)(entrenador*, numero);
 	void (*actualizar_datos_del_entrenador)(entrenador*unEntrenador, numero tiempo);
 
 /*Mis Listas (son variables globales, para que puedan acceder todos los hilos)*/

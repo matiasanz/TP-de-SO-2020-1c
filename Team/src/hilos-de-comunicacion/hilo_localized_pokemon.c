@@ -25,7 +25,7 @@ void subscribir_y_escuchar_cola_localized_pokemon(void (*callback)(t_id_cola, vo
 
 void localized_pokemon_recibido(t_mensaje_localized_pokemon* localized_pokemon) {
 
-	if(1 /*mensaje_localized_es_para_mi(localized_pokemon)*/){
+	if(mensaje_localized_es_para_mi(localized_pokemon)){
 		pthread_mutex_lock(&Mutex_AndoLoggeando);
 		mensaje_localized_pokemon_log(logger, localized_pokemon);
 		pthread_mutex_unlock(&Mutex_AndoLoggeando);

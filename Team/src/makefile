@@ -21,6 +21,8 @@ create-dirs:
 	
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c)) #genera los .o
 SUBCARPETAS = $(patsubst %.c, %.o, $(wildcard **/*.c)) 
+SUBCARPETAS_COMPUESTAS = $(patsubst %.c, %.o, $(wildcard **/**/*.c)) 
+
 
 HEADERS = $(wildcard *.h) # wildcard implica todos los .h
 
@@ -30,8 +32,8 @@ HEADERS = $(wildcard *.h) # wildcard implica todos los .h
 .PRECIOUS: $(TARGET) $(SUBCARPETAS) $(OBJECTS)
 
  # Usamos compilador para linkear los objects a las bibliotecas y tener binario
-$(TARGET): create-dirs $(SUBCARPETAS) $(OBJECTS) 
-	$(CC)  $(SUBCARPETAS) $(OBJECTS) $(CFLAGS) -L"$(CRENITO-COMMONS-BIN)" -lCrenitoCommons $(LIBS) -o $@ 
+$(TARGET): create-dirs $(SUBCARPETAS_COMPUESTAS) $(SUBCARPETAS) $(OBJECTS) 
+	$(CC)  $(SUBCARPETAS_COMPUESTAS) $(SUBCARPETAS) $(OBJECTS) $(CFLAGS) -L"$(CRENITO-COMMONS-BIN)" -lCrenitoCommons $(LIBS) -o $@ 
 
 clean: # tarea para eliminar todos los .o y el binario
 	-rm -f *.o

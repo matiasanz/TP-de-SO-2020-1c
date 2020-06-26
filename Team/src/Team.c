@@ -3,7 +3,7 @@
  Name        : Team.c
  Author      : C-renito Casero
  Version     : Checkpoint
- Description : Proceso Team hasta hito 3
+ Description : Proceso Team
  ============================================================================
  */
 
@@ -174,7 +174,7 @@ void inicializar_listas() {
 }
 
 void listas_destroy(){
-	list_destroy(entrenadoresReady->lista);
+	cr_list_destroy(entrenadoresReady);
 
 	cr_list_clean_and_destroy_elements(pokemonesRecibidos, (void*) pokemon_destroy); //TODO, ver donde hago post(hayEntrenadores) porque no deberia romper
 	pendientes_destroy(capturasPendientes);
@@ -236,7 +236,7 @@ void inicializar_semaforos(){
 	pthread_mutex_init(&mutexEntrenadores         , NULL);
 	pthread_mutex_init(&mutexHistorialEspecies    , NULL);
 	pthread_mutex_init(&mutexRepuestos            , NULL);
-	pthread_mutex_init(&mutexInventariosGlobales  , NULL);
+//	pthread_mutex_init(&mutexInventariosGlobales  , NULL);
 
 	pthread_mutex_init(&mutexRecursosDisponibles  , NULL);
 	pthread_mutex_init(&mutexPedidos              , NULL);
@@ -250,7 +250,7 @@ void finalizar_semaforos(){
 	sem_destroy(&FinDePlanificacion);
 
 	pthread_mutex_destroy(&mutexEntrenadores);
-	pthread_mutex_destroy(&mutexInventariosGlobales);
+//	pthread_mutex_destroy(&mutexInventariosGlobales);
 	pthread_mutex_destroy(&mutexHistorialEspecies);
 	pthread_mutex_destroy(&Mutex_AndoLoggeando);
 	pthread_mutex_destroy(&Mutex_AndoLoggeandoEventos);

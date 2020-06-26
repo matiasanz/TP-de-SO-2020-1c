@@ -3,7 +3,7 @@
 
 #include "../header_global_team.h"
 #include "../estructuras-principales/pokemon.h"
-#include "../utils/mensajes-utils.h"
+#include "../../utils/mensajes-utils.h"
 #include <crenito-commons/mensajes/mensaje_localized_pokemon.h>
 #include <crenito-commons/mensajes/mensaje_caught_pokemon.h>
 #include <crenito-commons/mensajes/mensaje_appeared_catch_pokemon.h>

@@ -1,5 +1,5 @@
 #include "detector_de_deadlock.h"
-#include "../team.h"
+#include "../../team.h"
 
 void finalizar_suscripcion_a_colas(){ //TODO ver si vale la pena aplicar a los hilos reales
 	//******************************************************************** INICIO HARDCODEADO

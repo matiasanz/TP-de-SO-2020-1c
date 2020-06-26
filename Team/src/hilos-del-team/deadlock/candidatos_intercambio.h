@@ -1,8 +1,8 @@
 # ifndef _TAD_INTERCAMBIOS_
 # define _TAD_INTERCAMBIOS_
 
-#include "../estructuras-principales/entrenador.h"
-#include "../algoritmos-de-planificacion/planificacion.h"
+#include "../../dominio/estructuras-principales/entrenador.h"
+#include "../../dominio/planificacion/planificacion.h"
 
 //TAD Candidatos de intercambio
 
