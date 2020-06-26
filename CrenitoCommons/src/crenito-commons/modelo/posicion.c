@@ -39,12 +39,19 @@ char* posicion_list_to_string(t_list* posiciones) {
 
 	char *string = string_new();
 
-	string_append_with_format(&string, " posiciones: %d -->",
+	string_append_with_format(&string, " posiciones: %d",
 			list_size(posiciones));
 
-	for (int i = 0; i < list_size(posiciones); ++i) {
-		t_posicion* posicion = list_get(posiciones, i);
-		string_append_posicion(&string, *posicion);
+	if(!list_is_empty(posiciones)){
+
+		string_append_with_format(&string, " -->",
+					list_size(posiciones));
+
+		for (int i = 0; i < list_size(posiciones); ++i) {
+			t_posicion* posicion = list_get(posiciones, i);
+			string_append_posicion(&string, *posicion);
+		}
+
 	}
 
 	return string;
