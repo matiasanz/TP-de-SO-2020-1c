@@ -56,6 +56,7 @@ uint32_t particion_get_id_mensaje(t_particion* particion);
 uint32_t particion_get_id_cola(t_particion* particion);
 void* particion_get_direccion_contenido(t_particion* particion);
 bool particion_en_uso(t_particion* particion);
+
 //Setters
 void particion_set_uso(t_particion* particion);
 void particion_actualizar_acceso(t_particion* particion);
