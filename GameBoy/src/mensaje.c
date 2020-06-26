@@ -1,6 +1,6 @@
 #include "gameboy.h"
 
-t_paquete* crearMensaje(char* argumentos[], int longitud) {
+t_paquete* crear_mensaje(char* argumentos[], int longitud) {
 
 	t_buffer* mensaje_serializado;
 	t_id_cola Tipomensaje;
@@ -28,8 +28,7 @@ t_paquete* crearMensaje(char* argumentos[], int longitud) {
 			validar_cantidad_argumentos(longitud, 7);
 			cantidad = argumentos[6];
 			validar_mayor_a_cero(cantidad);
-			t_mensaje_new_pokemon* msj = mensaje_new_pokemon_crear(especie,
-					atoi(x), atoi(y), atoi(cantidad));
+			t_mensaje_new_pokemon* msj = mensaje_new_pokemon_crear(especie, atoi(x), atoi(y), atoi(cantidad));
 			mensaje_serializado = mensaje_new_pokemon_serializar(msj);
 
 		} else {
@@ -43,8 +42,7 @@ t_paquete* crearMensaje(char* argumentos[], int longitud) {
 			//validar_que_es_numero(id);
 			cantidad = argumentos[6];
 			validar_mayor_a_cero(cantidad);
-			t_mensaje_new_pokemon* msj = mensaje_new_pokemon_crear(especie,
-					atoi(x), atoi(y), atoi(cantidad));
+			t_mensaje_new_pokemon* msj = mensaje_new_pokemon_crear(especie, atoi(x), atoi(y), atoi(cantidad));
 			mensaje_new_pokemon_set_id(msj, atoi(id));
 			mensaje_serializado = mensaje_new_pokemon_serializar(msj);
 		}
@@ -62,26 +60,22 @@ t_paquete* crearMensaje(char* argumentos[], int longitud) {
 			validar_cantidad_argumentos(longitud, 7);
 			id_correlativo = argumentos[6];
 			validar_que_es_numero(id_correlativo);
-			t_mensaje_appeared_catch_pokemon* msj =
-					mensaje_appeared_catch_pokemon_crear(especie, atoi(x),
-							atoi(y));
-			mensaje_appeared_catch_pokemon_set_id_correlativo(msj,
-					atoi(id_correlativo));
-			mensaje_serializado = mensaje_appeared_catch_pokemon_serializar(
-					msj);
+			t_mensaje_appeared_catch_pokemon* msj = mensaje_appeared_catch_pokemon_crear(especie, atoi(x),
+					atoi(y));
+			mensaje_appeared_catch_pokemon_set_id_correlativo(msj, atoi(id_correlativo));
+			mensaje_serializado = mensaje_appeared_catch_pokemon_serializar(msj);
 
 		} else {
 			validar_cantidad_argumentos(longitud, 6);
-			t_mensaje_appeared_catch_pokemon* msj =
-					mensaje_appeared_catch_pokemon_crear(especie, atoi(x),
-							atoi(y));
 
-			mensaje_serializado = mensaje_appeared_catch_pokemon_serializar(
-					msj);
+			t_mensaje_appeared_catch_pokemon* msj = mensaje_appeared_catch_pokemon_crear(especie, atoi(x),
+					atoi(y));
+			mensaje_serializado = mensaje_appeared_catch_pokemon_serializar(msj);
 
 		}
 
 		break;
+
 	case CATCH_POKEMON:
 		Tipomensaje = CATCH_POKEMON;
 		validar_quien_conoce_catchpokemon(process);
@@ -89,25 +83,22 @@ t_paquete* crearMensaje(char* argumentos[], int longitud) {
 		validar_mayor_igual_a_cero(y);
 		if (string_equals_ignore_case(argumentos[1], BROKER_STRING)) {
 			validar_cantidad_argumentos(longitud, 6);
-			t_mensaje_appeared_catch_pokemon* msj =
-					mensaje_appeared_catch_pokemon_crear(especie, atoi(x),
-							atoi(y));
-			mensaje_serializado = mensaje_appeared_catch_pokemon_serializar(
-					msj);
+			t_mensaje_appeared_catch_pokemon* msj = mensaje_appeared_catch_pokemon_crear(especie, atoi(x),
+					atoi(y));
+			mensaje_serializado = mensaje_appeared_catch_pokemon_serializar(msj);
 		} else {
 			validar_cantidad_argumentos(longitud, 7);
 			id = argumentos[6];
 			validar_que_es_numero(id);
-			t_mensaje_appeared_catch_pokemon* msj =
-					mensaje_appeared_catch_pokemon_crear(especie, atoi(x),
-							atoi(y));
+			t_mensaje_appeared_catch_pokemon* msj = mensaje_appeared_catch_pokemon_crear(especie, atoi(x),
+					atoi(y));
 			;
 			mensaje_appeared_catch_pokemon_set_id(msj, atoi(id));
-			mensaje_serializado = mensaje_appeared_catch_pokemon_serializar(
-					msj);
+			mensaje_serializado = mensaje_appeared_catch_pokemon_serializar(msj);
 		}
 
 		break;
+
 	case CAUGHT_POKEMON:
 
 		Tipomensaje = CAUGHT_POKEMON;
@@ -130,7 +121,10 @@ t_paquete* crearMensaje(char* argumentos[], int longitud) {
 	case GET_POKEMON:
 		Tipomensaje = GET_POKEMON;
 		validar_quien_conoce_getpokemon(process);
-		especie = argumentos[3];
+
+		char* especie = string_duplicate(argumentos[3]);
+		string_trim_right(&especie);
+
 		if (string_equals_ignore_case(argumentos[1], BROKER_STRING)) {
 			validar_cantidad_argumentos(longitud, 4);
 			t_mensaje_get_pokemon* msj = mensaje_get_pokemon_crear(especie);
@@ -144,6 +138,7 @@ t_paquete* crearMensaje(char* argumentos[], int longitud) {
 			mensaje_get_pokemon_set_id(msj, atoi(id));
 			mensaje_serializado = mensaje_get_pokemon_serializar(msj);
 		}
+		free(especie);
 		break;
 
 	default:
@@ -153,7 +148,6 @@ t_paquete* crearMensaje(char* argumentos[], int longitud) {
 
 	}
 
-	return paquete_crear(paquete_header_crear(MENSAJE, GAMEBOY, Tipomensaje),
-			mensaje_serializado);
+	return paquete_crear(paquete_header_crear(MENSAJE, GAMEBOY, Tipomensaje), mensaje_serializado);
 
 }

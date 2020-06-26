@@ -11,12 +11,14 @@
 void static manejar_error_socket(int socket, char* operacion);
 int static error_recibir(int recv_status);
 
-void socket_bind(int socket, struct addrinfo* info) {
+int socket_bind(int socket, struct addrinfo* info) {
 
 	if (error_conexion(bind(socket, info->ai_addr, info->ai_addrlen))) {
 		manejar_error_socket(socket, "bind");
-
+		return ERROR_SOCKET;
 	}
+
+	return socket;
 }
 
 int socket_connect(int socket, struct addrinfo* info) {
@@ -76,7 +78,11 @@ int socket_crear_listener(char* ip, char* puerto) {
 	struct addrinfo *servinfo;
 	socket_configurar(ip, puerto, SERVIDOR, &servinfo);
 	int socket = socket_create(servinfo);
-	socket_bind(socket, servinfo);
+
+	if(error_conexion(socket_bind(socket, servinfo))) {
+		freeaddrinfo(servinfo);
+		return ERROR_SOCKET;
+	}
 	socket_listen(socket);
 
 	freeaddrinfo(servinfo);

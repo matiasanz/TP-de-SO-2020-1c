@@ -55,7 +55,7 @@ void subscribir_y_escuchar_cola(t_conexion* args) {
 		return;
 
 	t_conexion_cliente* cliente = args->cliente;
-	t_subscriptor* subscriptor = cliente->subscriptor;
+	t_suscriptor* subscriptor = cliente->subscriptor;
 
 	while (1) {
 

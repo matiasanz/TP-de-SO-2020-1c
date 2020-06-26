@@ -7,12 +7,6 @@
 
 #include"utils.h"
 
-void mensaje_header_inicializar(t_mensaje_header* header) {
-
-	header->id = 0;
-	header-> id_correlativo = 0;
-}
-
 char* get_nombre_proceso(t_id_proceso id_proceso) {
 
 	switch (id_proceso) {
@@ -63,25 +57,6 @@ char* get_separador_string(char* texto) {
 
 	return string_from_format(" \n *************   %s   ************* \n",
 			texto);
-}
-
-void string_append_mensaje_header(char** string, t_mensaje_header header, char* tipo){
-
-	char* string_header = mensaje_header_to_string(header, tipo);
-	string_append_with_format(string, string_header);
-	free(string_header);
-}
-
-char* mensaje_header_to_string(t_mensaje_header header, char* tipo) {
-
-	char *string = string_new();
-
-	string_append_separador(&string, LOG_HEADER_MENSAJE_RECIBIDO);
-	string_append_with_format(&string, " mensaje: %s \n", tipo);
-	string_append_with_format(&string, " id: %d, id_correlativo: %d \n",
-			header.id, header.id_correlativo);
-
-	return string;
 }
 
 int error_conexion(int indicador_conexion) {
