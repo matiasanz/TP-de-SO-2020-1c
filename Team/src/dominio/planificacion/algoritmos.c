@@ -1,4 +1,4 @@
-#include "../planificacion/planificacion.h"
+#include "../../listas/cr_list.h"
 #include "../../team.h"
 
 //Inicializar
@@ -149,10 +149,10 @@ entrenador*cola_entrenador_con_menor_estimacion(cola_entrenadores colaReady){
 		return estimacion_del_entrenador(unEntrenador) <= estimacion_del_entrenador(otro)? unEntrenador: otro;
 	}
 
-	pthread_mutex_lock(colaReady->mutex);
+	pthread_mutex_lock(&colaReady->mutex);
 	entrenador*proximo = list_fold(colaReady->lista, NULL, entrenador_con_menor_estimacion);
 	entrenadores_remover_del_equipo_a(colaReady->lista, proximo->id);
-	pthread_mutex_unlock(colaReady->mutex);
+	pthread_mutex_unlock(&colaReady->mutex);
 
 	return proximo;
 }

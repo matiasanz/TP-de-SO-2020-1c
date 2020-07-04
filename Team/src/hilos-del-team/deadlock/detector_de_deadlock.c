@@ -7,6 +7,8 @@ void finalizar_suscripcion_a_colas(){ //TODO ver si vale la pena aplicar a los h
 	FIN_PSEUDOBROKER = true;
 	pthread_mutex_unlock(&mutex_PSEUDOBROKER);
 	//******************************************************************** fin HARDCODEADO
+
+//	pthread_cancel()
 }
 
 void team_ejecutar_algoritmo_de_deteccion_de_deadlock(){

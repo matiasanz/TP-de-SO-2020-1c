@@ -61,9 +61,9 @@ pokemon*mapa_first(mapa_pokemones unMapa){
 }
 
 bool mapa_especie_mapeada(mapa_pokemones unMapa, especie_pokemon unaEspecie){
-	pthread_mutex_lock(unMapa->mutex);
+	pthread_mutex_lock(&unMapa->mutex);
 	bool resultado = list_contains_element(unMapa->lista, unaEspecie, (bool(*)(void*, void*))&especie_cmp);
-	pthread_mutex_unlock(unMapa->mutex); puts((resultado? "especie mapeada": "especie no mapeada"));
+	pthread_mutex_unlock(&unMapa->mutex); puts((resultado? "especie mapeada": "especie no mapeada"));
 
 	return resultado;
 }
