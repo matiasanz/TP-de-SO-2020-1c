@@ -114,6 +114,8 @@ void captura_procesar_fallo(captura_pendiente*capturaFallida){
 	pokemon*repuesto = list_remove_by_comparation(pokemonesDeRepuesto, capturaFallida->pokemonCatcheado, (bool(*)(void*, void*))&pokemon_misma_especie_que);
 	pthread_mutex_unlock(&mutexRepuestos);
 
+	puts("\nFASHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n");
+
 	if(repuesto){
 		cr_list_add_and_signal(pokemonesRecibidos, repuesto);
 	}

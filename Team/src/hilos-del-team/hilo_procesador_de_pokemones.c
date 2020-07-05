@@ -20,8 +20,11 @@ void team_procesar_pokemones(){
 			if(pokemon_en_tramite(unPokemon)){
 				pthread_mutex_unlock(&mutexRecursosDisponibles);
 
+
+
 				pthread_mutex_lock(&mutexRepuestos);
 				list_add(pokemonesDeRepuesto, unPokemon);
+printf("************* Agrego repuesto -> %s\n\n", unPokemon->especie);
 				pthread_mutex_unlock(&mutexRepuestos);
 			}
 

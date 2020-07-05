@@ -87,9 +87,13 @@ void registrar_pokemon(pokemon*unPokemon){
 // Retorna true si la especie ya se encuentra en el registro de especies
 bool especie_recibida_con_anterioridad(especie_pokemon especie, especies_pokemones historial){
 
+	especie_pokemon especieDuplicada = string_duplicate(especie);
+
 	pthread_mutex_lock(&mutexHistorialEspecies);
 	bool siONo = list_get_by_comparation(historial, especie, (bool(*)(void*, void*))especie_cmp);
-	if(!siONo) list_add(historial, string_duplicate(especie));
+
+	if(siONo) free(especieDuplicada);
+	else  list_add(historial, string_duplicate(especie));
 	pthread_mutex_unlock(&mutexHistorialEspecies);
 
 	return siONo;

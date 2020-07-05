@@ -11,6 +11,11 @@
 #include "hilos-del-team/hilos_team.h"
 //#include "tests/tests_team.o"
 
+
+void finalizar_conexiones();
+
+void finalizar_suscripcion_a_colas();
+
 //funciones team_log_info para logs importantes TODO
 
 int main(void) {
@@ -24,15 +29,15 @@ int main(void) {
 
 	inicializar_hilos();
 
-	team_ejecutar_algoritmo_de_deteccion_de_deadlock();
+	esperar_que_equipo_no_pueda_cazar_mas();
 
+	finalizar_suscripcion_a_colas();
+
+	team_ejecutar_algoritmo_de_deteccion_de_deadlock();
 
 	sem_wait(&FinDePlanificacion);
 
 	team_loggear_resultados();
-
-	log_info(logger, "\n\n                              Fin del proceso Team\n"
-						      "****************************************************************************");
 
 	return team_exit();
 }
@@ -71,8 +76,10 @@ void team_inicializar(){
 
 int team_exit(){
 
-	finalizar_estadisticas();
+	log_info(logger, "\n\n                              Fin del proceso Team\n"
+						      "****************************************************************************");
 	finalizar_logs_y_config();
+	finalizar_estadisticas();
 	listas_destroy();
 	finalizar_hilos();
 	finalizar_semaforos();
@@ -176,26 +183,24 @@ void inicializar_listas() {
 void listas_destroy(){
 	cr_list_destroy(entrenadoresReady);
 
-	cr_list_clean_and_destroy_elements(pokemonesRecibidos, (void*) pokemon_destroy); //TODO, ver donde hago post(hayEntrenadores) porque no deberia romper
+	cr_list_clean_and_destroy_elements(pokemonesRecibidos, (void*) pokemon_destroy);
 	pendientes_destroy(capturasPendientes);
+
 	recursos_destroy(objetivosGlobales);
 	recursos_destroy(inventariosGlobales);
 	recursos_destroy(recursosEnMapa);
+
 	candidatos_destroy(potencialesDeadlock);
 	entrenadores_destroy(equipo);
 
-	pthread_mutex_lock(&mutexPedidos);
-	list_clean_and_destroy_elements(registroDePedidos, free);
-	pthread_mutex_unlock(&mutexPedidos);
-
-	pthread_mutex_lock(&mutexHistorialEspecies);
-	list_clean_and_destroy_elements(historialDePokemones, free);
-	pthread_mutex_unlock(&mutexHistorialEspecies);
-
+	list_destroy_and_destroy_elements(registroDePedidos, free);
+	list_destroy_and_destroy_elements(historialDePokemones, free);
 	list_destroy_and_destroy_elements(pokemonesDeRepuesto, (void*) pokemon_destroy_hard);
 	cr_list_clean_and_destroy_elements(pokemonesRecibidos, (void*) pokemon_destroy);
-	cr_list_clean_and_destroy_elements(mensajesCAUGHT    , (void*) mensaje_caught_pokemon_destruir);
-	cr_list_clean_and_destroy_elements(mensajesLOCALIZED , (void*) mensaje_localized_pokemon_destruir);
+	list_destroy(pokemonesRecibidos->lista);
+
+	cr_list_destroy_and_destroy_elements(mensajesCAUGHT    , (void*) mensaje_caught_pokemon_destruir);
+	cr_list_destroy_and_destroy_elements(mensajesLOCALIZED , (void*) mensaje_localized_pokemon_destruir);
 }
 
 //Hilos
@@ -270,4 +275,23 @@ void inicializar_conexiones() {
 	subscribir_y_escuchar_cola_localized_pokemon((void*) mensaje_recibido);
 
 	conectar_gameboy((void*) mensaje_recibido);
+}
+
+void finalizar_conexiones(){
+	finalizar_suscripcion_a_colas();
+	conexion_server_destruir(conexion_broker);
+}
+
+void finalizar_suscripcion_a_colas(){
+	//******************************************************************** INICIO HARDCODEADO
+	pthread_mutex_lock(&mutex_PSEUDOBROKER);
+	FIN_PSEUDOBROKER = true;
+	pthread_mutex_unlock(&mutex_PSEUDOBROKER);
+	//******************************************************************** fin HARDCODEADO
+
+	pthread_cancel(hilo_appeared_pokemon);
+	pthread_cancel(hilo_localized_pokemon);
+	pthread_cancel(hilo_caught_pokemon);
+
+//	finalizar_conexiones();
 }
