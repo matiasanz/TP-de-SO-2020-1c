@@ -119,7 +119,7 @@ void finalizar_hilos_entrenadores(){
 /*************************************** Funciones Auxiliares ************************************************/
 
 bool cambio_de_contexto(t_estado inicial, t_estado final){
-	return inicial==EXECUTE || final==EXECUTE;
+	return final==EXECUTE;
 }
 
 //Cambia de estado al entrenador y lo loggea
