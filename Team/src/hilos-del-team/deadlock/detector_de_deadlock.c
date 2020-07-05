@@ -8,7 +8,9 @@ void finalizar_suscripcion_a_colas(){ //TODO ver si vale la pena aplicar a los h
 	pthread_mutex_unlock(&mutex_PSEUDOBROKER);
 	//******************************************************************** fin HARDCODEADO
 
-//	pthread_cancel()
+	pthread_cancel(hilo_appeared_pokemon);
+	pthread_cancel(hilo_localized_pokemon);
+	pthread_cancel(hilo_caught_pokemon);
 }
 
 void team_ejecutar_algoritmo_de_deteccion_de_deadlock(){
