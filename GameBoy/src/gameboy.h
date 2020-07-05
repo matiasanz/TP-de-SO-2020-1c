@@ -11,7 +11,10 @@
 #include <crenito-commons/conexiones/conexiones.h>
 #include "validaciones_gameboy.h"
 #include "mensaje.h"
+#include "modo_suscriptor.h"
 
+void inicializar();
 void inicializar_logs();
+void inicializar_config();
 
 #endif /* SRC_GAMEBOY_H_ */

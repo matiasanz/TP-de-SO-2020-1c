@@ -12,7 +12,7 @@
 #include "../utils.h"
 
 typedef enum {
-	SUBSCRIPCION = 1,
+	SUSCRIPCION = 1,
 	MENSAJE = 2
 } t_codigo_operacion;
 

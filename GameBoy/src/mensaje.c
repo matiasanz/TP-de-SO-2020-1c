@@ -1,12 +1,10 @@
 #include "gameboy.h"
 
-t_paquete* crear_mensaje(char* argumentos[], int longitud) {
+t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int longitud) {
 
 	t_buffer* mensaje_serializado;
-	t_id_cola Tipomensaje;
-	int atrapado;
-	char* process = argumentos[1];
-	char* mensaje = argumentos[2];
+	t_id_cola id_cola;
+
 	char* especie = argumentos[3];
 	char* x = argumentos[4];
 	char* y = argumentos[5];
@@ -17,8 +15,8 @@ t_paquete* crear_mensaje(char* argumentos[], int longitud) {
 	switch (get_id_mensaje(mensaje)) {
 
 	case NEW_POKEMON:
-		Tipomensaje = NEW_POKEMON;
-		validar_quien_conoce_newpokemon(process);
+		id_cola = NEW_POKEMON;
+		validar_quien_conoce_newpokemon(proceso);
 
 		validar_mayor_igual_a_cero(x);
 		validar_mayor_igual_a_cero(y);
@@ -50,8 +48,8 @@ t_paquete* crear_mensaje(char* argumentos[], int longitud) {
 		break;
 
 	case APPEARED_POKEMON:
-		Tipomensaje = APPEARED_POKEMON;
-		validar_quien_conoce_appearedpokemon(process);
+		id_cola = APPEARED_POKEMON;
+		validar_quien_conoce_appearedpokemon(proceso);
 
 		validar_mayor_igual_a_cero(x);
 		validar_mayor_igual_a_cero(y);
@@ -59,7 +57,7 @@ t_paquete* crear_mensaje(char* argumentos[], int longitud) {
 		if (string_equals_ignore_case(argumentos[1], BROKER_STRING)) {
 			validar_cantidad_argumentos(longitud, 7);
 			id_correlativo = argumentos[6];
-			validar_que_es_numero(id_correlativo);
+
 			t_mensaje_appeared_catch_pokemon* msj = mensaje_appeared_catch_pokemon_crear(especie, atoi(x),
 					atoi(y));
 			mensaje_appeared_catch_pokemon_set_id_correlativo(msj, atoi(id_correlativo));
@@ -75,8 +73,8 @@ t_paquete* crear_mensaje(char* argumentos[], int longitud) {
 
 		break;
 	case CATCH_POKEMON:
-		Tipomensaje = CATCH_POKEMON;
-		validar_quien_conoce_catchpokemon(process);
+		id_cola = CATCH_POKEMON;
+		validar_quien_conoce_catchpokemon(proceso);
 		validar_mayor_igual_a_cero(x);
 		validar_mayor_igual_a_cero(y);
 		if (string_equals_ignore_case(argumentos[1], BROKER_STRING)) {
@@ -87,7 +85,7 @@ t_paquete* crear_mensaje(char* argumentos[], int longitud) {
 		} else {
 			validar_cantidad_argumentos(longitud, 7);
 			id = argumentos[6];
-			validar_que_es_numero(id);
+
 			t_mensaje_appeared_catch_pokemon* msj = mensaje_appeared_catch_pokemon_crear(especie, atoi(x),
 					atoi(y));
 			;
@@ -98,16 +96,16 @@ t_paquete* crear_mensaje(char* argumentos[], int longitud) {
 		break;
 	case CAUGHT_POKEMON:
 
-		Tipomensaje = CAUGHT_POKEMON;
-		validar_quien_conoce_caughtpokemon(process);
+		id_cola = CAUGHT_POKEMON;
+		validar_quien_conoce_caughtpokemon(proceso);
 		validar_cantidad_argumentos(longitud, 5);
 		id_correlativo = argumentos[3];
-		validar_que_es_numero(id_correlativo);
+
 		char* string_atrapado = string_duplicate(argumentos[4]);
 		string_trim_right(&string_atrapado);
 
 		validar_ok_fail(string_atrapado);
-		atrapado = string_equals_ignore_case(string_atrapado, "OK");
+		int atrapado = string_equals_ignore_case(string_atrapado, "OK");
 
 		free(string_atrapado);
 		t_mensaje_caught_pokemon* msj = mensaje_caught_pokemon_crear(atrapado);
@@ -116,8 +114,8 @@ t_paquete* crear_mensaje(char* argumentos[], int longitud) {
 
 		break;
 	case GET_POKEMON:
-		Tipomensaje = GET_POKEMON;
-		validar_quien_conoce_getpokemon(process);
+		id_cola = GET_POKEMON;
+		validar_quien_conoce_getpokemon(proceso);
 
 		char* especie = string_duplicate(argumentos[3]);
 		string_trim_right(&especie);
@@ -130,7 +128,7 @@ t_paquete* crear_mensaje(char* argumentos[], int longitud) {
 		} else {
 			validar_cantidad_argumentos(longitud, 5);
 			id = argumentos[4];
-			validar_que_es_numero(id);
+
 			t_mensaje_get_pokemon* msj = mensaje_get_pokemon_crear(especie);
 			mensaje_get_pokemon_set_id(msj, atoi(id));
 			mensaje_serializado = mensaje_get_pokemon_serializar(msj);
@@ -145,6 +143,40 @@ t_paquete* crear_mensaje(char* argumentos[], int longitud) {
 
 	}
 
-	return paquete_crear(paquete_header_crear(MENSAJE, GAMEBOY, Tipomensaje), mensaje_serializado);
+	return paquete_crear(paquete_header_crear(MENSAJE, GAMEBOY, id_cola), mensaje_serializado);
 
+}
+
+void procesar_envio_mensaje(char* proceso, char* mensaje, char* argumentos[], int longitud) {
+
+	t_conexion_server* conexion = obtener_conexion(proceso);
+	t_paquete* pqt = crear_paquete(proceso, mensaje, argumentos, longitud);
+
+	int respuesta = enviar(conexion, pqt);
+	log_info(logger, "El proceso gameboy se conecto con el proceso %s", proceso, "y obtuvo la respuesta: %d",
+			respuesta);
+
+	paquete_destruir(pqt);
+	conexion_server_destruir(conexion);
+
+}
+
+t_conexion_server* obtener_conexion(char* proceso_string) {
+
+	switch (get_id_proceso(proceso_string)) {
+	case BROKER:
+		return conexion_server_crear(config_get_string_value(config, "IP_BROKER"),
+				config_get_string_value(config, "PUERTO_BROKER"), GAMEBOY);
+	case TEAM:
+		return conexion_server_crear(config_get_string_value(config, "IP_TEAM"),
+				config_get_string_value(config, "PUERTO_TEAM"), GAMEBOY);
+	case GAMECARD:
+		return conexion_server_crear(config_get_string_value(config, "IP_GAMECARD"),
+				config_get_string_value(config, "PUERTO_GAMECARD"), GAMEBOY);
+
+	default:
+		log_error(event_logger, "Error al inicializar la conexión. El proceso %s es incorrecto", proceso_string);
+		exit(EXIT_FAILURE);
+		return NULL;
+	}
 }
