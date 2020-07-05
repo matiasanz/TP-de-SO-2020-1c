@@ -5,11 +5,11 @@
 #include "../estructuras-principales/entrenador.h"
 typedef t_list* especies_pokemones;
 
-//TAD Pokemon									 Pasar a commons
-typedef struct Pokemon{
-	especie_pokemon especie; //string
-	t_posicion posicion;
-}pokemon;
+////TAD Pokemon									 Pasar a commons
+//typedef struct Pokemon{
+//	especie_pokemon especie; //string
+//	t_posicion posicion;
+//}pokemon;
 
 //constructor
 pokemon pokemon_create(especie_pokemon, coordenada X, coordenada Y);
@@ -18,10 +18,13 @@ pokemon* pokemon_ptr_create(especie_pokemon, t_posicion);
 //Destructor
 void pokemon_destroy(pokemon*);
 
+//Destruye el pokemon y la especie
+void pokemon_destroy_hard(pokemon*);
+
 //  Captura un pokemon - ver donde lo puedo poner; problema de ponerlo en entrenador: entrenador no reconoce pokemon y poke incluye entrenador
 	void entrenador_capturar(entrenador*entrenador, pokemon*victima);
 
-
+	bool pokemon_misma_especie_que(pokemon, pokemon);
 //******************************************************************************
 //TAD MAPA: Es una lista que mapea los pokemones que van llegando del gamecard con el mensaje APPEARD
 typedef cr_list* mapa_pokemones; //Mapa de pokemones

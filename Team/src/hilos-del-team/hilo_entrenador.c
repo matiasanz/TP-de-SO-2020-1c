@@ -1,42 +1,43 @@
-#include "../deadlock/candidatos_intercambio.h"
-#include "../hilos-del-team/hilos_team.h"
+#include "deadlock/candidatos_intercambio.h"
+#include "hilos_team.h"
 #include "../team.h"
 
-bool entrenador_validar_objetivos(entrenador*unEntrenador);
+pokemon* entrenador_get_proxima_presa(entrenador*unEntrenador){
+	return unEntrenador->proximaPresa;
+}
 
 void team_hilo_entrenador(entrenador*unEntrenador){
 	t_id pid = unEntrenador->id;
 	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	log_info(logger, "Se creo al Entrenador N°%u en estado NEW", pid);
+	log_info(logger, "Se cargo al Entrenador N°%u en estado NEW, en la posicion %s", pid, posicion_to_string(unEntrenador->posicion));
 	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 
 	bool hiloActivo = true;
 	while(hiloActivo){
 
-		sem_wait(&EjecutarEntrenador[pid]);
+		entrenador_esperar_y_consumir_cpu(unEntrenador);
 		switch(unEntrenador->siguienteTarea){
 			case CATCHEAR: {
-				pokemon*unPokemon = mapa_desmapear(pokemonesRequeridos);
 
-				entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar y lo va a utilizar para intentar catchear");
+				pokemon*unPokemon = entrenador_get_proxima_presa(unEntrenador);
 
 				entrenador_desplazarse_hacia(unEntrenador, unPokemon->posicion);
 
 				Catch(unEntrenador, unPokemon);
 
+				//Al hacer catch, el entrenador consume 1 ciclo de CPU y queda dormido hasta que llegue el resultado
+
 				break;
 			}
 
 			case CAPTURAR: {
-				entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar y lo va a utilizar para capturar");
-				captura_pendiente* capturaPendiente = pendientes_pendiente_del_entrenador(capturasPendientes, pid);
 
-				if(!capturaPendiente){
-					error_show("El id del entrenador N°%u no se corresponde con ningun mensaje pendiente\n", pid);
+				pokemon*pokemonCatcheado = entrenador_get_proxima_presa(unEntrenador);
+
+				if(!pokemonCatcheado){
+					error_show("El entrenador N°%u intento capturar un pokemon nulo\n", pid);
 					exit(1);
 				}
-
-				pokemon*pokemonCatcheado = capturaPendiente->pokemonCatcheado;
 
 				entrenador_capturar(unEntrenador, pokemonCatcheado);
 
@@ -46,29 +47,32 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 					sem_post(&HayEntrenadoresDisponibles);
 				}
 
-				else{
-					hiloActivo = !entrenador_validar_objetivos(unEntrenador);
-				}
+				else hiloActivo = !entrenador_verificar_objetivos(unEntrenador);
+
+				sem_post(&FinDeCiclo_CPU);
 
 				break;
 			}
 
 			case INTERCAMBIAR: {
-				entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar y lo va a utilizar para intercambiar");
 
 				candidato_intercambio*self = list_remove(potencialesDeadlock, 0);
 				candidato_intercambio*parejaDeIntercambio = candidatos_pareja_de_intercambio_para(potencialesDeadlock, self);
 
 				candidato_desplazarse_hacia_el_otro(self, parejaDeIntercambio);
 
-				while(candidato_puede_intercambiar_con(self, parejaDeIntercambio)){
+				int cpuConsumidosPorIntercambio=1;
+				do{
+					sem_post(&FinDeCiclo_CPU);
+					entrenador_consumir_N_cpu(unEntrenador, 5-cpuConsumidosPorIntercambio);
 					candidato_intercambiar_con(self, parejaDeIntercambio);
-					break;
-				}
+					cpuConsumidosPorIntercambio=0;
+				} while(candidato_puede_intercambiar_con(self, parejaDeIntercambio));
 
-				hiloActivo = !entrenador_validar_objetivos(unEntrenador);
+				hiloActivo = !entrenador_verificar_objetivos(unEntrenador);
+				entrenador_verificar_objetivos(parejaDeIntercambio->interesado);
 
-				entrenador_validar_objetivos(parejaDeIntercambio->unEntrenador);
+				sem_post(&FinDeCiclo_CPU); //Consumi el ultimo ciclo
 
 				sem_post(&finDeIntercambio);
 				candidato_destroy(self);
@@ -77,16 +81,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 				break;
 			}
 		}
-
-		sem_post(&EntradaSalida_o_FinDeEjecucion);
 	}
-
-	entrenador_destroy(unEntrenador);
-
-//	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-//	log_info(event_logger, "Finalizo un hilo entrenador");
-//	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
-
 }
 
 /********************************** Funciones de Inicio y Finalizacion ******************************************/
@@ -116,12 +111,16 @@ void finalizar_hilos_entrenadores(){
 	for(i=0; i<cantidadDeEntrenadores; i++){
 		pthread_join(hilosEntrenadores[i], NULL);
 		sem_destroy(&EjecutarEntrenador[i]);
-		pthread_mutex_destroy(&mutexEstadoEntrenador[i]);
 		pthread_mutex_destroy(&mutexPosicionEntrenador[i]);
+		pthread_mutex_destroy(&mutexEstadoEntrenador[i]);
 	}
 }
 
 /*************************************** Funciones Auxiliares ************************************************/
+
+bool cambio_de_contexto(t_estado inicial, t_estado final){
+	return inicial==EXECUTE || final==EXECUTE;
+}
 
 //Cambia de estado al entrenador y lo loggea
 void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const char*motivo){
@@ -131,8 +130,12 @@ void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const cha
 	pthread_mutex_unlock(&mutexEstadoEntrenador[unEntrenador->id]);
 
 	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	log_info(logger, "El Entrenador N°%u se paso de la cola de %s a %s, Motivo: %s", unEntrenador->id, estadoFromEnum(estadoActual), estadoFromEnum(estadoFinal), motivo);
+	log_info(logger, "\n--------------- Cambio de Estado ---------------\n Proceso: Entrenador N°%u\n Estado Inicial: %s\n Estado Final: %s\n Motivo: %s\n", unEntrenador->id, estadoFromEnum(estadoActual),  estadoFromEnum(estadoFinal), motivo);
 	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+
+	if(cambio_de_contexto(estadoActual, estadoFinal)){
+		Estadisticas.cambiosDeContexto++;
+	}
 }
 
 //Incrementa sus recursos y lo contabiliza como inventario global
@@ -140,7 +143,7 @@ void entrenador_capturar(entrenador*entrenador, pokemon*victima){
 
 	recursos_agregar_recurso(entrenador->pokemonesCazados, victima->especie);
 
-	objetivos_actualizar_por_captura_de(victima->especie);
+//	objetivos_actualizar_por_captura_de(victima->especie);
 
 	t_posicion posicionDelEvento = entrenador->posicion;
 
@@ -149,17 +152,6 @@ void entrenador_capturar(entrenador*entrenador, pokemon*victima){
 	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 
 	pokemon_destroy(victima);
-}
-
-//Contabiliza la captura de un pokemon en mapa y en inventarios
-void objetivos_actualizar_por_captura_de(especie_pokemon unaEspecie){
-	pthread_mutex_lock(&mutexInventariosGlobales);
-	recursos_agregar_recurso(inventariosGlobales, unaEspecie);
-	pthread_mutex_unlock(&mutexInventariosGlobales);
-
-	pthread_mutex_lock(&mutexRecursosEnMapa);
-	recursos_quitar_instancia_de_recurso(recursosEnMapa, unaEspecie);
-	pthread_mutex_unlock(&mutexRecursosEnMapa);
 }
 
 //Remueve un entrenador de una lista
@@ -176,10 +168,57 @@ entrenador* entrenadores_remover_del_equipo_a(entrenadores unEquipo, t_id id){
 }
 
 void candidato_desplazarse_hacia_el_otro(candidato_intercambio*unCandidato, candidato_intercambio*haciaQuien){
-	entrenador_desplazarse_hacia(unCandidato->unEntrenador, haciaQuien->unEntrenador->posicion);
+	entrenador_desplazarse_hacia(unCandidato->interesado, haciaQuien->interesado->posicion);
 }
 
 void entrenador_desplazarse_hacia(entrenador* unEntrenador, t_posicion posicionFinal){
+	pthread_mutex_lock(&Mutex_AndoLoggeando);
+	log_info(logger, "El entrenador N°%u partio de la posicion [%u %u]\n", unEntrenador->id, unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
+	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+
+	bool llegoALaPosicion = entrenador_llego_a(unEntrenador, posicionFinal);
+
+	while(!llegoALaPosicion){
+
+		pthread_mutex_lock(&mutexPosicionEntrenador[unEntrenador->id]);
+		entrenador_dar_un_paso_hacia(unEntrenador, posicionFinal);
+		llegoALaPosicion = entrenador_llego_a(unEntrenador, posicionFinal);
+		pthread_mutex_unlock(&mutexPosicionEntrenador[unEntrenador->id]);
+
+		sem_post(&FinDeCiclo_CPU);
+		entrenador_esperar_y_consumir_cpu(unEntrenador);
+	}
+}
+
+void desplazar_unidimensional(coordenada* posicionInicial, coordenada posicionFinal){
+	int desplazamiento = (posicionFinal > *posicionInicial) - (posicionFinal < *posicionInicial);
+	*posicionInicial += desplazamiento;
+}
+
+void entrenador_dar_un_paso_hacia(entrenador*unEntrenador, t_posicion posicionFinal){
+
+	t_posicion* posicionActual = &unEntrenador->posicion;
+
+	if(posicionActual->pos_x != posicionFinal.pos_x){
+		desplazar_unidimensional(&posicionActual->pos_x, posicionFinal.pos_x);
+	}
+
+	else{
+		desplazar_unidimensional(&posicionActual->pos_y, posicionFinal.pos_y);
+	}
+
+	pthread_mutex_lock(&Mutex_AndoLoggeando);
+	log_info(logger, "\nEl entrenador N°%u se desplazo a la posicion [%u %u]\n", unEntrenador->id, unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
+	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+
+}
+
+bool entrenador_llego_a(entrenador* unEntrenador, t_posicion posicion){
+	return posicion_cmp(unEntrenador->posicion, posicion);
+}
+
+void entrenador_teletransportarte_a(entrenador*unEntrenador, t_posicion posicionFinal){
+//	//implementacion anterior, para pruebas rapidas
 	t_posicion posicionActual = unEntrenador->posicion;
 
 	pthread_mutex_lock(&mutexPosicionEntrenador[unEntrenador->id]);
@@ -191,37 +230,27 @@ void entrenador_desplazarse_hacia(entrenador* unEntrenador, t_posicion posicionF
 	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 }
 
-bool entrenador_llego_a(entrenador* unEntrenador, t_posicion posicion){
-//	pthread_mutex_lock(&mutexPosicionEntrenador[unEntrenador->id]); //momentaneamente no hace falta ya que se pregunta despues de moverlo
-	t_posicion posDelEntrenador = unEntrenador->posicion;
-//	pthread_mutex_unlock(&mutexPosicionEntrenador[unEntrenador->id]);
-
-	return posicion_cmp(posDelEntrenador, posicion);
-}
-
 //************************************* Salida ********************************************/
 
 // Retorna true si el entrenador debe seguir ejecutando o false si es que ya puede finalizar
-bool entrenador_validar_objetivos(entrenador*unEntrenador){
+bool entrenador_verificar_objetivos(entrenador*unEntrenador){
 
 	bool cumplioObjetivos = entrenador_cumplio_sus_objetivos(unEntrenador);
 
+	printf("Objetivos: "); recursos_mostrar(unEntrenador->objetivos);puts("");
+	printf("Inventario: "); recursos_mostrar(unEntrenador->pokemonesCazados);puts("");
+
 	if(cumplioObjetivos){
-		printf("Objetivos: "); recursos_mostrar(unEntrenador->objetivos);
-		printf("Inventario: "); recursos_mostrar(unEntrenador->pokemonesCazados); puts("");
 
 		entrenador_pasar_a(unEntrenador, EXIT, "Ya logro cumplir sus objetivos");
 
-		entrenadores_remover_del_equipo_a(equipo, unEntrenador->id);
+		PROCESOS_SIN_FINALIZAR--;
+
 	}
 
 	else{
 		unEntrenador->siguienteTarea = INTERCAMBIAR;
 		if(!entrenador_en_estado(unEntrenador, LOCKED_HASTA_DEADLOCK)) entrenador_pasar_a(unEntrenador, LOCKED_HASTA_DEADLOCK, "Su inventario esta lleno y no cumplio sus objetivos");
-
-		printf("Objetivos: "); recursos_mostrar(unEntrenador->objetivos);puts("");
-		printf("Inventario: "); recursos_mostrar(unEntrenador->pokemonesCazados);puts("");
-
 		candidatos_agregar_entrenador(potencialesDeadlock, unEntrenador);
 	}
 

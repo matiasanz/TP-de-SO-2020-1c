@@ -19,6 +19,9 @@ cr_list* cr_list_create();
 //Crea una cr_lista a partir de una lista
 cr_list* cr_list_from_list();
 
+//Destruye los elementos de la lista
+void cr_list_clean_and_destroy_elements(cr_list*, void(*element_destroyer)(void*));
+
 //Destruye lista y semaforos, deja los elementos
 void cr_list_destroy(cr_list*);
 
@@ -82,8 +85,16 @@ bool cr_list_any(cr_list*, bool(*condition)(void*));
 //Retorna true si algun elemento de la lista coincide, segun el criterio dado
 bool cr_list_contains_element(cr_list*, void* elemento, bool (*comparator)(void *, void *));
 
+//****************************************************************************************
+
 //Retorna true si algun elemento de la lista coincide, segun el criterio dado
 bool list_contains_element(t_list*, void* elemento, bool (*comparator)(void *, void *));
+
+//TODO descripcion (se entiende igual)
+void* list_remove_by_comparation(t_list* unaLista, void* elemento, bool (*comparator)(void *, void *));
+
+//Retorna un puntero al elemento si es que lo encontro
+void* list_get_by_comparation(t_list* unaLista, void* elemento, bool (*comparator)(void *, void *));
 
 //****************************************************************************************
 #include <commons/collections/dictionary.h>

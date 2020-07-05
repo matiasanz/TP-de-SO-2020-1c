@@ -38,6 +38,8 @@ char* paths_estructuras[3]; //e_key_path_estructura
 pthread_mutex_t mutBitarray;
 t_dictionary* semaforosDePokemons; //key:char* especiePokemon, value: pthread_mutex_t* mutex
 pthread_mutex_t mutDiccionarioSemaforos;
+
+pthread_mutex_t envioPaquete;
 //-------------------------
 
 void inicializar();

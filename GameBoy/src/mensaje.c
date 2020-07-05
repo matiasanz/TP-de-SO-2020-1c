@@ -65,6 +65,7 @@ t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int l
 
 		} else {
 			validar_cantidad_argumentos(longitud, 6);
+
 			t_mensaje_appeared_catch_pokemon* msj = mensaje_appeared_catch_pokemon_crear(especie, atoi(x),
 					atoi(y));
 			mensaje_serializado = mensaje_appeared_catch_pokemon_serializar(msj);
@@ -72,6 +73,7 @@ t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int l
 		}
 
 		break;
+
 	case CATCH_POKEMON:
 		id_cola = CATCH_POKEMON;
 		validar_quien_conoce_catchpokemon(proceso);
@@ -94,6 +96,7 @@ t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int l
 		}
 
 		break;
+
 	case CAUGHT_POKEMON:
 
 		id_cola = CAUGHT_POKEMON;

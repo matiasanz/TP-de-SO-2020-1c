@@ -6,7 +6,7 @@ matriz_recursos recursos_create(){
 
 matriz_recursos recursos_from_string(char*cadena){
 
-	if(string_is_empty(cadena)){
+	if(string_equals_ignore_case(cadena, "NADA")){
 		return recursos_create();
 	}
 
@@ -20,12 +20,8 @@ matriz_recursos recursos_from_string(char*cadena){
 
     string_iterate_lines(tokens, _a_la_matriz);
 
-//    void mostrar(t_posicion pos){
-//    	printf("pos: (%u, %u)\n", pos.x, pos.y);
-//    }
-
-    string_iterate_lines(tokens, (void*)free); //TODO ver antes rompia
-//    free(tokens);
+    string_iterate_lines(tokens, (void*)free);
+    free(tokens);
 
     return recursosLeidos;
 }
@@ -200,7 +196,7 @@ bool recursos_suficientes_para(matriz_recursos proveedora, matriz_recursos recep
 
 recurso recursos_alguno_en_comun_con(matriz_recursos quien, matriz_recursos conQuien){
 	bool enComun(recurso unRecurso, void*cantidad){
-		return *((int*) cantidad) && recursos_get(conQuien, unRecurso);
+		return *((int*) cantidad) && recursos_cantidad_de_instancias_de(conQuien, unRecurso);
 	}
 
 	return dictionary_get_any_key(quien, &enComun);

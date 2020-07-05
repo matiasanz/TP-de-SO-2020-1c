@@ -30,13 +30,18 @@ pokemon* pokemon_ptr_create(especie_pokemon especie, t_posicion unaPos){
     return unPokemon;
 }
 
-bool pokemon_misma_especie(pokemon unPokemon, pokemon otroPokemon){
+bool pokemon_misma_especie_que(pokemon unPokemon, pokemon otroPokemon){
 	return especie_cmp(unPokemon.especie, otroPokemon.especie); //string_equals_ignore_case(objetivo->especie, deLista->especie);
 }
 
 //Destructor
 void pokemon_destroy(pokemon*destruido){
 	free(destruido);
+}
+
+void pokemon_destroy_hard(pokemon*destruido){
+	free(destruido->especie);
+	pokemon_destroy(destruido);
 }
 
 //**********************************************************************

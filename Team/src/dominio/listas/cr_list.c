@@ -29,18 +29,19 @@ void cr_list_destroy(cr_list* unaLista){
 	list_destroy(unaLista->lista);
 	sem_destroy(&unaLista->hayMas);
 	pthread_mutex_destroy(unaLista->mutex);
-	free(unaLista);
-}
-
-void cr_duplicated_list_destroy(cr_list* unaLista){
-	list_destroy(unaLista->lista);
-	sem_destroy(&unaLista->hayMas);
+	free(unaLista->mutex);
 	free(unaLista);
 }
 
 void cr_list_destroy_and_destroy_elements(cr_list* unaLista, void(*element_destroyer)(void*)){
 	list_clean_and_destroy_elements(unaLista->lista, element_destroyer);
 	cr_list_destroy(unaLista);
+}
+
+void cr_list_clean_and_destroy_elements(cr_list* unaLista, void(*element_destroyer)(void*)){
+	pthread_mutex_lock(unaLista->mutex);
+	list_clean_and_destroy_elements(unaLista->lista, element_destroyer);
+	pthread_mutex_unlock(unaLista->mutex);
 }
 
 /**
@@ -207,12 +208,24 @@ bool cr_list_any(cr_list*unaLista, bool(*condition)(void*)){
 	return algunoCumple;
 }
 
-bool list_contains_element(t_list* unaLista, void* elemento, bool (*comparator)(void *, void *)){
+void* list_remove_by_comparation(t_list* unaLista, void* elemento, bool (*comparator)(void *, void *)){
+	bool es_el_elemento(void*deLista){
+		return comparator(elemento, deLista);
+	}
+
+	return list_remove_by_condition(unaLista, &es_el_elemento);
+}
+
+void* list_get_by_comparation(t_list* unaLista, void* elemento, bool (*comparator)(void *, void *)){
 	bool es_el_elemento(void*deLista){
 		return comparator(elemento, deLista);
 	}
 
 	return list_find(unaLista, &es_el_elemento);
+}
+
+bool list_contains_element(t_list* unaLista, void* elemento, bool (*comparator)(void *, void *)){
+	return list_get_by_comparation(unaLista, elemento, comparator);
 }
 
 bool cr_list_contains_element(cr_list* unaLista, void* elemento, bool (*comparator)(void *, void *)){

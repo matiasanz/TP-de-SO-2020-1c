@@ -20,17 +20,21 @@
 #include "listas/cr_list.h"
 
 #include <crenito-commons/conexiones/conexiones.h>
-#include "utils/mensajes-utils.h"
-
-//#include <crenito-commons/mensajes/mensaje_new_pokemon.h>
-//#include <crenito-commons/prueba.h>
-//#include <crenito-commons/conexiones/conexiones.h>
+#include "../utils/mensajes-utils.h"
 
 # define NUMERO_MAXIMO 4294967295
 
 //Tipos de dato
 typedef uint32_t numero;
 typedef numero t_id;
+
+typedef struct{
+	numero ciclosCPU;
+	numero cambiosDeContexto;
+	numero*ciclosDelEntrenador;
+	numero deadlocksProducidos;
+	numero deadlocksResueltos;
+}estadisticas_team;
 
 /*Variables Globales*/
 
