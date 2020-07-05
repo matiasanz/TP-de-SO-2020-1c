@@ -119,9 +119,9 @@ static uint32_t eliminar_particiones_libres(bool* hay_fragmentacion_externa) {
 		}
 	}
 
-	/* Incrementa el tamaño disponible para generar nuevas particiones
+	/* Se actualiza el tamaño disponible para generar nuevas particiones
 	 * dado que se fueron borrando particiones libre */
-	memoria_actualizar_tamanio_disponible(tamanio_ocupado - tamanio_total_memoria);
+	memoria_reset_tamanio_disponible_sin_particionar(tamanio_total_memoria - tamanio_ocupado);
 	return tamanio_ocupado;
 }
 

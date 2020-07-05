@@ -15,7 +15,7 @@ t_particion* particion_crear_y_ocupar(uint32_t tamanio, uint32_t inicio) {
 
 	t_particion* particion = particion_inicializar(tamanio, inicio);
 
-	memoria_actualizar_tamanio_disponible(tamanio);
+	memoria_actualizar_tamanio_disponible_sin_particionar(tamanio);
 	//TODO: ojo con este if, real programmers do not use ifs.
 	if (esquema_de_memoria_particiones_dinamicas()) {
 		list_add(particiones, particion);
