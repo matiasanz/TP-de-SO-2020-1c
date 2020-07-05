@@ -98,7 +98,7 @@ int subscribir(t_conexion_server* server, t_conexion_cliente* cliente) {
 		return ERROR_SOCKET;
 	}
 
-	t_paquete_header pqt = paquete_header_crear(SUBSCRIPCION,
+	t_paquete_header pqt = paquete_header_crear(SUSCRIPCION,
 			server->id_proceso, cliente->id_cola);
 
 	cliente->subscriptor->id_subcriptor = handshake(

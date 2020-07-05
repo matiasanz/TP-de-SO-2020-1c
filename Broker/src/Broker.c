@@ -62,7 +62,7 @@ void atender_cliente(int* socket) {
 		procesar_mensaje(*socket, header);
 		break;
 	}
-	case SUBSCRIPCION: {
+	case SUSCRIPCION: {
 		procesar_suscripcion(*socket, header);
 		break;
 	}
