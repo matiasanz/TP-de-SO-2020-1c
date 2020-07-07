@@ -871,8 +871,15 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 		}
 		pthread_mutex_unlock(&mutDiccionarioSemaforos);
 
-		pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
+		pthread_mutex_lock(&mutDiccionarioSemaforos);
 
+		pthread_mutex_t* pokeMut1=dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie);
+
+		pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+		//pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
+
+		pthread_mutex_lock(pokeMut1);
 		config_metadata_pokemon=config_create(bin_metadata);
 		char* estadoArchivo=config_get_string_value(config_metadata_pokemon,"OPEN");
 		bool abierto=true;
@@ -881,8 +888,14 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 			config_save(config_metadata_pokemon);
 			abierto=false;
 		}
+		pthread_mutex_lock(&mutDiccionarioSemaforos);
 
-		pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
+		pthread_mutex_t* pokeMut2=dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie);
+
+		pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+		pthread_mutex_unlock(pokeMut2);
+		//pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
 
 
 		//------Ver si el archivo esta abierto------------
@@ -1125,14 +1138,30 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 			//retardo para simular acceso a disco
 			sleep(tiempo_retardo_operacion);
 
-			pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
+			pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+			pthread_mutex_t* pokeMut3=dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie);
+
+			pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+			//pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
+			pthread_mutex_lock(pokeMut3);
 
 			config_set_value(config_metadata_pokemon,"BLOCKS",listaBloques);
 			config_set_value(config_metadata_pokemon,"SIZE",stringSize);
 			config_set_value(config_metadata_pokemon,"OPEN","N");
 			config_save(config_metadata_pokemon);
 
-			pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
+
+			pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+			pthread_mutex_t* pokeMut4=dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie);
+
+			pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+			pthread_mutex_unlock(pokeMut4);
+
+			//pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
 
 			free(listaBloques);
 			free(stringSize);
@@ -1148,12 +1177,30 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 			//retardo para simular acceso a disco
 			sleep(tiempo_retardo_operacion);
 
-			pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
+
+			pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+			pthread_mutex_t* pokeMut5=dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie);
+
+			pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+			//pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
+			pthread_mutex_lock(pokeMut5);
 
 			config_set_value(config_metadata_pokemon,"OPEN","N");
 			config_save(config_metadata_pokemon);
 
-			pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
+
+			pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+			pthread_mutex_t* pokeMut6=dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie);
+
+			pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+
+			pthread_mutex_unlock(pokeMut6);
+
+			//pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
 
 			log_error(logger,"No se encuentra la posicion: (%i,%i), para el Pokemon: %s",unMsjCatchPoke->pokemon.posicion.pos_x,unMsjCatchPoke->pokemon.posicion.pos_y,unMsjCatchPoke->pokemon.especie);
 
@@ -1234,7 +1281,14 @@ void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
 		pthread_mutex_unlock(&mutDiccionarioSemaforos);
 
 
-		pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjGetPoke->especie));
+		pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+		pthread_mutex_t* pokeMut1=dictionary_get(semaforosDePokemons,unMsjGetPoke->especie);
+
+		pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+		pthread_mutex_lock(pokeMut1);
+		//pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjGetPoke->especie));
 
 		config_metadata_pokemon=config_create(bin_metadata);
 		char* estadoArchivo=config_get_string_value(config_metadata_pokemon,"OPEN");
@@ -1245,7 +1299,15 @@ void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
 			abierto=false;
 		}
 
-		pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjGetPoke->especie));
+
+		pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+		pthread_mutex_t* pokeMut2=dictionary_get(semaforosDePokemons,unMsjGetPoke->especie);
+
+		pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+		pthread_mutex_unlock(pokeMut2);
+		//pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjGetPoke->especie));
 
 
 		//------Ver si el archivo esta abierto------------
@@ -1309,12 +1371,29 @@ void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
 		//retardo para simular acceso a disco
 		sleep(tiempo_retardo_operacion);
 
-		pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjGetPoke->especie));
+		pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+		pthread_mutex_t* pokeMut3=dictionary_get(semaforosDePokemons,unMsjGetPoke->especie);
+
+		pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+		pthread_mutex_lock(pokeMut3);
+
+		//pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjGetPoke->especie));
 
 		config_set_value(config_metadata_pokemon,"OPEN","N");
 		config_save(config_metadata_pokemon);
 
-		pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjGetPoke->especie));
+
+		pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+		pthread_mutex_t* pokeMut4=dictionary_get(semaforosDePokemons,unMsjGetPoke->especie);
+
+		pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+		pthread_mutex_unlock(pokeMut4);
+
+		//pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjGetPoke->especie));
 
 		char* posicionesString=posicion_list_to_string(listaDePosiciones);
 		log_info(event_logger,"Mensaje:%s, se localizaron %i posiciones para %s,->>>: %s",GET_POKEMON_STRING,list_size(listaDePosiciones),unMsjGetPoke->especie,posicionesString);
