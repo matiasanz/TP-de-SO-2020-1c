@@ -28,7 +28,7 @@ int main(void) {
 	Get_pokemones(objetivosGlobales, inventariosGlobales);
 
 	//Para pruebas rapidas sin los otros modulos//
-	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) gamecard_simulator, NULL);
+//	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) gamecard_simulator, NULL);
 
 	inicializar_hilos();
 

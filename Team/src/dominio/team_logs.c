@@ -148,7 +148,8 @@ void log_event_pokemon_por_pedir(especie_pokemon especiePokemon){
 
 void log_event_mensaje_get_enviado(t_mensaje_get_pokemon* mensaje, t_id id){
 	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-	log_info(event_logger, "*********** MENSAJE GET ENVIADO ***********\n"
+	log_info(event_logger, "\n*********** MENSAJE ENVIADO ***********\n"
+						   " Tipo: GET\n"
 						   " Especie: %s\n"
 						   " Id: %u\n", mensaje->especie, id);
 	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);

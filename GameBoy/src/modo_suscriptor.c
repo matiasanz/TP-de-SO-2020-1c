@@ -9,6 +9,10 @@
 
 static void mensaje_recibido(t_id_cola id_cola, void* msj);
 
+bool modo_suscriptor(char*proceso){
+	return string_equals_ignore_case(proceso, SUSCRIPTOR_STRING);
+}
+
 void procesar_modo_suscriptor(char* cola_mensaje_string, char* tiempo_conexion_string) {
 
 	validar_mayor_igual_a_cero(tiempo_conexion_string);

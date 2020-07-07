@@ -156,6 +156,12 @@ void procesar_envio_mensaje(char* proceso, char* mensaje, char* argumentos[], in
 	t_paquete* pqt = crear_paquete(proceso, mensaje, argumentos, longitud);
 
 	int respuesta = enviar(conexion, pqt);
+
+	if(error_conexion(respuesta)){
+		log_warning(event_logger, "No se pudo conectar al proceso %s", proceso);
+		exit(EXIT_FAILURE);
+	}
+
 	log_info(logger, "El proceso gameboy se conecto con el proceso %s", proceso, "y obtuvo la respuesta: %d",
 			respuesta);
 

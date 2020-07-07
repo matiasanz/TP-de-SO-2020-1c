@@ -10,28 +10,29 @@
 
 #include "gameboy.h"
 
-int main(int argc, char*argv[]) {
+int main(int cantidadDeArgumentos, char*argv[]) {
 
 	inicializar();
 
 	char* proceso = argv[1];
 	char* mensaje = argv[2];
 
+	validar_cantidad_minima_argumentos(cantidadDeArgumentos, 4);
 	validar_proceso(proceso);
 	validar_mensaje(mensaje);
 
-	if (string_equals_ignore_case(proceso, SUSCRIPTOR_STRING)) {
+	if (modo_suscriptor(proceso)) {
 
+		validar_cantidad_argumentos(cantidadDeArgumentos, 4);
 		char* tiempo_conexion = argv[3];
 		procesar_modo_suscriptor(mensaje, tiempo_conexion);
 
 	} else {
 
-		procesar_envio_mensaje(proceso, mensaje, argv, argc);
+		procesar_envio_mensaje(proceso, mensaje, argv, cantidadDeArgumentos);
 	}
 
-	config_destroy(config);
-	return EXIT_SUCCESS;
+	finalizar_gameboy(EXIT_SUCCESS);
 }
 
 void inicializar() {
@@ -48,4 +49,11 @@ void inicializar_logs() {
 
 void inicializar_config() {
 	config = config_create("./config/gameboy.config");
+}
+
+void finalizar_gameboy(int ESTADO_FINALIZACION){
+	log_destroy(logger);
+	log_destroy(event_logger);
+
+	exit(ESTADO_FINALIZACION);
 }
