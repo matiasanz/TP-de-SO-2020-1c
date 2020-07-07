@@ -27,8 +27,8 @@ int main(void) {
 
 	Get_pokemones(objetivosGlobales, inventariosGlobales);
 
-	//Para pruebas sin los otros modulos//
-//	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) gamecard_simulator, NULL);
+	//Para pruebas rapidas sin los otros modulos//
+	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) gamecard_simulator, NULL);
 
 	inicializar_hilos();
 
@@ -97,17 +97,6 @@ void inicializar_logs_y_config(){
 	char*TEAM_LOG_PATH = config_get_string_value(config,"LOG_FILE");
 	logger=log_create(TEAM_LOG_PATH,"TEAM",true,LOG_LEVEL_INFO);
 	event_logger = log_create("log/team_event.log", "TEAM_EVENT", true, LOG_LEVEL_INFO);
-}
-
-void team_loggear_resultados(){
-
-	char*resultados = estadisticas_to_string(Estadisticas);
-
-	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	log_info(logger, "\n*************** Resultados del Team ****************\n\n%s", resultados);
-	pthread_mutex_unlock(&Mutex_AndoLoggeando);
-
-	free(resultados);
 }
 
 void finalizar_logs_y_config(){

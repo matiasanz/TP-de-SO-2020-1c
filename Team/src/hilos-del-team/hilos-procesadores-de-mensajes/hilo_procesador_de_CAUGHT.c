@@ -16,9 +16,7 @@ void team_procesador_cola_CAUGHT(cr_list* mensajes){
 
 		if(capturaPendiente) {
 
-			pthread_mutex_lock(&Mutex_AndoLoggeando);
-			mensaje_caught_pokemon_log(logger, mensajeRecibido);
-			pthread_mutex_unlock(&Mutex_AndoLoggeando);
+			log_enunciado_llegada_de_mensaje_caught(mensajeRecibido);
 
 			validar_captura(capturaPendiente);
 
@@ -28,9 +26,7 @@ void team_procesador_cola_CAUGHT(cr_list* mensajes){
 		}
 
 		else {
-			pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-			log_info(event_logger, "Se recibio el resultado de una captura id %u desconocida\n", idCaptura);
-			pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+			log_event_captura_desconocida(mensajeRecibido);
 		}
 
 		mensaje_caught_pokemon_destruir(mensajeRecibido);
@@ -95,21 +91,16 @@ void procesar_resultado_de_captura(captura_pendiente*capturaPendiente, bool fueE
 	entrenador* unEntrenador     = capturaPendiente->cazador;
 	pokemon*    pokemonCatcheado = capturaPendiente->pokemonCatcheado;
 
-	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	log_info(logger, "CAUGHT %s: %s", pokemonCatcheado->especie, (fueExitosa? "OK": "FAIL"));
-	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+	log_event_caught_especie(pokemonCatcheado, fueExitosa);
 
 	if(fueExitosa){
 
 		objetivos_actualizar_por_captura_de(pokemonCatcheado->especie);
-
 		entrenador_despertar(unEntrenador, "Se confirmo la captura del pokemon");
 		pokemon_localizar_en_mapa(pokemonCatcheado);
 	}
 
-	else{
-		captura_procesar_fallo(capturaPendiente);
-	}
+	else captura_procesar_fallo(capturaPendiente);
 
 	pendiente_destroy(capturaPendiente);
 }
@@ -124,7 +115,7 @@ void captura_procesar_fallo(captura_pendiente*capturaFallida){
 
 	entrenador_dormir_hasta_llegada_de_pokemon(cazador);
 	pokemon_localizar_en_mapa(pokemonCatcheado);
-	pokemon_destroy(pokemonCatcheado); //Destroy hard?
+	pokemon_destroy_hard(pokemonCatcheado); //(?)
 }
 
 void pokemon_localizar_en_mapa(pokemon*pokemonCatcheado){
@@ -142,8 +133,7 @@ void pokemon_localizar_en_mapa(pokemon*pokemonCatcheado){
 	else{
 
 		bool esOtraInstanciaDe(void* unPokemon){
-			puts("\n\n XXX PAREN TODO XXX");
-
+			log_event_busco_especie_en_mapa(unPokemon, pokemonCatcheado);
 			return pokemon_misma_especie_que(unPokemon, pokemonCatcheado);
 		}
 

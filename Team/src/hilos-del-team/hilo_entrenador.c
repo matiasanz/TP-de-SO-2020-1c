@@ -128,7 +128,7 @@ void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const cha
 	unEntrenador->estado = estadoFinal;
 	pthread_mutex_unlock(&mutexEstadoEntrenador[unEntrenador->id]);
 
-	log_enunciado_cambio_de_estado(unEntrenador, estadoActual, estadoFinal, motivo);
+	log_enunciado_cambio_de_cola(unEntrenador, estadoActual, estadoFinal, motivo);
 
 	if(cambio_de_contexto(estadoActual, estadoFinal)){
 		Estadisticas.cambiosDeContexto++;
@@ -142,7 +142,7 @@ void entrenador_capturar(entrenador*entrenador, pokemon*victima){
 
 	t_posicion posicionDelEvento = entrenador->posicion;
 
-	log_enunciado_captura_de_pokemon(entrenador, victima, posicionDelEvento);
+	log_enunciado_operacion_de_atrapar(entrenador, victima, posicionDelEvento);
 
 	pokemon_destroy_hard(victima);
 }
@@ -198,7 +198,7 @@ void entrenador_dar_un_paso_hacia(entrenador*unEntrenador, t_posicion posicionFi
 		desplazar_unidimensional(&posicionActual->pos_y, posicionFinal.pos_y);
 	}
 
-	log_enunciado_desplazamiento(unEntrenador);
+	log_enunciado_movimiento_de_un_entrenador(unEntrenador);
 
 }
 

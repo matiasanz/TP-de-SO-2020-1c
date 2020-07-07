@@ -26,7 +26,7 @@ void subscribir_y_escuchar_cola_localized_pokemon(void (*callback)(t_id_cola, vo
 void localized_pokemon_recibido(t_mensaje_localized_pokemon* localized_pokemon) {
 
 	if(mensaje_localized_es_para_mi(localized_pokemon)){
-		log_enunciado_mensaje_localized(localized_pokemon);
+		log_enunciado_llegada_de_mensaje_localized(localized_pokemon);
 
 		cr_list_add_and_signal(mensajesLOCALIZED, localized_pokemon);
 	}

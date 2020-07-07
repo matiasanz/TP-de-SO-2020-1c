@@ -1,4 +1,5 @@
 #include "candidatos_intercambio.h"
+#include "../../dominio/team_logs.h"
 
 //******************************************************
 
@@ -45,7 +46,7 @@ void candidato_intercambiar_con(candidato_intercambio* self, candidato_intercamb
 	recursos_intercambiar_instancia_de(self->interesado->pokemonesCazados, teDoyEste, aCambioDeEste);
 	recursos_intercambiar_instancia_de(parejaDeIntercambio->interesado->pokemonesCazados, aCambioDeEste, teDoyEste);
 
-	log_info(logger, "El Entrenador N°%u le intercambio al N°%u un %s por un %s", self->interesado->id, parejaDeIntercambio->interesado->id, teDoyEste, aCambioDeEste);
+	log_enunciado_operacion_de_intercambio(self->interesado, parejaDeIntercambio->interesado, teDoyEste, aCambioDeEste);
 
 	candidato_actualizar_matrices_por_intercambio(self, teDoyEste, aCambioDeEste);
 	candidato_actualizar_matrices_por_intercambio(parejaDeIntercambio, aCambioDeEste, teDoyEste);

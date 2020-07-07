@@ -20,7 +20,7 @@ void subscribir_y_escuchar_cola_appeared_pokemon(void (*callback)(t_id_cola, voi
 
 void appeared_pokemon_recibido(t_mensaje_appeared_pokemon* appeared_pokemon) {
 
-	log_enunciado_mensaje_appeared(appeared_pokemon);
+	log_enunciado_llegada_de_mensaje_appeared(appeared_pokemon);
 
 	pokemon*pokemonRecibido = leer_pokemon(appeared_pokemon);
 

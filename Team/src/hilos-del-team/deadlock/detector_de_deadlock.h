@@ -9,8 +9,6 @@ bool algoritmo_detectar_deadlock();
 
 void algoritmo_procesar_deadlock();
 
-void loggear_resultado_de_deteccion(bool resultado);
-
 void esperar_que_equipo_no_pueda_cazar_mas();
 
 #endif
