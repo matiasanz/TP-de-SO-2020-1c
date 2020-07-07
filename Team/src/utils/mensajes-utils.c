@@ -7,7 +7,27 @@
 
 #include "mensajes-utils.h"
 
+bool espero_mensajes(){
+
+	pthread_mutex_lock(&mutex_esperoMensajes);
+	bool esperoMensajes = ESPERO_MENSAJES;
+	pthread_mutex_unlock(&mutex_esperoMensajes);
+
+	return esperoMensajes;
+}
+
+void dejar_de_recibir(){
+	pthread_mutex_lock(&mutex_esperoMensajes);
+	ESPERO_MENSAJES = false;
+	pthread_mutex_unlock(&mutex_esperoMensajes);
+}
+
 void mensaje_recibido(t_id_cola id_cola, void* msj){
+
+	if(!espero_mensajes()){
+		free(msj);
+		return;
+	}
 
 	void* deserializado;
 

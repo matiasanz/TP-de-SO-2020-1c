@@ -20,9 +20,7 @@ void subscribir_y_escuchar_cola_appeared_pokemon(void (*callback)(t_id_cola, voi
 
 void appeared_pokemon_recibido(t_mensaje_appeared_pokemon* appeared_pokemon) {
 
-	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	mensaje_appeared_catch_pokemon_log(logger, appeared_pokemon, APPEARED_POKEMON_STRING);
-	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+	log_enunciado_mensaje_appeared(appeared_pokemon);
 
 	pokemon*pokemonRecibido = leer_pokemon(appeared_pokemon);
 

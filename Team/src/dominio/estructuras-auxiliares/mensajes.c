@@ -16,16 +16,16 @@ void mensaje_get_registrar(t_id idMensaje){
 
 void Get(void* especiePokemon) {
 
-	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-	log_info(event_logger, ">> get(%s)\n", (especie_pokemon) especiePokemon);
-	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+	log_event_pokemon_por_pedir(especiePokemon);
 
-	t_mensaje_get_pokemon* mensajeGet=mensaje_get_pokemon_crear(string_duplicate(especiePokemon));
+	t_mensaje_get_pokemon* mensajeGet=mensaje_get_pokemon_crear(especiePokemon);
 
 	t_paquete_header header=paquete_header_crear(MENSAJE,TEAM,GET_POKEMON);
 	t_buffer* bufferDepaquete=mensaje_get_pokemon_serializar(mensajeGet);
 	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
 	int idMensajeEnviado = enviar(conexion_broker,paqueteAEnviar);
+
+	log_event_mensaje_get_enviado(mensajeGet, idMensajeEnviado);
 
 	mensaje_get_registrar(idMensajeEnviado);
 
@@ -34,9 +34,13 @@ void Get(void* especiePokemon) {
 		log_warning(event_logger,"Se procedera a responder el mensaje GET por defecto");
 		pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 
-		t_mensaje_localized_pokemon* respuestaAutogenerada = mensaje_localized_pokemon_crear(string_duplicate(especiePokemon), list_create());
+		t_list*ningunaPosicion = list_create();
+
+		t_mensaje_localized_pokemon* respuestaAutogenerada = mensaje_localized_pokemon_crear(especiePokemon, ningunaPosicion);
 		mensaje_localized_pokemon_set_id_correlativo(respuestaAutogenerada, idMensajeEnviado);
 		localized_pokemon_recibido(respuestaAutogenerada);
+
+		list_destroy(ningunaPosicion);
 	}
 
 	mensaje_get_pokemon_destruir(mensajeGet);
@@ -69,7 +73,7 @@ void Catch(entrenador*unEntrenador, pokemon* pokemonCatcheado) {
 	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 
 	//creacion de  paquete catch pokemon y envio a Broker
-	t_mensaje_appeared_catch_pokemon* mensajeCatch=mensaje_appeared_catch_pokemon_crear(string_duplicate(pokemonCatcheado->especie),pokemonCatcheado->posicion.pos_x,pokemonCatcheado->posicion.pos_y);
+	t_mensaje_appeared_catch_pokemon* mensajeCatch=mensaje_appeared_catch_pokemon_crear(pokemonCatcheado->especie,pokemonCatcheado->posicion.pos_x,pokemonCatcheado->posicion.pos_y);
 
 	t_paquete_header header=paquete_header_crear(MENSAJE,TEAM,CATCH_POKEMON);
 	t_buffer* bufferDepaquete=mensaje_appeared_catch_pokemon_serializar(mensajeCatch);

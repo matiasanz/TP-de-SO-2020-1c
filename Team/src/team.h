@@ -5,13 +5,7 @@
 
 #include <pthread.h>
 
-#include "hilos-del-team/deadlock/candidatos_intercambio.h"
-#include "hilos-del-team/deadlock/detector_de_deadlock.h"
-#include "dominio/estructuras-auxiliares/captura_pendiente.h"
-#include "dominio/estructuras-auxiliares/lector_config.h"
-#include "dominio/estructuras-auxiliares/mensajes.h"
-#include "dominio/estructuras-principales/pokemon.h"
-#include "dominio/planificacion/planificacion.h"
+#include "dominio/team_logs.h"
 
 #define CONFIG_PATH "config/team.config"
 
@@ -49,6 +43,9 @@ char*num_array_to_string(numero*arreglo, int length);
 	numero RETARDO_CICLO_CPU;
 	datos_algoritmo DATOS_ALGORITMO;
 
+	numero PROCESOS_SIN_FINALIZAR;
+
+
 	entrenador* (*proximo_a_ejecutar_segun_criterio)(cola_entrenadores);
 	bool (*criterio_de_desalojo)(entrenador*, numero);
 	void (*actualizar_datos_del_entrenador)(entrenador*unEntrenador, numero tiempo);
@@ -63,17 +60,14 @@ char*num_array_to_string(numero*arreglo, int length);
 	capturas_pendientes capturasPendientes; //cambiar tipo de dato por capturas_pendientes
 	especies_pokemones historialDePokemones;
 	candidatos_intercambio potencialesDeadlock;
+	pthread_mutex_t mutexRepuestos;
+	t_list* pokemonesDeRepuesto;
+	t_list* registroDePedidos;
 
-//En revision
-	cr_list*mensajesAPPEARED;
+	//en revision
 	cr_list*mensajesCAUGHT;
 	cr_list*mensajesLOCALIZED;
 
-	pthread_mutex_t mutexRepuestos;
-	t_list* pokemonesDeRepuesto;
-
-	t_list* registroDePedidos; //Para mensajes get TODO
-	numero PROCESOS_SIN_FINALIZAR;
 
 /*--------------*/
 

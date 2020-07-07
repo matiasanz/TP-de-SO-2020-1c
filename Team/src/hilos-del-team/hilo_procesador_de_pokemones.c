@@ -24,24 +24,17 @@ void team_procesar_pokemones(){
 
 				pthread_mutex_lock(&mutexRepuestos);
 				list_add(pokemonesDeRepuesto, unPokemon);
-printf("************* Agrego repuesto -> %s\n\n", unPokemon->especie);
+				log_event_pokemon_mapeado(unPokemon->especie);
 				pthread_mutex_unlock(&mutexRepuestos);
 			}
 
 			else{
-				puts("************** SITUACION ACTUAL ********************");
-				printf("Objs: "); recursos_mostrar(objetivosGlobales); puts("");
-				printf("Invs: "); recursos_mostrar(inventariosGlobales);puts("");
-				pthread_mutex_unlock(&mutexRecursosDisponibles); //
+				log_event_loggear_situacion_actual(objetivosGlobales, inventariosGlobales);
+				pthread_mutex_unlock(&mutexRecursosDisponibles);
 
+				log_event_loggear_pokemon_descartado(unPokemon->especie);
 
-				pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-				log_info(event_logger, "Se recibio un %s y se descarto al no ser requerido\n", unPokemon->especie);
-				pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
-
-				free(unPokemon->especie);
-
-				pokemon_destroy(unPokemon);
+				pokemon_destroy_hard(unPokemon);
 			}
 
 			sem_post(&HayEntrenadoresDisponibles);

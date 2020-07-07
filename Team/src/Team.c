@@ -11,21 +11,24 @@
 #include "hilos-del-team/hilos_team.h"
 //#include "tests/tests_team.o"
 
+//funciones team_log_info para logs importantes TODO
 
-void finalizar_conexiones();
+
+void esperar_que_equipo_no_pueda_cazar_mas();
 
 void finalizar_suscripcion_a_colas();
 
-//funciones team_log_info para logs importantes TODO
 
 int main(void) {
 
 	team_inicializar();
 
+	inicializar_hilos_entrenadores();
+
 	Get_pokemones(objetivosGlobales, inventariosGlobales);
 
 	//Para pruebas sin los otros modulos//
-//	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) broker_simulator, NULL);
+//	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) gamecard_simulator, NULL);
 
 	inicializar_hilos();
 
@@ -62,16 +65,15 @@ void team_inicializar(){
 
 	log_info(logger, "\n\n*************************************************************************\n"
          		     "                        Inicio del proceso Team\n\n");
-
 	inicializar_conexiones();
-
-//	inicializar_hilos();
 
 	bool inicio_exitoso = config && event_logger ;
 	if(!inicio_exitoso){
 		error_show("algo malio sal en el inicio :(");
 		exit(1);
 	}
+
+	sleep(1); //
 }
 
 int team_exit(){
@@ -205,7 +207,6 @@ void listas_destroy(){
 
 //Hilos
 void inicializar_hilos(){
-	inicializar_hilos_entrenadores();
 
 	pthread_create(&hiloMensajesCAUGHT   , NULL, (void*)team_procesador_cola_CAUGHT   , mensajesCAUGHT);
 	pthread_create(&hiloMensajesLOCALIZED, NULL, (void*)team_procesador_cola_LOCALIZED, mensajesLOCALIZED);
@@ -241,10 +242,11 @@ void inicializar_semaforos(){
 	pthread_mutex_init(&mutexEntrenadores         , NULL);
 	pthread_mutex_init(&mutexHistorialEspecies    , NULL);
 	pthread_mutex_init(&mutexRepuestos            , NULL);
-//	pthread_mutex_init(&mutexInventariosGlobales  , NULL);
 
 	pthread_mutex_init(&mutexRecursosDisponibles  , NULL);
 	pthread_mutex_init(&mutexPedidos              , NULL);
+
+	pthread_mutex_init(&mutex_esperoMensajes, NULL);
 }
 
 void finalizar_semaforos(){
@@ -255,7 +257,6 @@ void finalizar_semaforos(){
 	sem_destroy(&FinDePlanificacion);
 
 	pthread_mutex_destroy(&mutexEntrenadores);
-//	pthread_mutex_destroy(&mutexInventariosGlobales);
 	pthread_mutex_destroy(&mutexHistorialEspecies);
 	pthread_mutex_destroy(&Mutex_AndoLoggeando);
 	pthread_mutex_destroy(&Mutex_AndoLoggeandoEventos);
@@ -269,6 +270,8 @@ void inicializar_conexiones() {
 			config_get_string_value(config, "PUERTO_BROKER"), TEAM);
 
 	pthread_mutex_init(&mutex_subscripcion, NULL);
+
+	ESPERO_MENSAJES = true;
 
 	subscribir_y_escuchar_cola_appeared_pokemon((void*) mensaje_recibido);
 	subscribir_y_escuchar_cola_caught_pokemon((void*) mensaje_recibido);
@@ -284,14 +287,16 @@ void finalizar_conexiones(){
 
 void finalizar_suscripcion_a_colas(){
 	//******************************************************************** INICIO HARDCODEADO
-	pthread_mutex_lock(&mutex_PSEUDOBROKER);
-	FIN_PSEUDOBROKER = true;
-	pthread_mutex_unlock(&mutex_PSEUDOBROKER);
+	pthread_mutex_lock(&mutex_PSEUDOGAMECARD);
+	FIN_PSEUDO_GAMECARD = true;
+	pthread_mutex_unlock(&mutex_PSEUDOGAMECARD);
 	//******************************************************************** fin HARDCODEADO
 
-	pthread_cancel(hilo_appeared_pokemon);
-	pthread_cancel(hilo_localized_pokemon);
-	pthread_cancel(hilo_caught_pokemon);
+	dejar_de_recibir();
+
+//	pthread_cancel(hilo_appeared_pokemon);
+//	pthread_cancel(hilo_localized_pokemon);
+//	pthread_cancel(hilo_caught_pokemon);
 
 //	finalizar_conexiones();
 }

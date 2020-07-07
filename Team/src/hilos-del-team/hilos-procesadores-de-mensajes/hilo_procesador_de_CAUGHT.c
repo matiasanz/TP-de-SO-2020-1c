@@ -2,6 +2,8 @@
 #include "../../team.h"
 #include "../../dominio/estructuras-auxiliares/mensajes.h"
 
+void pokemon_localizar_en_mapa(pokemon*pokemonCatcheado);
+
 void team_procesador_cola_CAUGHT(cr_list* mensajes){
 
 	while(PROCESO_ACTIVO){
@@ -80,6 +82,14 @@ bool mensaje_caught_pokemon_get_resultado(t_mensaje_caught_pokemon* mensaje){
 	return mensaje->atrapado;
 }
 
+bool pokemon_necesito_mas_instancias(pokemon*unPokemon){
+	pthread_mutex_lock(&mutexRecursosDisponibles);
+	bool siTraeMas = pokemon_es_requerido(*unPokemon);
+	pthread_mutex_unlock(&mutexRecursosDisponibles);
+
+	return siTraeMas;
+}
+
 void procesar_resultado_de_captura(captura_pendiente*capturaPendiente, bool fueExitosa){
 
 	entrenador* unEntrenador     = capturaPendiente->cazador;
@@ -94,29 +104,51 @@ void procesar_resultado_de_captura(captura_pendiente*capturaPendiente, bool fueE
 		objetivos_actualizar_por_captura_de(pokemonCatcheado->especie);
 
 		entrenador_despertar(unEntrenador, "Se confirmo la captura del pokemon");
+		pokemon_localizar_en_mapa(pokemonCatcheado);
 	}
 
 	else{
-		entrenador_dormir_hasta_llegada_de_pokemon(unEntrenador);
 		captura_procesar_fallo(capturaPendiente);
-		pokemon_destroy(pokemonCatcheado);
 	}
 
 	pendiente_destroy(capturaPendiente);
 }
 
 void captura_procesar_fallo(captura_pendiente*capturaFallida){
+	entrenador* cazador = capturaFallida->cazador;
+	pokemon*pokemonCatcheado = capturaFallida->pokemonCatcheado;
+
 	pthread_mutex_lock(&mutexRecursosDisponibles);
-	recursos_quitar_instancia_de_recurso(recursosEnMapa, capturaFallida->pokemonCatcheado->especie);
+	recursos_quitar_instancia_de_recurso(recursosEnMapa, pokemonCatcheado->especie);
 	pthread_mutex_unlock(&mutexRecursosDisponibles);
 
-	pthread_mutex_lock(&mutexRepuestos);
-	pokemon*repuesto = list_remove_by_comparation(pokemonesDeRepuesto, capturaFallida->pokemonCatcheado, (bool(*)(void*, void*))&pokemon_misma_especie_que);
-	pthread_mutex_unlock(&mutexRepuestos);
+	entrenador_dormir_hasta_llegada_de_pokemon(cazador);
+	pokemon_localizar_en_mapa(pokemonCatcheado);
+	pokemon_destroy(pokemonCatcheado); //Destroy hard?
+}
 
-	puts("\nFASHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n");
+void pokemon_localizar_en_mapa(pokemon*pokemonCatcheado){
 
-	if(repuesto){
-		cr_list_add_and_signal(pokemonesRecibidos, repuesto);
+	if(pokemon_necesito_mas_instancias(pokemonCatcheado)){
+		pthread_mutex_lock(&mutexRepuestos);
+		pokemon*repuesto = list_remove_by_comparation(pokemonesDeRepuesto, pokemonCatcheado, (bool(*)(void*, void*))&pokemon_misma_especie_que);
+		pthread_mutex_unlock(&mutexRepuestos);
+
+		if(repuesto){
+			cr_list_add_and_signal(pokemonesRecibidos, repuesto);
+		}
+	}
+
+	else{
+
+		bool esOtraInstanciaDe(void* unPokemon){
+			puts("\n\n XXX PAREN TODO XXX");
+
+			return pokemon_misma_especie_que(unPokemon, pokemonCatcheado);
+		}
+
+		pthread_mutex_lock(&mutexRepuestos);
+		list_remove_and_destroy_by_condition(pokemonesDeRepuesto, &esOtraInstanciaDe, (void*)pokemon_destroy_hard);
+		pthread_mutex_unlock(&mutexRepuestos);
 	}
 }

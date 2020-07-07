@@ -14,8 +14,6 @@
 #include <commons/error.h>
 #include <commons/collections/list.h>
 #include <commons/collections/dictionary.h>
-#include <commons/log.h>
-#include <commons/config.h>
 
 #include "../listas/cr_list.h"
 
@@ -35,12 +33,5 @@ typedef struct{
 	numero deadlocksProducidos;
 	numero deadlocksResueltos;
 }estadisticas_team;
-
-/*Variables Globales*/
-
-	pthread_mutex_t Mutex_AndoLoggeando;
-	pthread_mutex_t Mutex_AndoLoggeandoEventos;
-
-/*--------------*/
 
 # endif

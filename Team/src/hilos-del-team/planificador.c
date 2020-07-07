@@ -39,12 +39,11 @@ void ejecutar_entrenador(entrenador* unEntrenador){
 			break;
 		}
 
-		puts("***************************************** LE DOY CPU");
+		log_event_cpu_otorgado();
 		sem_post(&EjecutarEntrenador[unEntrenador->id]);
 
 		sem_wait(&FinDeCiclo_CPU);
-		puts("***************************************** CONSUMIO CPU");
-
+		log_event_cpu_consumido();
 	}
 
 	actualizar_datos_del_entrenador(unEntrenador, tiempo);

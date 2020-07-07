@@ -9,16 +9,13 @@ void team_procesador_cola_LOCALIZED(cr_list* mensajes){
 		t_mensaje_localized_pokemon* pokemonLocalizado = leer_mensaje_cuando_este_disponible(mensajes);
 
 		if(!especie_recibida_con_anterioridad(pokemonLocalizado->especie, historialDePokemones)){
-			especie_pokemon especie = string_duplicate(pokemonLocalizado->especie);
+			especie_pokemon especie = pokemonLocalizado->especie;
 			posiciones_ordenar_por_cercania_al_equipo(pokemonLocalizado->posiciones);
 			registrar_en_cada_posicion(especie, pokemonLocalizado->posiciones);
-			free(especie);
 		}
 
 		else{
-			pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-			log_info(event_logger, "Se descarto, ya que la especie %s habia sido recibida con anterioridad o el id no se corresponde con un get enviado", pokemonLocalizado->especie);
-			pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+			log_event_localized_repetido(pokemonLocalizado->especie);
 		}
 
 		mensaje_localized_pokemon_destruir(pokemonLocalizado);
@@ -87,16 +84,12 @@ void registrar_pokemon(pokemon*unPokemon){
 // Retorna true si la especie ya se encuentra en el registro de especies
 bool especie_recibida_con_anterioridad(especie_pokemon especie, especies_pokemones historial){
 
-	especie_pokemon especieDuplicada = string_duplicate(especie);
-
 	pthread_mutex_lock(&mutexHistorialEspecies);
-	bool siONo = list_get_by_comparation(historial, especie, (bool(*)(void*, void*))especie_cmp);
-
-	if(siONo) free(especieDuplicada);
-	else  list_add(historial, string_duplicate(especie));
+	bool yaLaTengo = list_get_by_comparation(historial, especie, (bool(*)(void*, void*))especie_cmp);
+	if(!yaLaTengo)  list_add(historial, string_duplicate(especie));
 	pthread_mutex_unlock(&mutexHistorialEspecies);
 
-	return siONo;
+	return yaLaTengo;
 }
 
 bool mensaje_localized_es_para_mi(t_mensaje_localized_pokemon* unMensaje){

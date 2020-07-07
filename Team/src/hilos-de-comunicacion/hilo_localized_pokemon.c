@@ -26,19 +26,14 @@ void subscribir_y_escuchar_cola_localized_pokemon(void (*callback)(t_id_cola, vo
 void localized_pokemon_recibido(t_mensaje_localized_pokemon* localized_pokemon) {
 
 	if(mensaje_localized_es_para_mi(localized_pokemon)){
-		pthread_mutex_lock(&Mutex_AndoLoggeando);
-		mensaje_localized_pokemon_log(logger, localized_pokemon);
-		pthread_mutex_unlock(&Mutex_AndoLoggeando);
+		log_enunciado_mensaje_localized(localized_pokemon);
 
 		cr_list_add_and_signal(mensajesLOCALIZED, localized_pokemon);
 	}
 
 	else{
+		log_event_localized_descartado_por_id(localized_pokemon);
 		mensaje_localized_pokemon_destruir(localized_pokemon);
-
-		pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-		log_info(event_logger, "Se descarto un mensaje LOCALIZED por id correlativo desconocido");
-		pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 	}
 
 }

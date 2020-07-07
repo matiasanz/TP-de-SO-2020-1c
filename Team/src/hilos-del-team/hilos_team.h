@@ -40,8 +40,8 @@ pthread_mutex_t mutexPedidos;
 numero cantidadDeEntrenadores;
 
 //HARDCODEOS ---------------------------------- ACORDARME DE BORRARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
-pthread_mutex_t mutex_PSEUDOBROKER;
-bool FIN_PSEUDOBROKER;
+pthread_mutex_t mutex_PSEUDOGAMECARD;
+bool FIN_PSEUDO_GAMECARD;
 
 /*----------------*/
 
@@ -52,7 +52,7 @@ void team_hilo_entrenador();
 void team_planificar();
 
 //Hilo que se encarga de recibir los mensajes
-void broker_simulator();
+void gamecard_simulator();
 void team_procesador_cola_CAUGHT(cr_list* mensajes);
 void team_procesador_cola_LOCALIZED(cr_list*mensajes);
 void team_procesar_pokemones();

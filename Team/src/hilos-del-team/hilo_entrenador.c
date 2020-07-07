@@ -8,9 +8,8 @@ pokemon* entrenador_get_proxima_presa(entrenador*unEntrenador){
 
 void team_hilo_entrenador(entrenador*unEntrenador){
 	t_id pid = unEntrenador->id;
-	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	log_info(logger, "Se cargo al Entrenador N°%u en estado NEW, en la posicion %s", pid, posicion_to_string(unEntrenador->posicion));
-	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+
+	log_enunciado_entrenador_creado(unEntrenador);
 
 	bool hiloActivo = true;
 	while(hiloActivo){
@@ -129,9 +128,7 @@ void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const cha
 	unEntrenador->estado = estadoFinal;
 	pthread_mutex_unlock(&mutexEstadoEntrenador[unEntrenador->id]);
 
-	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	log_info(logger, "\n--------------- Cambio de Estado ---------------\n Proceso: Entrenador N°%u\n Estado Inicial: %s\n Estado Final: %s\n Motivo: %s\n", unEntrenador->id, estadoFromEnum(estadoActual),  estadoFromEnum(estadoFinal), motivo);
-	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+	log_enunciado_cambio_de_estado(unEntrenador, estadoActual, estadoFinal, motivo);
 
 	if(cambio_de_contexto(estadoActual, estadoFinal)){
 		Estadisticas.cambiosDeContexto++;
@@ -143,15 +140,11 @@ void entrenador_capturar(entrenador*entrenador, pokemon*victima){
 
 	recursos_agregar_recurso(entrenador->pokemonesCazados, victima->especie);
 
-//	objetivos_actualizar_por_captura_de(victima->especie);
-
 	t_posicion posicionDelEvento = entrenador->posicion;
 
-	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	log_info(logger, "El Entrenador N°%u ha capturado un %s en la posicion [%u %u]", entrenador->id, victima->especie, posicionDelEvento.pos_x, posicionDelEvento.pos_y);
-	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+	log_enunciado_captura_de_pokemon(entrenador, victima, posicionDelEvento);
 
-	pokemon_destroy(victima);
+	pokemon_destroy_hard(victima);
 }
 
 //Remueve un entrenador de una lista
@@ -172,9 +165,7 @@ void candidato_desplazarse_hacia_el_otro(candidato_intercambio*unCandidato, cand
 }
 
 void entrenador_desplazarse_hacia(entrenador* unEntrenador, t_posicion posicionFinal){
-	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	log_info(logger, "El entrenador N°%u partio de la posicion [%u %u]\n", unEntrenador->id, unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
-	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+	log_event_de_donde_partio(unEntrenador, posicionFinal);
 
 	bool llegoALaPosicion = entrenador_llego_a(unEntrenador, posicionFinal);
 
@@ -207,9 +198,7 @@ void entrenador_dar_un_paso_hacia(entrenador*unEntrenador, t_posicion posicionFi
 		desplazar_unidimensional(&posicionActual->pos_y, posicionFinal.pos_y);
 	}
 
-	pthread_mutex_lock(&Mutex_AndoLoggeando);
-	log_info(logger, "\nEl entrenador N°%u se desplazo a la posicion [%u %u]\n", unEntrenador->id, unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
-	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+	log_enunciado_desplazamiento(unEntrenador);
 
 }
 
@@ -217,6 +206,7 @@ bool entrenador_llego_a(entrenador* unEntrenador, t_posicion posicion){
 	return posicion_cmp(unEntrenador->posicion, posicion);
 }
 
+//Funcion hardcodeada para acelerar pruebas
 void entrenador_teletransportarte_a(entrenador*unEntrenador, t_posicion posicionFinal){
 //	//implementacion anterior, para pruebas rapidas
 	t_posicion posicionActual = unEntrenador->posicion;
