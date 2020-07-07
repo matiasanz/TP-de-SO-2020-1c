@@ -240,7 +240,15 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 				}
 				pthread_mutex_unlock(&mutDiccionarioSemaforos);
 
-				pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+				pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+				pthread_mutex_t* pokeMut1=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+
+				pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+				pthread_mutex_lock(pokeMut1);
+
+				//pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 
 				t_config* metadata_pokemon_default=config_create(bin_metadata);
 				config_set_value(metadata_pokemon_default,"DIRECTORY","N");
@@ -249,7 +257,17 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 				config_set_value(metadata_pokemon_default,"OPEN","N");
 				config_save(metadata_pokemon_default);
 				config_destroy(metadata_pokemon_default);
-				pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+
+				pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+				pthread_mutex_t* pokeMut2=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+
+				pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+
+				pthread_mutex_unlock(pokeMut2);
+
+				//pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 
 			}else{
 				pthread_mutex_lock(&mutDiccionarioSemaforos);
@@ -273,18 +291,37 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 			}
 			fclose(f_metadata);
 
-			pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+			pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+			pthread_mutex_t* pokeMut3=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+
+			pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+			pthread_mutex_lock(pokeMut3);
+
+			//pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+
 			config_metadata_pokemon=config_create(bin_metadata);
 			char* estadoArchivo=config_get_string_value(config_metadata_pokemon,"OPEN");
 			bool abierto=true;
-					if(strcmp(estadoArchivo,"N")==0){
-						abierto=false;
-						config_set_value(config_metadata_pokemon,"OPEN","Y");
-						config_save(config_metadata_pokemon);
 
-					}
+			if(strcmp(estadoArchivo,"N")==0){
+			abierto=false;
+			config_set_value(config_metadata_pokemon,"OPEN","Y");
+			config_save(config_metadata_pokemon);
 
-			pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+			}
+
+
+			pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+			pthread_mutex_t* pokeMut4=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+
+			pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+			pthread_mutex_unlock(pokeMut4);
+
+			//pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 
 			//------Ver si el archivo esta abierto------------
 			if(abierto){
@@ -522,14 +559,31 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 			//retardo para simular acceso a disco
 			sleep(tiempo_retardo_operacion);
 
-			pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+			pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+			pthread_mutex_t* pokeMut5=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+
+			pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+			pthread_mutex_lock(pokeMut5);
+
+			//pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 
 			config_set_value(config_metadata_pokemon,"BLOCKS",listaBloques);
 			config_set_value(config_metadata_pokemon,"SIZE",stringSize);
 			config_set_value(config_metadata_pokemon,"OPEN","N");
 			config_save(config_metadata_pokemon);
 
-			pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+
+			pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+			pthread_mutex_t* pokeMut6=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+
+			pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+			pthread_mutex_unlock(pokeMut6);
+
+			//pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 
 			free(listaBloques);
 			free(stringSize);
@@ -634,14 +688,31 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 				//retardo para simular acceso a disco
 				sleep(tiempo_retardo_operacion);
 
-				pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+				pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+				pthread_mutex_t* pokeMut7=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+
+				pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+				pthread_mutex_lock(pokeMut7);
+
+				//pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 
 				config_set_value(config_metadata_pokemon,"BLOCKS",listaBloques);
 				config_set_value(config_metadata_pokemon,"SIZE",stringSize);
 				config_set_value(config_metadata_pokemon,"OPEN","N");
 				config_save(config_metadata_pokemon);
 
-				pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+
+				pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+				pthread_mutex_t* pokeMut8=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+
+				pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+				pthread_mutex_unlock(pokeMut8);
+
+				//pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 
 
 				log_info(event_logger,"no posee bloques, se usaran los bloques vacios nro:%s",listaBloques);
@@ -767,14 +838,30 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 				//retardo para simular acceso a disco
 				sleep(tiempo_retardo_operacion);
 
-				pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+				pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+				pthread_mutex_t* pokeMut9=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+
+				pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+				pthread_mutex_lock(pokeMut9);
+
+				//pthread_mutex_lock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 
 				config_set_value(config_metadata_pokemon,"BLOCKS",listaBloques);
 				config_set_value(config_metadata_pokemon,"SIZE",stringSize);
 				config_set_value(config_metadata_pokemon,"OPEN","N");
 				config_save(config_metadata_pokemon);
 
-				pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
+				pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+				pthread_mutex_t* pokeMut10=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+
+				pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+				pthread_mutex_unlock(pokeMut10);
+
+				//pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 
 
 				free(listaBloques);
