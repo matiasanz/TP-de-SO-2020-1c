@@ -66,6 +66,9 @@ void crearEstructuras(){
 	pthread_mutex_init(&mutDiccionarioSemaforos, NULL);
 	pthread_mutex_init(&envioPaquete, NULL);
 
+	pthread_mutex_init(&mutexLogger, NULL);
+	pthread_mutex_init(&mutexEventLogger, NULL);
+
 
 	semaforosDePokemons=dictionary_create();
 
@@ -331,11 +334,15 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 				free(bin_metadata);
 				free(dir_unNuevoPokemon);
 
-				log_info(event_logger,"Esta operacion se reintentara luego: New_Pokemon ::%s ::pos (%i,%i)::cant %i"
+				pthread_mutex_lock(&mutexLogger);
+				log_error(logger,"El archivo pokemon esta abierto, esta operacion se reintentara luego: New_Pokemon ::%s ::pos (%i,%i)::cant %i"
 										,unMsjNewPoke->pokemon.especie
 										,unMsjNewPoke->pokemon.posicion.pos_x
 										,unMsjNewPoke->pokemon.posicion.pos_y
 										,unMsjNewPoke->cantidad);
+
+				pthread_mutex_unlock(&mutexLogger);
+
 				pthread_t unHilo;
 				pthread_create(&unHilo, NULL,(void*) gamecard_New_Pokemon_ReIntento, unMsjNewPoke);
 				pthread_detach(unHilo);
@@ -588,7 +595,9 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 			free(listaBloques);
 			free(stringSize);
 
+			pthread_mutex_lock(&mutexEventLogger);
 			log_info(event_logger,"La posicion ya existe");
+			pthread_mutex_unlock(&mutexEventLogger);
 
 		}else{
 		//rama en donde el pokemon no esta en la posicion recibida
@@ -714,8 +723,9 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 				//pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie));
 
-
+				pthread_mutex_lock(&mutexEventLogger);
 				log_info(event_logger,"no posee bloques, se usaran los bloques vacios nro:%s",listaBloques);
+				pthread_mutex_unlock(&mutexEventLogger);
 
 				free(listaBloques);
 				free(nuevalinea);
@@ -869,7 +879,9 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 				free(stringSize);
 				free(pathBloque);
 
+				pthread_mutex_lock(&mutexEventLogger);
 				log_info(event_logger,"ya tiene bloques asignados");
+				pthread_mutex_unlock(&mutexEventLogger);
 			}
 
 		}
@@ -878,14 +890,14 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 		free(stringPosX);
 		free(stringPosY);
 
-
-		log_info(event_logger,"pokemon guardado:%s ::pos (%i,%i)::cant %i"
+		pthread_mutex_lock(&mutexLogger);
+		log_info(logger,"pokemon guardado:%s ::pos (%i,%i)::cant %i"
 				,unMsjNewPoke->pokemon.especie
 				,unMsjNewPoke->pokemon.posicion.pos_x
 				,unMsjNewPoke->pokemon.posicion.pos_y
 				,unMsjNewPoke->cantidad);
 
-
+		pthread_mutex_unlock(&mutexLogger);
 		//creacion de  paquete appeared pokemon y envio a Broker
 
 		t_mensaje_appeared_catch_pokemon* mensajeAEnviar=mensaje_appeared_catch_pokemon_crear(unMsjNewPoke->pokemon.especie,unMsjNewPoke->pokemon.posicion.pos_x,unMsjNewPoke->pokemon.posicion.pos_y);
@@ -992,10 +1004,14 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 			config_destroy(config_metadata_pokemon);
 			free(bin_metadata);
 
-			log_info(event_logger,"Esta operacion se reintentara luego: Catch_Pokemon ::%s ::pos (%i,%i)"
+			pthread_mutex_lock(&mutexLogger);
+			log_error(logger,"El archivo pokemon esta abierto, esta operacion se reintentara luego: Catch_Pokemon ::%s ::pos (%i,%i)"
 									,unMsjCatchPoke->pokemon.especie
 									,unMsjCatchPoke->pokemon.posicion.pos_x
 									,unMsjCatchPoke->pokemon.posicion.pos_y);
+
+			pthread_mutex_unlock(&mutexLogger);
+
 			pthread_t unHilo;
 			pthread_create(&unHilo, NULL,(void*) gamecard_Catch_Pokemon_ReIntento, unMsjCatchPoke);
 			pthread_detach(unHilo);
@@ -1404,7 +1420,13 @@ void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
 			config_destroy(config_metadata_pokemon);
 			free(bin_metadata);
 
-			log_info(event_logger,"Esta operacion se reintentara luego: GET_POKEMON ::%s",unMsjGetPoke->especie);
+
+			pthread_mutex_lock(&mutexLogger);
+
+			log_error(logger,"El archivo pokemon esta abierto, esta operacion se reintentara luego: GET_POKEMON ::%s",unMsjGetPoke->especie);
+
+			pthread_mutex_unlock(&mutexLogger);
+
 			pthread_t unHilo;
 			pthread_create(&unHilo, NULL,(void*) gamecard_Get_Pokemon_ReIntento, unMsjGetPoke);
 			pthread_detach(unHilo);
