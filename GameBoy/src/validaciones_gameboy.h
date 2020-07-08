@@ -3,6 +3,7 @@
 
 #include <ctype.h>
 #include <crenito-commons/utils.h>
+#include "gameboy_logs.h"
 
 void finalizar_gameboy(int ESTADO_FINALIZACION);
 

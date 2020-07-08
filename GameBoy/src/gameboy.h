@@ -17,4 +17,6 @@ void inicializar();
 void inicializar_logs();
 void inicializar_config();
 
+char*TIEMPO_CONEXION_STRING;
+
 #endif /* SRC_GAMEBOY_H_ */

@@ -15,9 +15,12 @@ bool modo_suscriptor(char*proceso){
 
 void procesar_modo_suscriptor(char* cola_mensaje_string, char* tiempo_conexion_string) {
 
+	log_event_intento_de_suscripcion_a_cola(cola_mensaje_string, tiempo_conexion_string);
+
 	validar_mayor_igual_a_cero(tiempo_conexion_string);
+
+	int tiempoConexion = atoi(tiempo_conexion_string);
 	t_id_cola id_cola = get_id_mensaje(cola_mensaje_string);
-	int tiempo_conexion = atoi(tiempo_conexion_string);
 
 	t_conexion_cliente* conexion_cliente = conexion_cliente_crear(id_cola,
 			config_get_int_value(config, "TIEMPO_DE_REINTENTO_CONEXION"), (void*) mensaje_recibido);
@@ -27,17 +30,12 @@ void procesar_modo_suscriptor(char* cola_mensaje_string, char* tiempo_conexion_s
 
 	t_conexion* args = conexion_crear(conexion_broker, conexion_cliente);
 
-	pthread_create(&hilo_suscriptor, NULL, (void*) subscribir_y_escuchar_cola, args);
+	pthread_create(&hilo_suscriptor, NULL, (void*) gameboy_suscribir_y_escuchar_cola, args);
 	pthread_detach(hilo_suscriptor);
 
-	//TODO: este mensaje no está valdiando realmente si la suscripción fué exitosa
-	log_info(logger, "El Proceso %s se suscribió a la cola %s por %d segundos", GAMEBOY_STRING,
-			cola_mensaje_string, tiempo_conexion);
+	sleep(tiempoConexion);
 
-	sleep(tiempo_conexion);
-
-	log_info(event_logger, "El tiempo de suscripción de %d segundos a la cola %s ha finalizado", tiempo_conexion,
-			cola_mensaje_string, tiempo_conexion);
+	log_event_fin_de_suscripcion_a_cola(tiempoConexion, cola_mensaje_string);
 
 	conexion_destruir(args);
 }
@@ -78,10 +76,43 @@ static void mensaje_recibido(t_id_cola id_cola, void* msj) {
 		mensaje_localized_pokemon_log(logger, deserializado);
 		mensaje_localized_pokemon_destruir(deserializado);
 		break;
+
 	default:
 		log_error(event_logger, "El %s recibió un mensaje que no esperaba: (%s)",
 		GAMEBOY_STRING, get_nombre_cola(id_cola));
 	}
 
 	free(msj);
+}
+
+//*************************************************************************************************
+#include "mensaje.h"
+
+/*
+ *  TODO ver si vale la pena reconectar y llegado el caso, a ESA funcion
+ *  pasarle como argumento el event_logger (de alguna manera)
+ */
+
+void suspender_escucha(t_conexion* conexion){
+	log_warning(event_logger, "Se perdió la conexión con el %s, cancelando escucha sobre la cola %s"
+							, BROKER_STRING, get_nombre_cola(conexion->cliente->id_cola));
+	exit(1);
+}
+
+int subscribir(t_conexion_server*, t_conexion_cliente*); //tomada de conexiones.c
+
+void gameboy_suscribir_y_escuchar_cola(t_conexion* conexion){
+	pthread_mutex_lock(&mutex_subscripcion);
+	int estado_subscripcion = subscribir(conexion->server, conexion->cliente);
+	pthread_mutex_unlock(&mutex_subscripcion);
+
+	if(error_conexion(estado_subscripcion)){
+		char*nombre_cola = get_nombre_cola(conexion->cliente->id_cola);
+		log_event_error_de_conexion(nombre_cola);
+		finalizar_gameboy(EXIT_FAILURE);
+	}
+
+	else log_enunciado_suscripcion_a_cola_de_mensajes(get_nombre_cola(conexion->cliente->id_cola));
+
+	mantener_suscripcion(conexion, (void*) suspender_escucha);
 }

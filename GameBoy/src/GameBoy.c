@@ -10,12 +10,12 @@
 
 #include "gameboy.h"
 
-int main(int cantidadDeArgumentos, char*argv[]) {
+int main(int cantidadDeArgumentos, char*argumentos[]) {
 
 	inicializar();
 
-	char* proceso = argv[1];
-	char* mensaje = argv[2];
+	char* proceso = argumentos[1];
+	char* mensaje = argumentos[2];
 
 	validar_cantidad_minima_argumentos(cantidadDeArgumentos, 4);
 	validar_proceso(proceso);
@@ -24,12 +24,11 @@ int main(int cantidadDeArgumentos, char*argv[]) {
 	if (modo_suscriptor(proceso)) {
 
 		validar_cantidad_argumentos(cantidadDeArgumentos, 4);
-		char* tiempo_conexion = argv[3];
-		procesar_modo_suscriptor(mensaje, tiempo_conexion);
+		TIEMPO_CONEXION_STRING = argumentos[3];
+		procesar_modo_suscriptor(mensaje, TIEMPO_CONEXION_STRING);
 
 	} else {
-
-		procesar_envio_mensaje(proceso, mensaje, argv, cantidadDeArgumentos);
+		procesar_envio_mensaje(proceso, mensaje, argumentos, cantidadDeArgumentos);
 	}
 
 	finalizar_gameboy(EXIT_SUCCESS);

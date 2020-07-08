@@ -38,6 +38,24 @@ int enviar_paquete(t_paquete* pqt, int socket);
 void subscribir_y_escuchar_cola(t_conexion* args);
 
 /*
+ * Funcion utilizada por el proceso GAMEBOY para
+ * suscribirse a una cola del broker. Trabaja igual que la
+ * anterior, con la diferencia de que usa los logs
+ * particulares del gameboy y en lugar de intentar reconectarse en caso de error
+ * suspende inmediatamente la escucha.
+ */
+void gameboy_suscribir_y_escuchar_cola(t_conexion* conexion); //La idea seria que estuviera en el archivo del gameboy
+
+/*
+ * Funcion utilizada por los procesos TEAM y GAMECARD
+ * en suscribir y escuchar cola y por el GAMEBOY en su
+ * implementación particular. Mantiene la espera activa,
+ * recibiendo los mensajes y en caso de fallo, aplica la
+ * funcion que recibe por parametro.
+ */
+void mantener_suscripcion(t_conexion* conexion, void (*procesar_fallo)(t_conexion*));
+
+/*
  * Funcion utilizada por los procesos GAME_CARD y TEAM para
  * conectarse con el GAME_BOY
  * Crea un socket de escucha usando un ip y puerto que recibe desde

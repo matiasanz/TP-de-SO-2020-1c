@@ -3,18 +3,21 @@
 void validar_proceso(char* proceso) {
 
 	if (strcmp(proceso, BROKER_STRING)   && strcmp(proceso, TEAM_STRING)
-	 && strcmp(proceso, GAMECARD_STRING) && strcmp(proceso, SUSCRIPTOR_STRING)) {
+									     && strcmp(proceso, GAMECARD_STRING)
+										 && strcmp(proceso, SUSCRIPTOR_STRING)) {
 
 		log_error(event_logger, "Se intento leer un proceso <<%s>> desconocido", proceso);
-		exit(EXIT_FAILURE);
+		finalizar_gameboy(EXIT_FAILURE);
 	}
 }
 
 void validar_mensaje(char* mensaje) {
 
-	if (strcmp(mensaje, NEW_POKEMON_STRING) && strcmp(mensaje, APPEARED_POKEMON_STRING)
-			&& strcmp(mensaje, CATCH_POKEMON_STRING) && strcmp(mensaje, CAUGHT_POKEMON_STRING)
-			&& strcmp(mensaje, GET_POKEMON_STRING)   && strcmp(mensaje, LOCALIZED_POKEMON_STRING)) {
+	if (strcmp(mensaje, NEW_POKEMON_STRING) && strcmp(mensaje, APPEARED_POKEMON_STRING )
+											&& strcmp(mensaje, CATCH_POKEMON_STRING    )
+											&& strcmp(mensaje, CAUGHT_POKEMON_STRING   )
+											&& strcmp(mensaje, GET_POKEMON_STRING      )
+											&& strcmp(mensaje, LOCALIZED_POKEMON_STRING)) {
 
 		log_error(event_logger, "Se leyo un mensaje invalido, el mensaje recibido es <<%s>>: ", mensaje);
 		finalizar_gameboy(EXIT_FAILURE);
@@ -32,8 +35,10 @@ void validar_cantidad_minima_argumentos(int cantidadRecibida, int cantidadMinima
 void validar_cantidad_argumentos(int cantidadRecibida, int cantidadEsperada) {
 
 	if (cantidadRecibida != cantidadEsperada) {
-		log_error(event_logger,
-				"Se esperaban %u argumentos pero se recibieron %u", cantidadEsperada, cantidadRecibida);
+		log_error(event_logger, "Se esperaban %u argumentos pero se recibieron %u"
+							  , cantidadEsperada
+							  , cantidadRecibida);
+
 		finalizar_gameboy(EXIT_FAILURE);
 	}
 }
@@ -93,6 +98,7 @@ void validar_mayor_a_cero(char* num) {
 		finalizar_gameboy(EXIT_FAILURE);
 	}
 }
+
 void validar_mayor_igual_a_cero(char* num) {
 
 	int pos = atoi(num);

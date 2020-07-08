@@ -10,7 +10,7 @@
 /*
  * Subscribe a los distintos procesos con el Broker.
  */
-static int subscribir(t_conexion_server* server, t_conexion_cliente* cliente);
+int subscribir(t_conexion_server* server, t_conexion_cliente* cliente);
 /*
  * Envía un paquete usando el socket indicado por parámetro
  * y se queda a la espera una respuesta de tipo entero
@@ -44,6 +44,54 @@ int enviar_paquete(t_paquete* pqt, int socket) {
 	return id_mensaje;
 }
 
+//*****************************************************************************
+void mantener_suscripcion(t_conexion* conexion, void (*procesar_fallo)(t_conexion*)){
+
+	t_conexion_cliente* cliente = conexion->cliente;
+	t_suscriptor* subscriptor = cliente->subscriptor;
+
+	while (1) {
+
+		int estadoSuscripcion = recibir(subscriptor->socket, cliente->callback);
+
+		if (error_conexion(estadoSuscripcion)) {
+
+			procesar_fallo(conexion);
+
+			break;
+		};
+
+	}
+}
+
+//int conexion_get_tiempo_reintento(t_conexion*conexion){
+//	return conexion->cliente->segundos_reconexion;
+//}
+
+//TODO
+//void intentar_reconectar(t_conexion* conexion){
+//	uint32_t TIEMPO_RECONEXION = conexion;
+//	int estado_suscripcion;
+//
+//	do{
+//
+//		sleep(TIEMPO_RECONEXION);
+//
+//		log_info(logger, "Inicio reintento de conexión");
+//
+//		pthread_mutex_lock(&mutex_subscripcion);
+//		estado_suscripcion = subscribir(conexion->server, conexion->cliente);
+//		pthread_mutex_unlock(&mutex_subscripcion);
+//
+//		log_info(logger, "Resultado del reintento de conexión: %s", (error_conexion(estado_suscripcion)? "Fallido": "Exitoso"));
+//
+//	} while(error_conexion(estado_suscripcion));
+//
+//}
+
+
+//**************************************************************************
+
 void subscribir_y_escuchar_cola(t_conexion* args) {
 
 	pthread_mutex_lock(&mutex_subscripcion);
@@ -52,6 +100,8 @@ void subscribir_y_escuchar_cola(t_conexion* args) {
 
 	//TO-DO reconectar
 	if (error_conexion(estado_subscripcion))
+		log_warning(logger, "No se pudo conectar al proceso %s, cancelando subscripción %s",
+								BROKER_STRING, get_nombre_cola(args->cliente->id_cola));
 		return;
 
 	t_conexion_cliente* cliente = args->cliente;
@@ -61,7 +111,7 @@ void subscribir_y_escuchar_cola(t_conexion* args) {
 
 		if (error_conexion(recibir(subscriptor->socket, cliente->callback))) {
 
-			log_warning(logger, "Se desconectó el %s, cancelando escucha sobre la cola %s",
+			log_warning(logger, "Se perdió la conexión con el %s, cancelando escucha sobre la cola %s",
 					BROKER_STRING, get_nombre_cola(cliente->id_cola));
 			break;
 		};
@@ -92,9 +142,6 @@ int subscribir(t_conexion_server* server, t_conexion_cliente* cliente) {
 
 	//TO-DO reconectar
 	if (error_conexion(cliente->subscriptor->socket)) {
-		log_warning(logger,
-				"el %s está desconectado, cancelando subscripción %s",
-				BROKER_STRING, get_nombre_cola(cliente->id_cola));
 		return ERROR_SOCKET;
 	}
 
