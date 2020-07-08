@@ -951,11 +951,17 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 		//retardo para simular acceso a disco
 		sleep(tiempo_retardo_operacion);
 
+		pthread_mutex_lock(&mutexLogger);
+
 		log_error(logger,"No existe el Pokemon: %s",unMsjCatchPoke->pokemon.especie);
 
-	}else{
-		log_info(event_logger,"Si existe el Pokemon: %s",unMsjCatchPoke->pokemon.especie);
+		pthread_mutex_unlock(&mutexLogger);
 
+	}else{
+
+		pthread_mutex_lock(&mutexEventLogger);
+		log_info(event_logger,"Si existe el Pokemon: %s",unMsjCatchPoke->pokemon.especie);
+		pthread_mutex_unlock(&mutexEventLogger);
 		//como existe el archivo, debo usar fclose, en caso contrario, no.
 		fclose(f_metadata);
 
@@ -1269,8 +1275,9 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 			free(listaBloques);
 			free(stringSize);
 
-			log_info(event_logger,"Un %s fue atrapado en la posicion: (%i,%i)",unMsjCatchPoke->pokemon.especie,unMsjCatchPoke->pokemon.posicion.pos_x,unMsjCatchPoke->pokemon.posicion.pos_y);
-
+			pthread_mutex_lock(&mutexLogger);
+			log_info(logger,"Un %s fue atrapado en la posicion: (%i,%i)",unMsjCatchPoke->pokemon.especie,unMsjCatchPoke->pokemon.posicion.pos_x,unMsjCatchPoke->pokemon.posicion.pos_y);
+			pthread_mutex_unlock(&mutexLogger);
 
 
 		}else{
@@ -1305,8 +1312,10 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 
 			//pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie));
 
-			log_error(logger,"No se encuentra la posicion: (%i,%i), para el Pokemon: %s",unMsjCatchPoke->pokemon.posicion.pos_x,unMsjCatchPoke->pokemon.posicion.pos_y,unMsjCatchPoke->pokemon.especie);
 
+			pthread_mutex_lock(&mutexLogger);
+			log_error(logger,"No se encuentra la posicion: (%i,%i), para el Pokemon: %s",unMsjCatchPoke->pokemon.posicion.pos_x,unMsjCatchPoke->pokemon.posicion.pos_y,unMsjCatchPoke->pokemon.especie);
+			pthread_mutex_unlock(&mutexLogger);
 		}
 
 		free(cadenaABuscar);
@@ -1367,7 +1376,10 @@ void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
 		//retardo para simular acceso a disco
 		sleep(tiempo_retardo_operacion);
 
-		log_info(event_logger,"Mensaje:%s, se localizaron 0 posiciones para %s",GET_POKEMON_STRING,unMsjGetPoke->especie);
+		pthread_mutex_lock(&mutexLogger);
+		log_info(logger,"Mensaje:%s, se localizaron 0 posiciones para %s",GET_POKEMON_STRING,unMsjGetPoke->especie);
+		pthread_mutex_unlock(&mutexLogger);
+
 	}else{
 
 		fclose(f_metadata);
@@ -1505,7 +1517,10 @@ void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
 		//pthread_mutex_unlock(dictionary_get(semaforosDePokemons,unMsjGetPoke->especie));
 
 		char* posicionesString=posicion_list_to_string(listaDePosiciones);
-		log_info(event_logger,"Mensaje:%s, se localizaron %i posiciones para %s,->>>: %s",GET_POKEMON_STRING,list_size(listaDePosiciones),unMsjGetPoke->especie,posicionesString);
+
+		pthread_mutex_lock(&mutexLogger);
+		log_info(logger,"Mensaje:%s, se localizaron %i posiciones para %s,->>>: %s",GET_POKEMON_STRING,list_size(listaDePosiciones),unMsjGetPoke->especie,posicionesString);
+		pthread_mutex_unlock(&mutexLogger);
 
 		free(posicionesString);
 		split_liberar(bloquesDelPokemon);
