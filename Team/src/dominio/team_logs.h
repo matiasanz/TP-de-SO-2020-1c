@@ -27,21 +27,36 @@
 	void log_enunciado_llegada_de_mensaje_appeared(t_mensaje_appeared_pokemon*);
 	void log_enunciado_llegada_de_mensaje_localized(t_mensaje_localized_pokemon*);
 	void log_enunciado_llegada_de_mensaje_caught(t_mensaje_caught_pokemon*);
+	void log_enunciado_respuesta_autogenerada_catch();
+	void log_enunciado_respuesta_autogenerada_get();
 	void team_loggear_resultados();
 
 //Eventos Random
+
+	//GET
+	void log_event_pokemon_por_pedir(especie_pokemon);
+	void log_event_mensaje_get_enviado(t_mensaje_get_pokemon*, t_id);
+
+	//CATCH
+	void log_event_pokemon_por_catchear(pokemon* pokemonCatcheado);
+
+	//LOCALIZED
 	void log_event_localized_repetido(especie_pokemon);
 	void log_event_localized_descartado_por_id(t_mensaje_localized_pokemon* localized_pokemon);
-	void log_event_loggear_situacion_actual(matriz_recursos objetivos, matriz_recursos inventarios);
+
+	//PROCESAR POKEMON
 	void log_event_pokemon_mapeado(especie_pokemon);
+	void log_event_busco_especie_en_mapa(pokemon* buscado, pokemon*encontrado);
 	void log_event_loggear_pokemon_descartado(especie_pokemon);
+	void log_event_loggear_situacion_actual(matriz_recursos objetivos, matriz_recursos inventarios);
+
+	//CAUGHT
+	void log_event_caught_especie(pokemon*pokemonCatcheado, bool fueExitosa);
+	void log_event_captura_desconocida(t_mensaje_caught_pokemon*);
+
+	//ENTRENADOR
 	void log_event_de_donde_partio(entrenador*, t_posicion);
 	void log_event_cpu_otorgado();
 	void log_event_cpu_consumido();
-	void log_event_pokemon_por_pedir(especie_pokemon);
-	void log_event_mensaje_get_enviado(t_mensaje_get_pokemon*, t_id);
-	void log_event_caught_especie(pokemon*pokemonCatcheado, bool fueExitosa);
-	void log_event_captura_desconocida(t_mensaje_caught_pokemon*);
-	void log_event_busco_especie_en_mapa(pokemon* buscado, pokemon*encontrado);
 
 #endif

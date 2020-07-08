@@ -76,6 +76,18 @@ void log_enunciado_llegada_de_mensaje_caught(t_mensaje_caught_pokemon* mensajeRe
 	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 }
 
+void log_enunciado_respuesta_autogenerada_catch(){
+	pthread_mutex_lock(&Mutex_AndoLoggeando);
+	log_warning(logger,"Se procedera a responder el mensaje CATCH por defecto");
+	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+}
+
+void log_enunciado_respuesta_autogenerada_get(){
+	pthread_mutex_lock(&Mutex_AndoLoggeando);
+	log_warning(logger,"Se procedera a responder el mensaje GET por defecto");
+	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+}
+
 void team_loggear_resultados(){
 
 	char*resultados = estadisticas_to_string(Estadisticas);
@@ -89,7 +101,7 @@ void team_loggear_resultados(){
 
 //**************************************************************
 
-void log_event_localized_repetido(especie_pokemon especie){
+void log_event_localized_repetido(especie_pokemon especie){ //TODO localized to string
 	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
 	log_info(event_logger, "\n********* MENSAJE DESCARTADO ********\n"
 							  " Tipo: localized\n"
@@ -147,12 +159,33 @@ void log_event_pokemon_por_pedir(especie_pokemon especiePokemon){
 }
 
 void log_event_mensaje_get_enviado(t_mensaje_get_pokemon* mensaje, t_id id){
+	mensaje_get_pokemon_set_id(mensaje, id);
+	char* mensajeGet = mensaje_get_pokemon_to_string(mensaje);
+
 	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-	log_info(event_logger, "\n*********** MENSAJE ENVIADO ***********\n"
-						   " Tipo: GET\n"
-						   " Especie: %s\n"
-						   " Id: %u\n", mensaje->especie, id);
+	log_info(event_logger, "\n*********** MENSAJE ENVIADO *********** ignorar -> %s", mensajeGet);
 	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+
+	free(mensajeGet);
+}
+
+void log_event_pokemon_por_catchear(pokemon* pokemonCatcheado){
+	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
+	log_info(event_logger, ">> catch(%s)", pokemonCatcheado->especie);
+	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+}
+
+void log_event_mensaje_catch_enviado(t_mensaje_appeared_catch_pokemon* mensaje, t_id id){
+
+	mensaje_appeared_catch_pokemon_set_id(mensaje, id);
+
+	char* mensajeCatch = mensaje_appeared_catch_pokemon_to_string(mensaje, "CATCH");
+
+		pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
+		log_info(event_logger, "\n*********** MENSAJE ENVIADO *********** ignorar -> %s", mensajeCatch);
+		pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+
+	free(mensajeCatch);
 }
 
 void log_event_caught_especie(pokemon*pokemonCatcheado, bool fueExitosa){

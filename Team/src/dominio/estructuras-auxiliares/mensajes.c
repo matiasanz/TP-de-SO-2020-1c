@@ -30,10 +30,8 @@ void Get(void* especiePokemon) {
 	mensaje_get_registrar(idMensajeEnviado);
 
 	if(error_conexion(idMensajeEnviado)){
-		pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-		log_warning(event_logger,"Se procedera a responder el mensaje GET por defecto");
-		pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 
+		log_enunciado_respuesta_autogenerada_get();
 		t_list*ningunaPosicion = list_create();
 
 		t_mensaje_localized_pokemon* respuestaAutogenerada = mensaje_localized_pokemon_crear(especiePokemon, ningunaPosicion);
@@ -68,9 +66,7 @@ void Get_pokemones(matriz_recursos objetivosTotales, matriz_recursos recursosDis
 //Envia mensaje al broker para ser replicado al gamecard, devuelve el id del mensaje pendiente por recibir
 void Catch(entrenador*unEntrenador, pokemon* pokemonCatcheado) {
 
-	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-	log_info(event_logger, ">> catch(%s)", pokemonCatcheado->especie);
-	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+	log_event_pokemon_por_catchear(pokemonCatcheado);
 
 	//creacion de  paquete catch pokemon y envio a Broker
 	t_mensaje_appeared_catch_pokemon* mensajeCatch=mensaje_appeared_catch_pokemon_crear(pokemonCatcheado->especie,pokemonCatcheado->posicion.pos_x,pokemonCatcheado->posicion.pos_y);
@@ -86,12 +82,12 @@ void Catch(entrenador*unEntrenador, pokemon* pokemonCatcheado) {
 	unEntrenador->siguienteTarea = CAPTURAR;
 	entrenador_pasar_a(unEntrenador, LOCKED_HASTA_CAUGHT, "Debera esperar a que este el resultado de la captura");
 
+	log_event_mensaje_catch_enviado(mensajeCatch, idCapturaPendiente);
+
 	sem_post(&FinDeCiclo_CPU);
 
 	if(error_conexion(idCapturaPendiente)){
-		pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-		log_warning(event_logger,"Se procedera a responder el mensaje CATCH por defecto");
-		pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+		log_enunciado_respuesta_autogenerada_catch();
 
 		t_mensaje_caught_pokemon* respuestaAutogenerada = mensaje_caught_pokemon_crear(true);
 		mensaje_caught_pokemon_set_id_correlativo(respuestaAutogenerada, idCapturaPendiente);
