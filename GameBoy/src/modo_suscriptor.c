@@ -94,8 +94,7 @@ static void mensaje_recibido(t_id_cola id_cola, void* msj) {
  */
 
 void suspender_escucha(t_conexion* conexion){
-	log_warning(event_logger, "Se perdió la conexión con el %s, cancelando escucha sobre la cola %s"
-							, BROKER_STRING, get_nombre_cola(conexion->cliente->id_cola));
+	log_event_perdida_de_conexion_a_cola(get_nombre_cola(conexion->cliente->id_cola));
 	exit(1);
 }
 
@@ -108,7 +107,7 @@ void gameboy_suscribir_y_escuchar_cola(t_conexion* conexion){
 
 	if(error_conexion(estado_subscripcion)){
 		char*nombre_cola = get_nombre_cola(conexion->cliente->id_cola);
-		log_event_error_de_conexion(nombre_cola);
+		log_event_intento_fallido_de_conexion(nombre_cola);
 		finalizar_gameboy(EXIT_FAILURE);
 	}
 
