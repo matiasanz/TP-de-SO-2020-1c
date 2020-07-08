@@ -931,7 +931,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 
-	int pokemonAtrapado;//0 o 1
+	uint32_t pokemonAtrapado;//0 o 1
 
 	char* bin_metadata = string_new();
 
@@ -1029,7 +1029,24 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 
 		}
 
+		//----------------------
+		pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+		pthread_mutex_t* pokeMutAux1=dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie);
+
+		pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+		pthread_mutex_lock(pokeMutAux1);
+		//------------aqui marca condicion de carrera, aunque no deberia--------------
 		char** bloquesDelPokemon=config_get_array_value(config_metadata_pokemon,"BLOCKS");
+
+		pthread_mutex_lock(&mutDiccionarioSemaforos);
+
+		pthread_mutex_t* pokeMutAux2=dictionary_get(semaforosDePokemons,unMsjCatchPoke->pokemon.especie);
+
+		pthread_mutex_unlock(&mutDiccionarioSemaforos);
+
+		pthread_mutex_unlock(pokeMutAux2);
 
 
 		//--------comenzar a operar el pokemon-------
@@ -1338,11 +1355,13 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 
 
 	pthread_mutex_lock(&envioPaquete);
-	t_conexion_server* unaConexion=conexion_server_crear(
+	/*t_conexion_server* unaConexion=conexion_server_crear(
 						config_get_string_value(config, "IP_BROKER"),
 						config_get_string_value(config, "PUERTO_BROKER"), GAMECARD);
 
-	if(enviar(unaConexion,paqueteAEnviar)==ERROR_SOCKET){
+	*/
+
+	if(enviar(conexion_broker,paqueteAEnviar)==ERROR_SOCKET){
 		log_warning(logger,"NO se puede realizar la conexion con el BROKER");
 	}
 	pthread_mutex_unlock(&envioPaquete);
@@ -1352,7 +1371,7 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 	free(bin_metadata);
 	mensaje_appeared_catch_pokemon_destruir(unMsjCatchPoke);
 	mensaje_caught_pokemon_destruir(mensajeAEnviar);
-	conexion_server_destruir(unaConexion);
+	//conexion_server_destruir(unaConexion);
 	paquete_destruir(paqueteAEnviar);
 
 }
@@ -1539,11 +1558,11 @@ void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
 	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
 
 	pthread_mutex_lock(&envioPaquete);
-	t_conexion_server* unaConexion=conexion_server_crear(
+	/*t_conexion_server* unaConexion=conexion_server_crear(
 							config_get_string_value(config, "IP_BROKER"),
 							config_get_string_value(config, "PUERTO_BROKER"), GAMECARD);
-
-	if(enviar(unaConexion,paqueteAEnviar)==ERROR_SOCKET){
+	 */
+	if(enviar(conexion_broker,paqueteAEnviar)==ERROR_SOCKET){
 		log_warning(logger,"NO se puede realizar la conexion con el BROKER");
 	}
 	pthread_mutex_unlock(&envioPaquete);
@@ -1553,7 +1572,7 @@ void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
 	free(bin_metadata);
 	mensaje_get_pokemon_destruir(unMsjGetPoke);
 	mensaje_localized_pokemon_destruir(mensajeAEnviar);
-	conexion_server_destruir(unaConexion);
+	//conexion_server_destruir(unaConexion);
 	paquete_destruir(paqueteAEnviar);
 	//si uso list_destroy_and_destroy_elements(listaDePosiciones, (void*) posicion_destruir)
 	//me dice en valgrind, free invalidos, puede que las posiciones
