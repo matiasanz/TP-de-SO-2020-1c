@@ -27,6 +27,11 @@ void inicializar_hilos();
 void finalizar_hilos();
 
 void inicializar_conexiones();
+void finalizar_conexiones();
+
+void esperar_que_equipo_no_pueda_cazar_mas();
+void finalizar_suscripcion_a_colas();
+
 
 //Estadisticas
 void inicializar_estadisticas(numero);
@@ -45,11 +50,6 @@ char*num_array_to_string(numero*arreglo, int length);
 
 	numero PROCESOS_SIN_FINALIZAR;
 	numero TIEMPO_RECONEXION;
-
-
-	entrenador* (*proximo_a_ejecutar_segun_criterio)(cola_entrenadores);
-	bool (*criterio_de_desalojo)(entrenador*, numero);
-	void (*actualizar_datos_del_entrenador)(entrenador*unEntrenador, numero tiempo);
 
 /*Mis Listas (son variables globales, para que puedan acceder todos los hilos)*/
 	entrenadores equipo;

@@ -75,9 +75,18 @@ void agregar_al_historial(pokemon*unPokemon){
 	especie_recibida_con_anterioridad(unPokemon->especie, historialDePokemones);
 }
 
+bool pedidos_pendientes(){
+	pthread_mutex_lock(&mutexPedidos);
+	bool pedidosPendientes = !list_is_empty(registroDePedidos);
+	pthread_mutex_unlock(&mutexPedidos);
+
+	return pedidosPendientes;
+}
+
 // Agrega los pokemones que van llegando al mapa en caso de ser requeridos
 void registrar_pokemon(pokemon*unPokemon){
-	agregar_al_historial(unPokemon);
+	if(pedidos_pendientes()) agregar_al_historial(unPokemon);
+
 	mapa_mapear_pokemon(pokemonesRecibidos, unPokemon);
 }
 

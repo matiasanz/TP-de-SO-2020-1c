@@ -27,6 +27,11 @@ typedef union{
 	void inicializar_sjf();
 	void inicializar_rr(numero QUANTUM);
 
+  //Planificacion
+	entrenador* (*proximo_a_ejecutar_segun_criterio)(cola_entrenadores);
+	bool (*criterio_de_desalojo)(entrenador*, numero);
+	void (*actualizar_datos_del_entrenador)(entrenador*unEntrenador, numero tiempo);
+
   //Proximo
 	entrenador*proximo_segun_fifo(cola_entrenadores);
 	entrenador*proximo_segun_rr(cola_entrenadores);

@@ -11,14 +11,6 @@
 #include "hilos-del-team/hilos_team.h"
 //#include "tests/tests_team.o"
 
-//funciones team_log_info para logs importantes TODO
-
-
-void esperar_que_equipo_no_pueda_cazar_mas();
-
-void finalizar_suscripcion_a_colas();
-
-
 int main(void) {
 
 	team_inicializar();
@@ -26,7 +18,7 @@ int main(void) {
 	Get_pokemones(objetivosGlobales, inventariosGlobales);
 
 	//Para pruebas rapidas sin los otros modulos//
-	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) gamecard_simulator, NULL);
+//	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) gamecard_simulator, NULL);
 
 	inicializar_hilos();
 
@@ -36,7 +28,7 @@ int main(void) {
 
 	team_ejecutar_algoritmo_de_deteccion_de_deadlock();
 
-	sem_wait(&FinDePlanificacion);
+	pthread_join(hiloPlanificador, NULL);
 
 	team_loggear_resultados();
 
@@ -208,7 +200,6 @@ void inicializar_hilos(){
 void finalizar_hilos(){
 	finalizar_hilos_entrenadores();
 
-//	pthread_join(hiloPlanificador	   , NULL);
 //	pthread_join(hiloMensajesAppeard   , NULL);
 //	pthread_join(hiloMensajesCAUGHT	   , NULL);
 //	pthread_join(hiloMensajesLOCALIZED , NULL);
@@ -222,7 +213,6 @@ void inicializar_semaforos(){
 	sem_init(&EquipoNoPuedaCazarMas     , 0, 0);
 	sem_init(&FinDeCiclo_CPU            , 0, 0);
 	sem_init(&finDeIntercambio          , 0, 0);
-	sem_init(&FinDePlanificacion        , 0, 0);
 
 	boolean_sem_init(&BOOLSEM_EsperoMensajes);
 
@@ -244,7 +234,6 @@ void finalizar_semaforos(){
 	sem_destroy(&HayEntrenadoresDisponibles);
 	sem_destroy(&FinDeCiclo_CPU);
 	sem_destroy(&finDeIntercambio);
-	sem_destroy(&FinDePlanificacion);
 
 	pthread_mutex_destroy(&mutexEntrenadores);
 	pthread_mutex_destroy(&mutexHistorialEspecies);
