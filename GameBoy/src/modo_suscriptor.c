@@ -16,6 +16,7 @@ void procesar_modo_suscriptor(char* cola_mensaje_string, char* tiempo_conexion_s
 	int tiempo_conexion = atoi(tiempo_conexion_string);
 
 	t_conexion_cliente* conexion_cliente = conexion_cliente_crear(id_cola,
+			id_proceso,
 			config_get_int_value(config, "TIEMPO_DE_REINTENTO_CONEXION"), (void*) mensaje_recibido);
 
 	conexion_broker = conexion_server_crear(config_get_string_value(config, "IP_BROKER"),
@@ -23,7 +24,7 @@ void procesar_modo_suscriptor(char* cola_mensaje_string, char* tiempo_conexion_s
 
 	t_conexion* args = conexion_crear(conexion_broker, conexion_cliente);
 
-	pthread_create(&hilo_suscriptor, NULL, (void*) subscribir_y_escuchar_cola, args);
+	pthread_create(&hilo_suscriptor, NULL, (void*) suscribir_y_escuchar_cola, args);
 	pthread_detach(hilo_suscriptor);
 
 	//TODO: este mensaje no está valdiando realmente si la suscripción fué exitosa

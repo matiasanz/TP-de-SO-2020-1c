@@ -15,7 +15,7 @@ t_particion* particion_crear_y_ocupar(uint32_t tamanio, uint32_t inicio) {
 
 	t_particion* particion = particion_inicializar(tamanio, inicio);
 
-	memoria_actualizar_tamanio_disponible(tamanio);
+	memoria_actualizar_tamanio_disponible_sin_particionar(tamanio);
 	//TODO: ojo con este if, real programmers do not use ifs.
 	if (esquema_de_memoria_particiones_dinamicas()) {
 		list_add(particiones, particion);
@@ -39,7 +39,7 @@ void particion_destruir(t_particion* particion) {
 void particion_liberar(t_particion* particion) {
 
 	gettimeofday(&particion->creacion, NULL);
-	particion->en_uso = 0;
+	particion->en_uso = false;
 	particion->id_cola = -1;
 	particion->ultimo_acceso = particion->creacion;
 	particion->id_mensaje = 0;
@@ -174,25 +174,18 @@ void* particion_get_direccion_contenido(t_particion* particion) {
 	return memoria_principal + particion_get_base(particion);
 }
 
-bool particion_en_uso(t_particion* particion){
-//	TODO: sincronizar
-//	pthread_mutex_lock(&mutex_acceso_memoria);
-	return particion -> en_uso;
-//	pthread_mutex_unlock(&mutex_acceso_memoria);
-}
-
 void particion_set_uso(t_particion* particion) {
 
-	particion->en_uso = 1;
+	particion->en_uso = true;
 	gettimeofday(&particion->creacion, NULL);
 	particion->ultimo_acceso = particion->creacion;
 }
 
-void particion_actualizar_acceso(t_particion* particion) {
-	//	TODO: sincronizar
-//	pthread_mutex_lock(&mutex_acceso_memoria);
+void particion_actualizar_fecha_ultimo_acceso(t_particion* particion) {
+	
+	pthread_mutex_lock(&mutex_acceso_memoria);
 	gettimeofday(&particion->ultimo_acceso, NULL);
-//	pthread_mutex_unlock(&mutex_acceso_memoria);
+	pthread_mutex_unlock(&mutex_acceso_memoria);
 }
 
 void particion_set_id_cola(t_particion* particion, t_id_cola id_cola) {

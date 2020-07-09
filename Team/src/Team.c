@@ -264,15 +264,17 @@ void finalizar_semaforos(){
 //Conexiones
 void inicializar_conexiones() {
 
+	id_proceso = config_get_int_value(config, "ID_PROCESO");
+
 	conexion_broker = conexion_server_crear(
 			config_get_string_value(config, "IP_BROKER"),
 			config_get_string_value(config, "PUERTO_BROKER"), TEAM);
 
 	pthread_mutex_init(&mutex_subscripcion, NULL);
 
-	subscribir_y_escuchar_cola_appeared_pokemon((void*) mensaje_recibido);
-	subscribir_y_escuchar_cola_caught_pokemon((void*) mensaje_recibido);
-	subscribir_y_escuchar_cola_localized_pokemon((void*) mensaje_recibido);
+	suscribir_y_escuchar_cola_appeared_pokemon((void*) mensaje_recibido);
+	suscribir_y_escuchar_cola_caught_pokemon((void*) mensaje_recibido);
+	suscribir_y_escuchar_cola_localized_pokemon((void*) mensaje_recibido);
 
 	conectar_gameboy((void*) mensaje_recibido);
 }

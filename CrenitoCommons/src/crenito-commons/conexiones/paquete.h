@@ -18,8 +18,9 @@ typedef enum {
 
 typedef struct {
 	t_codigo_operacion codigo_operacion;
-	t_id_proceso id_proceso;
+	t_tipo_proceso tipo_proceso; //BROKER, GAMECARD, etc
 	t_id_cola id_cola;
+	int id_proceso; //Valor definido por archivo de configuración
 }__attribute__((packed))
 t_paquete_header;
 
@@ -31,7 +32,8 @@ typedef struct {
 
 // Funciones t_paquete*
 t_paquete* paquete_crear(t_paquete_header header, t_buffer* buffer);
-t_paquete_header paquete_header_crear(t_codigo_operacion cod_op, t_id_proceso id_proceso, t_id_cola id_cola);
+t_paquete_header paquete_header_crear(t_codigo_operacion cod_op, t_tipo_proceso tipo_proceso,
+		t_id_cola id_cola, int id_proceso);
 void paquete_destruir(t_paquete* paquete);
 
 /* Recibe un paquete y un puntero donde guarda la cantidad de bytes del stream serializado

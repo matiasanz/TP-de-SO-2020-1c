@@ -203,7 +203,7 @@ t_paquete* paquete_new_pokemon_test() {
 	t_mensaje_new_pokemon* msj = mensaje_new_pokemon_test();
 
 	t_paquete* pqt = paquete_crear(
-			paquete_header_crear(MENSAJE, GAMEBOY, NEW_POKEMON),
+			paquete_header_crear(MENSAJE, GAMEBOY, NEW_POKEMON, 1),
 			mensaje_new_pokemon_serializar(msj));
 
 	mensaje_new_pokemon_destruir(msj);
@@ -239,7 +239,7 @@ t_paquete* paquete_localized_pokemon_test() {
 	t_mensaje_localized_pokemon* msj = mensaje_localized_pokemon_test();
 
 	t_paquete* pqt = paquete_crear(
-			paquete_header_crear(MENSAJE, GAMEBOY, LOCALIZED_POKEMON),
+			paquete_header_crear(MENSAJE, GAMEBOY, LOCALIZED_POKEMON, 1),
 			mensaje_localized_pokemon_serializar(msj));
 
 	mensaje_localized_pokemon_destruir(msj);
@@ -261,7 +261,7 @@ t_paquete* paquete_get_pokemon_test() {
 	t_mensaje_get_pokemon* msj = mensaje_get_pokemon_test();
 
 	t_paquete* pqt = paquete_crear(
-			paquete_header_crear(MENSAJE, GAMEBOY, GET_POKEMON),
+			paquete_header_crear(MENSAJE, GAMEBOY, GET_POKEMON, 1),
 			mensaje_get_pokemon_serializar(msj));
 
 	mensaje_get_pokemon_destruir(msj);
@@ -285,7 +285,7 @@ t_paquete* paquete_appeared_catch_pokemon_test(t_id_cola cola_esperada) {
 			mensaje_appeared_catch_pokemon_test();
 
 	t_paquete* pqt = paquete_crear(
-			paquete_header_crear(MENSAJE, GAMEBOY, cola_esperada),
+			paquete_header_crear(MENSAJE, GAMEBOY, cola_esperada, 1),
 			mensaje_appeared_catch_pokemon_serializar(msj));
 
 	mensaje_appeared_catch_pokemon_destruir(msj);
@@ -307,7 +307,7 @@ t_paquete* paquete_caught_pokemon_test() {
 	t_mensaje_caught_pokemon* msj = mensaje_caught_pokemon_test();
 
 	t_paquete* pqt = paquete_crear(
-			paquete_header_crear(MENSAJE, GAMEBOY, CAUGHT_POKEMON),
+			paquete_header_crear(MENSAJE, GAMEBOY, CAUGHT_POKEMON, 1),
 			mensaje_caught_pokemon_serializar(msj));
 
 	mensaje_caught_pokemon_destruir(msj);

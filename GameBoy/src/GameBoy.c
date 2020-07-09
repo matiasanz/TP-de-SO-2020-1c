@@ -38,6 +38,7 @@ void inicializar() {
 
 	inicializar_logs();
 	inicializar_config();
+	id_proceso = config_get_int_value(config, "ID_PROCESO");
 }
 
 void inicializar_logs() {

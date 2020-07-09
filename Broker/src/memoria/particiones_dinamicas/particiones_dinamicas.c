@@ -119,9 +119,9 @@ static uint32_t eliminar_particiones_libres(bool* hay_fragmentacion_externa) {
 		}
 	}
 
-	/* Incrementa el tamaño disponible para generar nuevas particiones
+	/* Se actualiza el tamaño disponible para generar nuevas particiones
 	 * dado que se fueron borrando particiones libre */
-	memoria_actualizar_tamanio_disponible(tamanio_ocupado - tamanio_total_memoria);
+	memoria_reset_tamanio_disponible_sin_particionar(tamanio_total_memoria - tamanio_ocupado);
 	return tamanio_ocupado;
 }
 
@@ -178,7 +178,8 @@ static void liberar_victima(bool (*algoritmo_victima)(t_particion*, t_particion*
 		}
 	}
 
-	cola_eliminar_mensaje(particion_get_id_mensaje(victima), particion_get_id_cola(victima));
+	cola_buscar_y_eliminar_mensaje(particion_get_id_mensaje(victima), particion_get_id_cola(victima));
+	particion_log_eliminacion(logger, victima);
 	consolidar(victima, index_victima);
 }
 
@@ -206,4 +207,3 @@ static void consolidar(t_particion* victima, int index_victima) {
 		list_remove_and_destroy_element(particiones, index_victima + 1, (void*) particion_destruir);
 	}
 }
-

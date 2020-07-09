@@ -7,7 +7,7 @@
 #include "procesar_mensaje.h"
 
 //Funciones privadas
-static void replicar_mensaje(t_cola_container* container, t_mensaje_cache* msj, t_id_cola id_cola);
+static void replicar_mensaje(t_cola_container* container, t_mensaje_cache* msj);
 
 void procesar_mensaje(int socket, t_paquete_header header) {
 
@@ -24,20 +24,19 @@ void procesar_mensaje(int socket, t_paquete_header header) {
 	int id_mensaje = mensaje_cache_get_id(msj_cache);
 	socket_send(socket, &id_mensaje, sizeof(id_mensaje));
 
-	replicar_mensaje(container, msj_cache, header.id_cola);
+	replicar_mensaje(container, msj_cache);
 }
 
-static void replicar_mensaje(t_cola_container* container, t_mensaje_cache* mensaje_cache, t_id_cola id_cola) {
+static void replicar_mensaje(t_cola_container* container, t_mensaje_cache* mensaje_cache) {
 
-	//TODO sincronizar correctamente
-	pthread_mutex_lock(&container->mutex);
-	for (int i = 0; i < list_size(container->suscriptores); ++i) {
+	pthread_mutex_lock(&container->mutex_suscriptores);
+	t_list* suscriptores = list_duplicate(container->suscriptores);
+	pthread_mutex_unlock(&container->mutex_suscriptores);
 
-		t_suscriptor* suscriptor = list_get(container->suscriptores, i);
-
-		enviar_mensaje_a_suscriptor(mensaje_cache, suscriptor);
-
+	void replicar(t_suscriptor* suscriptor) {
+		crear_hilo_y_enviar_mensaje_a_suscriptor(mensaje_cache, suscriptor);
 	}
-	pthread_mutex_unlock(&container->mutex);
-}
 
+	list_iterate(suscriptores, (void*) replicar);
+	list_destroy(suscriptores);
+}

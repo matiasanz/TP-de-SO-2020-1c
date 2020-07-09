@@ -49,9 +49,9 @@ void inicializar();
 void inicializar_config();
 void inicializar_logs();
 void inicializar_conexiones();
-void subscribir_y_escuchar_cola_catch_pokemon();
-void subscribir_y_escuchar_cola_get_pokemon();
-void subscribir_y_escuchar_cola_new_pokemon();
+void suscribir_y_escuchar_cola_catch_pokemon();
+void suscribir_y_escuchar_cola_get_pokemon();
+void suscribir_y_escuchar_cola_new_pokemon();
 
 
 void crearEstructuras();

@@ -110,7 +110,7 @@ context (test_conexiones) {
 				//ARRANGE
 				cola_esperada = CATCH_POKEMON;
 
-				conexion_catch_pokemon = conexion_cliente_crear(cola_esperada,
+				conexion_catch_pokemon = conexion_cliente_crear(cola_esperada, 1,
 						0,
 						(void*)assert_mensaje_recibido_thread);
 
@@ -119,7 +119,7 @@ context (test_conexiones) {
 				//ACTION:
 				//Subscribimos al proceso
 				pthread_create(&hilo_catch_pokemon, NULL,
-						(void*) subscribir_y_escuchar_cola, args);
+						(void*) suscribir_y_escuchar_cola, args);
 
 				pthread_detach(hilo_catch_pokemon);
 				/*simulamos que el envio que vamos a realizar va a tener este ACK
@@ -140,7 +140,7 @@ context (test_conexiones) {
 				//ARRANGE
 				cola_esperada = GET_POKEMON;
 
-				conexion_get_pokemon = conexion_cliente_crear(cola_esperada,
+				conexion_get_pokemon = conexion_cliente_crear(cola_esperada, 1,
 						0,
 						(void*)assert_mensaje_recibido_thread);
 
@@ -150,7 +150,7 @@ context (test_conexiones) {
 				//ACTION:
 				//Subscribimos al proceso
 				pthread_create(&hilo_get_pokemon, NULL,
-						(void*) subscribir_y_escuchar_cola, args);
+						(void*) suscribir_y_escuchar_cola, args);
 
 				pthread_detach(hilo_get_pokemon);
 				/*simulamos que el envio que vamos a realizar va a tener este ACK
@@ -171,7 +171,7 @@ context (test_conexiones) {
 				//ARRANGE
 				cola_esperada = NEW_POKEMON;
 
-				conexion_new_pokemon = conexion_cliente_crear(cola_esperada,
+				conexion_new_pokemon = conexion_cliente_crear(cola_esperada,1,
 						0,
 						(void*)assert_mensaje_recibido_thread);
 
@@ -181,7 +181,7 @@ context (test_conexiones) {
 				//ACTION:
 				//Subscribimos al proceso
 				pthread_create(&hilo_new_pokemon, NULL,
-						(void*) subscribir_y_escuchar_cola, args);
+						(void*) suscribir_y_escuchar_cola, args);
 
 				pthread_detach(hilo_new_pokemon);
 				/*simulamos que el envio que vamos a realizar va a tener este ACK
@@ -203,7 +203,7 @@ context (test_conexiones) {
 				//ARRANGE
 				cola_esperada = APPEARED_POKEMON;
 
-				conexion_appeared_pokemon = conexion_cliente_crear(cola_esperada,
+				conexion_appeared_pokemon = conexion_cliente_crear(cola_esperada,1,
 						0,
 						(void*)assert_mensaje_recibido_thread);
 
@@ -213,7 +213,7 @@ context (test_conexiones) {
 				//ACTION:
 				//Subscribimos al proceso
 				pthread_create(&hilo_appeared_pokemon, NULL,
-						(void*) subscribir_y_escuchar_cola, args);
+						(void*) suscribir_y_escuchar_cola, args);
 
 				pthread_detach(hilo_appeared_pokemon);
 				/*simulamos que el envio que vamos a realizar va a tener este ACK
@@ -234,7 +234,7 @@ context (test_conexiones) {
 				//ARRANGE
 				cola_esperada = LOCALIZED_POKEMON;
 
-				conexion_localized_pokemon = conexion_cliente_crear(cola_esperada,
+				conexion_localized_pokemon = conexion_cliente_crear(cola_esperada,1,
 						0,
 						(void*)assert_mensaje_recibido_thread);
 
@@ -244,7 +244,7 @@ context (test_conexiones) {
 				//ACTION:
 				//Subscribimos al proceso
 				pthread_create(&hilo_localized_pokemon, NULL,
-						(void*) subscribir_y_escuchar_cola, args);
+						(void*) suscribir_y_escuchar_cola, args);
 
 				pthread_detach(hilo_localized_pokemon);
 				/*simulamos que el envio que vamos a realizar va a tener este ACK
@@ -265,7 +265,7 @@ context (test_conexiones) {
 				//ARRANGE
 				cola_esperada = CAUGHT_POKEMON;
 
-				conexion_caught_pokemon = conexion_cliente_crear(cola_esperada,
+				conexion_caught_pokemon = conexion_cliente_crear(cola_esperada,1,
 						0,
 						(void*)assert_mensaje_recibido_thread);
 
@@ -275,7 +275,7 @@ context (test_conexiones) {
 				//ACTION:
 				//Subscribimos al proceso
 				pthread_create(&hilo_caught_pokemon, NULL,
-						(void*) subscribir_y_escuchar_cola, args);
+						(void*) suscribir_y_escuchar_cola, args);
 
 				pthread_detach(hilo_caught_pokemon);
 				/*simulamos que el envio que vamos a realizar va a tener este ACK

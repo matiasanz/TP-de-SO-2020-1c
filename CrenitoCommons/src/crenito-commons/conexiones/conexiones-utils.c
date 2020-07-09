@@ -18,13 +18,13 @@ t_conexion_host* conexion_host_crear(char* ip, char* puerto, void (*callback)(t_
 	return host;
 }
 
-t_conexion_server* conexion_server_crear(char* ip, char* puerto, t_id_proceso id_proceso) {
+t_conexion_server* conexion_server_crear(char* ip, char* puerto, t_tipo_proceso id_proceso) {
 
 	t_conexion_server* server = malloc(sizeof(t_conexion_server));
 
 	server -> ip = ip;
 	server-> puerto = puerto;
-	server-> id_proceso = id_proceso;
+	server-> tipo_proceso = id_proceso;
 
 	return server;
 }
@@ -34,11 +34,11 @@ void conexion_server_destruir(t_conexion_server* server) {
 	free(server);
 }
 
-t_conexion_cliente* conexion_cliente_crear(t_id_cola id_cola , int segundos_reconexion, void (*callback)(t_id_cola, void*)) {
+t_conexion_cliente* conexion_cliente_crear(t_id_cola id_cola , int id_proceso, int segundos_reconexion, void (*callback)(t_id_cola, void*)) {
 
 	t_conexion_cliente* cliente = malloc(sizeof(t_conexion_cliente));
 
-	cliente->subscriptor = suscriptor_crear(0, 0);
+	cliente->suscriptor = suscriptor_crear(0, id_proceso);
 	cliente->id_cola = id_cola;
 	cliente -> segundos_reconexion = segundos_reconexion;
 	cliente -> callback = callback;
@@ -48,7 +48,7 @@ t_conexion_cliente* conexion_cliente_crear(t_id_cola id_cola , int segundos_reco
 
 void conexion_cliente_destruir(t_conexion_cliente* cliente) {
 
-	subscriptor_destruir(cliente ->subscriptor);
+	suscriptor_destruir(cliente ->suscriptor);
 	free(cliente);
 }
 
@@ -67,22 +67,6 @@ void conexion_destruir(t_conexion* conexion) {
 	conexion_server_destruir(conexion -> server);
 	conexion_cliente_destruir(conexion -> cliente);
 	free(conexion);
-}
-
-
-t_suscriptor* suscriptor_crear(uint32_t socket, uint32_t id_suscriptor) {
-
-	t_suscriptor* suscriptor = malloc(sizeof(t_suscriptor));
-
-	suscriptor->id_subcriptor = id_suscriptor;
-	suscriptor->socket = socket;
-
-	return suscriptor;
-}
-
-void subscriptor_destruir(t_suscriptor* suscriptor) {
-
-	free(suscriptor);
 }
 
 void* deserializar(void* msj, t_id_cola id_cola) {

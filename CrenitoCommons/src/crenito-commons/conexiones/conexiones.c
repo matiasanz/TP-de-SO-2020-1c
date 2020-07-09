@@ -10,7 +10,7 @@
 /*
  * Subscribe a los distintos procesos con el Broker.
  */
-static int subscribir(t_conexion_server* server, t_conexion_cliente* cliente);
+static int suscribir(t_conexion_server* server, t_conexion_cliente* cliente);
 /*
  * Envía un paquete usando el socket indicado por parámetro
  * y se queda a la espera una respuesta de tipo entero
@@ -44,10 +44,10 @@ int enviar_paquete(t_paquete* pqt, int socket) {
 	return id_mensaje;
 }
 
-void subscribir_y_escuchar_cola(t_conexion* args) {
+void suscribir_y_escuchar_cola(t_conexion* args) {
 
 	pthread_mutex_lock(&mutex_subscripcion);
-	int estado_subscripcion = subscribir(args->server, args->cliente);
+	int estado_subscripcion = suscribir(args->server, args->cliente);
 	pthread_mutex_unlock(&mutex_subscripcion);
 
 	//TO-DO reconectar
@@ -55,11 +55,11 @@ void subscribir_y_escuchar_cola(t_conexion* args) {
 		return;
 
 	t_conexion_cliente* cliente = args->cliente;
-	t_suscriptor* subscriptor = cliente->subscriptor;
+	t_suscriptor* suscriptor = cliente->suscriptor;
 
 	while (1) {
 
-		if (error_conexion(recibir(subscriptor->socket, cliente->callback))) {
+		if (error_conexion(recibir(suscriptor->socket, cliente->callback))) {
 
 			log_warning(logger, "Se desconectó el %s, cancelando escucha sobre la cola %s",
 					BROKER_STRING, get_nombre_cola(cliente->id_cola));
@@ -86,12 +86,12 @@ void conectar_y_escuchar_gameboy(t_conexion_host* gameboy) {
 	}
 
 }
-int subscribir(t_conexion_server* server, t_conexion_cliente* cliente) {
+int suscribir(t_conexion_server* server, t_conexion_cliente* cliente) {
 
-	cliente->subscriptor->socket = socket_crear_client(server->ip, server->puerto);
+	cliente->suscriptor->socket = socket_crear_client(server->ip, server->puerto);
 
 	//TO-DO reconectar
-	if (error_conexion(cliente->subscriptor->socket)) {
+	if (error_conexion(cliente->suscriptor->socket)) {
 		log_warning(logger,
 				"el %s está desconectado, cancelando subscripción %s",
 				BROKER_STRING, get_nombre_cola(cliente->id_cola));
@@ -99,12 +99,9 @@ int subscribir(t_conexion_server* server, t_conexion_cliente* cliente) {
 	}
 
 	t_paquete_header pqt = paquete_header_crear(SUSCRIPCION,
-			server->id_proceso, cliente->id_cola);
+			server->tipo_proceso, cliente->id_cola, cliente ->suscriptor ->id_subcriptor);
 
-	cliente->subscriptor->id_subcriptor = handshake(
-			cliente->subscriptor->socket, &pqt, sizeof(t_paquete_header));
-
-	return cliente->subscriptor->id_subcriptor;
+	return handshake(cliente->suscriptor->socket, &pqt, sizeof(t_paquete_header));
 }
 
 int recibir(int socket, void (*callback)(t_id_cola, void*)) {
