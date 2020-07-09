@@ -23,6 +23,7 @@ void procesar_modo_suscriptor(char* cola_mensaje_string, char* tiempo_conexion_s
 	t_id_cola id_cola = get_id_mensaje(cola_mensaje_string);
 
 	t_conexion_cliente* conexion_cliente = conexion_cliente_crear(id_cola,
+			id_proceso,
 			config_get_int_value(config, "TIEMPO_DE_REINTENTO_CONEXION"), (void*) mensaje_recibido);
 
 	conexion_broker = conexion_server_crear(config_get_string_value(config, "IP_BROKER"),
@@ -98,11 +99,11 @@ void suspender_escucha(t_conexion* conexion){
 	exit(1);
 }
 
-int subscribir(t_conexion_server*, t_conexion_cliente*); //tomada de conexiones.c
+int suscribir(t_conexion_server*, t_conexion_cliente*); //tomada de conexiones.c
 
 void gameboy_suscribir_y_escuchar_cola(t_conexion* conexion){
 	pthread_mutex_lock(&mutex_subscripcion);
-	int estado_subscripcion = subscribir(conexion->server, conexion->cliente);
+	int estado_subscripcion = suscribir(conexion->server, conexion->cliente);
 	pthread_mutex_unlock(&mutex_subscripcion);
 
 	if(error_conexion(estado_subscripcion)){

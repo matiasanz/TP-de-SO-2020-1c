@@ -35,7 +35,7 @@ int enviar_paquete(t_paquete* pqt, int socket);
  * Al recibir un mensaje lo reenvia a través de la funcion de escucha que
  * recibe por parámeetro llamada mensaje_recibido(...)
  */
-void subscribir_y_escuchar_cola(t_conexion* args);
+void suscribir_y_escuchar_cola(t_conexion* args);
 
 /*
  * Funcion utilizada por el proceso GAMEBOY para

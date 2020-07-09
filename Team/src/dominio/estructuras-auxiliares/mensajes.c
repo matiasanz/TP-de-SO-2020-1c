@@ -14,13 +14,17 @@ void mensaje_get_registrar(t_id idMensaje){
     pthread_mutex_unlock(&mutexPedidos);
 }
 
+t_paquete_header team_crear_header(t_id_cola TipoMensaje){
+	return paquete_header_crear(MENSAJE, TEAM, TipoMensaje, id_proceso);
+}
+
 void Get(void* especiePokemon) {
 
 	log_event_pokemon_por_pedir(especiePokemon);
 
 	t_mensaje_get_pokemon* mensajeGet=mensaje_get_pokemon_crear(especiePokemon);
 
-	t_paquete_header header=paquete_header_crear(MENSAJE,TEAM,GET_POKEMON);
+	t_paquete_header header= team_crear_header(GET_POKEMON);
 	t_buffer* bufferDepaquete=mensaje_get_pokemon_serializar(mensajeGet);
 	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
 	int idMensajeEnviado = enviar(conexion_broker,paqueteAEnviar);
@@ -71,7 +75,7 @@ void Catch(entrenador*unEntrenador, pokemon* pokemonCatcheado) {
 	//creacion de  paquete catch pokemon y envio a Broker
 	t_mensaje_appeared_catch_pokemon* mensajeCatch=mensaje_appeared_catch_pokemon_crear(pokemonCatcheado->especie,pokemonCatcheado->posicion.pos_x,pokemonCatcheado->posicion.pos_y);
 
-	t_paquete_header header=paquete_header_crear(MENSAJE,TEAM,CATCH_POKEMON);
+	t_paquete_header header= team_crear_header(CATCH_POKEMON);
 	t_buffer* bufferDepaquete=mensaje_appeared_catch_pokemon_serializar(mensajeCatch);
 	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
 	t_id idCapturaPendiente = enviar(conexion_broker,paqueteAEnviar);

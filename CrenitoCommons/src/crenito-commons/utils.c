@@ -7,9 +7,9 @@
 
 #include"utils.h"
 
-char* get_nombre_proceso(t_id_proceso id_proceso) {
+char* get_nombre_proceso(t_tipo_proceso tipo_proceso) {
 
-	switch (id_proceso) {
+	switch (tipo_proceso) {
 	case BROKER:
 		return BROKER_STRING;
 	case GAMEBOY:
@@ -19,7 +19,7 @@ char* get_nombre_proceso(t_id_proceso id_proceso) {
 	case TEAM:
 		return TEAM_STRING;
 	default:
-		log_error(event_logger, "Id de proceso incorrecto: %d", id_proceso);
+		log_error(event_logger, "Tipo de proceso incorrecto: %d", tipo_proceso);
 		return NULL;
 	}
 }
@@ -67,20 +67,21 @@ int conexion_exitosa(int indicador_conexion) {
 	return !error_conexion(indicador_conexion);
 }
 
-t_id_proceso get_id_proceso(char* proceso){
-	if(strcmp(proceso,BROKER_STRING)==0){
+t_tipo_proceso get_tipo_proceso(char* proceso_string){
+
+	if(strcmp(proceso_string,BROKER_STRING)==0){
 		return BROKER;
 	}
-	if(strcmp(proceso,TEAM_STRING)==0){
+	if(strcmp(proceso_string,TEAM_STRING)==0){
 		return TEAM;
 	}
-	if(strcmp(proceso,GAMECARD_STRING)==0){
+	if(strcmp(proceso_string,GAMECARD_STRING)==0){
 		return GAMECARD;
 	}
-	if(strcmp(proceso,GAMEBOY_STRING)==0){
+	if(strcmp(proceso_string,GAMEBOY_STRING)==0){
 		return GAMEBOY;
 	}
-	log_error(event_logger,"este proceso no es conocido %s",proceso);
+	log_error(event_logger,"este proceso no es conocido %s",proceso_string);
 	return 0;
 }
 
@@ -106,4 +107,18 @@ t_id_cola get_id_mensaje(char* mensaje){
 	}
 	log_error(event_logger,"este mensaje no es conocido %s",mensaje);
 	return 0;
+}
+
+t_suscriptor* suscriptor_crear(uint32_t socket, uint32_t id_suscriptor) {
+
+	t_suscriptor* suscriptor = malloc(sizeof(t_suscriptor));
+
+	suscriptor->id_subcriptor = id_suscriptor;
+	suscriptor->socket = socket;
+
+	return suscriptor;
+}
+
+void suscriptor_destruir(t_suscriptor* suscriptor) {
+	free(suscriptor);
 }

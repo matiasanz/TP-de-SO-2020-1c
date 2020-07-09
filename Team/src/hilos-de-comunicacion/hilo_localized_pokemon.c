@@ -8,17 +8,15 @@
 #include "../hilos-de-comunicacion/hilo_localized_pokemon.h"
 #include "../team.h"
 
-void subscribir_y_escuchar_cola_localized_pokemon(void (*callback)(t_id_cola, void*)) {
+void suscribir_y_escuchar_cola_localized_pokemon(void (*callback)(t_id_cola, void*)) {
 
-	conexion_localized_pokemon = conexion_cliente_crear(LOCALIZED_POKEMON,
+	conexion_localized_pokemon = conexion_cliente_crear(LOCALIZED_POKEMON, id_proceso,
 			TIEMPO_RECONEXION,
 			callback);
 
-	t_conexion* args_s = conexion_crear(conexion_broker,
-			conexion_localized_pokemon);
+	t_conexion* args_s = conexion_crear(conexion_broker, conexion_localized_pokemon);
 
-	pthread_create(&hilo_localized_pokemon, NULL,
-			(void*) subscribir_y_escuchar_cola, args_s);
+	pthread_create(&hilo_localized_pokemon, NULL, (void*) suscribir_y_escuchar_cola, args_s);
 
 	pthread_detach(hilo_localized_pokemon);
 }

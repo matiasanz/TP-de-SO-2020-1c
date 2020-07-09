@@ -15,7 +15,8 @@
 typedef struct {
 	t_list* cola;
 	t_list* suscriptores;
-	pthread_mutex_t mutex;
+	pthread_mutex_t mutex_mensajes;
+	pthread_mutex_t mutex_suscriptores;
 } t_cola_container;
 
 //Las 6 colas de mensajes
@@ -28,10 +29,9 @@ t_cola_container* cola_localized_pokemon;
 
 t_cola_container* cola_crear();
 t_cola_container* get_cola(t_id_cola id_cola);
-void cola_eliminar_mensaje(uint32_t id_mensaje, t_id_cola id_cola);
 
-t_mensaje_cache* buscar_por_id(t_list* cola, uint32_t id_buscado);
-void cola_eliminar_mensaje(uint32_t id_mensaje, t_id_cola id_cola);
+void cola_buscar_y_eliminar_mensaje(uint32_t id_mensaje, t_id_cola id_cola);
 void encolar_mensaje(t_cola_container* container, t_mensaje_cache* msj);
+int cola_get_cantidad_suscriptores(t_cola_container* container);
 
 #endif /* SRC_COLAS_H_ */

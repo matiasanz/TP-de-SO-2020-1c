@@ -157,7 +157,7 @@ t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int l
 
 	}
 
-	return paquete_crear(paquete_header_crear(MENSAJE, GAMEBOY, id_cola), mensaje_serializado);
+	return paquete_crear(paquete_header_crear(MENSAJE, GAMEBOY, id_cola, id_proceso), mensaje_serializado);
 }
 
 void procesar_envio_mensaje(char* proceso, char* mensaje, char* argumentos[], int longitud) {
@@ -183,7 +183,7 @@ void procesar_envio_mensaje(char* proceso, char* mensaje, char* argumentos[], in
 
 t_conexion_server* obtener_conexion(char* proceso_string) {
 
-	switch (get_id_proceso(proceso_string)) {
+	switch (get_tipo_proceso(proceso_string)) {
 	case BROKER:
 		return conexion_server_crear(config_get_string_value(config, "IP_BROKER"),
 				config_get_string_value(config, "PUERTO_BROKER"), GAMEBOY);

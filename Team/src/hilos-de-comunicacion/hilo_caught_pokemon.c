@@ -8,18 +8,14 @@
 #include "../hilos-de-comunicacion/hilo_caught_pokemon.h"
 #include "../team.h"
 
-void subscribir_y_escuchar_cola_caught_pokemon(void (*callback)(t_id_cola, void*)) {
+void suscribir_y_escuchar_cola_caught_pokemon(void (*callback)(t_id_cola, void*)) {
 
-	conexion_caught_pokemon = conexion_cliente_crear(CAUGHT_POKEMON,
-			TIEMPO_RECONEXION,
-			callback);
+	conexion_caught_pokemon = conexion_cliente_crear(CAUGHT_POKEMON, id_proceso,
+			TIEMPO_RECONEXION, callback);
 
-	t_conexion* args_s = conexion_crear(conexion_broker,
-			conexion_caught_pokemon);
+	t_conexion* args_s = conexion_crear(conexion_broker, conexion_caught_pokemon);
 
-	pthread_create(&hilo_caught_pokemon, NULL,
-			(void*) subscribir_y_escuchar_cola, args_s);
-
+	pthread_create(&hilo_caught_pokemon, NULL, (void*) suscribir_y_escuchar_cola, args_s);
 	pthread_detach(hilo_caught_pokemon);
 }
 

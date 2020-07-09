@@ -1,8 +1,7 @@
 #ifndef BROKER_H_
 #define BROKER_H_
 
-#include "colas.h"
-#include "memoria/mmu.h"
+#include "hilos/hilo_consolidacion_colas.h"
 #include "modos_procesamiento/procesar_mensaje.h"
 #include "modos_procesamiento/procesar_suscripcion.h"
 
