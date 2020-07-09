@@ -40,6 +40,9 @@ t_dictionary* semaforosDePokemons; //key:char* especiePokemon, value: pthread_mu
 pthread_mutex_t mutDiccionarioSemaforos;
 
 pthread_mutex_t envioPaquete;
+
+pthread_mutex_t mutexLogger;
+pthread_mutex_t mutexEventLogger;
 //-------------------------
 
 void inicializar();
