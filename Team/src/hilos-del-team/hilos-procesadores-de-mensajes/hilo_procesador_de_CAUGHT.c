@@ -118,11 +118,19 @@ void captura_procesar_fallo(captura_pendiente*capturaFallida){
 	pokemon_destroy_hard(pokemonCatcheado); //(?)
 }
 
+void list_remove_and_destroy_all_satisfying(t_list*lista, bool (*condicion)(void*), void (*element_destroyer)(void*)){
+	numero cantidadDeOcurrencias = list_count_satisfying(lista, condicion);
+
+	while(cantidadDeOcurrencias--){
+		list_remove_and_destroy_by_condition(lista, condicion, element_destroyer);
+	}
+}
+
 void pokemon_localizar_en_mapa(pokemon*pokemonCatcheado){
 
 	if(pokemon_necesito_mas_instancias(pokemonCatcheado)){
 		pthread_mutex_lock(&mutexRepuestos);
-		pokemon*repuesto = list_remove_by_comparation(pokemonesDeRepuesto, pokemonCatcheado, (bool(*)(void*, void*))&pokemon_misma_especie_que);
+		pokemon*repuesto = list_remove_by_comparation(mapaRequeridos, pokemonCatcheado, (bool(*)(void*, void*))&pokemon_misma_especie_que);
 		pthread_mutex_unlock(&mutexRepuestos);
 
 		if(repuesto){
@@ -138,7 +146,7 @@ void pokemon_localizar_en_mapa(pokemon*pokemonCatcheado){
 		}
 
 		pthread_mutex_lock(&mutexRepuestos);
-		list_remove_and_destroy_by_condition(pokemonesDeRepuesto, &esOtraInstanciaDe, (void*)pokemon_destroy_hard);
+		list_remove_and_destroy_all_satisfying(mapaRequeridos, &esOtraInstanciaDe, (void*)pokemon_destroy_hard);
 		pthread_mutex_unlock(&mutexRepuestos);
 	}
 }

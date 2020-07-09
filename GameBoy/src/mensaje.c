@@ -52,6 +52,7 @@ t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int l
 	case APPEARED_POKEMON:
 		id_cola = APPEARED_POKEMON;
 		validar_quien_conoce_appearedpokemon(proceso);
+		validar_cantidad_minima_argumentos(longitud, 6);
 
 		validar_mayor_igual_a_cero(pos_x);
 		validar_mayor_igual_a_cero(pos_y);
@@ -79,6 +80,7 @@ t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int l
 
 		id_cola = CATCH_POKEMON;
 		validar_quien_conoce_catchpokemon(proceso);
+		validar_cantidad_minima_argumentos(longitud, 6);
 		validar_mayor_igual_a_cero(pos_x);
 		validar_mayor_igual_a_cero(pos_y);
 

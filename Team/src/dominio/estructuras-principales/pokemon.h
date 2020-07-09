@@ -16,7 +16,7 @@ pokemon pokemon_create(especie_pokemon, coordenada X, coordenada Y);
 pokemon* pokemon_ptr_create(especie_pokemon, t_posicion);
 
 //Destructor
-void pokemon_destroy(pokemon*);
+//void pokemon_destroy(pokemon*);
 
 //Destruye el pokemon y la especie
 void pokemon_destroy_hard(pokemon*);

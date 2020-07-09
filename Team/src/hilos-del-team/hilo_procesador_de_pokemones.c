@@ -23,7 +23,7 @@ void team_procesar_pokemones(){
 
 
 				pthread_mutex_lock(&mutexRepuestos);
-				list_add(pokemonesDeRepuesto, unPokemon);
+				list_add(mapaRequeridos, unPokemon);
 				log_event_pokemon_mapeado(unPokemon->especie);
 				pthread_mutex_unlock(&mutexRepuestos);
 			}

@@ -39,6 +39,7 @@
 
 	//CATCH
 	void log_event_pokemon_por_catchear(pokemon* pokemonCatcheado);
+	void log_event_mensaje_catch_enviado(t_mensaje_appeared_catch_pokemon* mensaje, t_id id);
 
 	//LOCALIZED
 	void log_event_localized_repetido(especie_pokemon);

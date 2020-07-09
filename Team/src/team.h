@@ -61,7 +61,7 @@ char*num_array_to_string(numero*arreglo, int length);
 	especies_pokemones historialDePokemones;
 	candidatos_intercambio potencialesDeadlock;
 	pthread_mutex_t mutexRepuestos;
-	t_list* pokemonesDeRepuesto;
+	t_list* mapaRequeridos;
 	t_list* registroDePedidos;
 
 	//en revision

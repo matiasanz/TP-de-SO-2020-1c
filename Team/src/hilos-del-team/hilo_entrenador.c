@@ -99,7 +99,10 @@ void inicializar_hilos_entrenadores(){
 		sem_init(&EjecutarEntrenador[i], 0, 0);
 		pthread_mutex_init(&mutexEstadoEntrenador[i], NULL);
 		pthread_mutex_init(&mutexPosicionEntrenador[i], NULL);
-		pthread_create(&hilosEntrenadores[i], NULL, (void*) team_hilo_entrenador, list_get(equipo, i));
+
+		pthread_t hiloEntrenador;
+		pthread_create(&hiloEntrenador, NULL, (void*) team_hilo_entrenador, list_get(equipo, i));
+		pthread_detach(hiloEntrenador);
 
 		sem_post(&HayEntrenadoresDisponibles);
 	}
@@ -108,8 +111,8 @@ void inicializar_hilos_entrenadores(){
 void finalizar_hilos_entrenadores(){
 	int i=0;
 	for(i=0; i<cantidadDeEntrenadores; i++){
-		pthread_join(hilosEntrenadores[i], NULL);
-		sem_destroy(&EjecutarEntrenador[i]);
+//		pthread_join(hilosEntrenadores[i], NULL);
+//		sem_destroy(&EjecutarEntrenador[i]);
 		pthread_mutex_destroy(&mutexPosicionEntrenador[i]);
 		pthread_mutex_destroy(&mutexEstadoEntrenador[i]);
 	}

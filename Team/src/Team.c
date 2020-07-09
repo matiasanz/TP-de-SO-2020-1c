@@ -23,8 +23,6 @@ int main(void) {
 
 	team_inicializar();
 
-	inicializar_hilos_entrenadores();
-
 	Get_pokemones(objetivosGlobales, inventariosGlobales);
 
 	//Para pruebas rapidas sin los otros modulos//
@@ -74,6 +72,8 @@ void team_inicializar(){
 	}
 
 	sleep(1); //
+
+	inicializar_hilos_entrenadores();
 }
 
 int team_exit(){
@@ -161,7 +161,7 @@ void inicializar_listas() {
 
 	//Ver si vale la pena abstraer las listas
 	historialDePokemones = list_create();
-	pokemonesDeRepuesto = list_create();
+	mapaRequeridos = list_create();
 	entrenadoresReady = cr_list_create();
 	registroDePedidos = list_create();
 
@@ -173,8 +173,6 @@ void inicializar_listas() {
 
 void listas_destroy(){
 	cr_list_destroy(entrenadoresReady);
-
-	cr_list_clean_and_destroy_elements(pokemonesRecibidos, (void*) pokemon_destroy);
 	pendientes_destroy(capturasPendientes);
 
 	recursos_destroy(objetivosGlobales);
@@ -186,10 +184,9 @@ void listas_destroy(){
 
 	list_destroy_and_destroy_elements(registroDePedidos, free);
 	list_destroy_and_destroy_elements(historialDePokemones, free);
-	list_destroy_and_destroy_elements(pokemonesDeRepuesto, (void*) pokemon_destroy_hard);
-	cr_list_clean_and_destroy_elements(pokemonesRecibidos, (void*) pokemon_destroy);
-	list_destroy(pokemonesRecibidos->lista);
+	list_destroy_and_destroy_elements(mapaRequeridos, (void*) pokemon_destroy_hard);
 
+	cr_list_destroy_and_destroy_elements(pokemonesRecibidos, (void*) pokemon_destroy_hard);
 	cr_list_destroy_and_destroy_elements(mensajesCAUGHT    , (void*) mensaje_caught_pokemon_destruir);
 	cr_list_destroy_and_destroy_elements(mensajesLOCALIZED , (void*) mensaje_localized_pokemon_destruir);
 }
@@ -208,16 +205,16 @@ void inicializar_hilos(){
 void finalizar_hilos(){
 	finalizar_hilos_entrenadores();
 
-	pthread_join(hiloPlanificador	   , NULL);
-	pthread_join(hiloMensajesAppeard   , NULL);
-	pthread_join(hiloMensajesCAUGHT	   , NULL);
-	pthread_join(hiloMensajesLOCALIZED , NULL);
+//	pthread_join(hiloPlanificador	   , NULL);
+//	pthread_join(hiloMensajesAppeard   , NULL);
+//	pthread_join(hiloMensajesCAUGHT	   , NULL);
+//	pthread_join(hiloMensajesLOCALIZED , NULL);
 }
 
 //Semaforos
 
 void inicializar_semaforos(){
-	sem_init(&HayTareasPendientes       , 0, 0);
+//	sem_init(&HayTareasPendientes       , 0, 0);
 	sem_init(&HayEntrenadoresDisponibles, 0, 0);
 	sem_init(&EquipoNoPuedaCazarMas     , 0, 0);
 	sem_init(&FinDeCiclo_CPU            , 0, 0);
@@ -239,7 +236,7 @@ void inicializar_semaforos(){
 }
 
 void finalizar_semaforos(){
-	sem_destroy(&HayTareasPendientes);
+//	sem_destroy(&HayTareasPendientes);
 	sem_destroy(&HayEntrenadoresDisponibles);
 	sem_destroy(&FinDeCiclo_CPU);
 	sem_destroy(&finDeIntercambio);

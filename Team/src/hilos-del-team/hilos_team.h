@@ -23,7 +23,7 @@ pthread_t hiloProcesadorDePokemones;
 sem_t* EjecutarEntrenador;
 sem_t EquipoNoPuedaCazarMas;
 sem_t FinDeCiclo_CPU;
-sem_t HayTareasPendientes;
+//sem_t HayTareasPendientes;
 sem_t HayEntrenadoresDisponibles;
 sem_t finDeIntercambio;
 sem_t FinDePlanificacion;
