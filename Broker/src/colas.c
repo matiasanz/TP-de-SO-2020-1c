@@ -12,8 +12,8 @@ t_cola_container* cola_crear() {
 	t_cola_container* cola = malloc(sizeof(t_cola_container));
 	cola->cola = list_create();
 	cola->suscriptores = list_create();
-	pthread_mutex_init(&cola->mutex, NULL);
-
+	pthread_mutex_init(&cola->mutex_mensajes, NULL);
+	pthread_mutex_init(&cola->mutex_suscriptores, NULL);
 	return cola;
 }
 
@@ -39,32 +39,33 @@ t_cola_container* get_cola(t_id_cola id_cola) {
 	}
 }
 
-void cola_eliminar_mensaje(uint32_t id_mensaje, t_id_cola id_cola) {
+void cola_buscar_y_eliminar_mensaje(uint32_t id_mensaje, t_id_cola id_cola) {
 
 	t_cola_container* container = get_cola(id_cola);
-	bool found = false;
-	uint32_t index;
-	//TODO sincronizar correctamente
-	pthread_mutex_lock(&container->mutex);
-	for (int i = 0; i < list_size(container->cola); ++i) {
 
-		t_mensaje_cache* candidato = list_get(container->cola, i);
-		if (equals_from_id(candidato, id_mensaje)) {
-			found = true;
-			index = i;
-			break;
-		}
+	bool id_mensaje_buscado(t_mensaje_cache* msj) {
+		return particion_get_id_mensaje(msj->particion) == id_mensaje;
 	}
 
-	if (found) {
-		list_remove_and_destroy_element(container->cola, index, (void*) mensaje_cache_destruir);
-	}
-	pthread_mutex_unlock(&container->mutex);
+	pthread_mutex_lock(&container->mutex_mensajes);
+	list_remove_and_destroy_by_condition(container->cola, (void*) id_mensaje_buscado,
+			(void*) mensaje_cache_eliminar_de_cola);
+	pthread_mutex_unlock(&container->mutex_mensajes);
 }
 
 void encolar_mensaje(t_cola_container* container, t_mensaje_cache* msj) {
 
-	pthread_mutex_lock(&container->mutex);
+	pthread_mutex_lock(&container->mutex_mensajes);
 	list_add(container->cola, msj);
-	pthread_mutex_unlock(&container->mutex);
+	pthread_mutex_unlock(&container->mutex_mensajes);
 }
+
+int cola_get_cantidad_suscriptores(t_cola_container* container) {
+
+	pthread_mutex_lock(&container->mutex_suscriptores);
+	int cantidad_suscriptores = list_size(container->suscriptores);
+	pthread_mutex_unlock(&container->mutex_suscriptores);
+
+	return cantidad_suscriptores;
+}
+

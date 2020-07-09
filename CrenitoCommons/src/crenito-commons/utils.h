@@ -21,6 +21,7 @@
 #include<commons/config.h>
 #include<commons/collections/list.h>
 #include<commons/string.h>
+#include <commons/collections/dictionary.h>
 
 #define ERROR_SOCKET -1
 
@@ -62,6 +63,14 @@ typedef enum {
 	TEAM = 4
 } t_id_proceso;
 
+/*
+ * TAD para almacenar los datos luego de realizar una subscripción
+ */
+typedef struct {
+	uint32_t id_subcriptor;
+	uint32_t socket;
+} t_suscriptor;
+
 // dado un id de proceso devuelve el mismo representado por un string
 char* get_nombre_proceso(t_id_proceso id_proceso);
 // dado un id de mensaje/nombre de cola el mismo representado por un string
@@ -74,5 +83,8 @@ int conexion_exitosa(int indicador_conexion);
 int error_conexion(int indicador_conexion);
 t_id_proceso get_id_proceso(char* proceso);
 t_id_cola get_id_mensaje(char* mensaje);
+
+t_suscriptor* suscriptor_crear(uint32_t socket, uint32_t id_subscriptor);
+void suscriptor_destruir(t_suscriptor* subscriptor);
 
 #endif /* UTILS_H_ */

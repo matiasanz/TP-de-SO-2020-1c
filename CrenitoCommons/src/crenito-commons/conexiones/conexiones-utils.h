@@ -19,14 +19,6 @@
 #include "../mensajes/mensaje_caught_pokemon.h"
 
 /* 
- * TAD para almacenar los datos luego de realizar una subscripción
- */
-typedef struct {
-	uint32_t id_subcriptor;
-	uint32_t socket;
-} t_suscriptor;
-
-/* 
  * Contiene la información necesaria para poder enviarle mensajes 
  * a un proceso servidor.
  * Ejemplo: cuando el TEAM o GAME_CARD nececistan enviarle información al BROKER.
@@ -80,9 +72,6 @@ void conexion_cliente_destruir(t_conexion_cliente* cliente);
 
 t_conexion* conexion_crear(t_conexion_server* server, t_conexion_cliente* cliente);
 void conexion_destruir(t_conexion* conexion);
-
-t_suscriptor* suscriptor_crear(uint32_t socket, uint32_t id_subscriptor);
-void subscriptor_destruir(t_suscriptor* subscriptor);
 
 t_buffer* serializar(void* msj, t_id_cola id_cola);
 void* deserializar(void* msj, t_id_cola id_cola);

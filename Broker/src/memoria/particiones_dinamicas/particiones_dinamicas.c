@@ -178,7 +178,8 @@ static void liberar_victima(bool (*algoritmo_victima)(t_particion*, t_particion*
 		}
 	}
 
-	cola_eliminar_mensaje(particion_get_id_mensaje(victima), particion_get_id_cola(victima));
+	cola_buscar_y_eliminar_mensaje(particion_get_id_mensaje(victima), particion_get_id_cola(victima));
+	particion_log_eliminacion(logger, victima);
 	consolidar(victima, index_victima);
 }
 
@@ -206,4 +207,3 @@ static void consolidar(t_particion* victima, int index_victima) {
 		list_remove_and_destroy_element(particiones, index_victima + 1, (void*) particion_destruir);
 	}
 }
-

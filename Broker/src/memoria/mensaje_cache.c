@@ -12,29 +12,36 @@ t_mensaje_cache* mensaje_cache_crear() {
 	t_mensaje_cache* mensaje_cache = malloc(sizeof(t_mensaje_cache));
 
 	mensaje_cache->particion = NULL;
+	pthread_mutex_init(&mensaje_cache->mutex_edicion_mensaje, NULL);
 	mensaje_cache->metadata = mensaje_metadata_crear();
 
 	return mensaje_cache;
 }
 
-void mensaje_cache_destruir(t_mensaje_cache* msj) {
+void mensaje_cache_eliminar_de_cola(t_mensaje_cache* msj) {
 
-	particion_log_eliminacion(logger, msj->particion);
 	particion_liberar(msj->particion);
+	pthread_mutex_lock(&msj->mutex_edicion_mensaje);
 	mensaje_metadata_destruir(msj->metadata);
+	pthread_mutex_unlock(&msj->mutex_edicion_mensaje);
 	free(msj);
 }
 
-bool equals_from_id(t_mensaje_cache* msj, uint32_t id_buscado) {
-	return particion_get_id_mensaje(msj->particion) == id_buscado;
+bool todos_los_suscriptores_confirmaron(t_mensaje_cache* msj, int suscriptores_cola) {
+
+	pthread_mutex_lock(&msj->mutex_edicion_mensaje);
+	int suscriptores_confirmados = list_size(mensaje_cache_get_suscriptores(msj, CONFIRMADO));
+	pthread_mutex_unlock(&msj->mutex_edicion_mensaje);
+
+	return suscriptores_confirmados == suscriptores_cola;
 }
 
 uint32_t mensaje_cache_get_id(t_mensaje_cache* msj) {
-	return particion_get_id_mensaje(msj -> particion);
+	return particion_get_id_mensaje(msj->particion);
 }
 
 t_id_cola mensaje_cache_get_id_cola(t_mensaje_cache* msj) {
-	return particion_get_id_cola(msj -> particion);
+	return particion_get_id_cola(msj->particion);
 }
 
 uint32_t mensaje_cache_get_tamanio_contenido(t_mensaje_cache* msj) {
@@ -45,12 +52,27 @@ void mensaje_cache_set_particion(t_mensaje_cache* msj, t_particion* particion) {
 	msj->particion = particion;
 }
 
-void mensaje_cache_set_suscriptor_confirmado(t_mensaje_cache* msj, t_suscriptor* suscriptor) {
-	list_add(msj->metadata->suscriptores_confirmados, suscriptor);
+void mensaje_cache_agregar_suscriptor(t_mensaje_cache* msj, t_suscriptor* suscriptor, t_estado_envio estado_envio) {
+
+	pthread_mutex_lock(&msj->mutex_edicion_mensaje);
+	t_suscriptor* copy = suscriptor_crear(suscriptor->socket, suscriptor->id_subcriptor);
+	list_add(mensaje_cache_get_suscriptores(msj, estado_envio), copy);
+	pthread_mutex_unlock(&msj->mutex_edicion_mensaje);
 }
 
-void mensaje_cache_set_suscriptor_enviado(t_mensaje_cache* msj, t_suscriptor* suscriptor) {
-	list_add(msj->metadata->suscriptores_enviados, suscriptor);
+t_list* mensaje_cache_get_suscriptores(t_mensaje_cache* msj, t_estado_envio estado_envio) {
+
+	switch (estado_envio) {
+	case ENVIADO:
+		return msj->metadata->suscriptores_enviados;
+	case CONFIRMADO:
+		return msj->metadata->suscriptores_confirmados;
+	case FALLIDO:
+		return msj->metadata->suscriptores_fallidos;
+	default:
+		log_error(event_logger, "Error al obtener suscriptores asociados al mensaje");
+		return NULL;
+	}
 }
 
 t_mensaje_header mensaje_header_restaurar_desde_cache(t_mensaje_cache* msj) {

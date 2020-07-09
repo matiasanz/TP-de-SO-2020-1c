@@ -15,8 +15,15 @@ typedef struct {
 	uint32_t id_correlativo;
 	t_list* suscriptores_enviados;
 	t_list* suscriptores_confirmados;
+	t_list* suscriptores_fallidos;
 	uint32_t tamanio_contenido;
 } t_mensaje_cache_metadata;
+
+typedef enum {
+	ENVIADO = 1,
+	CONFIRMADO = 2,
+	FALLIDO = 3,
+} t_estado_envio;
 
 t_mensaje_cache_metadata* mensaje_metadata_crear();
 void mensaje_metadata_destruir(t_mensaje_cache_metadata* msj);

@@ -31,6 +31,10 @@ void inicializar_colas() {
 	cola_localized_pokemon = cola_crear();
 }
 
+void inicializar_hilos() {
+	inicializar_hilo_consolidacion_colas();
+}
+
 void inicializar(void) {
 
 	inicializar_config();
@@ -38,6 +42,7 @@ void inicializar(void) {
 	inicializar_colas();
 	inicializar_memoria();
 	inicializar_servidor();
+	inicializar_hilos();
 }
 
 void inicializar_config() {
