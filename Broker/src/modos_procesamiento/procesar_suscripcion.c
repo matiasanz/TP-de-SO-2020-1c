@@ -8,32 +8,28 @@
 #include "procesar_suscripcion.h"
 
 //Funciones privadas
-static t_suscriptor* suscribir_proceso(int socket, t_cola_container* container);
+static t_suscriptor* suscribir_proceso(int socket, int id_proceso, t_cola_container* container);
 static void enviar_mensajes_cacheados(t_cola_container* container, t_suscriptor* suscriptor);
 
 void procesar_suscripcion(int socket, t_paquete_header header) {
 
 	t_cola_container* container = get_cola(header.id_cola);
-	t_suscriptor* suscriptor = suscribir_proceso(socket, container);
+	t_suscriptor* suscriptor = suscribir_proceso(socket, header.id_proceso, container);
 
 	uint32_t id_suscriptor = suscriptor->id_subcriptor;
 	//TODO: sacar este log a broker_utils
-	log_info(logger,
-			"Un proceso %s se suscribió a la cola %s. El id_subscriptor generado es: %d. El socket id es: %d \n",
-			get_nombre_proceso(header.id_proceso), get_nombre_cola(header.id_cola), id_suscriptor,
-			suscriptor->socket);
+	log_info(logger, "Un proceso %s con id %d se suscribió a la cola %s \n",
+			get_nombre_proceso(header.tipo_proceso), header.id_proceso, get_nombre_cola(header.id_cola));
 
 	socket_send(socket, &id_suscriptor, sizeof(id_suscriptor));
 
 	enviar_mensajes_cacheados(container, suscriptor);
 }
 
-static t_suscriptor* suscribir_proceso(int socket, t_cola_container* container) {
+static t_suscriptor* suscribir_proceso(int socket, int id_proceso, t_cola_container* container) {
 
 	pthread_mutex_lock(&container->mutex_suscriptores);
-	/*TODO en lugar de generar el id de suscriptor deberia recibirse
-	 * y estar definido en el config file de cada proceso */
-	t_suscriptor* suscriptor = suscriptor_crear(socket, list_size(container->suscriptores) + 1);
+	t_suscriptor* suscriptor = suscriptor_crear(socket, id_proceso);
 	list_add(container->suscriptores, suscriptor);
 	pthread_mutex_unlock(&container->mutex_suscriptores);
 

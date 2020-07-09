@@ -25,7 +25,7 @@ void enviar_mensaje_a_suscriptor(t_enviar_args* args) {
 
 	void* deserializado = restaurar_mensaje_desde_cache(args->msj_cache);
 	t_id_cola id_cola = mensaje_cache_get_id_cola(args->msj_cache);
-	t_paquete* pqt = paquete_crear(paquete_header_crear(MENSAJE, BROKER, id_cola),
+	t_paquete* pqt = paquete_crear(paquete_header_crear(MENSAJE, BROKER, id_cola, id_proceso),
 			serializar(deserializado, id_cola));
 
 	uint32_t ack = enviar_paquete(pqt, args->suscriptor->socket);

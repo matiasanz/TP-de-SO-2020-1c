@@ -35,15 +35,17 @@ void inicializar_config() {
 
 void inicializar_conexiones() {
 
+	id_proceso = config_get_int_value(config, "ID_PROCESO");
+
 	conexion_broker = conexion_server_crear(
 			config_get_string_value(config, "IP_BROKER"),
 			config_get_string_value(config, "PUERTO_BROKER"), GAMECARD);
 
 	pthread_mutex_init(&mutex_subscripcion, NULL);
 
-	subscribir_y_escuchar_cola_catch_pokemon((void*) mensaje_recibido);
-	subscribir_y_escuchar_cola_get_pokemon((void*) mensaje_recibido);
-	subscribir_y_escuchar_cola_new_pokemon((void*) mensaje_recibido);
+	suscribir_y_escuchar_cola_catch_pokemon((void*) mensaje_recibido);
+	suscribir_y_escuchar_cola_get_pokemon((void*) mensaje_recibido);
+	suscribir_y_escuchar_cola_new_pokemon((void*) mensaje_recibido);
 
 	conectar_gameboy((void*) mensaje_recibido);
 
@@ -804,7 +806,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 		t_mensaje_appeared_catch_pokemon* mensajeAEnviar=mensaje_appeared_catch_pokemon_crear(unMsjNewPoke->pokemon.especie,unMsjNewPoke->pokemon.posicion.pos_x,unMsjNewPoke->pokemon.posicion.pos_y);
 		mensaje_appeared_catch_pokemon_set_id_correlativo(mensajeAEnviar,mensaje_new_pokemon_get_id(unMsjNewPoke));
 
-		t_paquete_header header=paquete_header_crear(MENSAJE,GAMECARD,APPEARED_POKEMON);
+		t_paquete_header header=paquete_header_crear(MENSAJE,GAMECARD,APPEARED_POKEMON, id_proceso);
 		t_buffer* bufferDepaquete=mensaje_appeared_catch_pokemon_serializar(mensajeAEnviar);
 		t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
 
@@ -1173,7 +1175,7 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 	t_mensaje_caught_pokemon* mensajeAEnviar=mensaje_caught_pokemon_crear(pokemonAtrapado);
 	mensaje_caught_pokemon_set_id_correlativo(mensajeAEnviar,mensaje_appeared_catch_pokemon_get_id(unMsjCatchPoke));
 
-	t_paquete_header header=paquete_header_crear(MENSAJE,GAMECARD,CAUGHT_POKEMON);
+	t_paquete_header header=paquete_header_crear(MENSAJE,GAMECARD,CAUGHT_POKEMON, id_proceso);
 	t_buffer* bufferDepaquete=mensaje_caught_pokemon_serializar(mensajeAEnviar);
 	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
 
@@ -1331,7 +1333,7 @@ void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
 	t_mensaje_localized_pokemon* mensajeAEnviar=mensaje_localized_pokemon_crear(unMsjGetPoke->especie,listaDePosiciones);
 	mensaje_localized_pokemon_set_id_correlativo(mensajeAEnviar,mensaje_get_pokemon_get_id(unMsjGetPoke));
 
-	t_paquete_header header=paquete_header_crear(MENSAJE,GAMECARD,LOCALIZED_POKEMON);
+	t_paquete_header header=paquete_header_crear(MENSAJE,GAMECARD,LOCALIZED_POKEMON, id_proceso);
 	t_buffer* bufferDepaquete=mensaje_localized_pokemon_serializar(mensajeAEnviar);
 	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
 

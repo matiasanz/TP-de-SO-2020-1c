@@ -17,13 +17,14 @@ t_paquete* paquete_crear(t_paquete_header header, t_buffer* buffer) {
 	return paquete;
 }
 
-t_paquete_header paquete_header_crear(t_codigo_operacion cod_op, t_id_proceso id_proceso,
-		t_id_cola id_cola) {
+t_paquete_header paquete_header_crear(t_codigo_operacion cod_op, t_tipo_proceso tipo_proceso,
+		t_id_cola id_cola, int id_proceso) {
 
 	t_paquete_header header;
 	header.codigo_operacion = cod_op;
-	header.id_proceso = id_proceso;
+	header.tipo_proceso = tipo_proceso;
 	header.id_cola = id_cola;
+	header.id_proceso = id_proceso;
 	return header;
 
 }
