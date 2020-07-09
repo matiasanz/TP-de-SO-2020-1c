@@ -26,7 +26,7 @@ int main(void) {
 	Get_pokemones(objetivosGlobales, inventariosGlobales);
 
 	//Para pruebas rapidas sin los otros modulos//
-//	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) gamecard_simulator, NULL);
+	pthread_create(&hiloReceptorDeMensajes, NULL, (void*) gamecard_simulator, NULL);
 
 	inicializar_hilos();
 
@@ -165,41 +165,44 @@ void inicializar_listas() {
 	entrenadoresReady = cr_list_create();
 	registroDePedidos = list_create();
 
-	mensajesCAUGHT    = cr_list_create();
-	mensajesLOCALIZED = cr_list_create();
+//	mensajesCAUGHT    = cr_list_create();
+//	mensajesLOCALIZED = cr_list_create();
 
 	//***************
 }
 
 void listas_destroy(){
 	cr_list_destroy(entrenadoresReady);
-	pendientes_destroy(capturasPendientes);
 
 	recursos_destroy(objetivosGlobales);
 	recursos_destroy(inventariosGlobales);
 	recursos_destroy(recursosEnMapa);
-
 	candidatos_destroy(potencialesDeadlock);
 	entrenadores_destroy(equipo);
 
+	boolean_sem_wait_end(&BOOLSEM_EsperoMensajes);
+
+	pendientes_destroy(capturasPendientes);
+
 	list_destroy_and_destroy_elements(registroDePedidos, free);
-	list_destroy_and_destroy_elements(historialDePokemones, free);
+	list_destroy_and_destroy_elements(historialDePokemones, free); //
 	list_destroy_and_destroy_elements(mapaRequeridos, (void*) pokemon_destroy_hard);
 
 	cr_list_destroy_and_destroy_elements(pokemonesRecibidos, (void*) pokemon_destroy_hard);
-	cr_list_destroy_and_destroy_elements(mensajesCAUGHT    , (void*) mensaje_caught_pokemon_destruir);
-	cr_list_destroy_and_destroy_elements(mensajesLOCALIZED , (void*) mensaje_localized_pokemon_destruir);
+//	cr_list_destroy_and_destroy_elements(mensajesCAUGHT    , (void*) mensaje_caught_pokemon_destruir);
+//	cr_list_destroy_and_destroy_elements(mensajesLOCALIZED , (void*) mensaje_localized_pokemon_destruir);
 }
 
 //Hilos
 void inicializar_hilos(){
 
-	pthread_create(&hiloMensajesCAUGHT   , NULL, (void*)team_procesador_cola_CAUGHT   , mensajesCAUGHT);
-	pthread_create(&hiloMensajesLOCALIZED, NULL, (void*)team_procesador_cola_LOCALIZED, mensajesLOCALIZED);
+//	pthread_create(&hiloMensajesCAUGHT   , NULL, (void*)team_procesador_cola_CAUGHT   , mensajesCAUGHT);
+//	pthread_create(&hiloMensajesLOCALIZED, NULL, (void*)team_procesador_cola_LOCALIZED, mensajesLOCALIZED);
 
 	pthread_create(&hiloPlanificador, NULL, (void*) team_planificar, NULL);
 
 	pthread_create(&hiloProcesadorDePokemones, NULL, (void*) team_procesar_pokemones, NULL);
+	pthread_detach(hiloProcesadorDePokemones);
 }
 
 void finalizar_hilos(){
@@ -221,6 +224,7 @@ void inicializar_semaforos(){
 	sem_init(&finDeIntercambio          , 0, 0);
 	sem_init(&FinDePlanificacion        , 0, 0);
 
+	boolean_sem_init(&BOOLSEM_EsperoMensajes);
 
 	pthread_mutex_init(&Mutex_AndoLoggeando       , NULL);
 	pthread_mutex_init(&Mutex_AndoLoggeandoEventos, NULL);
@@ -251,13 +255,15 @@ void finalizar_semaforos(){
 //Conexiones
 void inicializar_conexiones() {
 
+	TIEMPO_RECONEXION = config_get_int_value(config, "TIEMPO_RECONEXION");
+
 	conexion_broker = conexion_server_crear(
 			config_get_string_value(config, "IP_BROKER"),
 			config_get_string_value(config, "PUERTO_BROKER"), TEAM);
 
 	pthread_mutex_init(&mutex_subscripcion, NULL);
 
-	ESPERO_MENSAJES = true;
+//	ESPERO_MENSAJES = true;
 
 	subscribir_y_escuchar_cola_appeared_pokemon((void*) mensaje_recibido);
 	subscribir_y_escuchar_cola_caught_pokemon((void*) mensaje_recibido);
@@ -277,7 +283,6 @@ void finalizar_suscripcion_a_colas(){
 	FIN_PSEUDO_GAMECARD = true;
 	pthread_mutex_unlock(&mutex_PSEUDOGAMECARD);
 	//******************************************************************** fin HARDCODEADO
-
 	dejar_de_recibir();
 
 //	pthread_cancel(hilo_appeared_pokemon);

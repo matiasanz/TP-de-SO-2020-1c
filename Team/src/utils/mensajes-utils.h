@@ -14,10 +14,13 @@
 #include "../hilos-de-comunicacion/hilo_gameboy.h"
 #include "../hilos-de-comunicacion/hilo_localized_pokemon.h"
 #include <stdbool.h>
+#include "../listas/boolean_semaphore.h"
 
-bool ESPERO_MENSAJES;
+//bool ESPERO_MENSAJES;
 
 pthread_mutex_t mutex_esperoMensajes;
+
+boolean_sem_t BOOLSEM_EsperoMensajes;
 
 void dejar_de_recibir();
 

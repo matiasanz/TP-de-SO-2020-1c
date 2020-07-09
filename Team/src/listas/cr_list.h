@@ -96,6 +96,9 @@ void* list_remove_by_comparation(t_list* unaLista, void* elemento, bool (*compar
 //Retorna un puntero al elemento si es que lo encontro
 void* list_get_by_comparation(t_list* unaLista, void* elemento, bool (*comparator)(void *, void *));
 
+//Remueve de la lista y destruye todos los elementos que satisfagan la condicion
+void list_remove_and_destroy_all_satisfying(t_list*lista, bool (*condicion)(void*), void (*element_destroyer)(void*));
+
 //****************************************************************************************
 #include <commons/collections/dictionary.h>
 

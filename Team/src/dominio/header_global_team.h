@@ -15,6 +15,7 @@
 #include <commons/collections/list.h>
 #include <commons/collections/dictionary.h>
 
+#include "../listas/boolean_semaphore.h"
 #include "../listas/cr_list.h"
 
 #include <crenito-commons/conexiones/conexiones.h>

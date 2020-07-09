@@ -5,7 +5,7 @@
 void subscribir_y_escuchar_cola_appeared_pokemon(void (*callback)(t_id_cola, void*)) {
 
 	conexion_appeared_pokemon = conexion_cliente_crear(APPEARED_POKEMON,
-			config_get_int_value(config, "TIEMPO_RECONEXION"),
+			TIEMPO_RECONEXION,
 			(void*) callback);
 
 	t_conexion* args = conexion_crear(conexion_broker,

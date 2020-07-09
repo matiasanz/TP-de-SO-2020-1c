@@ -44,6 +44,7 @@ char*num_array_to_string(numero*arreglo, int length);
 	datos_algoritmo DATOS_ALGORITMO;
 
 	numero PROCESOS_SIN_FINALIZAR;
+	numero TIEMPO_RECONEXION;
 
 
 	entrenador* (*proximo_a_ejecutar_segun_criterio)(cola_entrenadores);

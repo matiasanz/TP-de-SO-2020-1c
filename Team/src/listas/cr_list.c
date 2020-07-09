@@ -1,5 +1,56 @@
 #include "cr_list.h"
 
+bool list_contains_element(t_list* unaLista, void* elemento, bool (*comparator)(void *, void *)){
+	return list_get_by_comparation(unaLista, elemento, comparator);
+}
+
+void list_remove_and_destroy_all_satisfying(t_list*lista, bool (*condicion)(void*), void (*element_destroyer)(void*)){
+	int cantidadDeOcurrencias = list_count_satisfying(lista, condicion);
+
+	while(cantidadDeOcurrencias--){
+		list_remove_and_destroy_by_condition(lista, condicion, element_destroyer);
+	}
+}
+
+void* list_remove_by_comparation(t_list* unaLista, void* elemento, bool (*comparator)(void *, void *)){
+	bool es_el_elemento(void*deLista){
+		return comparator(elemento, deLista);
+	}
+
+	return list_remove_by_condition(unaLista, &es_el_elemento);
+}
+
+void* list_get_by_comparation(t_list* unaLista, void* elemento, bool (*comparator)(void *, void *)){
+	bool es_el_elemento(void*deLista){
+		return comparator(elemento, deLista);
+	}
+
+	return list_find(unaLista, &es_el_elemento);
+}
+
+//*****************************************************************************************
+
+char* dictionary_get_any_key(t_dictionary* self, bool(*condition)(char*, void*)){
+	int table_index;
+	for (table_index = 0; table_index < self->table_max_size; table_index++) {
+		t_hash_element *element = self->elements[table_index];
+
+		while (element != NULL) {
+
+			if(condition(element->key, element->data)){
+				return element->key;
+			}
+
+			element = element->next;
+		}
+	}
+
+	return NULL;
+}
+
+//******************************************************************************************
+
+
 //Ver a futuro, no logre que anduviera
 void* cr_list_entre_mutex(cr_list*unaLista, void*(*funcionDeLista)(t_list*, void*), void* argumento){
 	pthread_mutex_lock(&unaLista->mutex);
@@ -205,49 +256,9 @@ bool cr_list_any(cr_list*unaLista, bool(*condition)(void*)){
 	return algunoCumple;
 }
 
-void* list_remove_by_comparation(t_list* unaLista, void* elemento, bool (*comparator)(void *, void *)){
-	bool es_el_elemento(void*deLista){
-		return comparator(elemento, deLista);
-	}
-
-	return list_remove_by_condition(unaLista, &es_el_elemento);
-}
-
-void* list_get_by_comparation(t_list* unaLista, void* elemento, bool (*comparator)(void *, void *)){
-	bool es_el_elemento(void*deLista){
-		return comparator(elemento, deLista);
-	}
-
-	return list_find(unaLista, &es_el_elemento);
-}
-
-bool list_contains_element(t_list* unaLista, void* elemento, bool (*comparator)(void *, void *)){
-	return list_get_by_comparation(unaLista, elemento, comparator);
-}
-
 bool cr_list_contains_element(cr_list* unaLista, void* elemento, bool (*comparator)(void *, void *)){
 	pthread_mutex_lock(&unaLista->mutex);
 	bool siONo = list_contains_element(unaLista->lista, elemento, comparator);
 	pthread_mutex_unlock(&unaLista->mutex);
 	return siONo;
-}
-
-//******************************************************************************************
-
-char* dictionary_get_any_key(t_dictionary* self, bool(*condition)(char*, void*)){
-	int table_index;
-	for (table_index = 0; table_index < self->table_max_size; table_index++) {
-		t_hash_element *element = self->elements[table_index];
-
-		while (element != NULL) {
-
-			if(condition(element->key, element->data)){
-				return element->key;
-			}
-
-			element = element->next;
-		}
-	}
-
-	return NULL;
 }

@@ -9,17 +9,22 @@
 
 bool espero_mensajes(){
 
-	pthread_mutex_lock(&mutex_esperoMensajes);
-	bool esperoMensajes = ESPERO_MENSAJES;
-	pthread_mutex_unlock(&mutex_esperoMensajes);
+	bool esperoMensajes = boolean_sem_consult(&BOOLSEM_EsperoMensajes);
+
+//	pthread_mutex_lock(&mutex_esperoMensajes);
+//	bool esperoMensajes = ESPERO_MENSAJES;
+//	pthread_mutex_unlock(&mutex_esperoMensajes);
 
 	return esperoMensajes;
 }
 
 void dejar_de_recibir(){
-	pthread_mutex_lock(&mutex_esperoMensajes);
-	ESPERO_MENSAJES = false;
-	pthread_mutex_unlock(&mutex_esperoMensajes);
+
+	boolean_sem_turn_off(&BOOLSEM_EsperoMensajes);
+
+//	pthread_mutex_lock(&mutex_esperoMensajes);
+//	ESPERO_MENSAJES = false;
+//	pthread_mutex_unlock(&mutex_esperoMensajes);
 }
 
 void mensaje_recibido(t_id_cola id_cola, void* msj){
@@ -28,6 +33,8 @@ void mensaje_recibido(t_id_cola id_cola, void* msj){
 		free(msj);
 		return;
 	}
+
+	boolean_sem_open(&BOOLSEM_EsperoMensajes);
 
 	void* deserializado;
 
@@ -53,6 +60,8 @@ void mensaje_recibido(t_id_cola id_cola, void* msj){
 				"El %s recibió un mensaje que no esperaba: (%s)",
 				TEAM_STRING, get_nombre_cola(id_cola));
 	}
+
+	boolean_sem_close(&BOOLSEM_EsperoMensajes);
 
 	free(msj);
 }
