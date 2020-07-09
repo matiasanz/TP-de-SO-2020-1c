@@ -10,7 +10,7 @@
 typedef struct{
 	t_list* lista;
 	sem_t hayMas;
-	pthread_mutex_t* mutex;
+	pthread_mutex_t mutex;
 }cr_list;
 
 //Constructor de lista vacia con semaforos activos

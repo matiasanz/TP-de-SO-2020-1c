@@ -17,7 +17,7 @@
 #include <commons/log.h>
 #include <commons/config.h>
 
-#include "listas/cr_list.h"
+#include "../listas/cr_list.h"
 
 #include <crenito-commons/conexiones/conexiones.h>
 #include "../utils/mensajes-utils.h"
