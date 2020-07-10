@@ -23,7 +23,6 @@ pthread_t hiloProcesadorDePokemones;
 sem_t* EjecutarEntrenador;
 sem_t EquipoNoPuedaCazarMas;
 sem_t FinDeCiclo_CPU;
-//sem_t HayTareasPendientes;
 sem_t HayEntrenadoresDisponibles;
 sem_t finDeIntercambio;
 sem_t FinDePlanificacion;
@@ -32,16 +31,14 @@ pthread_mutex_t mutexHistorialEspecies;
 pthread_mutex_t mutexEntrenadores;
 pthread_mutex_t*mutexEstadoEntrenador;
 pthread_mutex_t*mutexPosicionEntrenador;
-//pthread_mutex_t mutexInventariosGlobales;
 pthread_mutex_t mutexRecursosDisponibles;
 pthread_mutex_t mutexPedidos;
 
 //Variables globales
 numero cantidadDeEntrenadores;
 
-//HARDCODEOS ---------------------------------- ACORDARME DE BORRARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
-pthread_mutex_t mutex_PSEUDOGAMECARD;
-bool FIN_PSEUDO_GAMECARD;
+//HARDCODEOS
+boolean_sem_t BOOLSEM_PSEUDOGAMECARD;
 
 /*----------------*/
 
@@ -85,7 +82,13 @@ numero objetivos_cantidad_requerida_de(especie_pokemon unaEspecie);
 void objetivos_actualizar_por_captura_de(especie_pokemon);
 void validar_captura(captura_pendiente*);
 
-//Otras
+//Deadlock
+void team_ejecutar_algoritmo_de_deteccion_de_deadlock();
+bool algoritmo_detectar_deadlock();
+void algoritmo_procesar_deadlock();
+void esperar_que_equipo_no_pueda_cazar_mas();
+
+//Mensajes
 pokemon*leer_pokemon(t_mensaje_appeared_pokemon*);
 bool mensaje_appeared_responde_a_mi_pedido(t_mensaje_appeared_pokemon*);
 

@@ -5,7 +5,6 @@
 #include <commons/config.h>
 
 #include "../utils/mensajes.h"
-#include "../hilos-del-team/detector_de_deadlock.h"
 #include "estructuras-auxiliares/candidatos_intercambio.h"
 #include "estructuras-auxiliares/captura_pendiente.h"
 #include "estructuras-auxiliares/lector_config.h"

@@ -15,5 +15,6 @@ pthread_t hilo_localized_pokemon;
 
 void localized_pokemon_recibido(t_mensaje_localized_pokemon* localized_pokemon);
 void suscribir_y_escuchar_cola_localized_pokemon(void (*callback)(t_id_cola, void*));
+void mensaje_localized_pokemon_procesar(t_mensaje_localized_pokemon* mensaje);
 
 #endif /* SRC_SUSCRIPCIONES_HILO_LOCALIZED_POKEMON_H_ */

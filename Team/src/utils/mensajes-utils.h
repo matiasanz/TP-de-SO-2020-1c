@@ -18,8 +18,6 @@
 
 //bool ESPERO_MENSAJES;
 
-pthread_mutex_t mutex_esperoMensajes;
-
 boolean_sem_t BOOLSEM_EsperoMensajes;
 
 void dejar_de_recibir();

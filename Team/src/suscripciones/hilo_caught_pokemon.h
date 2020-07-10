@@ -9,7 +9,6 @@
 #define SRC_SUSCRIPCIONES_HILO_CAUGHT_POKEMON_H_
 
 #include <crenito-commons/conexiones/conexiones.h>
-#include "../utils/mensajes-utils.h"
 
 t_conexion_cliente* conexion_caught_pokemon;
 pthread_t hilo_caught_pokemon;

@@ -14,11 +14,9 @@ void hardcodear_appeared(especie_pokemon especie, coordenada x, coordenada y){
 void gamecard_simulator(){
 	puts("Simulacro de recepcion de mensajes");
 
-	FIN_PSEUDO_GAMECARD = false;
+	boolean_sem_init(&BOOLSEM_PSEUDOGAMECARD);
 
 	int i;
-	pthread_mutex_init(&mutex_PSEUDOGAMECARD, NULL);
-
 	for(i=0; PROCESO_ACTIVO; i= (i+1)%11){
 
 		switch(i){
@@ -124,12 +122,8 @@ void gamecard_simulator(){
 
 		sleep(1);
 
-		pthread_mutex_lock(&mutex_PSEUDOGAMECARD);
-		if(FIN_PSEUDO_GAMECARD){
-			pthread_mutex_unlock(&mutex_PSEUDOGAMECARD);
+		if(!boolean_sem_consult(&BOOLSEM_PSEUDOGAMECARD)){
 			break;
-		} else{
-			pthread_mutex_unlock(&mutex_PSEUDOGAMECARD);
 		}
 	}
 }
