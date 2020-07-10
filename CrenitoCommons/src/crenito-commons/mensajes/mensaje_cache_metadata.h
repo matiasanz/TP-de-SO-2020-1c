@@ -10,6 +10,8 @@
 
 #include "../utils.h"
 #include "mensaje_header.h"
+#include "../modelo/suscriptor.h"
+
 //Estructura con la información solicitada por el tp en la parte "Administración de Mensajes"
 typedef struct {
 	uint32_t id_correlativo;

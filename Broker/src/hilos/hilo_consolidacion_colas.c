@@ -7,9 +7,11 @@
 
 #include "hilo_consolidacion_colas.h"
 
+static bool debe_consolidar_cola(t_cola_container* container, int* cantidad_suscriptores);
 static void consolidar_colas(void* param);
-static void consolidar_cola(t_cola_container* container);
+static void consolidar_cola(t_cola_container* container, int cantidad_suscriptores, t_id_cola id_cola);
 static void reenviar(t_mensaje_cache* msj);
+static void eliminar(t_list* mensajes_confirmados, t_cola_container* container, t_id_cola id_cola);
 
 void inicializar_hilo_consolidacion_colas() {
 
@@ -19,72 +21,94 @@ void inicializar_hilo_consolidacion_colas() {
 	pthread_detach(hilo_consolidacion_colas);
 }
 
+static bool debe_consolidar_cola(t_cola_container* container, int* cantidad_suscriptores) {
+
+	// Si no hay mensajes en la cola no se debe consolidar
+	if (list_is_empty(container->cola))
+		return false;
+
+	// Si no hay suscriptores no se debe consolidar
+	*cantidad_suscriptores = cola_get_cantidad_suscriptores(container);
+	return *cantidad_suscriptores > 0;
+}
+
 static void consolidar_colas(void* param) {
 
 	while (true) {
 
 		sleep(frecuencia_consolidacion_colas);
 
+		pthread_mutex_lock(&mutex_acceso_memoria);
 		//TODO: Revisar esto para no hardcodear el id de las colas
 		for (int i = 1; i <= 6; ++i) {
+
 			t_cola_container* container = get_cola(i);
+			int cantidad_suscriptores = 0;
 
-			pthread_mutex_lock(&container->mutex_mensajes);
+			log_inicio_consolidacion_colas(get_nombre_cola(i), list_size(container->cola));
 
-			log_info(event_logger, "Inicio consolidacion cola %s , cantidad de mensajes: %d", get_nombre_cola(i),
-					list_size(container->cola));
-			// Si no hay mensajes no se debe consolidar
-			if (!list_is_empty(container->cola)) {
-				consolidar_cola(container);
+			if (debe_consolidar_cola(container, &cantidad_suscriptores)) {
+				consolidar_cola(container, cantidad_suscriptores, i);
 			}
-
-			log_info(event_logger, "Fin consolidacion cola %s , cantidad de mensajes: %d", get_nombre_cola(i),
-					list_size(container->cola));
-			pthread_mutex_unlock(&container->mutex_mensajes);
 		}
+		pthread_mutex_unlock(&mutex_acceso_memoria);
 	}
 }
 
-static void consolidar_cola(t_cola_container* container) {
+static void consolidar_cola(t_cola_container* container, int cantidad_suscriptores, t_id_cola id_cola) {
 
-	int cantidad_suscriptores = cola_get_cantidad_suscriptores(container);
+	t_list* mensajes_confirmados = list_create();
 
-	// Si no hay suscriptores no se debe consolidar
-	if (cantidad_suscriptores == 0) {
-		return;
-	}
-
-	for (int i = 0; i < list_size(container->cola); ++i) {
-
-		t_mensaje_cache* msj = list_get(container->cola, i);
+	void revisar_cola(t_mensaje_cache * msj) {
+		int* id_mensaje = malloc(sizeof(int));
 
 		if (todos_los_suscriptores_confirmaron(msj, cantidad_suscriptores)) {
-			list_remove_and_destroy_element(container->cola, i, (void*) mensaje_cache_eliminar_de_cola);
 
+			*id_mensaje = mensaje_cache_get_id(msj);
+			list_add(mensajes_confirmados, id_mensaje);
 		} else {
 			reenviar(msj);
 		}
 	}
+
+	pthread_mutex_lock(&container->mutex_mensajes);
+	t_list* copia_cola = list_duplicate(container->cola);
+	pthread_mutex_unlock(&container->mutex_mensajes);
+
+	list_iterate(copia_cola, (void*) revisar_cola);
+	eliminar(mensajes_confirmados, container, id_cola);
 }
 
 static void reenviar(t_mensaje_cache* msj) {
 
 	pthread_mutex_lock(&msj->mutex_edicion_mensaje);
-	int cantidad_destinatarios = list_size(mensaje_cache_get_suscriptores(msj, FALLIDO));
+	int cantidad_suscriptores_fallidos = list_size(mensaje_cache_get_suscriptores(msj, FALLIDO));
 	pthread_mutex_unlock(&msj->mutex_edicion_mensaje);
 
-	if (cantidad_destinatarios == 0)
+	//Si no hay destinatarios pendientes no se debe reenviar
+	if (cantidad_suscriptores_fallidos == 0)
 		return;
 
 	int index = 0;
-	while (index < cantidad_destinatarios) {
+	while (index < cantidad_suscriptores_fallidos) {
 
 		pthread_mutex_lock(&msj->mutex_edicion_mensaje);
 		t_suscriptor* suscriptor = list_remove(mensaje_cache_get_suscriptores(msj, FALLIDO), index);
 		pthread_mutex_unlock(&msj->mutex_edicion_mensaje);
 
 		crear_hilo_y_enviar_mensaje_a_suscriptor(msj, suscriptor);
-		suscriptor_destruir(suscriptor);
 		index++;
 	}
+}
+
+static void eliminar(t_list* mensajes_confirmados, t_cola_container* container, t_id_cola id_cola) {
+
+	void buscar_y_eliminar(uint32_t* id_mensaje) {
+		log_consolidacion_cola_eliminacion(*id_mensaje, id_cola);
+		cola_buscar_y_eliminar_mensaje(*id_mensaje, id_cola);
+	}
+
+	list_iterate(mensajes_confirmados, (void*) buscar_y_eliminar);
+	//TODO: revisar si hay que destruir elementos
+	list_destroy(mensajes_confirmados);
 }

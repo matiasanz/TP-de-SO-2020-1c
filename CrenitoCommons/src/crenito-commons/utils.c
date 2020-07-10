@@ -108,17 +108,3 @@ t_id_cola get_id_mensaje(char* mensaje){
 	log_error(event_logger,"este mensaje no es conocido %s",mensaje);
 	return 0;
 }
-
-t_suscriptor* suscriptor_crear(uint32_t socket, uint32_t id_suscriptor) {
-
-	t_suscriptor* suscriptor = malloc(sizeof(t_suscriptor));
-
-	suscriptor->id_subcriptor = id_suscriptor;
-	suscriptor->socket = socket;
-
-	return suscriptor;
-}
-
-void suscriptor_destruir(t_suscriptor* suscriptor) {
-	free(suscriptor);
-}
