@@ -17,6 +17,7 @@
 #include "../mensajes/mensaje_get_pokemon.h"
 #include "../mensajes/mensaje_appeared_catch_pokemon.h"
 #include "../mensajes/mensaje_caught_pokemon.h"
+#include "../modelo/suscriptor.h"
 
 /* 
  * Contiene la información necesaria para poder enviarle mensajes 

@@ -33,8 +33,7 @@ t_cola_container* get_cola(t_id_cola id_cola) {
 	case LOCALIZED_POKEMON:
 		return cola_localized_pokemon;
 	default:
-		log_error(event_logger, "No existe la cola: %d. Finalizando hilo", id_cola);
-		pthread_exit(NULL);
+		log_error_cola(id_cola);
 		return NULL;
 	}
 }

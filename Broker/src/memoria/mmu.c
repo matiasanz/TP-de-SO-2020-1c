@@ -128,8 +128,7 @@ void* restaurar_mensaje_desde_cache(t_mensaje_cache* msj) {
 	case LOCALIZED_POKEMON:
 		return mensaje_localized_pokemon_restaurar_desde_cache(contenido_cache, header);
 	default:
-		log_error(event_logger, "No existe la cola: %d. Finalizando hilo", mensaje_cache_get_id_cola(msj));
-		pthread_exit(NULL);
+		log_error_cola(mensaje_cache_get_id_cola(msj));
 		return NULL;
 	}
 }
@@ -149,8 +148,7 @@ void* compactar_contenido_mensaje(void* msj_recibido, t_mensaje_cache_metadata* 
 	case LOCALIZED_POKEMON:
 		return mensaje_localized_pokemon_formato_cache(msj_recibido, metadata);
 	default:
-		log_error(event_logger, "No existe la cola: %d. Finalizando hilo", id_cola);
-		pthread_exit(NULL);
+		log_error_cola(id_cola);
 		return NULL;
 	}
 }

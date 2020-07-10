@@ -55,7 +55,7 @@ void mensaje_cache_set_particion(t_mensaje_cache* msj, t_particion* particion) {
 void mensaje_cache_agregar_suscriptor(t_mensaje_cache* msj, t_suscriptor* suscriptor, t_estado_envio estado_envio) {
 
 	pthread_mutex_lock(&msj->mutex_edicion_mensaje);
-	t_suscriptor* copy = suscriptor_crear(suscriptor->socket, suscriptor->id_subcriptor);
+	t_suscriptor* copy = suscriptor_duplicar(suscriptor);
 	list_add(mensaje_cache_get_suscriptores(msj, estado_envio), copy);
 	pthread_mutex_unlock(&msj->mutex_edicion_mensaje);
 }
@@ -70,7 +70,7 @@ t_list* mensaje_cache_get_suscriptores(t_mensaje_cache* msj, t_estado_envio esta
 	case FALLIDO:
 		return msj->metadata->suscriptores_fallidos;
 	default:
-		log_error(event_logger, "Error al obtener suscriptores asociados al mensaje");
+		log_error_get_suscriptores(mensaje_cache_get_id(msj));
 		return NULL;
 	}
 }
