@@ -20,7 +20,7 @@ int main(void) {
 
 void inicializar(void) {
 
-	sem_init(&objetivos_gamecard, 0, 0);
+	sem_init(&objetivos_gamecard, 0, 0); //TODO
 
 	inicializar_config();
 	inicializar_logs();
@@ -29,7 +29,6 @@ void inicializar(void) {
 }
 
 void inicializar_config() {
-
 	config = config_create("./config/gamecard.config");
 }
 
@@ -280,9 +279,9 @@ void gamecard_Catch_Pokemon_ReIntento(t_mensaje_appeared_catch_pokemon* unMsjCat
 	sleep(tiempo_de_reintento_operacion);
 	gamecard_Catch_Pokemon(unMsjCatchPoke);
 }
-void gamecard_Get_Pokemon_ReIntento(t_mensaje_get_pokemon* unMsjGetPoke){
+void gamecard_Get_Pokemon_reintento(t_mensaje_get_pokemon* unMsjGetPoke){
 	sleep(tiempo_de_reintento_operacion);
-	gamecard_Get_Pokemon(unMsjGetPoke);
+	gamecard_procesar_Get_Pokemon(unMsjGetPoke);
 }
 
 
@@ -450,47 +449,47 @@ bool contienePosicionEnBloques(char* string, char**bloques){
 
 	}
 
-
 	return false;
 }
+
 //DEPRECATED
 char* contenidoDeBloques(char** bloques){
-		char* cadenaCompleta=string_new();
-		FILE* archivo;
-		int file_size;
-		char* cadena;
-		char* bin_block;
+	char* cadenaCompleta=string_new();
+	FILE* archivo;
+	int file_size;
+	char* cadena;
+	char* bin_block;
 
-		int cantbloques=cant_elemetos_array(bloques);
+	int cantbloques=cant_elemetos_array(bloques);
 
-			if(cantbloques>0){
-				for(int x=0;x<cantbloques;x++){
+	if(cantbloques>0){
+		for(int x=0;x<cantbloques;x++){
 
-						bin_block = string_new();
-						string_append(&bin_block,paths_estructuras[BLOCKS]);
-						string_append(&bin_block,bloques[x]);
-						string_append(&bin_block,".bin");
+				bin_block = string_new();
+				string_append(&bin_block,paths_estructuras[BLOCKS]);
+				string_append(&bin_block,bloques[x]);
+				string_append(&bin_block,".bin");
 
 
-						archivo=fopen(bin_block,"rb");
+				archivo=fopen(bin_block,"rb");
 
-						fseek(archivo, 0, SEEK_END);
-						file_size = ftell(archivo);
-						fseek(archivo, 0, SEEK_SET);
+				fseek(archivo, 0, SEEK_END);
+				file_size = ftell(archivo);
+				fseek(archivo, 0, SEEK_SET);
 
-						cadena=malloc(file_size);
+				cadena=malloc(file_size);
 
-						fread(cadena,sizeof(char),file_size,archivo);
+				fread(cadena,sizeof(char),file_size,archivo);
 
-						string_append(&cadenaCompleta,cadena);
+				string_append(&cadenaCompleta,cadena);
 
-						fclose(archivo);
-						free(bin_block);
-						free(cadena);
-				}
-			}
+				fclose(archivo);
+				free(bin_block);
+				free(cadena);
+		}
+	}
 
-		return cadenaCompleta;
+	return cadenaCompleta;
 }
 void sobrescribirLineas(char* path,char* nuevalinea,int len){
 	FILE* f_block;
@@ -507,37 +506,39 @@ void sobrescribirLineas(char* path,char* nuevalinea,int len){
 
 char* contenido_de_Bloques_con_mmap(char** bloques){
 	char* cadenaCompleta=string_new();
-			FILE* archivo;
-			int file_size;
-			char* cadena;
-			char* bin_block;
 
-			int cantbloques=cant_elemetos_array(bloques);
+	FILE* archivo;
+	int file_size;
+	char* cadena;
+	char* bin_block;
 
-				if(cantbloques>0){
-					for(int x=0;x<cantbloques;x++){
+	int cantbloques=cant_elemetos_array(bloques);
 
-					bin_block = string_new();
-					string_append(&bin_block,paths_estructuras[BLOCKS]);
-					string_append(&bin_block,bloques[x]);
-					string_append(&bin_block,".bin");
+	if(cantbloques>0){
+		for(int x=0;x<cantbloques;x++){
 
-					archivo=fopen(bin_block,"rb+");
+		bin_block = string_new();
+		string_append(&bin_block,paths_estructuras[BLOCKS]);
+		string_append(&bin_block,bloques[x]);
+		string_append(&bin_block,".bin");
 
-					fseek(archivo, 0, SEEK_END);
-					file_size = ftell(archivo);
-					fseek(archivo, 0, SEEK_SET);
+		archivo=fopen(bin_block,"rb+");
 
-					cadena=(char*)mmap(NULL,sizeof(char)*file_size,PROT_READ | PROT_WRITE | PROT_EXEC,MAP_SHARED,fileno(archivo),0);
+		fseek(archivo, 0, SEEK_END);
+		file_size = ftell(archivo);
+		fseek(archivo, 0, SEEK_SET);
 
-					string_append(&cadenaCompleta,cadena);
+		cadena=(char*)mmap(NULL,sizeof(char)*file_size,PROT_READ | PROT_WRITE | PROT_EXEC,MAP_SHARED,fileno(archivo),0);
+
+		string_append(&cadenaCompleta,cadena);
 
 
-					munmap(cadena,file_size);
-					fclose(archivo);
-					free(bin_block);
+		munmap(cadena,file_size);
+		fclose(archivo);
+		free(bin_block);
 
-					}
-				}
+		}
+	}
+
 	return cadenaCompleta;
 }

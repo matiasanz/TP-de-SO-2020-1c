@@ -20,10 +20,13 @@ void suscribir_y_escuchar_cola_get_pokemon(void (*callback)(t_id_cola, void*)) {
 }
 
 void get_pokemon_recibido(t_mensaje_get_pokemon* get_pokemon) {
-	pthread_t unHilo;
-	pthread_create(&unHilo, NULL,(void*) gamecard_Get_Pokemon, get_pokemon);
-	pthread_detach(unHilo);
-	// no borrar
+
+	pthread_mutex_lock(&mutexLogger);
 	mensaje_get_pokemon_log(logger, get_pokemon);
+	pthread_mutex_unlock(&mutexLogger);
+
+	pthread_t unHilo;
+	pthread_create(&unHilo, NULL,(void*) gamecard_procesar_Get_Pokemon, get_pokemon);
+	pthread_detach(unHilo);
 }
 

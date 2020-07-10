@@ -1,6 +1,6 @@
 #include "gamecard.h"
 
-void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
+void gamecard_New_Pokemon(t_mensaje_new_pokemon* mensajeNew){
 	    char* dir_unNuevoPokemon = string_new();
 		char* bin_metadata = string_new();
 
@@ -9,7 +9,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 		t_config* config_metadata_pokemon;
 
 		string_append(&dir_unNuevoPokemon,paths_estructuras[FILES]);
-		string_append(&dir_unNuevoPokemon,unMsjNewPoke->pokemon.especie);
+		string_append(&dir_unNuevoPokemon,mensajeNew->pokemon.especie);
 		mkdir(dir_unNuevoPokemon,0777);
 
 		string_append(&bin_metadata,dir_unNuevoPokemon);
@@ -20,18 +20,18 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 				pthread_mutex_lock(&mutDiccionarioSemaforos);
 				//este if es para cuando ya existe el pokemon en disco, pero no su mutex
-				if(!dictionary_has_key(semaforosDePokemons,unMsjNewPoke->pokemon.especie)){
+				if(!dictionary_has_key(semaforosDePokemons,mensajeNew->pokemon.especie)){
 
 					pthread_mutex_t* mutexMetadataPokemon=malloc(sizeof(pthread_mutex_t));
 					pthread_mutex_init(mutexMetadataPokemon, NULL);
-					dictionary_put(semaforosDePokemons,unMsjNewPoke->pokemon.especie,mutexMetadataPokemon);
+					dictionary_put(semaforosDePokemons,mensajeNew->pokemon.especie,mutexMetadataPokemon);
 
 				}
 				pthread_mutex_unlock(&mutDiccionarioSemaforos);
 
 				pthread_mutex_lock(&mutDiccionarioSemaforos);
 
-				pthread_mutex_t* pokeMut1=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+				pthread_mutex_t* pokeMut1=dictionary_get(semaforosDePokemons,mensajeNew->pokemon.especie);
 
 				pthread_mutex_unlock(&mutDiccionarioSemaforos);
 
@@ -49,7 +49,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 				pthread_mutex_lock(&mutDiccionarioSemaforos);
 
-				pthread_mutex_t* pokeMut2=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+				pthread_mutex_t* pokeMut2=dictionary_get(semaforosDePokemons,mensajeNew->pokemon.especie);
 
 				pthread_mutex_unlock(&mutDiccionarioSemaforos);
 
@@ -61,11 +61,11 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 			}else{
 				pthread_mutex_lock(&mutDiccionarioSemaforos);
 				//este if es para cuando ya existe el pokemon en disco, pero no su mutex
-				if(!dictionary_has_key(semaforosDePokemons,unMsjNewPoke->pokemon.especie)){
+				if(!dictionary_has_key(semaforosDePokemons,mensajeNew->pokemon.especie)){
 
 					pthread_mutex_t* mutexMetadataPokemon=malloc(sizeof(pthread_mutex_t));
 					pthread_mutex_init(mutexMetadataPokemon, NULL);
-					dictionary_put(semaforosDePokemons,unMsjNewPoke->pokemon.especie,mutexMetadataPokemon);
+					dictionary_put(semaforosDePokemons,mensajeNew->pokemon.especie,mutexMetadataPokemon);
 
 				}
 				pthread_mutex_unlock(&mutDiccionarioSemaforos);
@@ -82,7 +82,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 			pthread_mutex_lock(&mutDiccionarioSemaforos);
 
-			pthread_mutex_t* pokeMut3=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+			pthread_mutex_t* pokeMut3=dictionary_get(semaforosDePokemons,mensajeNew->pokemon.especie);
 
 			pthread_mutex_unlock(&mutDiccionarioSemaforos);
 
@@ -104,7 +104,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 			pthread_mutex_lock(&mutDiccionarioSemaforos);
 
-			pthread_mutex_t* pokeMut4=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+			pthread_mutex_t* pokeMut4=dictionary_get(semaforosDePokemons,mensajeNew->pokemon.especie);
 
 			pthread_mutex_unlock(&mutDiccionarioSemaforos);
 
@@ -122,15 +122,15 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 				pthread_mutex_lock(&mutexLogger);
 				log_error(logger,"El archivo pokemon esta abierto, esta operacion se reintentara luego: New_Pokemon ::%s ::pos (%i,%i)::cant %i"
-										,unMsjNewPoke->pokemon.especie
-										,unMsjNewPoke->pokemon.posicion.pos_x
-										,unMsjNewPoke->pokemon.posicion.pos_y
-										,unMsjNewPoke->cantidad);
+										,mensajeNew->pokemon.especie
+										,mensajeNew->pokemon.posicion.pos_x
+										,mensajeNew->pokemon.posicion.pos_y
+										,mensajeNew->cantidad);
 
 				pthread_mutex_unlock(&mutexLogger);
 
 				pthread_t unHilo;
-				pthread_create(&unHilo, NULL,(void*) gamecard_New_Pokemon_ReIntento, unMsjNewPoke);
+				pthread_create(&unHilo, NULL,(void*) gamecard_New_Pokemon_ReIntento, mensajeNew);
 				pthread_detach(unHilo);
 
 
@@ -153,8 +153,8 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 		//--------Comienzo a operar con el pokemon------------
 
 		char* cadenaABuscar=string_new();
-		char* stringPosX=string_itoa(unMsjNewPoke->pokemon.posicion.pos_x);
-		char* stringPosY=string_itoa(unMsjNewPoke->pokemon.posicion.pos_y);
+		char* stringPosX=string_itoa(mensajeNew->pokemon.posicion.pos_x);
+		char* stringPosY=string_itoa(mensajeNew->pokemon.posicion.pos_y);
 
 		string_append(&cadenaABuscar,stringPosX);
 		string_append(&cadenaABuscar,"-");
@@ -191,7 +191,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 					int cantActual=atoi(posYCant[1]);
 
-					int cantidadFinal=cantActual+unMsjNewPoke->cantidad;
+					int cantidadFinal=cantActual+mensajeNew->cantidad;
 					char* stringCantFinal=string_itoa(cantidadFinal);
 
 					string_append(&contenidoActualizadoDeBloques,posYCant[0]);
@@ -354,7 +354,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 			pthread_mutex_lock(&mutDiccionarioSemaforos);
 
-			pthread_mutex_t* pokeMut5=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+			pthread_mutex_t* pokeMut5=dictionary_get(semaforosDePokemons,mensajeNew->pokemon.especie);
 
 			pthread_mutex_unlock(&mutDiccionarioSemaforos);
 
@@ -370,7 +370,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 			pthread_mutex_lock(&mutDiccionarioSemaforos);
 
-			pthread_mutex_t* pokeMut6=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+			pthread_mutex_t* pokeMut6=dictionary_get(semaforosDePokemons,mensajeNew->pokemon.especie);
 
 			pthread_mutex_unlock(&mutDiccionarioSemaforos);
 
@@ -395,7 +395,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 				char* listaBloques=string_new();
 				int size;
-				char* nuevalinea=crearLinea(unMsjNewPoke);
+				char* nuevalinea=crearLinea(mensajeNew);
 				int longitud=string_length(nuevalinea);
 
 				int cantBloquesNecesarios=bloquesNecesarios(nuevalinea,config_get_int_value(config_metadata,"BLOCK_SIZE"));
@@ -485,7 +485,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 				pthread_mutex_lock(&mutDiccionarioSemaforos);
 
-				pthread_mutex_t* pokeMut7=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+				pthread_mutex_t* pokeMut7=dictionary_get(semaforosDePokemons,mensajeNew->pokemon.especie);
 
 				pthread_mutex_unlock(&mutDiccionarioSemaforos);
 
@@ -501,7 +501,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 				pthread_mutex_lock(&mutDiccionarioSemaforos);
 
-				pthread_mutex_t* pokeMut8=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+				pthread_mutex_t* pokeMut8=dictionary_get(semaforosDePokemons,mensajeNew->pokemon.especie);
 
 				pthread_mutex_unlock(&mutDiccionarioSemaforos);
 
@@ -521,7 +521,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 			}else{
 				//rama en donde el pokemon tiene bloques asignados
 
-				char* nuevalinea=crearLinea(unMsjNewPoke);
+				char* nuevalinea=crearLinea(mensajeNew);
 				int longitudCadenaNueva=string_length(nuevalinea);
 				char* pathBloque = string_new();
 				char* ultimoBloque=bloquesDelPokemon[cant_elemetos_array(bloquesDelPokemon)-1];
@@ -636,7 +636,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 				pthread_mutex_lock(&mutDiccionarioSemaforos);
 
-				pthread_mutex_t* pokeMut9=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+				pthread_mutex_t* pokeMut9=dictionary_get(semaforosDePokemons,mensajeNew->pokemon.especie);
 
 				pthread_mutex_unlock(&mutDiccionarioSemaforos);
 
@@ -651,7 +651,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 				pthread_mutex_lock(&mutDiccionarioSemaforos);
 
-				pthread_mutex_t* pokeMut10=dictionary_get(semaforosDePokemons,unMsjNewPoke->pokemon.especie);
+				pthread_mutex_t* pokeMut10=dictionary_get(semaforosDePokemons,mensajeNew->pokemon.especie);
 
 				pthread_mutex_unlock(&mutDiccionarioSemaforos);
 
@@ -678,16 +678,16 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 
 		pthread_mutex_lock(&mutexLogger);
 		log_info(logger,"pokemon guardado:%s ::pos (%i,%i)::cant %i"
-				,unMsjNewPoke->pokemon.especie
-				,unMsjNewPoke->pokemon.posicion.pos_x
-				,unMsjNewPoke->pokemon.posicion.pos_y
-				,unMsjNewPoke->cantidad);
+				,mensajeNew->pokemon.especie
+				,mensajeNew->pokemon.posicion.pos_x
+				,mensajeNew->pokemon.posicion.pos_y
+				,mensajeNew->cantidad);
 
 		pthread_mutex_unlock(&mutexLogger);
 		//creacion de  paquete appeared pokemon y envio a Broker
 
-		t_mensaje_appeared_catch_pokemon* mensajeAEnviar=mensaje_appeared_catch_pokemon_crear(unMsjNewPoke->pokemon.especie,unMsjNewPoke->pokemon.posicion.pos_x,unMsjNewPoke->pokemon.posicion.pos_y);
-		mensaje_appeared_catch_pokemon_set_id_correlativo(mensajeAEnviar,mensaje_new_pokemon_get_id(unMsjNewPoke));
+		t_mensaje_appeared_catch_pokemon* mensajeAEnviar=mensaje_appeared_catch_pokemon_crear(mensajeNew->pokemon.especie,mensajeNew->pokemon.posicion.pos_x,mensajeNew->pokemon.posicion.pos_y);
+		mensaje_appeared_catch_pokemon_set_id_correlativo(mensajeAEnviar,mensaje_new_pokemon_get_id(mensajeNew));
 
 		t_paquete_header header=paquete_header_crear(MENSAJE,GAMECARD,APPEARED_POKEMON, id_proceso);
 		t_buffer* bufferDepaquete=mensaje_appeared_catch_pokemon_serializar(mensajeAEnviar);
@@ -706,7 +706,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 		config_destroy(config_metadata_pokemon);
 		free(bin_metadata);
 		free(dir_unNuevoPokemon);
-		mensaje_new_pokemon_destruir(unMsjNewPoke);
+		mensaje_new_pokemon_destruir(mensajeNew);
 		mensaje_appeared_catch_pokemon_destruir(mensajeAEnviar);
 		paquete_destruir(paqueteAEnviar);
 

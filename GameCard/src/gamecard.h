@@ -57,11 +57,11 @@ void suscribir_y_escuchar_cola_new_pokemon();
 void crearEstructuras();
 void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke);
 void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke);
-void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke);
+void gamecard_procesar_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke);
 
 void gamecard_New_Pokemon_ReIntento(t_mensaje_new_pokemon* unMsjNewPoke);
 void gamecard_Catch_Pokemon_ReIntento(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke);
-void gamecard_Get_Pokemon_ReIntento(t_mensaje_get_pokemon* unMsjGetPoke);
+void gamecard_Get_Pokemon_reintento(t_mensaje_get_pokemon* unMsjGetPoke);
 
 int cant_elemetos_array(char** array);
 void split_liberar(char** split);
