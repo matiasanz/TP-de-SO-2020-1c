@@ -1,12 +1,13 @@
 # ifndef _MENSAJES_TEAM_
 # define _MENSAJES_TEAM_
 
-#include "../header_global_team.h"
-#include "../estructuras-principales/pokemon.h"
-#include "../../utils/mensajes-utils.h"
 #include <crenito-commons/mensajes/mensaje_localized_pokemon.h>
 #include <crenito-commons/mensajes/mensaje_caught_pokemon.h>
 #include <crenito-commons/mensajes/mensaje_appeared_catch_pokemon.h>
+
+#include "../dominio/header_global_team.h"
+#include "../dominio/estructuras-principales/pokemon.h"
+#include "mensajes-utils.h"
 
 typedef t_mensaje_appeared_catch_pokemon t_mensaje_appeared_pokemon;
 

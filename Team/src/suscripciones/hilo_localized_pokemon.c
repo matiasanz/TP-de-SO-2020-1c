@@ -5,7 +5,8 @@
  *      Author: C-renito Casero
  */
 
-#include "../hilos-de-comunicacion/hilo_localized_pokemon.h"
+#include "../suscripciones/hilo_localized_pokemon.h"
+
 #include "../team.h"
 
 void suscribir_y_escuchar_cola_localized_pokemon(void (*callback)(t_id_cola, void*)) {

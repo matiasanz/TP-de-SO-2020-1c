@@ -1,5 +1,5 @@
 #include "mensajes.h"
-#include "../../team.h"
+#include "../team.h"
 
 void* leer_mensaje_cuando_este_disponible(cr_list* unaLista){
 	return cr_list_wait_and_remove(unaLista, 0);

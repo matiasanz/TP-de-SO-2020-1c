@@ -5,8 +5,8 @@
  *      Author: utnso
  */
 
-#ifndef SRC_HILOS_DE_COMUNICACION_HILO_LOCALIZED_POKEMON_H_
-#define SRC_HILOS_DE_COMUNICACION_HILO_LOCALIZED_POKEMON_H_
+#ifndef SRC_SUSCRIPCIONES_HILO_LOCALIZED_POKEMON_H_
+#define SRC_SUSCRIPCIONES_HILO_LOCALIZED_POKEMON_H_
 
 #include <crenito-commons/conexiones/conexiones.h>
 
@@ -16,4 +16,4 @@ pthread_t hilo_localized_pokemon;
 void localized_pokemon_recibido(t_mensaje_localized_pokemon* localized_pokemon);
 void suscribir_y_escuchar_cola_localized_pokemon(void (*callback)(t_id_cola, void*));
 
-#endif /* SRC_HILOS_DE_COMUNICACION_HILO_LOCALIZED_POKEMON_H_ */
+#endif /* SRC_SUSCRIPCIONES_HILO_LOCALIZED_POKEMON_H_ */

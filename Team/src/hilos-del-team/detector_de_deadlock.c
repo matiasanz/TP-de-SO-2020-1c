@@ -1,5 +1,5 @@
 #include "detector_de_deadlock.h"
-#include "../../team.h"
+#include "../team.h"
 
 void team_ejecutar_algoritmo_de_deteccion_de_deadlock(){
 

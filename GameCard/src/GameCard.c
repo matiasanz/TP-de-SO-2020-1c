@@ -910,11 +910,9 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 		t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
 
 		pthread_mutex_lock(&envioPaquete);
-		t_conexion_server* unaConexion=conexion_server_crear(
-					config_get_string_value(config, "IP_BROKER"),
-					config_get_string_value(config, "PUERTO_BROKER"), GAMECARD);
+		int resultadoEnvio = enviar(conexion_broker, paqueteAEnviar);
 
-		if(enviar(unaConexion,paqueteAEnviar)==ERROR_SOCKET){
+		if(error_conexion(resultadoEnvio)){
 			log_warning(logger,"NO se puede realizar la conexion con el BROKER");
 		}
 
@@ -926,7 +924,6 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* unMsjNewPoke){
 		free(dir_unNuevoPokemon);
 		mensaje_new_pokemon_destruir(unMsjNewPoke);
 		mensaje_appeared_catch_pokemon_destruir(mensajeAEnviar);
-		conexion_server_destruir(unaConexion);
 		paquete_destruir(paqueteAEnviar);
 
 }
@@ -1363,9 +1360,11 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 
 	*/
 
-	if(enviar(conexion_broker,paqueteAEnviar)==ERROR_SOCKET){
+	int resultadoEnvio = enviar(conexion_broker,paqueteAEnviar);
+	if(error_conexion(resultadoEnvio)){
 		log_warning(logger,"NO se puede realizar la conexion con el BROKER");
 	}
+
 	pthread_mutex_unlock(&envioPaquete);
 
 	//----------------
@@ -1564,9 +1563,13 @@ void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
 							config_get_string_value(config, "IP_BROKER"),
 							config_get_string_value(config, "PUERTO_BROKER"), GAMECARD);
 	 */
-	if(enviar(conexion_broker,paqueteAEnviar)==ERROR_SOCKET){
+
+	int resultadoEnvio = enviar(conexion_broker,paqueteAEnviar);
+
+	if(error_conexion(resultadoEnvio)){
 		log_warning(logger,"NO se puede realizar la conexion con el BROKER");
 	}
+
 	pthread_mutex_unlock(&envioPaquete);
 
 	//----------------
@@ -1578,7 +1581,7 @@ void gamecard_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke){
 	paquete_destruir(paqueteAEnviar);
 	//si uso list_destroy_and_destroy_elements(listaDePosiciones, (void*) posicion_destruir)
 	//me dice en valgrind, free invalidos, puede que las posiciones
-	//hayan sido libereadas en el mensaje_localized_pokemon_destruir()
+	//hayan sido libereadas en el mensaje_localized_pokemon_destruir() <-- Confirmo.
 	list_destroy(listaDePosiciones);
 
 

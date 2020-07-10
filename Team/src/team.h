@@ -1,10 +1,8 @@
 # ifndef _TEAM_
 # define _TEAM_
 
-#include "dominio/header_global_team.h"
-
 #include <pthread.h>
-
+#include "dominio/header_global_team.h"
 #include "dominio/team_logs.h"
 
 #define CARPETA_CONFIG "config/"
@@ -52,14 +50,14 @@ char*num_array_to_string(numero*arreglo, int length);
 	numero PROCESOS_SIN_FINALIZAR;
 	numero TIEMPO_RECONEXION;
 
-/*Mis Listas (son variables globales, para que puedan acceder todos los hilos)*/
+//Listas
 	entrenadores equipo;
 	cola_entrenadores entrenadoresReady;
 	mapa_pokemones pokemonesRecibidos;
 	matriz_recursos objetivosGlobales;
-	matriz_recursos inventariosGlobales; //cambiar nombre por recursosDisponiblesGlobales
-	matriz_recursos recursosEnMapa; //cambiar nombre por recursosPorAdquirir o algo mas representativo
-	capturas_pendientes capturasPendientes; //cambiar tipo de dato por capturas_pendientes
+	matriz_recursos inventariosGlobales;
+	matriz_recursos recursosEnMapa;
+	capturas_pendientes capturasPendientes;
 	especies_pokemones historialDePokemones;
 	candidatos_intercambio potencialesDeadlock;
 	pthread_mutex_t mutexRepuestos;

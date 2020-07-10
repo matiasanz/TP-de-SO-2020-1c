@@ -4,7 +4,7 @@
 #include <semaphore.h>
 #include <commons/collections/list.h>
 
-#include "../dominio/estructuras-auxiliares/mensajes.h"
+#include "../utils/mensajes.h"
 #include "../dominio/estructuras-auxiliares/captura_pendiente.h"
 
 #define PROCESO_ACTIVO 1

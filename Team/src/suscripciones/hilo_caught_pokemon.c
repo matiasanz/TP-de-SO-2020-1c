@@ -5,7 +5,8 @@
  *      Author: utnso
  */
 
-#include "../hilos-de-comunicacion/hilo_caught_pokemon.h"
+#include "../suscripciones/hilo_caught_pokemon.h"
+
 #include "../team.h"
 
 void suscribir_y_escuchar_cola_caught_pokemon(void (*callback)(t_id_cola, void*)) {

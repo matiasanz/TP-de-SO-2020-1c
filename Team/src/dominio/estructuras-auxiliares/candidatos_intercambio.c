@@ -1,4 +1,5 @@
-#include "candidatos_intercambio.h"
+#include "../../dominio/estructuras-auxiliares/candidatos_intercambio.h"
+
 #include "../../dominio/team_logs.h"
 
 //******************************************************

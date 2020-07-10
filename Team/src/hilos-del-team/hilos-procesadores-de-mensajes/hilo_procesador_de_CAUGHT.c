@@ -1,6 +1,6 @@
 #include "../hilos_team.h"
 #include "../../team.h"
-#include "../../dominio/estructuras-auxiliares/mensajes.h"
+#include "../../utils/mensajes.h"
 
 void pokemon_localizar_en_mapa(pokemon*pokemonCatcheado);
 

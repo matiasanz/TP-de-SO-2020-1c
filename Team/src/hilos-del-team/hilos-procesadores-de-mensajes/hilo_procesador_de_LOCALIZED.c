@@ -1,6 +1,6 @@
 #include "../hilos_team.h"
 #include "../../team.h"
-#include "../../dominio/estructuras-auxiliares/mensajes.h"
+#include "../../utils/mensajes.h"
 
 void team_procesador_cola_LOCALIZED(cr_list* mensajes){
 
