@@ -49,3 +49,8 @@ void log_event_fin_de_suscripcion_a_cola(int tiempo_conexion,	char* cola_mensaje
 			, cola_mensaje_string
 			, tiempo_conexion);
 }
+
+void log_event_parametro_incorrecto(char* tipo_error, char* contenido) {
+	log_error(event_logger, "El %s %s  es inválido. Finalizando gameboy", tipo_error, contenido);
+}
+

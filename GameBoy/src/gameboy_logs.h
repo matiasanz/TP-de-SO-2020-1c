@@ -17,5 +17,6 @@ void log_event_intento_de_suscripcion_a_cola(char* cola, char* tiempo_conexion);
 void log_event_intento_fallido_de_conexion(char*cola);
 void log_event_perdida_de_conexion_a_cola(char*cola);
 void log_event_fin_de_suscripcion_a_cola(int tiempo_conexion, char* cola_mensaje_string);
+void log_event_parametro_incorrecto(char* tipo_error, char* contenido);
 
 # endif

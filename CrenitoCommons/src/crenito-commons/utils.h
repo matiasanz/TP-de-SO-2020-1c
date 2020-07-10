@@ -76,4 +76,16 @@ int error_conexion(int indicador_conexion);
 t_tipo_proceso get_tipo_proceso(char* proceso);
 t_id_cola get_id_mensaje(char* mensaje);
 
+void log_info_and_destroy(t_log* un_logger, char* string);
+void log_warning_and_destroy(t_log* un_logger, char* string);
+
+// Logs Adicionales
+
+// Logs Errores
+void log_warning_socket(int socket, char* operacion);
+void log_error_cola(int id_cola);
+void log_warning_suscripcion(t_id_cola id_cola);
+void log_warning_conexion_perdida(t_id_cola id_cola);
+void log_warning_broker_desconectado(t_id_cola id_cola);
+
 #endif /* UTILS_H_ */

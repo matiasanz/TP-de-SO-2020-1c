@@ -42,7 +42,6 @@ void log_inicio_proceso();
 void log_error_atender_cliente(int socket, t_paquete_header header);
 void log_error_conexion_proceso();
 void log_error_inicio_proceso();
-void log_error_cola(int id_cola);
 void log_error_get_suscriptores(uint32_t id_mensaje);
 void log_warning_envio_mensaje(uint32_t id_mensaje, uint32_t id_suscriptor);
 

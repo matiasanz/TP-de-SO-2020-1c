@@ -40,8 +40,7 @@ char* get_nombre_cola(t_id_cola id_cola) {
 	case LOCALIZED_POKEMON:
 		return LOCALIZED_POKEMON_STRING;
 	default:
-		log_error(event_logger, "No existe el tipo de cola: %d", 
-		id_cola);
+		log_error_cola(id_cola);
 		return NULL;
 	}
 }
@@ -55,8 +54,7 @@ void string_append_separador(char** string, char* texto) {
 
 char* get_separador_string(char* texto) {
 
-	return string_from_format(" \n *************   %s   ************* \n",
-			texto);
+	return string_from_format(" \n *************   %s   ************* \n", texto);
 }
 
 int error_conexion(int indicador_conexion) {
@@ -67,44 +65,43 @@ int conexion_exitosa(int indicador_conexion) {
 	return !error_conexion(indicador_conexion);
 }
 
-t_tipo_proceso get_tipo_proceso(char* proceso_string){
+void log_info_and_destroy(t_log* un_logger, char* string) {
 
-	if(strcmp(proceso_string,BROKER_STRING)==0){
-		return BROKER;
-	}
-	if(strcmp(proceso_string,TEAM_STRING)==0){
-		return TEAM;
-	}
-	if(strcmp(proceso_string,GAMECARD_STRING)==0){
-		return GAMECARD;
-	}
-	if(strcmp(proceso_string,GAMEBOY_STRING)==0){
-		return GAMEBOY;
-	}
-	log_error(event_logger,"este proceso no es conocido %s",proceso_string);
-	return 0;
+	log_info(un_logger, string);
+	free(string);
 }
 
-t_id_cola get_id_mensaje(char* mensaje){
+void log_warning_and_destroy(t_log* un_logger, char* string) {
 
-	if(strcmp(mensaje,NEW_POKEMON_STRING)==0){
-		return NEW_POKEMON;
-	}
-	if(strcmp(mensaje,APPEARED_POKEMON_STRING)==0){
-		return APPEARED_POKEMON;
-	}
-	if(strcmp(mensaje,CATCH_POKEMON_STRING)==0){
-		return CATCH_POKEMON;
-	}
-	if(strcmp(mensaje,CAUGHT_POKEMON_STRING)==0){
-		return CAUGHT_POKEMON;
-	}
-	if(strcmp(mensaje,GET_POKEMON_STRING)==0){
-		return GET_POKEMON;
-	}
-	if(strcmp(mensaje,LOCALIZED_POKEMON_STRING)==0){
-		return LOCALIZED_POKEMON;
-	}
-	log_error(event_logger,"este mensaje no es conocido %s",mensaje);
-	return 0;
+	log_warning(un_logger, string);
+	free(string);
+}
+
+//Logs Adicionales
+
+//Logs Errores
+void log_warning_socket(int socket, char* operacion){
+	log_warning(event_logger,
+				"Error al realizar la operación %s, socket: %d", operacion, socket);
+}
+
+void log_error_cola(int id_cola) {
+	log_error(event_logger, "No existe la cola: %d. Finalizando hilo", id_cola);
+	pthread_exit(NULL);
+}
+
+void log_warning_suscripcion(t_id_cola id_cola) {
+	log_warning(event_logger, "No se pudo conectar al proceso %s, cancelando subscripción %s \n",
+	BROKER_STRING, get_nombre_cola(id_cola));
+
+}
+
+void log_warning_conexion_perdida(t_id_cola id_cola) {
+	log_warning(event_logger, "Se perdió la conexión con el %s, cancelando escucha sobre la cola %s",
+	BROKER_STRING, get_nombre_cola(id_cola));
+}
+
+void log_warning_broker_desconectado(t_id_cola id_cola) {
+	log_warning(event_logger, "el %s está desconectado, cancelando subscripción %s",
+	BROKER_STRING, get_nombre_cola(id_cola));
 }

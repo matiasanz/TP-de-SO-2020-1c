@@ -8,8 +8,6 @@
 #include "broker_utils.h"
 
 static void log_proceso(char* header_string, t_paquete_header header);
-static void log_info_and_destroy(t_log* un_logger, char* string);
-static void log_warning_and_destroy(t_log* un_logger, char* string);
 static void string_append_mensaje_serializado(char** string, t_id_cola id_cola, void* msj_recibido);
 static void string_append_cola(char** string, t_id_cola id_cola);
 static void log_envio_mensaje(char* header_string, uint32_t id_mensaje, uint32_t id_suscriptor);
@@ -98,11 +96,6 @@ void log_error_inicio_proceso() {
 	BROKER_STRING);
 }
 
-void log_error_cola(int id_cola) {
-	log_error(event_logger, "No existe la cola: %d. Finalizando hilo", id_cola);
-	pthread_exit(NULL);
-}
-
 void log_error_get_suscriptores(uint32_t id_mensaje) {
 	log_error(event_logger, "Error al obtener suscriptores asociados al mensaje con id: %d\n", id_mensaje);
 }
@@ -123,17 +116,6 @@ static void log_proceso(char* header_string, t_paquete_header header) {
 	string_append_with_format(&string, " id proceso: %d \n", header.id_proceso);
 	string_append_with_format(&string, " tipo: %s \n", get_nombre_proceso(header.tipo_proceso));
 	log_info_and_destroy(logger, string);
-}
-
-static void log_info_and_destroy(t_log* un_logger, char* string) {
-
-	log_info(un_logger, string);
-	free(string);
-}
-
-static void log_warning_and_destroy(t_log* un_logger, char* string) {
-	log_warning(un_logger, string);
-	free(string);
 }
 
 static void string_append_mensaje_serializado(char** string, t_id_cola id_cola, void* msj_recibido) {
