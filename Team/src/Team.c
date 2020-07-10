@@ -11,9 +11,14 @@
 #include "hilos-del-team/hilos_team.h"
 //#include "tests/tests_team.o"
 
-int main(void) {
 
-	team_inicializar();
+char* team_get_nombre(int cantidad, char**argumentos){
+	return cantidad>1? argumentos[1]: "";
+}
+
+int main(int cantidad, char**argumentos ) {
+
+	team_inicializar(cantidad, argumentos);
 
 	Get_pokemones(objetivosGlobales, inventariosGlobales);
 
@@ -39,9 +44,13 @@ int main(void) {
 
 						/*Implementacion de funciones*/
 
-void team_inicializar(){
+void team_inicializar(int cantidad, char**argumentos){
 
-	inicializar_logs_y_config();
+	char*NombreEquipo = team_get_nombre(cantidad, argumentos);
+
+	inicializar_config(NombreEquipo);
+
+	inicializar_logs();
 
 	inicializar_listas();
 
@@ -54,14 +63,8 @@ void team_inicializar(){
  	inicializar_semaforos();
 
 	log_info(logger, "\n\n*************************************************************************\n"
-         		     "                        Inicio del proceso Team\n\n");
+         		     "                        Inicio del proceso Team %s\n\n", NombreEquipo);
 	inicializar_conexiones();
-
-	bool inicio_exitoso = config && event_logger ;
-	if(!inicio_exitoso){
-		error_show("algo malio sal en el inicio :(");
-		exit(1);
-	}
 
 	sleep(1); //
 
@@ -84,11 +87,24 @@ int team_exit(){
 /***********************************Funciones auxiliares *************************************/
 
 //Logs y config
-void inicializar_logs_y_config(){
-	config=config_create(CONFIG_PATH);
-	char*TEAM_LOG_PATH = config_get_string_value(config,"LOG_FILE");
-	logger=log_create(TEAM_LOG_PATH,"TEAM",true,LOG_LEVEL_INFO);
-	event_logger = log_create("log/team_event.log", "TEAM_EVENT", true, LOG_LEVEL_INFO);
+void inicializar_logs(){
+	logger = log_crear("TEAM", "LOG_PATH");
+	event_logger = log_crear("TEAM_EVENT", "LOG_EVENT_PATH");
+}
+
+void inicializar_config(char* NombreEquipo){
+	char* CONFIG_PATH = string_from_format("%steam%s.config", CARPETA_CONFIG, NombreEquipo);
+
+		config=config_create(CONFIG_PATH);
+
+		if(!config){
+
+			error_show("No se encontro el archivo <<%s>>", CONFIG_PATH);
+		    free(CONFIG_PATH);
+			exit(1);
+		}
+
+    free(CONFIG_PATH);
 }
 
 void finalizar_logs_y_config(){

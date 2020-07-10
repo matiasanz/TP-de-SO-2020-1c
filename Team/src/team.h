@@ -7,14 +7,15 @@
 
 #include "dominio/team_logs.h"
 
-#define CONFIG_PATH "config/team.config"
+#define CARPETA_CONFIG "config/"
 
 //funciones del team
 void team_inicializar();
 int team_exit();
 
 //funciones auxiliares
-void inicializar_logs_y_config();
+void inicializar_config(char* NombreEquipo);
+void inicializar_logs();
 void finalizar_logs_y_config();
 
 void inicializar_listas();

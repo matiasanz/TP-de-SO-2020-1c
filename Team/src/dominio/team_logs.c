@@ -1,6 +1,13 @@
 #include "team_logs.h"
 #include "../team.h"
 
+t_log* log_crear(char* PROPOSITO, char*KEY){
+	char*LOG_PATH = config_get_string_value(config, PROPOSITO);
+	return log_create(LOG_PATH,PROPOSITO,true,LOG_LEVEL_INFO);
+}
+
+//*********************************************************************
+
 void log_enunciado_entrenador_creado(entrenador* unEntrenador){
 
 	char*posicion = posicion_to_string(unEntrenador->posicion);

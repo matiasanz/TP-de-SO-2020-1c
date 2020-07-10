@@ -16,6 +16,9 @@
 	pthread_mutex_t Mutex_AndoLoggeando;
 	pthread_mutex_t Mutex_AndoLoggeandoEventos;
 
+//Constructor
+	t_log* log_crear(char* PROPOSITO, char*KEY);
+
 //Logs del enunciado
 	void log_enunciado_entrenador_creado(entrenador*); //Seria el estado NEW
 	void log_enunciado_cambio_de_cola(entrenador*, t_estado actual, t_estado final, const char* motivo);
