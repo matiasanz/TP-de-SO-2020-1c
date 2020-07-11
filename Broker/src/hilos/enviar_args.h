@@ -15,9 +15,18 @@
 typedef struct {
 	t_mensaje_cache* msj_cache;
 	t_suscriptor* suscriptor;
-} t_enviar_args;
+} t_enviar_mensaje_args;
 
-t_enviar_args* enviar_args_crear(t_mensaje_cache* msj, t_suscriptor* suscriptor);
-void enviar_args_destruir(t_enviar_args* args);
+typedef struct {
+	uint32_t id_mensaje;
+	int id_socket;
+	t_paquete_header header;
+} t_enviar_id_mensaje_args;
+
+t_enviar_mensaje_args* enviar_mensaje_args_crear(t_mensaje_cache* msj, t_suscriptor* suscriptor);
+void enviar_mensaje_args_destruir(t_enviar_mensaje_args* args);
+
+t_enviar_id_mensaje_args* enviar_id_mensaje_args_crear(uint32_t id_mensaje, int id_socket, t_paquete_header header);
+void enviar_id_mensaje_args_destruir(t_enviar_id_mensaje_args* args);
 
 #endif /* SRC_HILOS_ENVIAR_ARGS_H_ */

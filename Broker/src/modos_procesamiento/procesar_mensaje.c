@@ -17,13 +17,11 @@ void procesar_mensaje(int socket, t_paquete_header header) {
 
 	t_mensaje_cache* msj_cache = guardar_en_memoria(msj_recibido, header.id_cola);
 
+	crear_hilo_y_enviar_id_univoco(mensaje_cache_get_id_cola(msj_cache), socket, header);
+
 	t_cola_container* container = get_cola(header.id_cola);
 
 	encolar_mensaje(container, msj_cache);
-
-	//TODO sacar esto a una funcion
-	int id_mensaje = mensaje_cache_get_id(msj_cache);
-	socket_send(socket, &id_mensaje, sizeof(id_mensaje));
 
 	replicar_mensaje(container, msj_cache);
 }

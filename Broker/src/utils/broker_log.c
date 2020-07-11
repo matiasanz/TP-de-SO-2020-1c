@@ -114,6 +114,11 @@ void log_warning_envio_mensaje(uint32_t id_mensaje, uint32_t id_suscriptor) {
 	log_warning_and_destroy(event_logger, string);
 }
 
+void log_error_enviar_id_mensaje(uint32_t id_mensaje, t_paquete_header header) {
+	log_error(event_logger, "Se produjo un error al enviar el id de mensaje: %d al proceso %s con id_proceso: \n",
+			id_mensaje, get_nombre_proceso(header.tipo_proceso), header.id_proceso);
+}
+
 // Funciones Privadas
 static void log_proceso(char* header_string, t_paquete_header header) {
 

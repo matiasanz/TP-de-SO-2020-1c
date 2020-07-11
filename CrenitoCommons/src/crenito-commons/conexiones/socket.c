@@ -90,11 +90,14 @@ int socket_crear_listener(char* ip, char* puerto) {
 	return socket;
 }
 
-void socket_send(int socket, void* mensaje, int bytes) {
+int socket_send(int socket, void* mensaje, int bytes) {
 
 	if (error_conexion(send(socket, mensaje, bytes, MSG_WAITALL))) {
 		manejar_error_socket(socket, "send");
+		return ERROR_SOCKET;
 	}
+
+	return EXIT_SUCCESS;
 }
 
 void socket_cerrar(int socket) {

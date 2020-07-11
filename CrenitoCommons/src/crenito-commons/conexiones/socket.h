@@ -26,7 +26,7 @@ int socket_connect(int socket, struct addrinfo* info);
 int socket_create(struct addrinfo* info);
 void socket_configurar(char* ip, char* puerto, socket_type tipo, struct addrinfo **servinfo);
 
-void socket_send(int socket, void* mensaje, int bytes);
+int socket_send(int socket, void* mensaje, int bytes);
 void socket_cerrar(int socket);
 //Crea un socket de escucha,usando las funciones de construcción de sockets
 int socket_crear_listener(char* ip, char* puerto);
