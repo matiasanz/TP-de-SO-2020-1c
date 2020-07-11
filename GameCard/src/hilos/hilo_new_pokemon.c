@@ -20,9 +20,15 @@ void suscribir_y_escuchar_cola_new_pokemon(void (*callback)(t_id_cola, void*)) {
 }
 
 void new_pokemon_recibido(t_mensaje_new_pokemon* new_pokemon) {
+	mensaje_new_pokemon_log(logger, new_pokemon);
+	// no borrar
+
 	pthread_t unHilo;
 	pthread_create(&unHilo, NULL,(void*) gamecard_New_Pokemon, new_pokemon);
 	pthread_detach(unHilo);
-	// no borrar
-	mensaje_new_pokemon_log(logger, new_pokemon);
+}
+
+void gamecard_New_Pokemon_Reintento(t_mensaje_new_pokemon* unMsjNewPoke){
+	sleep(TIEMPO_REINTENTO_OPERACION);
+	gamecard_New_Pokemon(unMsjNewPoke);
 }

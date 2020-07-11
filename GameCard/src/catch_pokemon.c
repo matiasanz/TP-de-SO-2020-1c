@@ -1,4 +1,10 @@
 #include "gamecard.h"
+#include "mensajesGamecard.h"
+
+void gamecard_Catch_Pokemon_ReIntento(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
+	sleep(TIEMPO_REINTENTO_OPERACION);
+	gamecard_Catch_Pokemon(unMsjCatchPoke);
+}
 
 void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 
@@ -20,7 +26,7 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 		pokemonAtrapado=0;
 
 		//retardo para simular acceso a disco
-		sleep(tiempo_retardo_operacion);
+		simular_acceso_a_disco();
 
 		pthread_mutex_lock(&mutexLogger);
 
@@ -173,7 +179,7 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 					free(stringCantidadFinal);
 					}
 
-					split_liberar(posYCant);
+					string_array_liberar(posYCant);
 
 				}else{
 
@@ -273,7 +279,7 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 				string_append(&listaBloques,"]");
 
 
-				split_liberar(arrayBloqueActualizado);
+				string_array_liberar(arrayBloqueActualizado);
 				free(nroDebloquesActualizado);
 
 			}else{
@@ -333,7 +339,7 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 			char* stringSize=string_itoa(size);
 
 			//retardo para simular acceso a disco
-			sleep(tiempo_retardo_operacion);
+			simular_acceso_a_disco();
 
 			pthread_mutex_lock(&mutDiccionarioSemaforos);
 
@@ -373,7 +379,7 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 			pokemonAtrapado=0;
 
 			//retardo para simular acceso a disco
-			sleep(tiempo_retardo_operacion);
+			simular_acceso_a_disco();
 
 
 			pthread_mutex_lock(&mutDiccionarioSemaforos);
@@ -409,7 +415,7 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 		free(cadenaABuscar);
 		free(stringPosX);
 		free(stringPosY);
-		split_liberar(bloquesDelPokemon);
+		string_array_liberar(bloquesDelPokemon);
 		config_destroy(config_metadata_pokemon);
 
 	}
