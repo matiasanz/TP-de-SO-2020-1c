@@ -2,6 +2,10 @@
 #include "mensajesGamecard.h"
 #include <crenito-commons/mensajes/mensaje_new_pokemon.h>
 
+char*posicion_dar_formato(t_posicion posicion){
+	return string_from_format("%u-%u", posicion.pos_x, posicion.pos_y);
+}
+
 void gamecard_New_Pokemon(t_mensaje_new_pokemon* mensajeNew){
 
 	char* especie = mensajeNew->pokemon.especie;
@@ -35,14 +39,14 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* mensajeNew){
 		return;
 	}
 
-	pthread_mutex_unlock(mutexPokemon);
-
 	char** bloquesDelPokemon=config_get_array_value(config_metadata_pokemon,"BLOCKS");
+
+	pthread_mutex_unlock(mutexPokemon);
 
 
 	//--------Comienzo a operar con el pokemon------------
 
-	char* stringDePosicion=string_from_format("%u-%u", mensajeNew->pokemon.posicion.pos_x, mensajeNew->pokemon.posicion.pos_y);
+	char* stringDePosicion = posicion_dar_formato(mensajeNew->pokemon.posicion);
 
 	if(contienePosicionEnBloques(stringDePosicion,bloquesDelPokemon)){
 
@@ -62,7 +66,6 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* mensajeNew){
 	//------------------------
 	string_array_liberar(bloquesDelPokemon);
 	config_destroy(config_metadata_pokemon);
-	free(dir_metadata);
 
 	mensaje_new_pokemon_destruir(mensajeNew);
 }
@@ -287,12 +290,10 @@ void agregar_nueva_linea(t_config* config_metadata_pokemon, char**bloquesDelPoke
 		char* stringSize=string_itoa(size);
 
 		//retardo para simular acceso a disco
-		sleep(TIEMPO_RETARDO_OPERACION);
+		simular_acceso_a_disco();
 
 		pthread_mutex_lock(&mutDiccionarioSemaforos);
-
 		pthread_mutex_t* mutexPokemon=dictionary_get(semaforosDePokemons,mensajeNew->pokemon.especie);
-
 		pthread_mutex_unlock(&mutDiccionarioSemaforos);
 
 		pthread_mutex_lock(mutexPokemon);
@@ -515,7 +516,9 @@ char*pokemon_find_carpeta(char*especie){
 char* pokemon_find_metadata(char*especie){
 
 	char*carpeta = pokemon_find_carpeta(especie);
-	char*metadata = string_from_format("%s%s", carpeta, "/Metadata.bin");
+	printf("carpeta: %s\n", carpeta);
+	char*metadata = string_from_format("%s/Metadata.bin", carpeta);
+	printf("Metadata: %s\n", metadata);
 	free(carpeta);
 
 	return metadata;

@@ -1,5 +1,5 @@
 # ifndef _MENSAJES_GAMECARD_
-# define _MENSAJES_GAMECARD_
+# define _MENSAJES_GAMECARD_ //nombre provisorio
 
 #include "gamecard.h"
 
