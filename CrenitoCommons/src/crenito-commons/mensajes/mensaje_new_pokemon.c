@@ -152,8 +152,7 @@ t_mensaje_new_pokemon* mensaje_new_pokemon_restaurar_desde_cache(void* cache, t_
 void mensaje_new_pokemon_log(t_log* un_logger, t_mensaje_new_pokemon* new_pokemon) {
 
 	char* to_string = mensaje_new_pokemon_to_string(new_pokemon);
-	log_info(un_logger, to_string);
-	free(to_string);
+	log_info_and_destroy(un_logger, to_string);
 }
 
 char* mensaje_new_pokemon_to_string(t_mensaje_new_pokemon* new_pokemon) {

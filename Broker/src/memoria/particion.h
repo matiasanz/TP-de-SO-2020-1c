@@ -46,8 +46,8 @@ void particion_recalcular_direcciones(t_particion* particion, uint32_t nueva_bas
 
 // Log
 char* particion_to_string(t_particion* particion);
-void  particion_log_almacenamiento(t_log* un_logger, t_particion* particion);
-void  particion_log_eliminacion(t_log* un_logger, t_particion* particion);
+void  particion_log_almacenamiento(t_log* un_logger, t_particion* particion); // 6. Almacenado de un mensaje dentro de la memoria (indicando posición de inicio de su partición).
+void  particion_log_eliminacion(t_log* un_logger, t_particion* particion); // 7. Eliminado de una partición de memoria (indicado la posición de inicio de la misma).
 
 //Getters
 uint32_t particion_get_tamanio(t_particion* particion);

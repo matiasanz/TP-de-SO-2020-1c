@@ -99,21 +99,20 @@ void suscribir_y_escuchar_cola(t_conexion* args) {
 	int estado_subscripcion = suscribir(args->server, args->cliente);
 	pthread_mutex_unlock(&mutex_subscripcion);
 
-	//TO-DO reconectar
-	if (error_conexion(estado_subscripcion))
-		log_warning(logger, "No se pudo conectar al proceso %s, cancelando subscripción %s",
-								BROKER_STRING, get_nombre_cola(args->cliente->id_cola));
-		return;
-
 	t_conexion_cliente* cliente = args->cliente;
+
+	//TO-DO reconectar
+	if (error_conexion(estado_subscripcion)) {
+		log_warning_suscripcion(cliente->id_cola);
+		return;
+	}
+
 	t_suscriptor* suscriptor = cliente->suscriptor;
 
 	while (1) {
 
-		if (error_conexion(recibir(suscriptor->socket, cliente->callback))) {
-
-			log_warning(logger, "Se perdió la conexión con el %s, cancelando escucha sobre la cola %s",
-					BROKER_STRING, get_nombre_cola(cliente->id_cola));
+		if (error_conexion(recibir(suscriptor_get_socket(suscriptor), cliente->callback))) {
+			log_warning_conexion_perdida(cliente->id_cola);
 			break;
 		};
 
@@ -140,20 +139,19 @@ void conectar_y_escuchar_gameboy(t_conexion_host* gameboy) {
 
 int suscribir(t_conexion_server* server, t_conexion_cliente* cliente) {
 
-	cliente->suscriptor->socket = socket_crear_client(server->ip, server->puerto);
+	int socket = socket_crear_client(server->ip, server->puerto);
+	suscriptor_set_socket(cliente -> suscriptor, socket);
 
 	//TO-DO reconectar
-	if (error_conexion(cliente->suscriptor->socket)) {
-		log_warning(logger, "el %s está desconectado, cancelando subscripción %s"
-						  , BROKER_STRING, get_nombre_cola(cliente->id_cola));
-
+	if (error_conexion(suscriptor_get_socket(cliente->suscriptor))) {
+		log_warning_broker_desconectado(cliente->id_cola);
 		return ERROR_SOCKET;
 	}
 
 	t_paquete_header pqt = paquete_header_crear(SUSCRIPCION,
-			server->tipo_proceso, cliente->id_cola, cliente ->suscriptor ->id_subcriptor);
+			server->tipo_proceso, cliente->id_cola, suscriptor_get_id_proceso(cliente ->suscriptor));
 
-	return handshake(cliente->suscriptor->socket, &pqt, sizeof(t_paquete_header));
+	return handshake(socket, &pqt, sizeof(t_paquete_header));
 }
 
 int recibir(int socket, void (*callback)(t_id_cola, void*)) {

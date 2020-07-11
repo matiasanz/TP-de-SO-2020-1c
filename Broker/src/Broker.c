@@ -73,9 +73,7 @@ void atender_cliente(int* socket) {
 		break;
 	}
 	default:
-		log_error(event_logger,
-				"El codigo de operacion %d recibido desde el socket: %d por el proceso %s es incorrecto \n",
-				header.codigo_operacion, *socket, get_nombre_proceso(header.tipo_proceso));
+		log_error_atender_cliente(*socket, header);
 	}
 
 	pthread_exit(NULL);
@@ -91,22 +89,20 @@ void inicializar_servidor() {
 
 static void validar_header(t_paquete_header header) {
 
-	if (header.codigo_operacion == ERROR_SOCKET) {
-		log_error(event_logger, "Error al recibir el header del mensaje, finalizando hilo \n");
+	if (error_conexion(header.codigo_operacion)) {
+		log_error_conexion_proceso();
 		pthread_exit(NULL);
 	} else {
-		log_info(logger, "Un proceso %s con id %d se conectó correctamente al %s \n",
-				get_nombre_proceso(header.tipo_proceso), header.id_proceso,
-				BROKER_STRING);
+		log_conexion_proceso(header);
 	}
 }
 
 static void validar_socket(int socket_servidor) {
 
 	if (error_conexion(socket_servidor)) {
-		log_error(event_logger, "Se produjo un error de conexion al iniciar el %s \n", BROKER_STRING);
+		log_error_inicio_proceso();
 		exit(EXIT_FAILURE);
 	}
 
-	log_info(event_logger, "%s iniciado exitosamente \n", BROKER_STRING);
+	log_inicio_proceso();
 }

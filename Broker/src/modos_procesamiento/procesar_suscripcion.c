@@ -16,10 +16,8 @@ void procesar_suscripcion(int socket, t_paquete_header header) {
 	t_cola_container* container = get_cola(header.id_cola);
 	t_suscriptor* suscriptor = suscribir_proceso(socket, header.id_proceso, container);
 
-	uint32_t id_suscriptor = suscriptor->id_subcriptor;
-	//TODO: sacar este log a broker_utils
-	log_info(logger, "Un proceso %s con id %d se suscribió a la cola %s \n",
-			get_nombre_proceso(header.tipo_proceso), header.id_proceso, get_nombre_cola(header.id_cola));
+	uint32_t id_suscriptor = suscriptor->id_proceso;
+	log_nuevo_suscriptor(header);
 
 	socket_send(socket, &id_suscriptor, sizeof(id_suscriptor));
 
@@ -49,7 +47,7 @@ static void enviar_mensajes_cacheados(t_cola_container* container, t_suscriptor*
 
 	void enviar(t_mensaje_cache* msj) {
 		mensaje_cache_agregar_suscriptor(msj, suscriptor, ENVIADO);
-		crear_hilo_y_enviar_mensaje_a_suscriptor(msj, suscriptor);
+		crear_hilo_y_enviar_mensaje_a_suscriptor(msj, suscriptor_duplicar(suscriptor));
 	}
 
 	list_iterate(a_enviar, (void*) enviar);
