@@ -112,7 +112,7 @@ context (test_conexiones) {
 
 				conexion_catch_pokemon = conexion_cliente_crear(cola_esperada, 1,
 						0,
-						(void*)assert_mensaje_recibido_thread);
+						(void*)assert_mensaje_recibido);
 
 				t_conexion* args = conexion_crear(conexion_broker,
 						conexion_catch_pokemon);
@@ -142,7 +142,7 @@ context (test_conexiones) {
 
 				conexion_get_pokemon = conexion_cliente_crear(cola_esperada, 1,
 						0,
-						(void*)assert_mensaje_recibido_thread);
+						(void*)assert_mensaje_recibido);
 
 				t_conexion* args = conexion_crear(conexion_broker,
 						conexion_get_pokemon);
@@ -173,7 +173,7 @@ context (test_conexiones) {
 
 				conexion_new_pokemon = conexion_cliente_crear(cola_esperada,1,
 						0,
-						(void*)assert_mensaje_recibido_thread);
+						(void*)assert_mensaje_recibido);
 
 				t_conexion* args = conexion_crear(conexion_broker,
 						conexion_new_pokemon);
@@ -205,7 +205,7 @@ context (test_conexiones) {
 
 				conexion_appeared_pokemon = conexion_cliente_crear(cola_esperada,1,
 						0,
-						(void*)assert_mensaje_recibido_thread);
+						(void*)assert_mensaje_recibido);
 
 				t_conexion* args = conexion_crear(conexion_broker,
 						conexion_appeared_pokemon);
@@ -236,7 +236,7 @@ context (test_conexiones) {
 
 				conexion_localized_pokemon = conexion_cliente_crear(cola_esperada,1,
 						0,
-						(void*)assert_mensaje_recibido_thread);
+						(void*)assert_mensaje_recibido);
 
 				t_conexion* args = conexion_crear(conexion_broker,
 						conexion_localized_pokemon);
@@ -267,7 +267,7 @@ context (test_conexiones) {
 
 				conexion_caught_pokemon = conexion_cliente_crear(cola_esperada,1,
 						0,
-						(void*)assert_mensaje_recibido_thread);
+						(void*)assert_mensaje_recibido);
 
 				t_conexion* args = conexion_crear(conexion_broker,
 						conexion_caught_pokemon);
@@ -297,7 +297,7 @@ context (test_conexiones) {
 			it("El GAME_CARD y TEAM rciben mensajes del GAME_BOY") {
 
 				//ARRANGE
-				conexion_gameboy = conexion_host_crear("127.0.0.1", "3997", (void*)assert_mensaje_recibido_thread);
+				conexion_gameboy = conexion_host_crear("127.0.0.1", "3997", (void*)assert_mensaje_recibido);
 
 				pqt_test = paquete_localized_pokemon_test(LOCALIZED_POKEMON);
 

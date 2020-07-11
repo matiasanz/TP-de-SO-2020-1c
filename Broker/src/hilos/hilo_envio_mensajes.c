@@ -7,14 +7,12 @@
 
 #include "hilo_envio_mensajes.h"
 
-static void enviar_mensaje_a_suscriptor_y_finalizar_hilo(t_enviar_args* args);
-
 void crear_hilo_y_enviar_mensaje_a_suscriptor(t_mensaje_cache* msj, t_suscriptor* suscriptor) {
 
 	//TODO Verificar si al reenviar deberia actualizar este valor
 	particion_actualizar_fecha_ultimo_acceso(msj->particion);
 
-	pthread_create(&hilo_enviar, NULL, (void*) enviar_mensaje_a_suscriptor_y_finalizar_hilo, enviar_args_crear(msj, suscriptor));
+	pthread_create(&hilo_enviar, NULL, (void*) enviar_mensaje_a_suscriptor, enviar_args_crear(msj, suscriptor));
 	pthread_detach(hilo_enviar);
 }
 
@@ -40,10 +38,4 @@ void enviar_mensaje_a_suscriptor(t_enviar_args* args) {
 
 	enviar_args_destruir(args);
 	paquete_destruir(pqt);
-}
-
-static void enviar_mensaje_a_suscriptor_y_finalizar_hilo(t_enviar_args* args) {
-
-	enviar_mensaje_a_suscriptor(args);
-	pthread_exit(NULL);
 }

@@ -77,8 +77,6 @@ void atender_cliente(int* socket) {
 	default:
 		log_error_atender_cliente(*socket, header);
 	}
-
-	pthread_exit(NULL);
 }
 
 void inicializar_servidor() {

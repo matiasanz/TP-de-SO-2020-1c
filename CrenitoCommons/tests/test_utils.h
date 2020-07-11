@@ -34,7 +34,6 @@ void should_posicion(t_posicion esperado, t_posicion real);
 void should_pokemon(t_pokemon esperado, t_pokemon real);
 
 void assert_mensaje_recibido(t_id_cola id_cola_esperada, void* serializado_real);
-void assert_mensaje_recibido_thread(t_id_cola id_cola_esperada, void* serializado_real);
 
 void assert_mensaje_new_pokemon(t_mensaje_new_pokemon* esperado, t_mensaje_new_pokemon* real);
 void assert_mensaje_localized_pokemon(t_mensaje_localized_pokemon* esperado, t_mensaje_localized_pokemon* real);

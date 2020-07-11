@@ -176,15 +176,6 @@ void assert_mensaje_recibido(t_id_cola id_cola_esperada, void* serializado_real)
 	free(serializado_real);
 }
 
-void assert_mensaje_recibido_thread(t_id_cola id_cola_esperada,
-		void* serializado_real) {
-
-	assert_mensaje_recibido(id_cola_esperada, serializado_real);
-
-	pthread_exit(NULL);
-
-}
-
 //+++++++++++++++++++++ TEST_DATA
 
 t_mensaje_new_pokemon* mensaje_new_pokemon_test() {
