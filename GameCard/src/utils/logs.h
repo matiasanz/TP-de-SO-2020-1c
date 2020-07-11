@@ -1,7 +1,7 @@
 # ifndef _LOGS_GAMECARD_
 # define _LOGS_GAMECARD_
 
-#include "utils/mensajes-utils.h"
+#include "mensajes-utils.h"
 
 //Enunciado
 void log_enunciado_posiciones_encontradas(char*especie, t_list*posiciones);

@@ -14,15 +14,17 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* mensajeNew){
 
 	pthread_mutex_t* mutexPokemon = pokemon_get_mutex(especie);
 
+	pthread_mutex_lock(mutexPokemon); //TODO ver por que lo bloquea varias veces
 	t_config* config_metadata_pokemon = config_create(dir_metadata);
 
 	if(!archivo_existe(config_metadata_pokemon)){
 		config_metadata_pokemon = metadata_default(especie, dir_metadata);
 	}
+	pthread_mutex_unlock(mutexPokemon);
 
 	free(dir_metadata);
 
-	pthread_mutex_lock(mutexPokemon); //TODO ver por que lo bloquea varias veces
+	pthread_mutex_lock(mutexPokemon);
 	if(archivo_abierto(config_metadata_pokemon)){ //Si no esta abierto, la misma funcion lo abre
 		pthread_mutex_unlock(mutexPokemon);
 

@@ -1,4 +1,4 @@
-#include "gamecard.h"
+#include "../gamecard.h"
 
 uint32_t config_metadata_get_block_size(){
 	pthread_mutex_lock(&mutexConfigMetadata);

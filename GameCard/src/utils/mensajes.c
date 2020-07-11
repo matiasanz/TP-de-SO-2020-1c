@@ -46,3 +46,26 @@ void gamecard_enviar_appeared(t_mensaje_new_pokemon* mensajeNew){
 	mensaje_appeared_catch_pokemon_destruir(mensajeAEnviar);
 	paquete_destruir(paqueteAEnviar);
 }
+
+void gamecard_enviar_caught(t_mensaje_catch_pokemon* mensajeCatch, bool atrapado){
+
+	t_mensaje_caught_pokemon* mensajeAEnviar=mensaje_caught_pokemon_crear(atrapado);
+	mensaje_caught_pokemon_set_id_correlativo(mensajeAEnviar,mensaje_appeared_catch_pokemon_get_id(mensajeCatch));
+
+	t_paquete_header header=paquete_header_crear(MENSAJE,GAMECARD,CAUGHT_POKEMON, id_proceso);
+	t_buffer* bufferDepaquete=mensaje_caught_pokemon_serializar(mensajeAEnviar);
+	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
+
+
+	pthread_mutex_lock(&envioPaquete);
+	int resultadoEnvio = enviar(conexion_broker,paqueteAEnviar);
+	pthread_mutex_unlock(&envioPaquete);
+
+	if(error_conexion(resultadoEnvio)){
+		//TODO repetido
+		log_warning(logger,"NO se puede realizar la conexion con el BROKER");
+	}
+
+	paquete_destruir(paqueteAEnviar);
+	mensaje_caught_pokemon_destruir(mensajeAEnviar);
+}

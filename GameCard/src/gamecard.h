@@ -11,14 +11,14 @@
 #include <crenito-commons/conexiones/conexiones.h>
 #include "utils/mensajes-utils.h"
 
-
+#include <stdbool.h>
 #include <commons/string.h>
 #include <commons/bitarray.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
-#include "metadata.h"
 
-#include "logs.h"
+#include "dominio/metadata.h"
+#include "utils/logs.h"
 
 #define tope(x,y) (((x)+(y)-1)/(y))
 
@@ -76,7 +76,6 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke);
 void gamecard_procesar_Get_Pokemon(t_mensaje_get_pokemon* unMsjGetPoke);
 
 void gamecard_New_Pokemon_Reintento(t_mensaje_new_pokemon* unMsjNewPoke);
-void gamecard_Catch_Pokemon_ReIntento(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke);
 void gamecard_Get_Pokemon_reintento(t_mensaje_get_pokemon* unMsjGetPoke);
 
 int cant_elemetos_array(char** array);

@@ -1,15 +1,9 @@
-#include "gamecard.h"
+#include "../gamecard.h"
 
 void guardarLinea(char* path,char* nuevalinea,int len){
 	FILE* f_block;
 
 	f_block=fopen(path,"rb+");
-
-	if(!f_block){
-		puts(path);
-		puts("ERROR AL INTENTAR GUARDAR LINEA - bloques.c");
-		exit(1);
-	}
 
 	fseek(f_block,0,SEEK_END);
 

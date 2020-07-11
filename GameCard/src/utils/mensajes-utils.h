@@ -14,12 +14,16 @@
 #include "../hilos/hilo_get_pokemon.h"
 #include "../hilos/hilo_new_pokemon.h"
 
-sem_t objetivos_gamecard;
+typedef t_mensaje_appeared_catch_pokemon t_mensaje_catch_pokemon;
+
+sem_t objetivos_gamecard; //TODO
 
 void mensaje_recibido(t_id_cola id_cola, void* msj);
 
 void gamecard_enviar_localized(t_mensaje_get_pokemon* mensajeGet, t_list*posiciones);
 
 void gamecard_enviar_appeared(t_mensaje_new_pokemon* mensajeNew);
+
+void gamecard_enviar_caught(t_mensaje_appeared_catch_pokemon*, bool atrapado);
 
 #endif /* SRC_UTILS_MENSAJES_UTILS_H_ */

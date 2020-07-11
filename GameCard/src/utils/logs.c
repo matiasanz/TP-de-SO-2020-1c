@@ -1,5 +1,6 @@
 #include "logs.h"
-#include "mensajesGamecard.h"
+
+#include "../mensajesGamecard.h"
 
 void log_enunciado_posiciones_encontradas(char*especie, t_list*posiciones){
 	char* posicionesString=posicion_list_to_string(posiciones);
