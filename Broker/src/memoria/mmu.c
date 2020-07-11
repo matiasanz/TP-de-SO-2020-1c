@@ -66,6 +66,7 @@ t_mensaje_cache* guardar_en_memoria(void* msj_recibido, t_id_cola id_cola) {
 	memcpy(particion_get_direccion_base_absoluta(particion), contenido, tamanio);
 	free(contenido);
 	mensaje_cache_set_particion(msj_cache, particion);
+	mensaje_cache_set_id_correlativo(msj_cache, id_cola);
 	pthread_mutex_unlock(&mutex_acceso_memoria);
 
 	log_almacenamiento_mensaje_en_particion(logger, particion);

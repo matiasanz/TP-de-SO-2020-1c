@@ -28,6 +28,8 @@ typedef enum {
 } t_estado_envio;
 
 t_mensaje_cache_metadata* mensaje_metadata_crear();
-void mensaje_metadata_destruir(t_mensaje_cache_metadata* msj);
+void mensaje_metadata_destruir(t_mensaje_cache_metadata* metadata);
+
+void mensaje_cache_metadata_set_id_correlativo(t_mensaje_cache_metadata* metadata, uint32_t id_correlativo);
 
 #endif /* SRC_CRENITO_COMMONS_MENSAJES_MENSAJE_CACHE_METADATA_H_ */

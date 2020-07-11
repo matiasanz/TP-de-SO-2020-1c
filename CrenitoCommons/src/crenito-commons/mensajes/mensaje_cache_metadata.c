@@ -27,3 +27,7 @@ void mensaje_metadata_destruir(t_mensaje_cache_metadata* msj) {
 	list_destroy_and_destroy_elements(msj -> suscriptores_fallidos, (void*)suscriptor_destruir);
 	free(msj);
 }
+
+void mensaje_cache_metadata_set_id_correlativo(t_mensaje_cache_metadata* metadata, uint32_t id_correlativo) {
+	metadata ->id_correlativo = id_correlativo;
+}
