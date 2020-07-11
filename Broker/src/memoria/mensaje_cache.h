@@ -9,6 +9,7 @@
 #define SRC_MEMORIA_MENSAJE_CACHE_H_
 
 #include "particion.h"
+#include "../utils/broker_log.h"
 
 // Estructura adminitrativa de la memoria (contenido a poner en la cola de mensajes)
 typedef struct {

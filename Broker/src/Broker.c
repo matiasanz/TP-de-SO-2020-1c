@@ -44,6 +44,7 @@ void inicializar(void) {
 	inicializar_memoria();
 	inicializar_servidor();
 	inicializar_hilos();
+	inicializar_senial();
 }
 
 void inicializar_config() {
@@ -56,6 +57,7 @@ void inicializar_logs() {
 	char* ruta = config_get_string_value(config, "LOGGER");
 	logger = log_create(ruta, BROKER_STRING, 1, LOG_LEVEL_INFO);
 	event_logger = log_create("./log/broker_event.log", "BROKER_EVENT", 1, LOG_LEVEL_INFO);
+	dump_logger = log_create("./log/dump_cache.log", "DUMP_CACHE_LOGGER", false, LOG_LEVEL_INFO);
 }
 
 void atender_cliente(int* socket) {
@@ -87,6 +89,10 @@ void inicializar_servidor() {
 	validar_socket(socket_servidor);
 }
 
+void inicializar_senial() {
+	signal(SIGUSR1, log_dump_cache);
+}
+
 static void validar_header(t_paquete_header header) {
 
 	if (error_conexion(header.codigo_operacion)) {
@@ -104,5 +110,5 @@ static void validar_socket(int socket_servidor) {
 		exit(EXIT_FAILURE);
 	}
 
-	log_inicio_proceso();
+	log_event_inicio_proceso();
 }

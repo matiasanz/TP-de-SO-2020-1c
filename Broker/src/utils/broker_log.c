@@ -1,11 +1,11 @@
 /*
- * broker_utils.c
+ * broker_log.c
  *
- *  Created on: 16 jun. 2020
+ *  Created on: 11 jul. 2020
  *      Author: utnso
  */
 
-#include "broker_utils.h"
+#include "broker_log.h"
 
 static void log_proceso(char* header_string, t_paquete_header header);
 static void string_append_mensaje_serializado(char** string, t_id_cola id_cola, void* msj_recibido);
@@ -13,22 +13,6 @@ static void string_append_cola(char** string, t_id_cola id_cola);
 static void log_envio_mensaje(char* header_string, uint32_t id_mensaje, uint32_t id_suscriptor);
 static void string_append_contenido_envio_mensaje(char** string, char* header_string, uint32_t id_mensaje,
 		uint32_t id_suscriptor);
-
-uint32_t generar_id_univoco() {
-
-	uint32_t id_mensaje = 0;
-
-	pthread_mutex_lock(&mutex_id_univoco);
-	id_univoco += 1;
-	id_mensaje = id_univoco;
-	pthread_mutex_unlock(&mutex_id_univoco);
-
-	return id_mensaje;
-}
-
-long get_fecha_en_microsegundos(struct timeval fecha) {
-	return (fecha.tv_sec) * 1000 + (fecha.tv_usec) / 1000;
-}
 
 //Logs obligatorios
 void log_conexion_proceso(t_paquete_header paquete_header) {
@@ -60,22 +44,44 @@ void log_confirmacion_mensaje_suscriptor(uint32_t id_mensaje, uint32_t id_suscri
 	log_envio_mensaje(LOG_HEADER_CONFIRMACION_MSJ_SUSCRIPTOR, id_mensaje, id_suscriptor);
 }
 
+void log_almacenamiento_mensaje_en_particion(t_log* un_logger, t_particion* particion) {
+
+	char *string = string_new();
+
+	string_append_separador(&string, LOG_HEADER_MENSAJE_ALMACENADO);
+	string_append_particion(&string, particion);
+
+	log_info(un_logger, string);
+	free(string);
+}
+
+void log_eliminacion_particion(t_log* un_logger, t_particion* particion) {
+
+	char *string = string_new();
+
+	string_append_separador(&string, LOG_HEADER_PARTICION_ELIMINADA);
+	string_append_particion(&string, particion);
+
+	log_info(un_logger, string);
+	free(string);
+}
+
 void log_ejecucion_compactacion() {
 	log_info(logger, get_separador_string(LOG_HEADER_COMPACTACION));
 }
 
 //Logs adicionales
-void log_inicio_consolidacion_colas(char* nombre_cola, int cantidad_mensajes) {
+void log_event_inicio_consolidacion_colas(char* nombre_cola, int cantidad_mensajes) {
 	log_info(event_logger, "Inicio consolidacion cola %s, cantidad de mensajes: %d \n", nombre_cola,
 			cantidad_mensajes);
 }
 
-void log_consolidacion_cola_eliminacion(uint32_t id_mensaje, t_id_cola id_cola) {
+void log_event_consolidacion_cola_eliminacion(uint32_t id_mensaje, t_id_cola id_cola) {
 	log_info(event_logger, "Consolidacion cola %s, mensaje id eliminado: %d \n", get_nombre_cola(id_cola),
 			id_mensaje);
 }
 
-void log_inicio_proceso() {
+void log_event_inicio_proceso() {
 	log_info(event_logger, "%s iniciado exitosamente \n", BROKER_STRING);
 }
 

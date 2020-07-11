@@ -11,6 +11,29 @@
 static void consolidar(t_particion* victima, int index_victima);
 static void liberar_victima(bool (*algoritmo_victima)(t_particion*, t_particion*));
 static uint32_t eliminar_particiones_libres(bool* hay_fragmentacion_externa);
+static bool pd_memoria_esta_vacia();
+static int pd_obtener_tamanio_espacio_de_memoria_libre(t_particion* ultima_particion);
+
+//TODO: validar valores de configuracion y lanzar error si correspone
+void inicializar_particiones_dinamicas() {
+	//"FF" o "BF"
+	char* algoritmo_libres = config_get_string_value(config, "ALGORITMO_PARTICION_LIBRE");
+
+	algoritmo_particion_libre =
+			string_equals_ignore_case(algoritmo_libres, "BF") ?
+					(void*) pd_obtener_particion_libre_best_fit : (void*) pd_obtener_particion_libre_first_fit;
+
+	//"FIFO" o "LRU"
+	char* algoritmo_reemplazo_string = config_get_string_value(config, "ALGORITMO_REEMPLAZO");
+
+	algoritmo_reemplazo =
+			string_equals_ignore_case(algoritmo_reemplazo_string, "FIFO") ?
+					(void*) pd_liberar_victima_fifo : (void*) pd_liberar_victima_lru;
+
+	frecuencia_compactacion = config_get_int_value(config, "FRECUENCIA_COMPACTACION");
+	particiones = list_create();
+	cantidad_busquedas_fallidas = 0;
+}
 
 t_particion* pd_obtener_particion_libre_best_fit(int tamanio_contenido, int* offset) {
 
@@ -137,7 +160,7 @@ void reubicar_particiones_y_compactar_contenido(uint32_t tamanio_ocupado) {
 		t_particion* p = list_get(particiones, i);
 
 		int tamanio = particion_get_tamanio(p);
-		memcpy(buffer + offset, particion_get_direccion_contenido(p), tamanio);
+		memcpy(buffer + offset, particion_get_direccion_base_absoluta(p), tamanio);
 
 		particion_recalcular_direcciones(p, offset);
 
@@ -149,21 +172,42 @@ void reubicar_particiones_y_compactar_contenido(uint32_t tamanio_ocupado) {
 	free(buffer);
 }
 
+t_list* pd_obtener_particiones_dump() {
+
+	t_list* particiones_dump = list_duplicate(particiones);
+
+	if (pd_memoria_esta_vacia()) {
+		//Si la memoria está vacia, creo una particion dummy para representar el agujero en el dump
+		list_add(particiones_dump, particion_crear_dummy(tamanio_total_memoria, 0));
+	} else {
+		//Si hay espacio sin ocupar al final de la memoria, creo una particion dummy para representar el agujero en el dump
+		t_particion* ultima_particion = list_get(particiones, list_size(particiones) - 1);
+		int espacio_libre = pd_obtener_tamanio_espacio_de_memoria_libre(ultima_particion);
+
+		if (espacio_libre > 0) {
+			list_add(particiones_dump, particion_crear_dummy(espacio_libre,
+							particion_get_direccion_limite_relativa(ultima_particion) + 1));
+		}
+	}
+
+	return particiones_dump;
+}
+
 static void liberar_victima(bool (*algoritmo_victima)(t_particion*, t_particion*)) {
 
 	int index_victima = 0;
 	t_link_element* item = particiones->head;
 
-	//Busca indice de la primer particion ocupada
+//Busca indice de la primer particion ocupada
 	while (item != NULL && particion_esta_libre(item->data)) {
 		item = item->next;
 		index_victima += 1;
 	}
 
-	//Si todas las particiones están vacias, no tiene sentido buscar víctima
+//Si todas las particiones están vacias, no tiene sentido buscar víctima
 	if (item == NULL) return;
 
-	//Se inicializa la victima con la primer particion ocupada encontrada
+//Se inicializa la victima con la primer particion ocupada encontrada
 	t_particion* victima = list_get(particiones, index_victima);
 
 	/*Recorre la lista y si aparece un mejor candidato a liberar
@@ -178,14 +222,14 @@ static void liberar_victima(bool (*algoritmo_victima)(t_particion*, t_particion*
 		}
 	}
 
-	particion_log_eliminacion(logger, victima);
+	log_eliminacion_particion(logger, victima);
 	cola_buscar_y_eliminar_mensaje(particion_get_id_mensaje(victima), particion_get_id_cola(victima));
 	consolidar(victima, index_victima);
 }
 
 static void consolidar(t_particion* victima, int index_victima) {
 
-	// Completa las variables anterior/sgte solo si existen particiones anteriores o siguientes
+// Completa las variables anterior/sgte solo si existen particiones anteriores o siguientes
 	t_particion* anterior = index_victima > 0 ? list_get(particiones, index_victima - 1) : NULL;
 	t_particion* sgte = index_victima <= list_size(particiones) ? list_get(particiones, index_victima + 1) : NULL;
 
@@ -206,4 +250,12 @@ static void consolidar(t_particion* victima, int index_victima) {
 		list_replace(particiones, index_victima, particion_fusionar(victima, sgte));
 		list_remove_and_destroy_element(particiones, index_victima + 1, (void*) particion_destruir);
 	}
+}
+
+static bool pd_memoria_esta_vacia() {
+	return list_is_empty(particiones);
+}
+
+static int pd_obtener_tamanio_espacio_de_memoria_libre(t_particion* ultima_particion) {
+	return tamanio_total_memoria - 1 - particion_get_direccion_limite_relativa(ultima_particion);
 }

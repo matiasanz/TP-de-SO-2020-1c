@@ -24,6 +24,8 @@ typedef struct {
 //Creación y destrucción
 t_particion* particion_crear_y_ocupar(uint32_t tamanio, uint32_t inicio);
 t_particion* particion_crear_libre(uint32_t tamanio, uint32_t inicio, uint32_t index);
+t_particion* particion_crear_dummy(uint32_t tamanio, uint32_t inicio);
+
 void particion_destruir(t_particion* particion);
 void particion_liberar(t_particion* particion);
 
@@ -33,6 +35,7 @@ bool particion_es_best_fit(t_particion* particion, uint32_t tamanio_contenido, u
 bool particion_esta_libre(t_particion* particion);
 bool particion_esta_ocupada(t_particion* particion);
 bool particion_encontrada(t_particion* particion);
+bool particion_es_dummy(t_particion* particion);
 
 //Algoritmos eleccion de victima
 bool fecha_creacion_anterior(t_particion* una_particion, t_particion* otra_particion);
@@ -46,15 +49,17 @@ void particion_recalcular_direcciones(t_particion* particion, uint32_t nueva_bas
 
 // Log
 char* particion_to_string(t_particion* particion);
-void  particion_log_almacenamiento(t_log* un_logger, t_particion* particion); // 6. Almacenado de un mensaje dentro de la memoria (indicando posición de inicio de su partición).
-void  particion_log_eliminacion(t_log* un_logger, t_particion* particion); // 7. Eliminado de una partición de memoria (indicado la posición de inicio de la misma).
+char* particion_to_string_dump(t_particion* particion, int index);
+void string_append_particion(char** string, t_particion* particion);
 
 //Getters
 uint32_t particion_get_tamanio(t_particion* particion);
-uint32_t particion_get_base(t_particion* particion);
 uint32_t particion_get_id_mensaje(t_particion* particion);
 uint32_t particion_get_id_cola(t_particion* particion);
-void* particion_get_direccion_contenido(t_particion* particion);
+uint32_t particion_get_direccion_base_relativa(t_particion* particion);
+uint32_t particion_get_direccion_limite_relativa(t_particion* particion);
+void* particion_get_direccion_base_absoluta(t_particion* particion);
+void* particion_get_direccion_limite_absoluta(t_particion* particion);
 
 //Setters
 void particion_set_uso(t_particion* particion);

@@ -45,7 +45,7 @@ static void consolidar_colas(void* param) {
 			t_cola_container* container = get_cola(i);
 			int cantidad_suscriptores = 0;
 
-			log_inicio_consolidacion_colas(get_nombre_cola(i), list_size(container->cola));
+			log_event_inicio_consolidacion_colas(get_nombre_cola(i), list_size(container->cola));
 
 			if (debe_consolidar_cola(container, &cantidad_suscriptores)) {
 				consolidar_cola(container, cantidad_suscriptores, i);
@@ -104,7 +104,7 @@ static void reenviar(t_mensaje_cache* msj) {
 static void eliminar(t_list* mensajes_confirmados, t_cola_container* container, t_id_cola id_cola) {
 
 	void buscar_y_eliminar(uint32_t* id_mensaje) {
-		log_consolidacion_cola_eliminacion(*id_mensaje, id_cola);
+		log_event_consolidacion_cola_eliminacion(*id_mensaje, id_cola);
 		cola_buscar_y_eliminar_mensaje(*id_mensaje, id_cola);
 	}
 

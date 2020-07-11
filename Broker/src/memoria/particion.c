@@ -9,7 +9,6 @@
 
 //Funciones Privadas
 static t_particion* particion_inicializar(uint32_t tamanio, uint32_t inicio);
-static void string_append_particion(char** string, t_particion* particion);
 
 t_particion* particion_crear_y_ocupar(uint32_t tamanio, uint32_t inicio) {
 
@@ -28,6 +27,14 @@ t_particion* particion_crear_libre(uint32_t tamanio, uint32_t inicio, uint32_t i
 	//TODO: esto está acoplado a particiones dinámicas
 	t_particion* particion = particion_inicializar(tamanio, inicio);
 	list_add_in_index(particiones, index, particion);
+
+	return particion;
+}
+
+t_particion* particion_crear_dummy(uint32_t tamanio, uint32_t inicio) {
+
+	t_particion* particion = particion_inicializar(tamanio, inicio);
+	particion->id_mensaje = -1;
 
 	return particion;
 }
@@ -65,6 +72,10 @@ bool particion_esta_ocupada(t_particion* particion) {
 
 bool particion_encontrada(t_particion* particion) {
 	return particion != NULL;
+}
+
+bool particion_es_dummy(t_particion* particion) {
+	return particion_get_id_mensaje(particion) == -1;
 }
 
 bool fecha_creacion_anterior(t_particion* victima_actual, t_particion* candidato) {
@@ -121,7 +132,7 @@ char* particion_to_string(t_particion* particion) {
 	string_append_with_format(&to_string, " Detalle de la partición: \n");
 	string_append_with_format(&to_string, " id mensaje: %d \n", particion_get_id_mensaje(particion));
 	string_append_with_format(&to_string, " tipo: %s \n", get_nombre_cola(particion_get_id_cola(particion)));
-	string_append_with_format(&to_string, " base: %d \n", particion_get_base(particion));
+	string_append_with_format(&to_string, " base: %d \n", particion_get_direccion_base_relativa(particion));
 	string_append_with_format(&to_string, " limite: %d \n", particion->limite);
 	string_append_with_format(&to_string, " tamaño: %d \n", particion_get_tamanio(particion));
 	string_append_with_format(&to_string, " creación (μs): %lu \n",
@@ -132,34 +143,40 @@ char* particion_to_string(t_particion* particion) {
 	return to_string;
 }
 
-void particion_log_almacenamiento(t_log* un_logger, t_particion* particion) {
+char* particion_to_string_dump(t_particion* particion, int index) {
 
-	char *string = string_new();
+	char *to_string = string_new();
 
-	string_append_separador(&string, LOG_HEADER_MENSAJE_ALMACENADO);
-	string_append_particion(&string, particion);
+	string_append_with_format(&to_string, " Partición: %d: ", index);
+	string_append_with_format(&to_string, "%06p", particion_get_direccion_base_absoluta(particion));
+	//Debug: imprime las direcciones relativas
+	//string_append_with_format(&to_string, "%ju", (uintmax_t) (particion_get_direccion_base_absoluta(particion) - memoria_principal));
+	string_append_with_format(&to_string, " - ");
+	string_append_with_format(&to_string, "%06p.	", particion_get_direccion_limite_absoluta(particion));
+	//Debug: imprime las direcciones relativas
+	//string_append_with_format(&to_string, "%ju.	     ", (uintmax_t) (particion_get_direccion_limite_absoluta(particion) - memoria_principal));
+	string_append_with_format(&to_string, "[%c]	", particion_esta_libre(particion) ? 'L' : 'X');
+	string_append_with_format(&to_string, "Size: %db	", particion_get_tamanio(particion));
+	if (particion_esta_libre(particion)) {
+		string_append_with_format(&to_string, "\n");
+		return to_string;
+	}
+	string_append_with_format(&to_string, "LRU: %lu	", get_fecha_en_microsegundos(particion -> ultimo_acceso));
+	string_append_with_format(&to_string, "Cola: %s   ", get_nombre_cola(particion_get_id_cola(particion)));
+	string_append_with_format(&to_string, "ID: %d \n", particion_get_id_mensaje(particion));
 
-	log_info(un_logger, string);
-	free(string);
+	return to_string;
 }
 
-void particion_log_eliminacion(t_log* un_logger, t_particion* particion) {
+void string_append_particion(char** string, t_particion* particion) {
 
-	char *string = string_new();
-
-	string_append_separador(&string, LOG_HEADER_PARTICION_ELIMINADA);
-	string_append_particion(&string, particion);
-
-	log_info(un_logger, string);
-	free(string);
+	char* string_particion = particion_to_string(particion);
+	string_append_with_format(string, string_particion);
+	free(string_particion);
 }
 
 uint32_t particion_get_tamanio(t_particion* particion) {
 	return particion->limite - particion->base + 1;
-}
-
-uint32_t particion_get_base(t_particion* particion) {
-	return particion->base;
 }
 
 uint32_t particion_get_id_mensaje(t_particion* particion) {
@@ -170,8 +187,20 @@ uint32_t particion_get_id_cola(t_particion* particion) {
 	return particion->id_cola;
 }
 
-void* particion_get_direccion_contenido(t_particion* particion) {
-	return memoria_principal + particion_get_base(particion);
+uint32_t particion_get_direccion_base_relativa(t_particion* particion) {
+	return particion->base;
+}
+
+uint32_t particion_get_direccion_limite_relativa(t_particion* particion) {
+	return particion->limite;
+}
+
+void* particion_get_direccion_base_absoluta(t_particion* particion) {
+	return memoria_principal + particion_get_direccion_base_relativa(particion);
+}
+
+void* particion_get_direccion_limite_absoluta(t_particion* particion) {
+	return particion_get_direccion_base_absoluta(particion) + particion_get_tamanio(particion) - 1;
 }
 
 void particion_set_uso(t_particion* particion) {
@@ -182,7 +211,7 @@ void particion_set_uso(t_particion* particion) {
 }
 
 void particion_actualizar_fecha_ultimo_acceso(t_particion* particion) {
-	
+
 	pthread_mutex_lock(&mutex_acceso_memoria);
 	gettimeofday(&particion->ultimo_acceso, NULL);
 	pthread_mutex_unlock(&mutex_acceso_memoria);
@@ -207,9 +236,4 @@ static t_particion* particion_inicializar(uint32_t tamanio, uint32_t inicio) {
 	return particion;
 }
 
-static void string_append_particion(char** string, t_particion* particion) {
 
-	char* string_particion = particion_to_string(particion);
-	string_append_with_format(string, string_particion);
-	free(string_particion);
-}

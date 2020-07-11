@@ -76,6 +76,7 @@ int error_conexion(int indicador_conexion);
 t_tipo_proceso get_tipo_proceso(char* proceso);
 t_id_cola get_id_mensaje(char* mensaje);
 
+void log_debug_and_destroy(t_log* un_logger, char* string);
 void log_info_and_destroy(t_log* un_logger, char* string);
 void log_warning_and_destroy(t_log* un_logger, char* string);
 

@@ -65,6 +65,12 @@ int conexion_exitosa(int indicador_conexion) {
 	return !error_conexion(indicador_conexion);
 }
 
+void log_debug_and_destroy(t_log* un_logger, char* string) {
+
+	log_debug(un_logger, string);
+	free(string);
+}
+
 void log_info_and_destroy(t_log* un_logger, char* string) {
 
 	log_info(un_logger, string);

@@ -8,7 +8,7 @@
 #ifndef SRC_HILOS_HILO_CONSOLIDACION_COLAS_H_
 #define SRC_HILOS_HILO_CONSOLIDACION_COLAS_H_
 
-#include "../broker_utils.h"
+#include "../utils/broker_utils.h"
 #include "../colas.h"
 #include "../memoria/mmu.h"
 #include "hilo_envio_mensajes.h"

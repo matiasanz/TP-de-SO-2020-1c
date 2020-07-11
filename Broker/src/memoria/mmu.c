@@ -11,33 +11,10 @@
 static void* obtener_contenido_cache(t_mensaje_cache* mensaje_cache);
 static t_particion* obtener_particion_libre(int tamanio_contenido);
 static bool debe_ejecutarse_compactacion();
-static void inicializar_buddy_system();
-static void inicializar_particiones_dinamicas();
-
-//TODO implementar
-static void inicializar_buddy_system() {
-}
-
-//TODO: validar valores de configuracion y lanzar error si correspone
-void inicializar_particiones_dinamicas() {
-	//"FF" o "BF"
-	char* algoritmo_libres = config_get_string_value(config, "ALGORITMO_PARTICION_LIBRE");
-
-	algoritmo_particion_libre =
-			string_equals_ignore_case(algoritmo_libres, "BF") ?
-					(void*) pd_obtener_particion_libre_best_fit : (void*) pd_obtener_particion_libre_first_fit;
-
-	//"FIFO" o "LRU"
-	char* algoritmo_reemplazo_string = config_get_string_value(config, "ALGORITMO_REEMPLAZO");
-
-	algoritmo_reemplazo =
-			string_equals_ignore_case(algoritmo_reemplazo_string, "FIFO") ?
-					(void*) pd_liberar_victima_fifo : (void*) pd_liberar_victima_lru;
-
-	frecuencia_compactacion = config_get_int_value(config, "FRECUENCIA_COMPACTACION");
-	particiones = list_create();
-	cantidad_busquedas_fallidas = 0;
-}
+static t_list* obtener_particiones_dump();
+static char* get_dump_cache_string();
+static void log_debug_dump_cache();
+static void destruir_particiones_dummy(t_list* particiones_dump);
 
 void inicializar_memoria() {
 
@@ -86,12 +63,14 @@ t_mensaje_cache* guardar_en_memoria(void* msj_recibido, t_id_cola id_cola) {
 	particion_set_uso(particion);
 	particion_set_id_mensaje(particion);
 
-	memcpy(particion_get_direccion_contenido(particion), contenido, tamanio);
+	memcpy(particion_get_direccion_base_absoluta(particion), contenido, tamanio);
 	free(contenido);
 	mensaje_cache_set_particion(msj_cache, particion);
 	pthread_mutex_unlock(&mutex_acceso_memoria);
 
-	particion_log_almacenamiento(logger, particion);
+	log_almacenamiento_mensaje_en_particion(logger, particion);
+	log_debug_dump_cache();
+
 	return msj_cache;
 }
 
@@ -153,12 +132,19 @@ void* compactar_contenido_mensaje(void* msj_recibido, t_mensaje_cache_metadata* 
 	}
 }
 
+//Dump
+void log_dump_cache(int signum) {
+
+	char* string = get_dump_cache_string();
+	log_info_and_destroy(dump_logger, string);
+}
+
 static void* obtener_contenido_cache(t_mensaje_cache* mensaje_cache) {
 
 	int tamanio_contenido = mensaje_cache_get_tamanio_contenido(mensaje_cache);
 	void* contenido = malloc(tamanio_contenido);
 
-	memcpy(contenido, particion_get_direccion_contenido(mensaje_cache->particion), tamanio_contenido);
+	memcpy(contenido, particion_get_direccion_base_absoluta(mensaje_cache->particion), tamanio_contenido);
 
 	return contenido;
 
@@ -173,4 +159,48 @@ static bool debe_ejecutarse_compactacion() {
 		return !hay_particiones_ocupadas();
 
 	return frecuencia_compactacion <= cantidad_busquedas_fallidas;
+}
+
+static t_list* obtener_particiones_dump() {
+	return esquema_de_memoria_particiones_dinamicas() ?
+			pd_obtener_particiones_dump() : 
+			bs_obtner_particiones_dump();
+}
+
+static char* get_dump_cache_string() {
+
+	char* string = string_new();
+	string_append_with_format(&string, "\n");
+	string_append_with_format(&string, SEPARADOR_DUMP_CACHE);
+	string_append_timestamp(&string);
+
+	pthread_mutex_lock(&mutex_acceso_memoria);
+	t_list* particiones_dump = obtener_particiones_dump();
+	for (int i = 0; i < list_size(particiones_dump); ++i) {
+		string_append_with_format(&string, particion_to_string_dump(list_get(particiones_dump, i), i + 1));
+	}
+	pthread_mutex_unlock(&mutex_acceso_memoria);
+
+	string_append_with_format(&string, SEPARADOR_DUMP_CACHE);
+	destruir_particiones_dummy(particiones_dump);
+
+	return string;
+}
+
+static void log_debug_dump_cache() {
+
+	char* string = get_dump_cache_string();
+	log_debug_and_destroy(event_logger, string);
+}
+
+static void destruir_particiones_dummy(t_list* particiones_dump) {
+
+	/*TODO:
+	 *  En particiones dinámicas solo puede haber 1 dummy. Si pasa lo mismo en BS cambiar este codigo por
+	 *  list_remove_and_destroy_by_condition
+	 */
+	t_list* particiones_dummy = list_filter(particiones_dump, (void*) particion_es_dummy);
+	list_iterate(particiones_dummy, (void*) particion_destruir);
+
+	list_destroy(particiones_dump);
 }

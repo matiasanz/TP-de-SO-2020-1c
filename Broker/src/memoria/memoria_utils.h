@@ -9,7 +9,9 @@
 #define SRC_MEMORIA_MEMORIA_UTILS_H_
 
 #include <sys/time.h>
-#include "../broker_utils.h"
+#include "../utils/broker_utils.h"
+
+#define SEPARADOR_DUMP_CACHE "----------------------------------------------------------------------------------------------------------------"
 
 void* memoria_principal;
 uint32_t tamanio_total_memoria;
