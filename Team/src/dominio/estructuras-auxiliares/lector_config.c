@@ -1,8 +1,5 @@
 #include "lector_config.h"
-
-#include <commons/string.h> //no pasar al .h porque no deja correr tests
-
-#include "../estructuras-auxiliares/mensajes.h"
+#include <commons/string.h>
 
 entrenadores entrenadores_cargar(){
 	entrenadores miEquipo = entrenadores_create();

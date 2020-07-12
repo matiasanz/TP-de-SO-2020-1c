@@ -1,4 +1,4 @@
-#include "deadlock/candidatos_intercambio.h"
+#include "../dominio/estructuras-auxiliares/candidatos_intercambio.h"
 #include "hilos_team.h"
 #include "../team.h"
 
@@ -168,7 +168,7 @@ void candidato_desplazarse_hacia_el_otro(candidato_intercambio*unCandidato, cand
 }
 
 void entrenador_desplazarse_hacia(entrenador* unEntrenador, t_posicion posicionFinal){
-	log_event_de_donde_partio(unEntrenador, posicionFinal);
+	log_event_de_donde_partio(unEntrenador);
 
 	bool llegoALaPosicion = entrenador_llego_a(unEntrenador, posicionFinal);
 

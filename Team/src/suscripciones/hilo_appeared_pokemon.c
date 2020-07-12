@@ -1,4 +1,5 @@
-#include "../hilos-de-comunicacion/hilo_appeared_pokemon.h"
+#include "../suscripciones/hilo_appeared_pokemon.h"
+
 #include "../team.h"
 
 void suscribir_y_escuchar_cola_appeared_pokemon(void (*callback)(t_id_cola, void*)) {

@@ -4,11 +4,10 @@
 #include <commons/log.h>
 #include <commons/config.h>
 
-#include "../hilos-del-team/deadlock/candidatos_intercambio.h"
-#include "../hilos-del-team/deadlock/detector_de_deadlock.h"
+#include "../utils/mensajes.h"
+#include "estructuras-auxiliares/candidatos_intercambio.h"
 #include "estructuras-auxiliares/captura_pendiente.h"
 #include "estructuras-auxiliares/lector_config.h"
-#include "estructuras-auxiliares/mensajes.h"
 #include "estructuras-principales/pokemon.h"
 #include "planificacion/planificacion.h"
 #include "header_global_team.h"
@@ -59,7 +58,7 @@
 	void log_event_captura_desconocida(t_mensaje_caught_pokemon*);
 
 	//ENTRENADOR
-	void log_event_de_donde_partio(entrenador*, t_posicion);
+	void log_event_de_donde_partio(entrenador*);
 	void log_event_cpu_otorgado();
 	void log_event_cpu_consumido();
 

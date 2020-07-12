@@ -1,5 +1,5 @@
-#include "detector_de_deadlock.h"
-#include "../../team.h"
+#include "hilos_team.h"
+#include "../team.h"
 
 void team_ejecutar_algoritmo_de_deteccion_de_deadlock(){
 
@@ -10,8 +10,6 @@ void team_ejecutar_algoritmo_de_deteccion_de_deadlock(){
 
 		log_enunciado_resultado_de_algoritmo_de_deteccion_de_deadlock(hayDeadlock);
 		algoritmo_procesar_deadlock();
-
-		Estadisticas.deadlocksResueltos++;
 
 		hayDeadlock = algoritmo_detectar_deadlock();
 	}
@@ -39,6 +37,8 @@ void algoritmo_procesar_deadlock(){
 	candidato_despertar_para_intercambio(unCandidato);
 
 	sem_wait(&finDeIntercambio);
+
+	Estadisticas.deadlocksResueltos++;
 }
 
 //************************************** Auxiliares ***********************************************************

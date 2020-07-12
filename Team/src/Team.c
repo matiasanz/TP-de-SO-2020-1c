@@ -86,10 +86,20 @@ int team_exit(){
 
 /***********************************Funciones auxiliares *************************************/
 
+void validar_lectura(void*lectura, char* MENSAJE_EXCEPCION){
+	if(!lectura){
+		error_show(MENSAJE_EXCEPCION);
+		exit(1);
+	}
+}
+
 //Logs y config
 void inicializar_logs(){
-	logger = log_crear("TEAM", "LOG_PATH");
-	event_logger = log_crear("TEAM_EVENT", "LOG_EVENT_PATH");
+	logger = log_crear("TEAM", "LOG_FILE");
+	validar_lectura(logger, "No se encontro el archivo logger");
+
+	event_logger = log_crear("TEAM_EVENT", "LOG_EVENT_FILE");
+	validar_lectura(event_logger, "No se encontro el archivo event_logger");
 }
 
 void inicializar_config(char* NombreEquipo){
@@ -150,7 +160,7 @@ char*num_array_to_string(numero*arreglo, int length){
 	char* stringFromArray = string_new();
 
 	numero i;
-	for(i=0; i<cantidadDeEntrenadores; i++){
+	for(i=0; i<length; i++){
 		string_append_with_format(&stringFromArray,"  . Entrenador N°%u .................. %u\n", i, arreglo[i]);
 	}
 
@@ -160,18 +170,17 @@ char*num_array_to_string(numero*arreglo, int length){
 //Listas
 void inicializar_listas() {
 	equipo = entrenadores_cargar();
-	objetivosGlobales = entrenadores_objetivos_globales(equipo);
+	objetivosGlobales   = entrenadores_objetivos_globales(equipo);
 	inventariosGlobales = entrenadores_inventarios_globales(equipo);
-	recursosEnMapa = recursos_create();
-	pokemonesRecibidos = mapa_create();
-	capturasPendientes = pendientes_create();
+	recursosEnMapa      = recursos_create();
+	pokemonesRecibidos  = mapa_create();
+	capturasPendientes  = pendientes_create();
 	potencialesDeadlock = candidatos_create();
 
-	//Ver si vale la pena abstraer las listas
 	historialDePokemones = list_create();
-	mapaRequeridos = list_create();
-	entrenadoresReady = cr_list_create();
-	registroDePedidos = list_create();
+	mapaRequeridos       = list_create();
+	entrenadoresReady    = cr_list_create();
+	registroDePedidos    = list_create();
 
 //	mensajesCAUGHT    = cr_list_create();
 //	mensajesLOCALIZED = cr_list_create();
@@ -193,7 +202,7 @@ void listas_destroy(){
 	pendientes_destroy(capturasPendientes);
 
 	list_destroy_and_destroy_elements(registroDePedidos, free);
-	list_destroy_and_destroy_elements(historialDePokemones, free); //
+	list_destroy_and_destroy_elements(historialDePokemones, free);
 	list_destroy_and_destroy_elements(mapaRequeridos, (void*) pokemon_destroy_hard);
 
 	cr_list_destroy_and_destroy_elements(pokemonesRecibidos, (void*) pokemon_destroy_hard);
@@ -224,7 +233,6 @@ void finalizar_hilos(){
 //Semaforos
 
 void inicializar_semaforos(){
-//	sem_init(&HayTareasPendientes       , 0, 0);
 	sem_init(&HayEntrenadoresDisponibles, 0, 0);
 	sem_init(&EquipoNoPuedaCazarMas     , 0, 0);
 	sem_init(&FinDeCiclo_CPU            , 0, 0);
@@ -241,18 +249,18 @@ void inicializar_semaforos(){
 
 	pthread_mutex_init(&mutexRecursosDisponibles  , NULL);
 	pthread_mutex_init(&mutexPedidos              , NULL);
-
-	pthread_mutex_init(&mutex_esperoMensajes, NULL);
 }
 
 void finalizar_semaforos(){
-//	sem_destroy(&HayTareasPendientes);
 	sem_destroy(&HayEntrenadoresDisponibles);
 	sem_destroy(&FinDeCiclo_CPU);
 	sem_destroy(&finDeIntercambio);
 
 	pthread_mutex_destroy(&mutexEntrenadores);
 	pthread_mutex_destroy(&mutexHistorialEspecies);
+	pthread_mutex_destroy(&mutexRepuestos);
+	pthread_mutex_destroy(&mutexRecursosDisponibles);
+	pthread_mutex_destroy(&mutexPedidos);
 	pthread_mutex_destroy(&Mutex_AndoLoggeando);
 	pthread_mutex_destroy(&Mutex_AndoLoggeandoEventos);
 }
@@ -264,9 +272,9 @@ void inicializar_conexiones() {
 
 	id_proceso = config_get_int_value(config, "ID_PROCESO");
 
-	conexion_broker = conexion_server_crear(
-			config_get_string_value(config, "IP_BROKER"),
-			config_get_string_value(config, "PUERTO_BROKER"), TEAM);
+	conexion_broker = conexion_server_crear(config_get_string_value(config, "IP_BROKER")
+										  , config_get_string_value(config, "PUERTO_BROKER")
+										  , TEAM);
 
 	pthread_mutex_init(&mutex_subscripcion, NULL);
 
@@ -279,20 +287,17 @@ void inicializar_conexiones() {
 
 void finalizar_conexiones(){
 	finalizar_suscripcion_a_colas();
-	conexion_server_destruir(conexion_broker);
+//	conexion_server_destruir(conexion_broker);
+//	conexion_host_destruir(conexion_gameboy);
 }
 
 void finalizar_suscripcion_a_colas(){
 	//******************************************************************** INICIO HARDCODEADO
-	pthread_mutex_lock(&mutex_PSEUDOGAMECARD);
-	FIN_PSEUDO_GAMECARD = true;
-	pthread_mutex_unlock(&mutex_PSEUDOGAMECARD);
+	boolean_sem_turn_off(&BOOLSEM_PSEUDOGAMECARD);
 	//******************************************************************** fin HARDCODEADO
 	dejar_de_recibir();
 
 //	pthread_cancel(hilo_appeared_pokemon);
 //	pthread_cancel(hilo_localized_pokemon);
 //	pthread_cancel(hilo_caught_pokemon);
-
-//	finalizar_conexiones();
 }

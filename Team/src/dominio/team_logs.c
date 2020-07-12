@@ -2,7 +2,10 @@
 #include "../team.h"
 
 t_log* log_crear(char* PROPOSITO, char*KEY){
-	char*LOG_PATH = config_get_string_value(config, PROPOSITO);
+	char*LOG_PATH = config_get_string_value(config, KEY);
+
+//	printf("LOG en: %s\n\n", LOG_PATH);
+
 	return log_create(LOG_PATH,PROPOSITO,true,LOG_LEVEL_INFO);
 }
 
@@ -132,8 +135,8 @@ void log_event_loggear_pokemon_descartado(char* especie){
 	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 }
 
-void log_event_de_donde_partio(entrenador*unEntrenador, t_posicion deDonde){
-	char*posicion = posicion_to_string(deDonde);
+void log_event_de_donde_partio(entrenador*unEntrenador){
+	char*posicion = posicion_to_string(unEntrenador->posicion);
 
 	pthread_mutex_lock(&Mutex_AndoLoggeando);
 	log_info(logger, "El entrenador N°%u partio de la posicion%s\n", unEntrenador->id, posicion);
