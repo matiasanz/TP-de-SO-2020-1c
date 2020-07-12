@@ -7,11 +7,11 @@
 
 #include "suscriptor.h"
 
-t_suscriptor* suscriptor_crear(int socket, uint32_t id_suscriptor) {
+t_suscriptor* suscriptor_crear(int socket, uint32_t id_proceso) {
 
 	t_suscriptor* suscriptor = malloc(sizeof(t_suscriptor));
 
-	suscriptor->id_proceso = id_suscriptor;
+	suscriptor->id_proceso = id_proceso;
 	suscriptor->socket = socket;
 
 	return suscriptor;

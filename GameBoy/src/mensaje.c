@@ -1,6 +1,6 @@
-#include "gameboy.h"
+#include "mensaje.h"
 
-t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int longitud) {
+t_paquete* crear_paquete(char* proceso_recibido, char* mensaje, char* argumentos[], int longitud) {
 
 	t_buffer* mensaje_serializado;
 	t_id_cola id_cola;
@@ -16,7 +16,7 @@ t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int l
 
 	case NEW_POKEMON:
 		id_cola = NEW_POKEMON;
-		validar_quien_conoce_newpokemon(proceso);
+		validar_quien_conoce_newpokemon(proceso_recibido);
 
 		validar_mayor_igual_a_cero(pos_x);
 		validar_mayor_igual_a_cero(pos_y);
@@ -28,21 +28,22 @@ t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int l
 			cantidad = argumentos[6];
 			validar_mayor_a_cero(cantidad);
 
-			t_mensaje_new_pokemon* msj = mensaje_new_pokemon_crear(especie, atoi(pos_x), atoi(pos_y), atoi(cantidad));
+			t_mensaje_new_pokemon* msj = mensaje_new_pokemon_crear(especie, atoi(pos_x), atoi(pos_y),
+					atoi(cantidad));
 			mensaje_serializado = mensaje_new_pokemon_serializar(msj);
 
 		} else {
 
 			validar_cantidad_minima_argumentos(longitud, 5);
 
-			id = (longitud==8)? argumentos[7] : "99999";
+			id = (longitud == 8) ? argumentos[7] : "99999";
 			// numero alto como se sugiere en https://github.com/sisoputnfrba/foro/issues/1673
-//			validar_que_es_numero(id);
 
 			cantidad = argumentos[6];
 			validar_mayor_a_cero(cantidad);
 
-			t_mensaje_new_pokemon* msj = mensaje_new_pokemon_crear(especie, atoi(pos_x), atoi(pos_y), atoi(cantidad));
+			t_mensaje_new_pokemon* msj = mensaje_new_pokemon_crear(especie, atoi(pos_x), atoi(pos_y),
+					atoi(cantidad));
 			mensaje_new_pokemon_set_id(msj, atoi(id));
 			mensaje_serializado = mensaje_new_pokemon_serializar(msj);
 		}
@@ -51,7 +52,7 @@ t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int l
 
 	case APPEARED_POKEMON:
 		id_cola = APPEARED_POKEMON;
-		validar_quien_conoce_appearedpokemon(proceso);
+		validar_quien_conoce_appearedpokemon(proceso_recibido);
 		validar_cantidad_minima_argumentos(longitud, 6);
 
 		validar_mayor_igual_a_cero(pos_x);
@@ -69,8 +70,8 @@ t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int l
 		} else {
 			validar_cantidad_argumentos(longitud, 6);
 
-			t_mensaje_appeared_catch_pokemon* msj = mensaje_appeared_catch_pokemon_crear(especie, atoi(pos_x)
-																								, atoi(pos_y));
+			t_mensaje_appeared_catch_pokemon* msj = mensaje_appeared_catch_pokemon_crear(especie, atoi(pos_x),
+					atoi(pos_y));
 			mensaje_serializado = mensaje_appeared_catch_pokemon_serializar(msj);
 		}
 
@@ -79,15 +80,15 @@ t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int l
 	case CATCH_POKEMON:
 
 		id_cola = CATCH_POKEMON;
-		validar_quien_conoce_catchpokemon(proceso);
+		validar_quien_conoce_catchpokemon(proceso_recibido);
 		validar_cantidad_minima_argumentos(longitud, 6);
 		validar_mayor_igual_a_cero(pos_x);
 		validar_mayor_igual_a_cero(pos_y);
 
 		if (string_equals_ignore_case(argumentos[1], BROKER_STRING)) {
 			validar_cantidad_argumentos(longitud, 6);
-			t_mensaje_appeared_catch_pokemon* msj = mensaje_appeared_catch_pokemon_crear(especie, atoi(pos_x)
-																								, atoi(pos_y));
+			t_mensaje_appeared_catch_pokemon* msj = mensaje_appeared_catch_pokemon_crear(especie, atoi(pos_x),
+					atoi(pos_y));
 			mensaje_serializado = mensaje_appeared_catch_pokemon_serializar(msj);
 
 		} else {
@@ -107,7 +108,7 @@ t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int l
 	case CAUGHT_POKEMON:
 
 		id_cola = CAUGHT_POKEMON;
-		validar_quien_conoce_caughtpokemon(proceso);
+		validar_quien_conoce_caughtpokemon(proceso_recibido);
 		validar_cantidad_argumentos(longitud, 5);
 		id_correlativo = argumentos[3];
 
@@ -128,7 +129,7 @@ t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int l
 	case GET_POKEMON:
 
 		id_cola = GET_POKEMON;
-		validar_quien_conoce_getpokemon(proceso);
+		validar_quien_conoce_getpokemon(proceso_recibido);
 
 		char* especie = string_duplicate(argumentos[3]);
 		string_trim_right(&especie);
@@ -157,7 +158,7 @@ t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int l
 
 	}
 
-	return paquete_crear(paquete_header_crear(MENSAJE, GAMEBOY, id_cola, id_proceso), mensaje_serializado);
+	return paquete_crear(MENSAJE, id_cola, mensaje_serializado);
 }
 
 void procesar_envio_mensaje(char* proceso, char* mensaje, char* argumentos[], int longitud) {
@@ -172,7 +173,7 @@ void procesar_envio_mensaje(char* proceso, char* mensaje, char* argumentos[], in
 	paquete_destruir(pqt);
 	conexion_server_destruir(conexion);
 
-	if(error_conexion(respuesta)){
+	if (error_conexion(respuesta)) {
 		log_warning(event_logger, "No se pudo conectar al proceso %s\n", proceso);
 		finalizar_gameboy(EXIT_FAILURE);
 	}
@@ -183,16 +184,16 @@ void procesar_envio_mensaje(char* proceso, char* mensaje, char* argumentos[], in
 
 t_conexion_server* obtener_conexion(char* proceso_string) {
 
-	switch (get_tipo_proceso(proceso_string)) {
+	switch (proceso_obtener_tipo_segun_nombre(proceso_string)) {
 	case BROKER:
 		return conexion_server_crear(config_get_string_value(config, "IP_BROKER"),
-				config_get_string_value(config, "PUERTO_BROKER"), GAMEBOY);
+				config_get_string_value(config, "PUERTO_BROKER"));
 	case TEAM:
 		return conexion_server_crear(config_get_string_value(config, "IP_TEAM"),
-				config_get_string_value(config, "PUERTO_TEAM"), GAMEBOY);
+				config_get_string_value(config, "PUERTO_TEAM"));
 	case GAMECARD:
 		return conexion_server_crear(config_get_string_value(config, "IP_GAMECARD"),
-				config_get_string_value(config, "PUERTO_GAMECARD"), GAMEBOY);
+				config_get_string_value(config, "PUERTO_GAMECARD"));
 
 	default:
 		log_error(event_logger, "Error al inicializar la conexión. El proceso %s es incorrecto", proceso_string);

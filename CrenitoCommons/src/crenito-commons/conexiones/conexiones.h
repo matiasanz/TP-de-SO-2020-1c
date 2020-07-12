@@ -74,4 +74,5 @@ void conectar_y_escuchar_gameboy(t_conexion_host* gameboy);
  * que los hilos de escucha se encargan de ejecutarla
  */
 int recibir(int socket, void (*callback)(t_id_cola, void*));
+
 #endif /* SRC_CRENITO_COMMONS_CONEXIONES_CONEXIONES_H_ */

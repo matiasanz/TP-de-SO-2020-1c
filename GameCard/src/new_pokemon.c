@@ -689,9 +689,8 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* mensajeNew){
 		t_mensaje_appeared_catch_pokemon* mensajeAEnviar=mensaje_appeared_catch_pokemon_crear(mensajeNew->pokemon.especie,mensajeNew->pokemon.posicion.pos_x,mensajeNew->pokemon.posicion.pos_y);
 		mensaje_appeared_catch_pokemon_set_id_correlativo(mensajeAEnviar,mensaje_new_pokemon_get_id(mensajeNew));
 
-		t_paquete_header header=paquete_header_crear(MENSAJE,GAMECARD,APPEARED_POKEMON, id_proceso);
 		t_buffer* bufferDepaquete=mensaje_appeared_catch_pokemon_serializar(mensajeAEnviar);
-		t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
+		t_paquete* paqueteAEnviar=paquete_crear(MENSAJE,APPEARED_POKEMON,bufferDepaquete);
 
 		pthread_mutex_lock(&envioPaquete);
 		int resultadoEnvio = enviar(conexion_broker, paqueteAEnviar);

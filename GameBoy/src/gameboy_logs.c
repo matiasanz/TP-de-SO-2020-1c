@@ -1,4 +1,3 @@
-#include "gameboy_logs.h"
 #include "gameboy.h"
 
 // Si se quieren comentar o agregar nuevos logs, canalizar en este archivo, no modificar en el codigo.
@@ -26,11 +25,11 @@ void log_event_intento_de_envio(char* proceso, char* mensaje){
 }
 
 void log_event_intento_de_suscripcion_a_cola(char* cola_mensaje_string, char* tiempo_conexion_string){
-//	log_info(event_logger, "************************\n"
-//			"    Se intentara suscribir a la cola %s del proceso %s por %s segundos\n"
-//			, cola_mensaje_string
-//			, BROKER_STRING
-//			, tiempo_conexion_string);
+	log_info(event_logger, "************************\n"
+			"    Se intentara suscribir a la cola %s del proceso %s por %s segundos\n"
+			, cola_mensaje_string
+			, BROKER_STRING
+			, tiempo_conexion_string);
 }
 
 void log_event_intento_fallido_de_conexion(char* nombre_cola){
@@ -50,7 +49,4 @@ void log_event_fin_de_suscripcion_a_cola(int tiempo_conexion,	char* cola_mensaje
 			, tiempo_conexion);
 }
 
-void log_event_parametro_incorrecto(char* tipo_error, char* contenido) {
-	log_error(event_logger, "El %s %s  es inválido. Finalizando gameboy", tipo_error, contenido);
-}
 

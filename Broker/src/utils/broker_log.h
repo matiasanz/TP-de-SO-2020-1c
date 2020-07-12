@@ -21,7 +21,7 @@
 #define LOG_HEADER_WARNING_MSJ_SUSCRIPTOR "ERROR AL RECIBIR ACK"
 
 // Logs obligatorios
-void log_conexion_proceso(t_paquete_header header); // 1. Conexión de un proceso al broker.
+void log_conexion_proceso(t_proceso proceso); // 1. Conexión de un proceso al broker.
 void log_nuevo_suscriptor(t_paquete_header header); // 2. Suscripción de un proceso a una cola de mensajes.
 void log_mensaje_recibido(t_id_cola id_cola, void* msj); // 3.Llegada de un nuevo mensaje a una cola de mensajes.
 void log_envio_mensaje_a_suscriptor(uint32_t id_mensaje, uint32_t id_suscriptor); // 4. Envío de un mensaje a un suscriptor específico.
@@ -41,6 +41,6 @@ void log_error_conexion_proceso();
 void log_error_inicio_proceso();
 void log_error_get_suscriptores(uint32_t id_mensaje);
 void log_warning_envio_mensaje(uint32_t id_mensaje, uint32_t id_suscriptor);
-void log_error_enviar_id_mensaje(uint32_t id_mensaje, t_paquete_header header);
+void log_error_enviar_id_mensaje(uint32_t id_mensaje, t_proceso proceso);
 
 #endif /* SRC_UTILS_BROKER_LOG_H_ */

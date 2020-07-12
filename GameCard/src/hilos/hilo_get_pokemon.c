@@ -9,13 +9,12 @@
 
 void suscribir_y_escuchar_cola_get_pokemon(void (*callback)(t_id_cola, void*)) {
 
-	conexion_get_pokemon = conexion_cliente_crear(GET_POKEMON,id_proceso,
+	conexion_get_pokemon = conexion_cliente_crear(GET_POKEMON,
 			config_get_int_value(config, "TIEMPO_DE_REINTENTO_CONEXION"), callback);
 
 	t_conexion* args = conexion_crear(conexion_broker, conexion_get_pokemon);
 
 	pthread_create(&hilo_get_pokemon, NULL, (void*) suscribir_y_escuchar_cola, args);
-
 	pthread_detach(hilo_get_pokemon);
 }
 

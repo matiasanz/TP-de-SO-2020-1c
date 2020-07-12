@@ -38,13 +38,13 @@ void inicializar_hilos() {
 void inicializar(void) {
 
 	inicializar_config();
-	id_proceso = config_get_int_value(config, "ID_PROCESO");
 	inicializar_logs();
 	inicializar_colas();
 	inicializar_memoria();
 	inicializar_servidor();
 	inicializar_hilos();
 	inicializar_senial();
+	proceso_inicializar(BROKER);
 }
 
 void inicializar_config() {
@@ -97,7 +97,7 @@ static void validar_header(t_paquete_header header) {
 		log_error_conexion_proceso();
 		pthread_exit(NULL);
 	} else {
-		log_conexion_proceso(header);
+		log_conexion_proceso(header.proceso);
 	}
 }
 

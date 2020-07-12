@@ -420,9 +420,8 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* unMsjCatchPoke){
 	t_mensaje_caught_pokemon* mensajeAEnviar=mensaje_caught_pokemon_crear(pokemonAtrapado);
 	mensaje_caught_pokemon_set_id_correlativo(mensajeAEnviar,mensaje_appeared_catch_pokemon_get_id(unMsjCatchPoke));
 
-	t_paquete_header header=paquete_header_crear(MENSAJE,GAMECARD,CAUGHT_POKEMON, id_proceso);
 	t_buffer* bufferDepaquete=mensaje_caught_pokemon_serializar(mensajeAEnviar);
-	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
+	t_paquete* paqueteAEnviar=paquete_crear(MENSAJE,CAUGHT_POKEMON,bufferDepaquete);
 
 
 	pthread_mutex_lock(&envioPaquete);

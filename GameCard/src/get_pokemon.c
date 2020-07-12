@@ -69,11 +69,9 @@ void gamecard_responder_localized(t_mensaje_get_pokemon* mensajeGet, t_list*posi
 
 	mensaje_localized_pokemon_set_id_correlativo(mensajeAEnviar ,mensaje_get_pokemon_get_id(mensajeGet));
 
-	t_paquete_header header = paquete_header_crear(MENSAJE,GAMECARD,LOCALIZED_POKEMON, id_proceso);
-
 	t_buffer* bufferDepaquete=mensaje_localized_pokemon_serializar(mensajeAEnviar);
 
-	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
+	t_paquete* paqueteAEnviar=paquete_crear(MENSAJE,LOCALIZED_POKEMON,bufferDepaquete);
 
 	pthread_mutex_lock(&envioPaquete);
 	int resultadoEnvio = enviar(conexion_broker,paqueteAEnviar);

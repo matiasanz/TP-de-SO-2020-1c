@@ -4,8 +4,7 @@
 
 void suscribir_y_escuchar_cola_appeared_pokemon(void (*callback)(t_id_cola, void*)) {
 
-	conexion_appeared_pokemon = conexion_cliente_crear(APPEARED_POKEMON, id_proceso,
-			TIEMPO_RECONEXION, (void*) callback);
+	conexion_appeared_pokemon = conexion_cliente_crear(APPEARED_POKEMON, TIEMPO_RECONEXION, (void*) callback);
 
 	t_conexion* args = conexion_crear(conexion_broker, conexion_appeared_pokemon);
 

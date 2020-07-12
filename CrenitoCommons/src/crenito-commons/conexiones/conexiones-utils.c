@@ -18,27 +18,24 @@ t_conexion_host* conexion_host_crear(char* ip, char* puerto, void (*callback)(t_
 	return host;
 }
 
-t_conexion_server* conexion_server_crear(char* ip, char* puerto, t_tipo_proceso id_proceso) {
+t_conexion_server* conexion_server_crear(char* ip, char* puerto) {
 
 	t_conexion_server* server = malloc(sizeof(t_conexion_server));
 
 	server -> ip = ip;
 	server-> puerto = puerto;
-	server-> tipo_proceso = id_proceso;
 
 	return server;
 }
 
 void conexion_server_destruir(t_conexion_server* server) {
-
 	free(server);
 }
 
-t_conexion_cliente* conexion_cliente_crear(t_id_cola id_cola , int id_proceso, int segundos_reconexion, void (*callback)(t_id_cola, void*)) {
+t_conexion_cliente* conexion_cliente_crear(t_id_cola id_cola, int segundos_reconexion, void (*callback)(t_id_cola, void*)) {
 
 	t_conexion_cliente* cliente = malloc(sizeof(t_conexion_cliente));
 
-	cliente->suscriptor = suscriptor_crear(0, id_proceso);
 	cliente->id_cola = id_cola;
 	cliente -> segundos_reconexion = segundos_reconexion;
 	cliente -> callback = callback;
@@ -47,8 +44,6 @@ t_conexion_cliente* conexion_cliente_crear(t_id_cola id_cola , int id_proceso, i
 }
 
 void conexion_cliente_destruir(t_conexion_cliente* cliente) {
-
-	suscriptor_destruir(cliente ->suscriptor);
 	free(cliente);
 }
 
@@ -107,4 +102,8 @@ t_buffer* serializar(void* msj, t_id_cola id_cola) {
 		log_error_cola(id_cola);
 		return NULL;
 	}
+}
+
+bool debe_reconectar(t_conexion_cliente* cliente) {
+	return cliente ->segundos_reconexion > 0;
 }

@@ -28,6 +28,8 @@
 #include "../../Team/src/suscripciones/hilo_caught_pokemon.h"
 #include "../../Team/src/suscripciones/hilo_gameboy.h"
 #include "../../Team/src/suscripciones/hilo_localized_pokemon.h"
+#include "../src/crenito-commons/modelo/proceso.h"
+#include "../src/crenito-commons/utils.h"
 
 void inicializar_logs();
 
@@ -56,5 +58,7 @@ t_paquete* paquete_appeared_catch_pokemon_test(t_id_cola id_cola);
 
 t_mensaje_caught_pokemon* mensaje_caught_pokemon_test();
 t_paquete* paquete_caught_pokemon_test();
+
+void proceso_inicializar_test();
 
 #endif /* TESTS_TEST_UTILS_H_ */

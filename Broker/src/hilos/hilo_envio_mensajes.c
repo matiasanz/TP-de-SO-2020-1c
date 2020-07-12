@@ -22,7 +22,7 @@ void enviar_mensaje_a_suscriptor(t_enviar_mensaje_args* args) {
 
 	void* deserializado = restaurar_mensaje_desde_cache(args->msj_cache);
 	t_id_cola id_cola = mensaje_cache_get_id_cola(args->msj_cache);
-	t_paquete* pqt = paquete_crear(paquete_header_crear(MENSAJE, BROKER, id_cola, id_proceso), serializar(deserializado, id_cola));
+	t_paquete* pqt = paquete_crear(MENSAJE, id_cola, serializar(deserializado, id_cola));
 	uint32_t id_mensaje = mensaje_cache_get_id(args->msj_cache);
 	uint32_t id_suscriptor = suscriptor_get_id_proceso(args->suscriptor);
 
@@ -51,7 +51,7 @@ void crear_hilo_y_enviar_id_univoco(uint32_t id_mensaje, int socket_id, t_paquet
 static void enviar_id_mensaje(t_enviar_id_mensaje_args* args) {
 
 	if(error_conexion(socket_send(args ->id_socket, &args ->id_mensaje, sizeof(uint32_t)))){
-		log_error_enviar_id_mensaje(args ->id_mensaje, args -> header);
+		log_error_enviar_id_mensaje(args ->id_mensaje, paquete_header_get_proceso(args -> header));
 	}
 
 	enviar_id_mensaje_args_destruir(args);

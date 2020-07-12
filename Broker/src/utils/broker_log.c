@@ -7,16 +7,14 @@
 
 #include "broker_log.h"
 
-static void log_proceso(char* header_string, t_paquete_header header);
 static void string_append_mensaje_serializado(char** string, t_id_cola id_cola, void* msj_recibido);
-static void string_append_cola(char** string, t_id_cola id_cola);
 static void log_envio_mensaje(char* header_string, uint32_t id_mensaje, uint32_t id_suscriptor);
 static void string_append_contenido_envio_mensaje(char** string, char* header_string, uint32_t id_mensaje,
 		uint32_t id_suscriptor);
 
 //Logs obligatorios
-void log_conexion_proceso(t_paquete_header paquete_header) {
-	log_proceso(LOG_HEADER_CONEXION_PROCESO, paquete_header);
+void log_conexion_proceso(t_proceso proceso) {
+	log_proceso(logger, LOG_HEADER_CONEXION_PROCESO, proceso);
 }
 
 void log_nuevo_suscriptor(t_paquete_header paquete_header) {
@@ -24,7 +22,7 @@ void log_nuevo_suscriptor(t_paquete_header paquete_header) {
 	char *header_string = string_new();
 	string_append_with_format(&header_string, LOG_HEADER_NUEVO_SUSCRIPTOR,
 			get_nombre_cola(paquete_header.id_cola));
-	log_proceso(header_string, paquete_header);
+	log_proceso(logger, header_string, paquete_header_get_proceso(paquete_header));
 	free(header_string);
 }
 
@@ -32,7 +30,6 @@ void log_mensaje_recibido(t_id_cola id_cola, void* msj_recibido) {
 
 	char *string = string_new();
 	string_append_mensaje_serializado(&string, id_cola, msj_recibido);
-	string_append_cola(&string, id_cola);
 	log_info_and_destroy(logger, string);
 }
 
@@ -90,7 +87,7 @@ void log_error_atender_cliente(int socket, t_paquete_header header) {
 
 	log_error(event_logger,
 			"El codigo de operacion %d recibido desde el socket: %d por el proceso con id: %d (%s) es incorrecto \n",
-			header.codigo_operacion, socket, header.id_proceso, get_nombre_proceso(header.tipo_proceso));
+			header.codigo_operacion, socket, proceso_get_id(header.proceso), proceso_get_nombre(header.proceso));
 }
 
 void log_error_conexion_proceso() {
@@ -114,20 +111,12 @@ void log_warning_envio_mensaje(uint32_t id_mensaje, uint32_t id_suscriptor) {
 	log_warning_and_destroy(event_logger, string);
 }
 
-void log_error_enviar_id_mensaje(uint32_t id_mensaje, t_paquete_header header) {
+void log_error_enviar_id_mensaje(uint32_t id_mensaje, t_proceso proceso) {
 	log_error(event_logger, "Se produjo un error al enviar el id de mensaje: %d al proceso %s con id_proceso: \n",
-			id_mensaje, get_nombre_proceso(header.tipo_proceso), header.id_proceso);
+			id_mensaje, proceso_get_nombre(proceso), proceso_get_id(proceso));
 }
 
 // Funciones Privadas
-static void log_proceso(char* header_string, t_paquete_header header) {
-
-	char *string = string_new();
-	string_append_separador(&string, header_string);
-	string_append_with_format(&string, " id proceso: %d \n", header.id_proceso);
-	string_append_with_format(&string, " tipo: %s \n", get_nombre_proceso(header.tipo_proceso));
-	log_info_and_destroy(logger, string);
-}
 
 static void string_append_mensaje_serializado(char** string, t_id_cola id_cola, void* msj_recibido) {
 
@@ -175,10 +164,6 @@ static void log_envio_mensaje(char* header_string, uint32_t id_mensaje, uint32_t
 
 	string_append_contenido_envio_mensaje(&string, header_string, id_mensaje, id_suscriptor);
 	log_info_and_destroy(logger, string);
-}
-
-static void string_append_cola(char** string, t_id_cola id_cola) {
-	string_append_with_format(string, " cola: %s \n", get_nombre_cola(id_cola));
 }
 
 static void string_append_contenido_envio_mensaje(char** string, char* header_string, uint32_t id_mensaje,

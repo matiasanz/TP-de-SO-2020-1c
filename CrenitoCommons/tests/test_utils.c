@@ -10,8 +10,7 @@
 void inicializar_logs() {
 
 	logger = log_create("./log/test.log", "TESTS", 1, LOG_LEVEL_INFO);
-	event_logger = log_create("./log/test_event.log", "TESTS", 1,
-			LOG_LEVEL_ERROR);
+	event_logger = log_create("./log/test_event.log", "TESTS", 1, LOG_LEVEL_ERROR);
 }
 
 //+++++++++++++++++++++ SHOULD
@@ -31,8 +30,7 @@ void should_pokemon(t_pokemon esperado, t_pokemon real) {
 
 //+++++++++++++++++++++ ASSERT
 
-void assert_mensaje_new_pokemon(t_mensaje_new_pokemon* esperado,
-		t_mensaje_new_pokemon* real) {
+void assert_mensaje_new_pokemon(t_mensaje_new_pokemon* esperado, t_mensaje_new_pokemon* real) {
 
 	should_ptr(real) not be null;
 	should_int(mensaje_new_pokemon_get_id(real)) be equal to
@@ -45,8 +43,7 @@ void assert_mensaje_new_pokemon(t_mensaje_new_pokemon* esperado,
 	should_pokemon(real->pokemon, esperado->pokemon);
 }
 
-void assert_mensaje_localized_pokemon(t_mensaje_localized_pokemon* esperado,
-		t_mensaje_localized_pokemon* real) {
+void assert_mensaje_localized_pokemon(t_mensaje_localized_pokemon* esperado, t_mensaje_localized_pokemon* real) {
 
 	should_ptr(real) not be null;
 	should_int(mensaje_localized_pokemon_get_id(real)) be equal to
@@ -70,8 +67,7 @@ void assert_mensaje_localized_pokemon(t_mensaje_localized_pokemon* esperado,
 
 }
 
-void assert_mensaje_get_pokemon(t_mensaje_get_pokemon* esperado,
-		t_mensaje_get_pokemon* real) {
+void assert_mensaje_get_pokemon(t_mensaje_get_pokemon* esperado, t_mensaje_get_pokemon* real) {
 
 	should_ptr(real) not be null;
 	should_int(mensaje_get_pokemon_get_id(real)) be equal to
@@ -83,8 +79,7 @@ void assert_mensaje_get_pokemon(t_mensaje_get_pokemon* esperado,
 	should_string(real ->especie) be equal to (esperado ->especie);
 }
 
-void assert_mensaje_appeared_catch_pokemon(
-		t_mensaje_appeared_catch_pokemon* esperado,
+void assert_mensaje_appeared_catch_pokemon(t_mensaje_appeared_catch_pokemon* esperado,
 		t_mensaje_appeared_catch_pokemon* real) {
 
 	should_ptr(real) not be null;
@@ -98,8 +93,7 @@ void assert_mensaje_appeared_catch_pokemon(
 	should_pokemon(real->pokemon, esperado->pokemon);
 }
 
-void assert_mensaje_caught_pokemon(t_mensaje_caught_pokemon* esperado,
-		t_mensaje_caught_pokemon* real) {
+void assert_mensaje_caught_pokemon(t_mensaje_caught_pokemon* esperado, t_mensaje_caught_pokemon* real) {
 
 	should_ptr(real) not be null;
 	should_int(mensaje_caught_pokemon_get_id(real)) be equal to
@@ -168,8 +162,7 @@ void assert_mensaje_recibido(t_id_cola id_cola_esperada, void* serializado_real)
 		break;
 
 	default:
-		log_error(event_logger, "No existe el tipo de cola: %d",
-				id_cola_esperada);
+		log_error(event_logger, "No existe el tipo de cola: %d", id_cola_esperada);
 		break;
 	}
 
@@ -178,10 +171,15 @@ void assert_mensaje_recibido(t_id_cola id_cola_esperada, void* serializado_real)
 
 //+++++++++++++++++++++ TEST_DATA
 
+void proceso_inicializar_test() {
+
+	proceso.tipo_proceso = GAMECARD;
+	proceso.id_proceso = 999;
+}
+
 t_mensaje_new_pokemon* mensaje_new_pokemon_test() {
 
-	t_mensaje_new_pokemon* new_pokemon = mensaje_new_pokemon_crear("pickachu",
-			4, 5, 6);
+	t_mensaje_new_pokemon* new_pokemon = mensaje_new_pokemon_crear("pickachu", 4, 5, 6);
 
 	mensaje_new_pokemon_set_id(new_pokemon, 5);
 	mensaje_new_pokemon_set_id_correlativo(new_pokemon, 1);
@@ -193,9 +191,7 @@ t_paquete* paquete_new_pokemon_test() {
 
 	t_mensaje_new_pokemon* msj = mensaje_new_pokemon_test();
 
-	t_paquete* pqt = paquete_crear(
-			paquete_header_crear(MENSAJE, GAMEBOY, NEW_POKEMON, 1),
-			mensaje_new_pokemon_serializar(msj));
+	t_paquete* pqt = paquete_crear(MENSAJE, NEW_POKEMON, mensaje_new_pokemon_serializar(msj));
 
 	mensaje_new_pokemon_destruir(msj);
 
@@ -215,8 +211,7 @@ t_mensaje_localized_pokemon* mensaje_localized_pokemon_test() {
 	t_posicion* p1 = posicion_crear_ptr(2, 4);
 	list_add(posiciones, p1);
 
-	t_mensaje_localized_pokemon* localized = mensaje_localized_pokemon_crear(
-			"bulbasaur", posiciones);
+	t_mensaje_localized_pokemon* localized = mensaje_localized_pokemon_crear("bulbasaur", posiciones);
 	mensaje_localized_pokemon_set_id(localized, 3);
 	mensaje_localized_pokemon_set_id_correlativo(localized, 2);
 
@@ -229,9 +224,7 @@ t_paquete* paquete_localized_pokemon_test() {
 
 	t_mensaje_localized_pokemon* msj = mensaje_localized_pokemon_test();
 
-	t_paquete* pqt = paquete_crear(
-			paquete_header_crear(MENSAJE, GAMEBOY, LOCALIZED_POKEMON, 1),
-			mensaje_localized_pokemon_serializar(msj));
+	t_paquete* pqt = paquete_crear(MENSAJE, LOCALIZED_POKEMON, mensaje_localized_pokemon_serializar(msj));
 
 	mensaje_localized_pokemon_destruir(msj);
 
@@ -251,9 +244,7 @@ t_paquete* paquete_get_pokemon_test() {
 
 	t_mensaje_get_pokemon* msj = mensaje_get_pokemon_test();
 
-	t_paquete* pqt = paquete_crear(
-			paquete_header_crear(MENSAJE, GAMEBOY, GET_POKEMON, 1),
-			mensaje_get_pokemon_serializar(msj));
+	t_paquete* pqt = paquete_crear(MENSAJE, GET_POKEMON, mensaje_get_pokemon_serializar(msj));
 
 	mensaje_get_pokemon_destruir(msj);
 
@@ -262,8 +253,7 @@ t_paquete* paquete_get_pokemon_test() {
 
 t_mensaje_appeared_catch_pokemon* mensaje_appeared_catch_pokemon_test() {
 
-	t_mensaje_appeared_catch_pokemon* appeared_catch =
-			mensaje_appeared_catch_pokemon_crear("squirtle", 7, 9);
+	t_mensaje_appeared_catch_pokemon* appeared_catch = mensaje_appeared_catch_pokemon_crear("squirtle", 7, 9);
 	mensaje_appeared_catch_pokemon_set_id(appeared_catch, 1);
 	mensaje_appeared_catch_pokemon_set_id_correlativo(appeared_catch, 2);
 
@@ -272,12 +262,9 @@ t_mensaje_appeared_catch_pokemon* mensaje_appeared_catch_pokemon_test() {
 
 t_paquete* paquete_appeared_catch_pokemon_test(t_id_cola cola_esperada) {
 
-	t_mensaje_appeared_catch_pokemon* msj =
-			mensaje_appeared_catch_pokemon_test();
+	t_mensaje_appeared_catch_pokemon* msj = mensaje_appeared_catch_pokemon_test();
 
-	t_paquete* pqt = paquete_crear(
-			paquete_header_crear(MENSAJE, GAMEBOY, cola_esperada, 1),
-			mensaje_appeared_catch_pokemon_serializar(msj));
+	t_paquete* pqt = paquete_crear(MENSAJE, cola_esperada, mensaje_appeared_catch_pokemon_serializar(msj));
 
 	mensaje_appeared_catch_pokemon_destruir(msj);
 
@@ -297,11 +284,10 @@ t_paquete* paquete_caught_pokemon_test() {
 
 	t_mensaje_caught_pokemon* msj = mensaje_caught_pokemon_test();
 
-	t_paquete* pqt = paquete_crear(
-			paquete_header_crear(MENSAJE, GAMEBOY, CAUGHT_POKEMON, 1),
-			mensaje_caught_pokemon_serializar(msj));
+	t_paquete* pqt = paquete_crear(MENSAJE, CAUGHT_POKEMON, mensaje_caught_pokemon_serializar(msj));
 
 	mensaje_caught_pokemon_destruir(msj);
 
 	return pqt;
 }
+

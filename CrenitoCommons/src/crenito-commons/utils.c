@@ -7,23 +7,6 @@
 
 #include"utils.h"
 
-char* get_nombre_proceso(t_tipo_proceso tipo_proceso) {
-
-	switch (tipo_proceso) {
-	case BROKER:
-		return BROKER_STRING;
-	case GAMEBOY:
-		return GAMEBOY_STRING;
-	case GAMECARD:
-		return GAMECARD_STRING;
-	case TEAM:
-		return TEAM_STRING;
-	default:
-		log_error(event_logger, "Tipo de proceso incorrecto: %d", tipo_proceso);
-		return NULL;
-	}
-}
-
 char* get_nombre_cola(t_id_cola id_cola) {
 
 	switch (id_cola) {
@@ -83,31 +66,29 @@ void log_warning_and_destroy(t_log* un_logger, char* string) {
 	free(string);
 }
 
-//Logs Adicionales
+//Logs Obligatorios
+//Team
+void log_inicio_proceso_reconexion(t_id_cola id_cola, int segundos) {
+	log_info(logger, "Inicio reintento de conexión cola %s. Se intentará conectar en %d segundos",
+			get_nombre_cola(id_cola), segundos);
+}
+
+void log_resultado_proceso_reconexion(t_id_cola id_cola, char* resultado) {
+	log_info(logger, "Resultado del reintento de conexión cola %s: %s \n", get_nombre_cola(id_cola), resultado);
+}
+
+//GameBoy
+//TODO mover todos los logs a un archivo aparte y preguntar acá adentro si debe loggearse
+void log_suscripcion(t_id_cola id_cola) {
+	log_info(logger, "El Proceso %s se suscribió a la cola %s", GAMEBOY_STRING, get_nombre_cola(id_cola));
+}
 
 //Logs Errores
-void log_warning_socket(int socket, char* operacion){
-	log_warning(event_logger,
-				"Error al realizar la operación %s, socket: %d", operacion, socket);
+void log_warning_socket(int socket, char* operacion) {
+	log_warning(event_logger, "Error al realizar la operación %s, socket: %d", operacion, socket);
 }
 
 void log_error_cola(int id_cola) {
 	log_error(event_logger, "No existe la cola: %d. Finalizando hilo", id_cola);
 	pthread_exit(NULL);
-}
-
-void log_warning_suscripcion(t_id_cola id_cola) {
-	log_warning(event_logger, "No se pudo conectar al proceso %s, cancelando subscripción %s \n",
-	BROKER_STRING, get_nombre_cola(id_cola));
-
-}
-
-void log_warning_conexion_perdida(t_id_cola id_cola) {
-	log_warning(event_logger, "Se perdió la conexión con el %s, cancelando escucha sobre la cola %s",
-	BROKER_STRING, get_nombre_cola(id_cola));
-}
-
-void log_warning_broker_desconectado(t_id_cola id_cola) {
-	log_warning(event_logger, "el %s está desconectado, cancelando subscripción %s",
-	BROKER_STRING, get_nombre_cola(id_cola));
 }

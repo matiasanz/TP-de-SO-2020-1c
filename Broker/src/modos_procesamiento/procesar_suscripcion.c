@@ -14,7 +14,7 @@ static void enviar_mensajes_cacheados(t_cola_container* container, t_suscriptor*
 void procesar_suscripcion(int socket, t_paquete_header header) {
 
 	t_cola_container* container = get_cola(header.id_cola);
-	t_suscriptor* suscriptor = suscribir_proceso(socket, header.id_proceso, container);
+	t_suscriptor* suscriptor = suscribir_proceso(socket, proceso_get_id(header.proceso), container);
 
 	uint32_t id_suscriptor = suscriptor->id_proceso;
 	log_nuevo_suscriptor(header);

@@ -34,11 +34,9 @@ void inicializar_config() {
 
 void inicializar_conexiones() {
 
-	id_proceso = config_get_int_value(config, "ID_PROCESO");
-
 	conexion_broker = conexion_server_crear(
 			config_get_string_value(config, "IP_BROKER"),
-			config_get_string_value(config, "PUERTO_BROKER"), GAMECARD);
+			config_get_string_value(config, "PUERTO_BROKER"));
 
 	pthread_mutex_init(&mutex_subscripcion, NULL);
 

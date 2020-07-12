@@ -7,26 +7,25 @@
 
 #include "paquete.h"
 
-t_paquete* paquete_crear(t_paquete_header header, t_buffer* buffer) {
+t_paquete* paquete_crear(t_codigo_operacion cod_op, t_id_cola id_cola, t_buffer* buffer) {
 
 	t_paquete* paquete = malloc(sizeof(t_paquete));
 
-	paquete->header = header;
+	paquete->header = paquete_header_crear(cod_op, id_cola);
 	paquete->buffer = buffer;
 
 	return paquete;
 }
 
-t_paquete_header paquete_header_crear(t_codigo_operacion cod_op, t_tipo_proceso tipo_proceso,
-		t_id_cola id_cola, int id_proceso) {
+t_paquete_header paquete_header_crear(t_codigo_operacion cod_op, t_id_cola id_cola) {
 
 	t_paquete_header header;
-	header.codigo_operacion = cod_op;
-	header.tipo_proceso = tipo_proceso;
-	header.id_cola = id_cola;
-	header.id_proceso = id_proceso;
-	return header;
 
+	header.codigo_operacion = cod_op;
+	header.id_cola = id_cola;
+	header.proceso = proceso;
+
+	return header;
 }
 
 void paquete_destruir(t_paquete* paquete) {
@@ -37,10 +36,8 @@ void paquete_destruir(t_paquete* paquete) {
 
 void* paquete_serializar(t_paquete* paquete, int *bytes) {
 
-	*bytes = sizeof(t_paquete_header) +
-			 paquete->buffer->size +
-	         sizeof(paquete->buffer->size);
-	
+	*bytes = sizeof(t_paquete_header) + paquete->buffer->size + sizeof(paquete->buffer->size);
+
 	void * stream = malloc(*bytes);
 
 	int desplazamiento = 0;
@@ -51,8 +48,7 @@ void* paquete_serializar(t_paquete* paquete, int *bytes) {
 	memcpy(stream + desplazamiento, &(paquete->buffer->size), sizeof(int));
 	desplazamiento += sizeof(int);
 
-	memcpy(stream + desplazamiento, paquete->buffer->stream,
-			paquete->buffer->size);
+	memcpy(stream + desplazamiento, paquete->buffer->stream, paquete->buffer->size);
 	desplazamiento += paquete->buffer->size;
 
 	return stream;
@@ -60,9 +56,13 @@ void* paquete_serializar(t_paquete* paquete, int *bytes) {
 
 void* paquete_get_stream(t_paquete* paquete) {
 
-	return buffer_get_stream(paquete -> buffer);
+	return buffer_get_stream(paquete->buffer);
 }
 
 t_id_cola paquete_get_id_cola(t_paquete* paquete) {
-	return paquete -> header.id_cola;
+	return paquete->header.id_cola;
+}
+
+t_proceso paquete_header_get_proceso(t_paquete_header header) {
+	return header.proceso;
 }

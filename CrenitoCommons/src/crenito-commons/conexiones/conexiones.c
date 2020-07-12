@@ -10,14 +10,19 @@
 /*
  * Subscribe a los distintos procesos con el Broker.
  */
-int suscribir(t_conexion_server* server, t_conexion_cliente* cliente);
-
+static int suscribir(t_conexion_server* server, t_conexion_cliente* cliente);
+/*
+ * Algoritmo de reconexion frente a una eventual caida del Broker.
+ * Devuelve el nuevo socket que pudo reconectar
+ */
+static int reconectar(t_conexion_server* server, t_conexion_cliente* cliente);
 /*
  * Envía un paquete usando el socket indicado por parámetro
  * y se queda a la espera una respuesta de tipo entero
  * la cual retorna
  */
 static int handshake(int socket, void* pqt, int size);
+static int crear_paquete_suscripcion_y_realizar_handshake(int un_socket, t_id_cola id_cola);
 
 int enviar(t_conexion_server* server, t_paquete* pqt) {
 
@@ -45,77 +50,16 @@ int enviar_paquete(t_paquete* pqt, int socket) {
 	return id_mensaje;
 }
 
-//*****************************************************************************
-void mantener_suscripcion(t_conexion* conexion, void (*procesar_fallo)(t_conexion*)){
-
-	t_conexion_cliente* cliente = conexion->cliente;
-	t_suscriptor* subscriptor = cliente->suscriptor;
-
-	while (1) {
-
-		int estadoSuscripcion = recibir(subscriptor->socket, cliente->callback);
-
-		if (error_conexion(estadoSuscripcion)) {
-
-			procesar_fallo(conexion);
-
-			break;
-		};
-
-	}
-}
-
-//int conexion_get_tiempo_reintento(t_conexion*conexion){
-//	return conexion->cliente->segundos_reconexion;
-//}
-
-//TODO
-//void intentar_reconectar(t_conexion* conexion){
-//	uint32_t TIEMPO_RECONEXION = conexion;
-//	int estado_suscripcion;
-//
-//	do{
-//
-//		sleep(TIEMPO_RECONEXION);
-//
-//		log_info(logger, "Inicio reintento de conexión");
-//
-//		pthread_mutex_lock(&mutex_subscripcion);
-//		estado_suscripcion = subscribir(conexion->server, conexion->cliente);
-//		pthread_mutex_unlock(&mutex_subscripcion);
-//
-//		log_info(logger, "Resultado del reintento de conexión: %s", (error_conexion(estado_suscripcion)? "Fallido": "Exitoso"));
-//
-//	} while(error_conexion(estado_suscripcion));
-//
-//}
-
-
-//**************************************************************************
-
 void suscribir_y_escuchar_cola(t_conexion* args) {
 
 	pthread_mutex_lock(&mutex_subscripcion);
-	int estado_subscripcion = suscribir(args->server, args->cliente);
+	int socket_cliente = suscribir(args->server, args->cliente);
 	pthread_mutex_unlock(&mutex_subscripcion);
 
-	t_conexion_cliente* cliente = args->cliente;
-
-	//TO-DO reconectar
-	if (error_conexion(estado_subscripcion)) {
-		log_warning_suscripcion(cliente->id_cola);
-		return;
-	}
-
-	t_suscriptor* suscriptor = cliente->suscriptor;
-
-	while (1) {
-
-		if (error_conexion(recibir(suscriptor_get_socket(suscriptor), cliente->callback))) {
-			log_warning_conexion_perdida(cliente->id_cola);
-			break;
+	while (true) {
+		if (error_conexion(recibir(socket_cliente, args->cliente->callback))) {
+			socket_cliente = reconectar(args->server, args->cliente);
 		};
-
 	}
 }
 
@@ -125,11 +69,19 @@ static int handshake(int socket, void* pqt, int size) {
 	return socket_recibir_int(socket);
 }
 
+static int crear_paquete_suscripcion_y_realizar_handshake(int un_socket, t_id_cola id_cola) {
+
+	if (proceso_debe_informar_suscripcion())
+		log_suscripcion(id_cola);
+	t_paquete_header pqt = paquete_header_crear(SUSCRIPCION, id_cola);
+	return handshake(un_socket, &pqt, sizeof(t_paquete_header));
+}
+
 void conectar_y_escuchar_gameboy(t_conexion_host* gameboy) {
 
 	int socket_server = socket_crear_listener(gameboy->ip, gameboy->puerto);
 
-	while (1) {
+	while (true) {
 
 		int socket_cliente = socket_aceptar_conexion(socket_server);
 		recibir(socket_cliente, gameboy->callback);
@@ -137,21 +89,17 @@ void conectar_y_escuchar_gameboy(t_conexion_host* gameboy) {
 
 }
 
-int suscribir(t_conexion_server* server, t_conexion_cliente* cliente) {
+static int suscribir(t_conexion_server* server, t_conexion_cliente* cliente) {
 
-	int socket = socket_crear_client(server->ip, server->puerto);
-	suscriptor_set_socket(cliente -> suscriptor, socket);
+	int socket_cliente = socket_crear_client(server->ip, server->puerto);
 
-	//TO-DO reconectar
-	if (error_conexion(suscriptor_get_socket(cliente->suscriptor))) {
-		log_warning_broker_desconectado(cliente->id_cola);
-		return ERROR_SOCKET;
+	if (error_conexion(socket_cliente)) {
+		socket_cliente = reconectar(server, cliente);
+	} else {
+		crear_paquete_suscripcion_y_realizar_handshake(socket_cliente, cliente->id_cola);
 	}
 
-	t_paquete_header pqt = paquete_header_crear(SUSCRIPCION,
-			server->tipo_proceso, cliente->id_cola, suscriptor_get_id_proceso(cliente ->suscriptor));
-
-	return handshake(socket, &pqt, sizeof(t_paquete_header));
+	return socket_cliente;
 }
 
 int recibir(int socket, void (*callback)(t_id_cola, void*)) {
@@ -175,4 +123,21 @@ int recibir(int socket, void (*callback)(t_id_cola, void*)) {
 	callback(header.id_cola, msj);
 
 	return EXIT_SUCCESS;
+}
+
+static int reconectar(t_conexion_server* server, t_conexion_cliente* cliente) {
+
+	if (!debe_reconectar(cliente)) return ERROR_SOCKET;
+	int un_socket = 0;
+
+	do {
+		log_inicio_proceso_reconexion(cliente->id_cola, cliente ->segundos_reconexion);
+		sleep(cliente ->segundos_reconexion);
+		un_socket = socket_crear_client(server->ip, server->puerto);
+		log_resultado_proceso_reconexion(cliente->id_cola, error_conexion(un_socket) ? "Fallido" : "Exitoso");
+
+	} while (error_conexion(un_socket));
+
+	crear_paquete_suscripcion_y_realizar_handshake(un_socket, cliente->id_cola);
+	return un_socket;
 }

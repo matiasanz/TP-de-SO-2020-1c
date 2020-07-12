@@ -18,7 +18,8 @@ context (test_conexiones) {
 		before {
 
 			inicializar_logs();
-			conexion_broker = conexion_server_crear("127.0.0.1", "3999", GAMEBOY);
+			proceso_inicializar_test();
+			conexion_broker = conexion_server_crear("127.0.0.1", "3999");
 
 		}end
 
@@ -110,7 +111,7 @@ context (test_conexiones) {
 				//ARRANGE
 				cola_esperada = CATCH_POKEMON;
 
-				conexion_catch_pokemon = conexion_cliente_crear(cola_esperada, 1,
+				conexion_catch_pokemon = conexion_cliente_crear(cola_esperada,
 						0,
 						(void*)assert_mensaje_recibido);
 
@@ -140,7 +141,7 @@ context (test_conexiones) {
 				//ARRANGE
 				cola_esperada = GET_POKEMON;
 
-				conexion_get_pokemon = conexion_cliente_crear(cola_esperada, 1,
+				conexion_get_pokemon = conexion_cliente_crear(cola_esperada,
 						0,
 						(void*)assert_mensaje_recibido);
 
@@ -171,7 +172,7 @@ context (test_conexiones) {
 				//ARRANGE
 				cola_esperada = NEW_POKEMON;
 
-				conexion_new_pokemon = conexion_cliente_crear(cola_esperada,1,
+				conexion_new_pokemon = conexion_cliente_crear(cola_esperada,
 						0,
 						(void*)assert_mensaje_recibido);
 
@@ -203,7 +204,7 @@ context (test_conexiones) {
 				//ARRANGE
 				cola_esperada = APPEARED_POKEMON;
 
-				conexion_appeared_pokemon = conexion_cliente_crear(cola_esperada,1,
+				conexion_appeared_pokemon = conexion_cliente_crear(cola_esperada,
 						0,
 						(void*)assert_mensaje_recibido);
 
@@ -234,7 +235,7 @@ context (test_conexiones) {
 				//ARRANGE
 				cola_esperada = LOCALIZED_POKEMON;
 
-				conexion_localized_pokemon = conexion_cliente_crear(cola_esperada,1,
+				conexion_localized_pokemon = conexion_cliente_crear(cola_esperada,
 						0,
 						(void*)assert_mensaje_recibido);
 
@@ -265,7 +266,7 @@ context (test_conexiones) {
 				//ARRANGE
 				cola_esperada = CAUGHT_POKEMON;
 
-				conexion_caught_pokemon = conexion_cliente_crear(cola_esperada,1,
+				conexion_caught_pokemon = conexion_cliente_crear(cola_esperada,
 						0,
 						(void*)assert_mensaje_recibido);
 
@@ -308,7 +309,7 @@ context (test_conexiones) {
 
 				pthread_detach(hilo_gameboy);
 
-				sleep(1);
+				sleep(2);
 				//Conexion al socket_server desde un cliente
 				int socket_enviar = socket_crear_client(conexion_gameboy -> ip, conexion_gameboy -> puerto);
 

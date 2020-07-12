@@ -19,24 +19,23 @@ void procesar_modo_suscriptor(char* cola_mensaje_string, char* tiempo_conexion_s
 
 	validar_mayor_igual_a_cero(tiempo_conexion_string);
 
-	int tiempoConexion = atoi(tiempo_conexion_string);
+	int tiempo_conexion = atoi(tiempo_conexion_string);
 	t_id_cola id_cola = get_id_mensaje(cola_mensaje_string);
 
 	t_conexion_cliente* conexion_cliente = conexion_cliente_crear(id_cola,
-			id_proceso,
 			config_get_int_value(config, "TIEMPO_DE_REINTENTO_CONEXION"), (void*) mensaje_recibido);
 
 	conexion_broker = conexion_server_crear(config_get_string_value(config, "IP_BROKER"),
-			config_get_string_value(config, "PUERTO_BROKER"), GAMEBOY);
+			config_get_string_value(config, "PUERTO_BROKER"));
 
 	t_conexion* args = conexion_crear(conexion_broker, conexion_cliente);
 
-	pthread_create(&hilo_suscriptor, NULL, (void*) gameboy_suscribir_y_escuchar_cola, args);
+	pthread_create(&hilo_suscriptor, NULL, (void*) suscribir_y_escuchar_cola, args);
 	pthread_detach(hilo_suscriptor);
 
-	sleep(tiempoConexion);
+	sleep(tiempo_conexion);
 
-	log_event_fin_de_suscripcion_a_cola(tiempoConexion, cola_mensaje_string);
+	log_event_fin_de_suscripcion_a_cola(tiempo_conexion, cola_mensaje_string);
 
 	conexion_destruir(args);
 }
@@ -86,33 +85,4 @@ static void mensaje_recibido(t_id_cola id_cola, void* msj) {
 	free(msj);
 }
 
-//*************************************************************************************************
-#include "mensaje.h"
 
-/*
- *  TODO ver si vale la pena reconectar y llegado el caso, a ESA funcion
- *  pasarle como argumento el event_logger (de alguna manera)
- */
-
-void suspender_escucha(t_conexion* conexion){
-	log_event_perdida_de_conexion_a_cola(get_nombre_cola(conexion->cliente->id_cola));
-	exit(1);
-}
-
-int suscribir(t_conexion_server*, t_conexion_cliente*); //tomada de conexiones.c
-
-void gameboy_suscribir_y_escuchar_cola(t_conexion* conexion){
-	pthread_mutex_lock(&mutex_subscripcion);
-	int estado_subscripcion = suscribir(conexion->server, conexion->cliente);
-	pthread_mutex_unlock(&mutex_subscripcion);
-
-	if(error_conexion(estado_subscripcion)){
-		char*nombre_cola = get_nombre_cola(conexion->cliente->id_cola);
-		log_event_intento_fallido_de_conexion(nombre_cola);
-		finalizar_gameboy(EXIT_FAILURE);
-	}
-
-	else log_enunciado_suscripcion_a_cola_de_mensajes(get_nombre_cola(conexion->cliente->id_cola));
-
-	mantener_suscripcion(conexion, (void*) suspender_escucha);
-}
