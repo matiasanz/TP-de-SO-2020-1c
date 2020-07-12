@@ -38,17 +38,32 @@ t_cola_container* get_cola(t_id_cola id_cola) {
 	}
 }
 
-void cola_buscar_y_eliminar_mensaje(uint32_t id_mensaje, t_id_cola id_cola) {
 
-	t_cola_container* container = get_cola(id_cola);
+//***************************************
+bool cola_esta_vacia(t_cola_container* cola){
+	return list_is_empty(cola->cola);
+}
 
+bool cola_tiene_suscriptores(t_cola_container* container){
+	return cola_get_cantidad_suscriptores(container);
+}
+
+void cola_remove_and_destroy_by_id(uint32_t id_mensaje, t_cola_container* container){
 	bool id_mensaje_buscado(t_mensaje_cache* msj) {
 		return particion_get_id_mensaje(msj->particion) == id_mensaje;
 	}
 
-	pthread_mutex_lock(&container->mutex_mensajes);
 	list_remove_and_destroy_by_condition(container->cola, (void*) id_mensaje_buscado,
-			(void*) mensaje_cache_eliminar_de_cola);
+				(void*) mensaje_cache_eliminar_de_cola);
+}
+//**************************************
+
+void cola_buscar_y_eliminar_mensaje(uint32_t id_mensaje, t_id_cola id_cola) {
+
+	t_cola_container* container = get_cola(id_cola);
+
+	pthread_mutex_lock(&container->mutex_mensajes);
+	cola_remove_and_destroy_by_id(id_mensaje, container);
 	pthread_mutex_unlock(&container->mutex_mensajes);
 }
 
@@ -67,4 +82,5 @@ int cola_get_cantidad_suscriptores(t_cola_container* container) {
 
 	return cantidad_suscriptores;
 }
+
 

@@ -9,9 +9,10 @@ int main(void) {
 
 	while (true) {
 
-		int socket_cliente = socket_aceptar_conexion(socket_servidor);
+		int*socket_cliente = malloc(sizeof(int));
+		   *socket_cliente = socket_aceptar_conexion(socket_servidor);
 
-		pthread_create(&hilo_receptor_mensajes, NULL, (void*) atender_cliente, &socket_cliente);
+		pthread_create(&hilo_receptor_mensajes, NULL, (void*) atender_cliente, socket_cliente);
 		pthread_detach(hilo_receptor_mensajes);
 	}
 
@@ -76,7 +77,8 @@ void atender_cliente(int* socket) {
 		log_error_atender_cliente(*socket, header);
 	}
 
-	pthread_exit(NULL);
+	free(socket);
+//	pthread_exit(NULL);
 }
 
 void inicializar_servidor() {

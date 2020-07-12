@@ -34,4 +34,18 @@ void cola_buscar_y_eliminar_mensaje(uint32_t id_mensaje, t_id_cola id_cola);
 void encolar_mensaje(t_cola_container* container, t_mensaje_cache* msj);
 int cola_get_cantidad_suscriptores(t_cola_container* container);
 
+//********************************************
+//bool cola_is_empty(t_cola_container* cola);
+
+//Bloquea suscriptores
+bool cola_tiene_suscriptores(t_cola_container* container);
+
+//No bloqueante
+bool cola_esta_vacia(t_cola_container*);
+
+//No bloqueante
+void cola_remove_and_destroy_by_id(uint32_t id_mensaje, t_cola_container* container);
+//*******************************************
+
+
 #endif /* SRC_COLAS_H_ */

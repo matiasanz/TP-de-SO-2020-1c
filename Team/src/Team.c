@@ -213,11 +213,7 @@ void listas_destroy(){
 //Hilos
 void inicializar_hilos(){
 
-//	pthread_create(&hiloMensajesCAUGHT   , NULL, (void*)team_procesador_cola_CAUGHT   , mensajesCAUGHT);
-//	pthread_create(&hiloMensajesLOCALIZED, NULL, (void*)team_procesador_cola_LOCALIZED, mensajesLOCALIZED);
-
 	pthread_create(&hiloPlanificador, NULL, (void*) team_planificar, NULL);
-
 	pthread_create(&hiloProcesadorDePokemones, NULL, (void*) team_procesar_pokemones, NULL);
 	pthread_detach(hiloProcesadorDePokemones);
 }

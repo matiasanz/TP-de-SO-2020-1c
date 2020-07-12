@@ -15,6 +15,7 @@ void procesar_mensaje(int socket, t_paquete_header header) {
 	void* msj_recibido = socket_recibir_mensaje(socket, &size);
 	log_mensaje_recibido(header.id_cola, msj_recibido);
 
+
 	t_mensaje_cache* msj_cache = guardar_en_memoria(msj_recibido, header.id_cola);
 
 	t_cola_container* container = get_cola(header.id_cola);
@@ -22,7 +23,12 @@ void procesar_mensaje(int socket, t_paquete_header header) {
 	encolar_mensaje(container, msj_cache);
 
 	//TODO sacar esto a una funcion
+	//Observacion: al leer una particion, se esta jugando con el contenido de memoria
+	pthread_mutex_lock(&mutex_acceso_memoria);
 	int id_mensaje = mensaje_cache_get_id(msj_cache);
+	pthread_mutex_unlock(&mutex_acceso_memoria);
+	//TODO Dudoso, quizas convendria retornarlo como argumento en guardar_en_memoria()
+
 	socket_send(socket, &id_mensaje, sizeof(id_mensaje));
 
 	replicar_mensaje(container, msj_cache);

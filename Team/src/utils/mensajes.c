@@ -1,6 +1,8 @@
 #include "mensajes.h"
 #include "../team.h"
 
+void team_enviar_mensaje_get(especie_pokemon especiePokemon);
+
 void* leer_mensaje_cuando_este_disponible(cr_list* unaLista){
 	return cr_list_wait_and_remove(unaLista, 0);
 }
@@ -18,9 +20,36 @@ t_paquete_header team_crear_header(t_id_cola TipoMensaje){
 	return paquete_header_crear(MENSAJE, TEAM, TipoMensaje, id_proceso);
 }
 
+//Itera los objetivos, aplicando la funcion Get a cada uno
+void Get_pokemones(matriz_recursos objetivosTotales, matriz_recursos recursosDisponibles){
+
+	pthread_mutex_lock(&mutexRecursosDisponibles);
+	matriz_recursos necesidadDelEquipo = recursos_matriz_diferencia(objetivosTotales, recursosDisponibles);
+	pthread_mutex_unlock(&mutexRecursosDisponibles);
+
+	void unGetPorPokemon(char* unaEspecie, void*cantidad){
+		if(*((numero*)cantidad) > 0){
+			consumir_ciclo_cpu();
+			Get(unaEspecie);
+		}
+	}
+
+	dictionary_iterator(necesidadDelEquipo, unGetPorPokemon);
+	recursos_destroy(necesidadDelEquipo);
+}
+
 void Get(void* especiePokemon) {
 
 	log_event_pokemon_por_pedir(especiePokemon);
+
+	team_enviar_mensaje_get(string_duplicate(especiePokemon));
+
+//	pthread_t hilo_get_sender;
+//	pthread_create(&hilo_get_sender, NULL, (void*) team_enviar_mensaje_get, string_duplicate(especiePokemon));
+//	pthread_detach(hilo_get_sender);
+}
+
+void team_enviar_mensaje_get(especie_pokemon especiePokemon){
 
 	t_mensaje_get_pokemon* mensajeGet=mensaje_get_pokemon_crear(especiePokemon);
 
@@ -47,24 +76,11 @@ void Get(void* especiePokemon) {
 
 	mensaje_get_pokemon_destruir(mensajeGet);
 	paquete_destruir(paqueteAEnviar);
+	free(especiePokemon);
 }
 
-//Itera los objetivos, aplicando la funcion Get a cada uno. No editar esta funcion, sino la de arriba
-void Get_pokemones(matriz_recursos objetivosTotales, matriz_recursos recursosDisponibles){
-
-	pthread_mutex_lock(&mutexRecursosDisponibles);
-	matriz_recursos necesidadDelEquipo = recursos_matriz_diferencia(objetivosTotales, recursosDisponibles);
-	pthread_mutex_unlock(&mutexRecursosDisponibles);
-
-	void unGetPorPokemon(char* unaEspecie, void*cantidad){
-		if(*((numero*)cantidad) > 0){
-			consumir_ciclo_cpu();
-			Get(unaEspecie);
-		}
-	}
-
-	dictionary_iterator(necesidadDelEquipo, unGetPorPokemon);
-	recursos_destroy(necesidadDelEquipo);
+void team_enviar_mensaje_catch(pokemon*pokemonCatcheado){
+//TODO
 }
 
 //Envia mensaje al broker para ser replicado al gamecard, devuelve el id del mensaje pendiente por recibir

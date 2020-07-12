@@ -57,6 +57,31 @@ void inicializar_memoria() {
 	}
 }
 
+t_particion* asignar_particion(int tamanioMinimo, void* contenido, t_id_cola id_cola){
+	t_particion* particion = obtener_particion_libre(tamanioMinimo);
+
+	while (!particion_encontrada(particion)) {
+
+		if (debe_ejecutarse_compactacion()) {
+			compactar_memoria();
+			particion = obtener_particion_libre(tamanioMinimo);
+		}
+
+		if (!particion_encontrada(particion)) {
+			algoritmo_reemplazo();
+			particion = obtener_particion_libre(tamanioMinimo);
+		}
+	}
+
+	particion_set_id_cola(particion, id_cola);
+	particion_set_uso(particion);
+	particion_set_id_mensaje(particion);
+
+	memcpy(particion_get_direccion_contenido(particion), contenido, tamanioMinimo);
+
+	return particion;
+}
+
 t_mensaje_cache* guardar_en_memoria(void* msj_recibido, t_id_cola id_cola) {
 
 	t_mensaje_cache* msj_cache = mensaje_cache_crear();
@@ -67,31 +92,14 @@ t_mensaje_cache* guardar_en_memoria(void* msj_recibido, t_id_cola id_cola) {
 
 	pthread_mutex_lock(&mutex_acceso_memoria);
 
-	t_particion* particion = obtener_particion_libre(tamanio);
-
-	while (!particion_encontrada(particion)) {
-
-		if (debe_ejecutarse_compactacion()) {
-			compactar_memoria();
-			particion = obtener_particion_libre(tamanio);
-		}
-
-		if (!particion_encontrada(particion)) {
-			algoritmo_reemplazo();
-			particion = obtener_particion_libre(tamanio);
-		}
-	}
-
-	particion_set_id_cola(particion, id_cola);
-	particion_set_uso(particion);
-	particion_set_id_mensaje(particion);
-
-	memcpy(particion_get_direccion_contenido(particion), contenido, tamanio);
-	free(contenido);
+	t_particion* particion = asignar_particion(tamanio, contenido, id_cola);
 	mensaje_cache_set_particion(msj_cache, particion);
+	particion_log_almacenamiento(logger, particion);
+
 	pthread_mutex_unlock(&mutex_acceso_memoria);
 
-	particion_log_almacenamiento(logger, particion);
+	free(contenido);
+
 	return msj_cache;
 }
 
