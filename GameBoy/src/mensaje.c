@@ -17,6 +17,7 @@ t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int l
 	case NEW_POKEMON:
 		id_cola = NEW_POKEMON;
 		validar_quien_conoce_newpokemon(proceso);
+		validar_cantidad_minima_argumentos(longitud, 5, "el mensaje NEW_POKEMON");
 
 		validar_mayor_igual_a_cero(pos_x);
 		validar_mayor_igual_a_cero(pos_y);
@@ -32,9 +33,6 @@ t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int l
 			mensaje_serializado = mensaje_new_pokemon_serializar(msj);
 
 		} else {
-
-			validar_cantidad_minima_argumentos(longitud, 5);
-
 			id = (longitud==8)? argumentos[7] : "99999";
 			// numero alto como se sugiere en https://github.com/sisoputnfrba/foro/issues/1673
 //			validar_que_es_numero(id);
@@ -52,7 +50,7 @@ t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int l
 	case APPEARED_POKEMON:
 		id_cola = APPEARED_POKEMON;
 		validar_quien_conoce_appearedpokemon(proceso);
-		validar_cantidad_minima_argumentos(longitud, 6);
+		validar_cantidad_minima_argumentos(longitud, 6, "el mensaje APPEARED_POKEMON");
 
 		validar_mayor_igual_a_cero(pos_x);
 		validar_mayor_igual_a_cero(pos_y);
@@ -80,7 +78,7 @@ t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int l
 
 		id_cola = CATCH_POKEMON;
 		validar_quien_conoce_catchpokemon(proceso);
-		validar_cantidad_minima_argumentos(longitud, 6);
+		validar_cantidad_minima_argumentos(longitud, 6, "el mensaje CATCH_POKEMON");
 		validar_mayor_igual_a_cero(pos_x);
 		validar_mayor_igual_a_cero(pos_y);
 
@@ -129,7 +127,7 @@ t_paquete* crear_paquete(char* proceso, char* mensaje, char* argumentos[], int l
 
 		id_cola = GET_POKEMON;
 		validar_quien_conoce_getpokemon(proceso);
-
+		validar_cantidad_minima_argumentos(longitud, 4, "el mensaje GET_POKEMON");
 		char* especie = string_duplicate(argumentos[3]);
 		string_trim_right(&especie);
 

@@ -93,17 +93,20 @@ void validar_lectura(void*lectura, char* MENSAJE_EXCEPCION){
 	}
 }
 
-//Logs y config
-void inicializar_logs(){
-	logger = log_crear("TEAM", "LOG_FILE");
-	validar_lectura(logger, "No se encontro el archivo logger");
+//Logs y configs
+void inicializar_logs(char*NombreEquipo){
+	MOSTRAR_LOGS = config_get_int_value(config, "MOSTRAR_LOGS");
 
-	event_logger = log_crear("TEAM_EVENT", "LOG_EVENT_FILE");
-	validar_lectura(event_logger, "No se encontro el archivo event_logger");
+	logger = log_crear("TEAM", "LOG_FILE"); //log_crear_oficial(NombreEquipo);
+	event_logger = log_crear("TEAM_EVENT", "LOG_EVENT_FILE");//log_crear_event(NombreEquipo);
+}
+
+char*team_get_config_path(char*NombreEquipo){
+	return string_from_format("%steam%s.config", CARPETA_CONFIG, NombreEquipo);
 }
 
 void inicializar_config(char* NombreEquipo){
-	char* CONFIG_PATH = string_from_format("%steam%s.config", CARPETA_CONFIG, NombreEquipo);
+	char* CONFIG_PATH = team_get_config_path(NombreEquipo);
 
 		config=config_create(CONFIG_PATH);
 
@@ -188,6 +191,14 @@ void inicializar_listas() {
 	//***************
 }
 
+void esperar_fin_de_suscripciones(){
+	sem_wait(&finDeSuscripcion);
+	sem_wait(&finDeSuscripcion);
+	sem_wait(&finDeSuscripcion);
+	sem_wait(&finDeSuscripcion);
+	sem_wait(&finDeSuscripcion);
+}
+
 void listas_destroy(){
 	cr_list_destroy(entrenadoresReady);
 
@@ -197,7 +208,7 @@ void listas_destroy(){
 	candidatos_destroy(potencialesDeadlock);
 	entrenadores_destroy(equipo);
 
-	boolean_sem_wait_end(&BOOLSEM_EsperoMensajes);
+	esperar_fin_de_suscripciones();
 
 	pendientes_destroy(capturasPendientes);
 
@@ -206,8 +217,6 @@ void listas_destroy(){
 	list_destroy_and_destroy_elements(mapaRequeridos, (void*) pokemon_destroy_hard);
 
 	cr_list_destroy_and_destroy_elements(pokemonesRecibidos, (void*) pokemon_destroy_hard);
-//	cr_list_destroy_and_destroy_elements(mensajesCAUGHT    , (void*) mensaje_caught_pokemon_destruir);
-//	cr_list_destroy_and_destroy_elements(mensajesLOCALIZED , (void*) mensaje_localized_pokemon_destruir);
 }
 
 //Hilos
@@ -237,6 +246,7 @@ void inicializar_semaforos(){
 	sem_init(&EquipoNoPuedaCazarMas     , 0, 0);
 	sem_init(&FinDeCiclo_CPU            , 0, 0);
 	sem_init(&finDeIntercambio          , 0, 0);
+	sem_init(&finDeSuscripcion          , 0, 2);
 
 	boolean_sem_init(&BOOLSEM_EsperoMensajes);
 
@@ -255,6 +265,7 @@ void finalizar_semaforos(){
 	sem_destroy(&HayEntrenadoresDisponibles);
 	sem_destroy(&FinDeCiclo_CPU);
 	sem_destroy(&finDeIntercambio);
+	sem_destroy(&finDeSuscripcion);
 
 	pthread_mutex_destroy(&mutexEntrenadores);
 	pthread_mutex_destroy(&mutexHistorialEspecies);

@@ -10,6 +10,7 @@
 #include "mensajes-utils.h"
 
 typedef t_mensaje_appeared_catch_pokemon t_mensaje_appeared_pokemon;
+typedef t_mensaje_appeared_catch_pokemon t_mensaje_catch_pokemon;
 
 //mensajes entre modulos
 void* leer_mensaje_cuando_este_disponible(cr_list*);

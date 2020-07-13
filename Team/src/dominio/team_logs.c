@@ -3,10 +3,31 @@
 
 t_log* log_crear(char* PROPOSITO, char*KEY){
 	char*LOG_PATH = config_get_string_value(config, KEY);
+	t_log* logger = log_create(LOG_PATH,PROPOSITO,MOSTRAR_LOGS,LOG_LEVEL_INFO);
 
-//	printf("LOG en: %s\n\n", LOG_PATH);
+	if(!logger){
+		FILE*f = fopen(LOG_PATH, "w+b");
+		fclose(f);
+		return log_crear(PROPOSITO, KEY);
+	}
 
-	return log_create(LOG_PATH,PROPOSITO,true,LOG_LEVEL_INFO);
+	return logger;
+}
+
+t_log* log_crear_oficial(char*nombreEquipo){
+	char* proposito = string_from_format("TEAM_%s", nombreEquipo);
+	t_log* logOficial = log_crear(proposito, "LOG_FILE");
+	free(proposito);
+
+	return logOficial;
+}
+
+t_log* log_crear_event(char*nombreEquipo){
+	char* proposito = string_from_format("TEAM_%s EVENT", nombreEquipo);
+	t_log*logEvent = log_crear(proposito, "LOG_EVENT_FILE");
+	free(proposito);
+
+	return logEvent;
 }
 
 //*********************************************************************

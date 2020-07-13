@@ -25,7 +25,6 @@ sem_t EquipoNoPuedaCazarMas;
 sem_t FinDeCiclo_CPU;
 sem_t HayEntrenadoresDisponibles;
 sem_t finDeIntercambio;
-sem_t FinDePlanificacion;
 
 pthread_mutex_t mutexHistorialEspecies;
 pthread_mutex_t mutexEntrenadores;

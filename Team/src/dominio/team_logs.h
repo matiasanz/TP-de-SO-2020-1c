@@ -12,11 +12,15 @@
 #include "planificacion/planificacion.h"
 #include "header_global_team.h"
 
+	bool MOSTRAR_LOGS;
+
 	pthread_mutex_t Mutex_AndoLoggeando;
 	pthread_mutex_t Mutex_AndoLoggeandoEventos;
 
 //Constructor
 	t_log* log_crear(char* PROPOSITO, char*KEY);
+	t_log* log_crear_oficial(char*nombreEquipo);
+	t_log* log_crear_event(char*nombreEquipo);
 
 //Logs del enunciado
 	void log_enunciado_entrenador_creado(entrenador*); //Seria el estado NEW

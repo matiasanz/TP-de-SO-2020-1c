@@ -51,14 +51,14 @@ char* dictionary_get_any_key(t_dictionary* self, bool(*condition)(char*, void*))
 //******************************************************************************************
 
 
-//Ver a futuro, no logre que anduviera
-void* cr_list_entre_mutex(cr_list*unaLista, void*(*funcionDeLista)(t_list*, void*), void* argumento){
-	pthread_mutex_lock(&unaLista->mutex);
-	void* retorno = funcionDeLista(unaLista->lista, argumento);
-	pthread_mutex_unlock(&unaLista->mutex);
-
-	return retorno;
-}
+////Ver a futuro, no logre que anduviera
+//void* cr_list_entre_mutex(cr_list*unaLista, void*(*funcionDeLista)(t_list*, void*), void* argumento){
+//	pthread_mutex_lock(&unaLista->mutex);
+//	void* retorno = funcionDeLista(unaLista->lista, argumento);
+//	pthread_mutex_unlock(&unaLista->mutex);
+//
+//	return retorno;
+//}
 
 cr_list* cr_list_create(){
 	return cr_list_from_list(list_create());
@@ -96,10 +96,17 @@ void cr_list_clean_and_destroy_elements(cr_list* unaLista, void(*element_destroy
 * @NAME: cr_listadd
 * @DESC: Agrega un elemento al final de la lista
 */
-int cr_list_add_and_signal(cr_list* unaLista, void *element){
+
+int cr_list_silent_add(cr_list*unaLista, void* element){
 	pthread_mutex_lock(&unaLista->mutex);
 	int i = list_add(unaLista->lista, element);
 	pthread_mutex_unlock(&unaLista->mutex);
+
+	return i;
+}
+
+int cr_list_add_and_signal(cr_list* unaLista, void *element){
+	int i = cr_list_silent_add(unaLista, element);
 	sem_post(&unaLista->hayMas);
 
 	return i;
@@ -160,7 +167,7 @@ void* cr_list_wait_and_remove(cr_list* unaLista, int index){
 	return elemento;
 }
 
-void* cr_list_remove_by_condition(cr_list* unaLista, bool(*condicion)(void*)){
+void* cr_list_silent_remove_by_condition(cr_list* unaLista, bool(*condicion)(void*)){
 //	return cr_list_entre_mutex(unaLista, (void*(*)(t_list*, void*)) &list_remove_by_condition, &condicion);
 
 	pthread_mutex_lock(&unaLista->mutex);
