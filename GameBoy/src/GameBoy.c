@@ -7,6 +7,7 @@
  Description : Hello World in C, Ansi-style
  ============================================================================
  */
+#include <stdbool.h>
 
 #include "gameboy.h"
 
@@ -14,10 +15,11 @@ int main(int cantidadDeArgumentos, char*argumentos[]) {
 
 	inicializar();
 
+	validar_cantidad_minima_argumentos(cantidadDeArgumentos, 4, "el proceso Gameboy");
+
 	char* proceso = argumentos[1];
 	char* mensaje = argumentos[2];
 
-	validar_cantidad_minima_argumentos(cantidadDeArgumentos, 4);
 	validar_proceso(proceso);
 	validar_mensaje(mensaje);
 
@@ -36,19 +38,20 @@ int main(int cantidadDeArgumentos, char*argumentos[]) {
 
 void inicializar() {
 
-	inicializar_logs();
 	inicializar_config();
 	proceso_inicializar(GAMEBOY);
+	inicializar_logs();
 }
 
 void inicializar_logs() {
 
-	logger = log_create("./log/gameboy.log", GAMEBOY_STRING, 1, LOG_LEVEL_INFO);
-	event_logger = log_create("./log/gameboy_event.log", "GAMEBOY_EVENT", 1, LOG_LEVEL_INFO);
+	logger = log_create("./log/gameboy.log", GAMEBOY_STRING, MOSTRAR_LOGS, LOG_LEVEL_INFO);
+	event_logger = log_create("./log/gameboy_event.log", "GAMEBOY_EVENT", MOSTRAR_LOGS, LOG_LEVEL_INFO);
 }
 
 void inicializar_config() {
 	config = config_create("./config/gameboy.config");
+	MOSTRAR_LOGS = config_get_int_value(config, "MOSTRAR_LOGS");
 }
 
 void finalizar_gameboy(int ESTADO_FINALIZACION){

@@ -20,7 +20,6 @@ void team_planificar(){
 		puts("*************************************** termino de ejecutar");
 	}
 
-	sem_post(&FinDePlanificacion);
 }
 
 //************************************ Funciones Auxiliares ****************************************

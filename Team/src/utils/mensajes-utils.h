@@ -20,6 +20,10 @@
 
 boolean_sem_t BOOLSEM_EsperoMensajes;
 
+sem_t finDeSuscripcion;
+
+bool espero_mensajes();
+
 void dejar_de_recibir();
 
 void mensaje_recibido(t_id_cola id_cola, void* msj);

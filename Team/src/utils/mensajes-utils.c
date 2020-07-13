@@ -8,33 +8,22 @@
 #include "mensajes-utils.h"
 
 bool espero_mensajes(){
-
-	bool esperoMensajes = boolean_sem_consult(&BOOLSEM_EsperoMensajes);
-
-//	pthread_mutex_lock(&mutex_esperoMensajes);
-//	bool esperoMensajes = ESPERO_MENSAJES;
-//	pthread_mutex_unlock(&mutex_esperoMensajes);
-
-	return esperoMensajes;
+	return boolean_sem_consult(&BOOLSEM_EsperoMensajes);
 }
 
 void dejar_de_recibir(){
-
 	boolean_sem_turn_off(&BOOLSEM_EsperoMensajes);
-
-//	pthread_mutex_lock(&mutex_esperoMensajes);
-//	ESPERO_MENSAJES = false;
-//	pthread_mutex_unlock(&mutex_esperoMensajes);
 }
 
 void mensaje_recibido(t_id_cola id_cola, void* msj){
 
 	if(!espero_mensajes()){
 		free(msj);
-		return;
-	}
+		sem_post(&finDeSuscripcion);
+		pthread_exit(NULL);
 
-	boolean_sem_open(&BOOLSEM_EsperoMensajes);
+		puts("Asi que me quisiste cortar? Mira como te rompo todo el proceso, gil");
+	}
 
 	void* deserializado;
 
@@ -60,8 +49,6 @@ void mensaje_recibido(t_id_cola id_cola, void* msj){
 				"El %s recibió un mensaje que no esperaba: (%s)",
 				TEAM_STRING, get_nombre_cola(id_cola));
 	}
-
-	boolean_sem_close(&BOOLSEM_EsperoMensajes);
 
 	free(msj);
 }

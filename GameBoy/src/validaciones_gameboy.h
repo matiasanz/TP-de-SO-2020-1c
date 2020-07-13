@@ -9,7 +9,7 @@ void finalizar_gameboy(int ESTADO_FINALIZACION);
 
 void validar_proceso(char* proceso);
 void validar_mensaje(char* mensaje);
-void validar_cantidad_minima_argumentos(int cantidadRecibida, int cantidadMinima);
+void validar_cantidad_minima_argumentos(int cantidadRecibida, int cantidadMinima, char*paraQue);
 void validar_cantidad_argumentos(int cantidad,int numero);
 void validar_quien_conoce_newpokemon(char* proceso);
 void validar_quien_conoce_appearedpokemon(char* proceso);

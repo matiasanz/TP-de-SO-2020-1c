@@ -93,26 +93,29 @@ void validar_lectura(void*lectura, char* MENSAJE_EXCEPCION){
 	}
 }
 
-//Logs y config
-void inicializar_logs(){
-	logger = log_crear("TEAM", "LOG_FILE");
-	validar_lectura(logger, "No se encontro el archivo logger");
+//Logs y configs
+void inicializar_logs(char*NombreEquipo){
+	MOSTRAR_LOGS = config_get_int_value(config, "MOSTRAR_LOGS");
 
-	event_logger = log_crear("TEAM_EVENT", "LOG_EVENT_FILE");
-	validar_lectura(event_logger, "No se encontro el archivo event_logger");
+	logger       = log_crear("TEAM_EVENT", "LOG_EVENT_FILE");//log_crear_oficial(NombreEquipo);
+	event_logger = log_crear("TEAM_EVENT", "LOG_EVENT_FILE");//log_crear_event(NombreEquipo);
+}
+
+char*team_get_config_path(char*NombreEquipo){
+	return string_from_format("%steam%s.config", CARPETA_CONFIG, NombreEquipo);
 }
 
 void inicializar_config(char* NombreEquipo){
-	char* CONFIG_PATH = string_from_format("%steam%s.config", CARPETA_CONFIG, NombreEquipo);
+	char* CONFIG_PATH = team_get_config_path(NombreEquipo);
 
-		config=config_create(CONFIG_PATH);
+	config=config_create(CONFIG_PATH);
 
-		if(!config){
+	if(!config){
 
-			error_show("No se encontro el archivo <<%s>>", CONFIG_PATH);
-		    free(CONFIG_PATH);
-			exit(1);
-		}
+		error_show("No se encontro el archivo <<%s>>", CONFIG_PATH);
+		free(CONFIG_PATH);
+		exit(1);
+	}
 
     free(CONFIG_PATH);
 }
@@ -188,6 +191,14 @@ void inicializar_listas() {
 	//***************
 }
 
+void esperar_fin_de_suscripciones(){
+	sem_wait(&finDeSuscripcion);
+	sem_wait(&finDeSuscripcion);
+	sem_wait(&finDeSuscripcion);
+	sem_wait(&finDeSuscripcion);
+	sem_wait(&finDeSuscripcion);
+}
+
 void listas_destroy(){
 	cr_list_destroy(entrenadoresReady);
 
@@ -197,7 +208,7 @@ void listas_destroy(){
 	candidatos_destroy(potencialesDeadlock);
 	entrenadores_destroy(equipo);
 
-	boolean_sem_wait_end(&BOOLSEM_EsperoMensajes);
+	esperar_fin_de_suscripciones();
 
 	pendientes_destroy(capturasPendientes);
 
@@ -206,8 +217,6 @@ void listas_destroy(){
 	list_destroy_and_destroy_elements(mapaRequeridos, (void*) pokemon_destroy_hard);
 
 	cr_list_destroy_and_destroy_elements(pokemonesRecibidos, (void*) pokemon_destroy_hard);
-//	cr_list_destroy_and_destroy_elements(mensajesCAUGHT    , (void*) mensaje_caught_pokemon_destruir);
-//	cr_list_destroy_and_destroy_elements(mensajesLOCALIZED , (void*) mensaje_localized_pokemon_destruir);
 }
 
 //Hilos
@@ -237,6 +246,7 @@ void inicializar_semaforos(){
 	sem_init(&EquipoNoPuedaCazarMas     , 0, 0);
 	sem_init(&FinDeCiclo_CPU            , 0, 0);
 	sem_init(&finDeIntercambio          , 0, 0);
+	sem_init(&finDeSuscripcion          , 0, 2);
 
 	boolean_sem_init(&BOOLSEM_EsperoMensajes);
 
@@ -255,6 +265,7 @@ void finalizar_semaforos(){
 	sem_destroy(&HayEntrenadoresDisponibles);
 	sem_destroy(&FinDeCiclo_CPU);
 	sem_destroy(&finDeIntercambio);
+	sem_destroy(&finDeSuscripcion);
 
 	pthread_mutex_destroy(&mutexEntrenadores);
 	pthread_mutex_destroy(&mutexHistorialEspecies);
@@ -271,7 +282,8 @@ void inicializar_conexiones() {
 	TIEMPO_RECONEXION = config_get_int_value(config, "TIEMPO_RECONEXION");
 
 	conexion_broker = conexion_server_crear(config_get_string_value(config, "IP_BROKER")
-										  , config_get_string_value(config, "PUERTO_BROKER"));
+										  , config_get_string_value(config, "PUERTO_BROKER")
+										  );
 
 	pthread_mutex_init(&mutex_subscripcion, NULL);
 
@@ -284,13 +296,13 @@ void inicializar_conexiones() {
 
 void finalizar_conexiones(){
 	finalizar_suscripcion_a_colas();
-//	conexion_server_destruir(conexion_broker);
-//	conexion_host_destruir(conexion_gameboy);
+	conexion_server_destruir(conexion_broker);
+	free(conexion_gameboy);
 }
 
 void finalizar_suscripcion_a_colas(){
 	//******************************************************************** INICIO HARDCODEADO
-	boolean_sem_turn_off(&BOOLSEM_PSEUDOGAMECARD);
+//	boolean_sem_turn_off(&BOOLSEM_PSEUDOGAMECARD);
 	//******************************************************************** fin HARDCODEADO
 	dejar_de_recibir();
 
