@@ -37,7 +37,7 @@ static void consolidar_colas(void* param) {
 		for (int i = 1; i <= 6; ++i) {
 
 			t_cola_container* container = get_cola(i);
-			int cantidad_suscriptores = 0;
+			int cantidad_suscriptores = 0;//?
 
 			pthread_mutex_lock(&container->mutex_mensajes); //Agrego
 			log_inicio_consolidacion_colas(get_nombre_cola(i), list_size(container->cola));

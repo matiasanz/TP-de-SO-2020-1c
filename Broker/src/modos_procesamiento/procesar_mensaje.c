@@ -36,14 +36,12 @@ void procesar_mensaje(int socket, t_paquete_header header) {
 
 static void replicar_mensaje(t_cola_container* container, t_mensaje_cache* mensaje_cache) {
 
-	pthread_mutex_lock(&container->mutex_suscriptores);
-	t_list* suscriptores = list_duplicate(container->suscriptores);
-	pthread_mutex_unlock(&container->mutex_suscriptores);
-
 	void replicar(t_suscriptor* suscriptor) {
 		crear_hilo_y_enviar_mensaje_a_suscriptor(mensaje_cache, suscriptor_duplicar(suscriptor));
 	}
 
-	list_iterate(suscriptores, (void*) replicar);
-	list_destroy(suscriptores);
+	pthread_mutex_lock(&container->mutex_suscriptores);
+	list_iterate(container->suscriptores, (void*) replicar);
+	pthread_mutex_unlock(&container->mutex_suscriptores);
+
 }
