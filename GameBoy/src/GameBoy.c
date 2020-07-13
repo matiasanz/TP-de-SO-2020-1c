@@ -15,10 +15,11 @@ int main(int cantidadDeArgumentos, char*argumentos[]) {
 
 	inicializar();
 
+	validar_cantidad_minima_argumentos(cantidadDeArgumentos, 4, "el proceso Gameboy");
+
 	char* proceso = argumentos[1];
 	char* mensaje = argumentos[2];
 
-	validar_cantidad_minima_argumentos(cantidadDeArgumentos, 4, "el proceso Gameboy");
 	validar_proceso(proceso);
 	validar_mensaje(mensaje);
 
