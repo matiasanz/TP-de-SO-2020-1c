@@ -63,14 +63,6 @@ typedef enum {
 	TEAM = 4
 } t_tipo_proceso;
 
-/*
- * TAD para almacenar los datos luego de realizar una subscripción
- */
-typedef struct {
-	uint32_t id_subcriptor;
-	uint32_t socket;
-} t_suscriptor;
-
 // dado un tipo de proceso devuelve el mismo representado por un string
 char* get_nombre_proceso(t_tipo_proceso tipo_proceso);
 // dado un id de mensaje/nombre de cola el mismo representado por un string
@@ -84,7 +76,16 @@ int error_conexion(int indicador_conexion);
 t_tipo_proceso get_tipo_proceso(char* proceso);
 t_id_cola get_id_mensaje(char* mensaje);
 
-t_suscriptor* suscriptor_crear(uint32_t socket, uint32_t id_subscriptor);
-void suscriptor_destruir(t_suscriptor* subscriptor);
+void log_info_and_destroy(t_log* un_logger, char* string);
+void log_warning_and_destroy(t_log* un_logger, char* string);
+
+// Logs Adicionales
+
+// Logs Errores
+void log_warning_socket(int socket, char* operacion);
+void log_error_cola(int id_cola);
+void log_warning_suscripcion(t_id_cola id_cola);
+void log_warning_conexion_perdida(t_id_cola id_cola);
+void log_warning_broker_desconectado(t_id_cola id_cola);
 
 #endif /* UTILS_H_ */

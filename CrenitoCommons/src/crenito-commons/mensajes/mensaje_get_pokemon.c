@@ -131,8 +131,7 @@ t_mensaje_get_pokemon* mensaje_get_pokemon_restaurar_desde_cache(void* cache, t_
 void mensaje_get_pokemon_log(t_log* un_logger, t_mensaje_get_pokemon* get_pokemon) {
 
 	char* to_string = mensaje_get_pokemon_to_string(get_pokemon);
-	log_info(un_logger, to_string);
-	free(to_string);
+	log_info_and_destroy(un_logger, to_string);
 }
 
 char* mensaje_get_pokemon_to_string(t_mensaje_get_pokemon* get_pokemon) {

@@ -205,60 +205,148 @@ void crearEstructuras(){
 	tiempo_de_reintento_operacion=config_get_int_value(config,"TIEMPO_DE_REINTENTO_OPERACION");
 	tiempo_retardo_operacion=config_get_int_value(config,"TIEMPO_RETARDO_OPERACION");
 	punto_montaje_tallgrass=config_get_string_value(config,"PUNTO_MONTAJE_TALLGRASS");
-
 	// Inicializo semaforo
-	inicializar_semaforos();
+	pthread_mutex_init(&mutBitarray, NULL);
+	pthread_mutex_init(&mutDiccionarioSemaforos, NULL);
+	pthread_mutex_init(&envioPaquete, NULL);
 
-	char* dir_metadata  	= string_new();
-	char* dir_files     	= string_new();
-	char* dir_blocks    	= string_new();
-	char* bin_metadata  	= string_new();
-	char* bin_bitmap        = string_new();
+	pthread_mutex_init(&mutexLogger, NULL);
+	pthread_mutex_init(&mutexEventLogger, NULL);
+
+
+	semaforosDePokemons=dictionary_create();
+
+	char* dir_metadata = string_new();
+	char* dir_files = string_new();
+	char* dir_blocks = string_new();
+	char* bin_metadata = string_new();
+	char* bin_bitmap = string_new();
 	char* bin_metadataFiles = string_new();
 
 	char* bin_block = string_new();
 
+	FILE* f_metadata;
+
+	bool esNuevoBitmap=false;
+
 	mkdir(punto_montaje_tallgrass,0777);
 
 	//-------Crecion de Directorios
-	crear_directorios(&dir_metadata, &dir_files, &dir_blocks);
+	string_append(&dir_metadata,punto_montaje_tallgrass);
+	string_append(&dir_metadata,"Metadata/");
+	mkdir(dir_metadata,0777);
+	log_info(event_logger,"Creada carpeta Metadata");
 
-	FILE*f_metadata; //TODO ver si hacer variable global o local de cada subfuncion
+	string_append(&dir_files,punto_montaje_tallgrass);
+	string_append(&dir_files,"Files/");
+	mkdir(dir_files,0777);
+	log_info(event_logger,"Creada carpeta Files");
 
-	leer_metadata(&dir_metadata, &bin_metadata, &f_metadata);
+	string_append(&dir_blocks,punto_montaje_tallgrass);
+	string_append(&dir_blocks,"Blocks/");
+	mkdir(dir_blocks,0777);
+	log_info(event_logger,"Creada carpeta Blocks");
 
-//	printf("\n\nCree -> metadata: %s\n files: %s\n blocks: %s\n bin metadata: %s\n\n", dir_metadata, dir_files, dir_blocks, bin_metadata);
+	//-----Creacion del Metadata, si es que no existe
+	string_append(&bin_metadata,dir_metadata);
+	string_append(&bin_metadata,"/Metadata.bin");
+
+	if((f_metadata=fopen(bin_metadata,"r"))==NULL){ //si no existe el archivo metadata
+		log_info(event_logger,"[ERROR FATAL] FILESYSTEM NO ENCONTRADO (se creara uno nuevo)");
+		f_metadata=fopen(bin_metadata,"wb+");
+		config_metadata=config_create(bin_metadata);
+		config_set_value(config_metadata,"BLOCK_SIZE","64");
+		config_set_value(config_metadata,"BLOCKS","5192");
+		config_set_value(config_metadata,"MAGIC_NUMBER","TALL_GRASS");
+		config_save(config_metadata);
+	}else
+		config_metadata=config_create(bin_metadata);
+
+	fclose(f_metadata);
+	log_info(event_logger,"Creado archivo Metadata.bin");
 
 	//---------------Creacion de Bitmap--------------------
 
-	crear_bit_map(&bin_bitmap, &dir_metadata);
+	string_append(&bin_bitmap,dir_metadata);
+	string_append(&bin_bitmap,"/Bitmap.bin");
+
+	if((f_bitmap=fopen(bin_bitmap,"rb+"))==NULL){// si no existe archivo bitmap
+		f_bitmap=fopen(bin_bitmap,"wb+");
+
+		char* bitarray_temp=malloc(tope(config_get_int_value(config_metadata,"BLOCKS"),8));
+		fwrite((void*)bitarray_temp,tope(config_get_int_value(config_metadata,"BLOCKS"),8),1,f_bitmap);
+		fflush(f_bitmap);
+		free(bitarray_temp);
+		esNuevoBitmap=true;
+
+	}
+	fseek(f_bitmap, 0, SEEK_END);
+	int file_size = ftell(f_bitmap);
+	fseek(f_bitmap, 0, SEEK_SET);
+
+	char* bitarray_str=(char*)mmap(NULL,file_size,PROT_READ | PROT_WRITE | PROT_EXEC,MAP_SHARED,fileno(f_bitmap),0);
+
+	if(bitarray_str == (char*) -1) {
+			log_error(logger, "Fallo el mmap");
+	}
+
+	fread((void*) bitarray_str, sizeof(char), file_size, f_bitmap);
+	bitmap = bitarray_create_with_mode(bitarray_str, file_size, MSB_FIRST);
+
+	//seteo de bitmap
+	if(esNuevoBitmap){
+		for(int i=0;i<config_get_int_value(config_metadata,"BLOCKS");i++){
+			bitarray_clean_bit(bitmap,i);
+		}
+	}
+
+	log_info(logger, "Creado el archivo Bitmap.bin");
 
 	//-----------------------------
 
 	string_append(&bin_metadataFiles,dir_files);
 	string_append(&bin_metadataFiles,"/Metadata.bin");
+	if((f_metadata=fopen(bin_metadataFiles,"r"))==NULL){ //si no existe el archivo metadata
+			f_metadata=fopen(bin_metadataFiles,"wb+");
+			config_metadata_directorio_files=config_create(bin_metadataFiles);
+			config_set_value(config_metadata_directorio_files,"DIRECTORY","Y");
+			config_save(config_metadata_directorio_files);
+		}else
+			config_metadata_directorio_files=config_create(bin_metadataFiles);
 
-	f_metadata=fopen(bin_metadataFiles,"r");
-
-	if(f_metadata==NULL){ //si no existe el archivo metadata
-
-		f_metadata=fopen(bin_metadataFiles,"wb+");
-		config_metadata_directorio_files=config_create(bin_metadataFiles);
-		config_set_value(config_metadata_directorio_files,"DIRECTORY","Y");
-		config_save(config_metadata_directorio_files);
-
-	}
-
-	else config_metadata_directorio_files=config_create(bin_metadataFiles);
-
-	fclose(f_metadata);
-	config_destroy(config_metadata_directorio_files);
-	log_info(event_logger,"Creado archivo Metadata.bin de directorio Files");
+		fclose(f_metadata);
+		config_destroy(config_metadata_directorio_files);
+		log_info(event_logger,"Creado archivo Metadata.bin de directorio Files");
 
 
 	///---------------Verificacion y Creacion de bloques--------
+		FILE* f_block;
 
-	crear_bloques(&bin_block, dir_blocks);
+		string_append(&bin_block,dir_blocks);
+		string_append(&bin_block,"/0.bin");
+
+		if((f_block=fopen(bin_block,"r"))==NULL){
+		free(bin_block);
+
+		int x;
+		for(x=0;x<config_get_int_value(config_metadata,"BLOCKS");x++){
+			bin_block = string_new();
+			char* nroBloque=string_itoa(x);
+
+			string_append(&bin_block,dir_blocks);
+			string_append(&bin_block,nroBloque);
+			string_append(&bin_block,".bin");
+			f_block=fopen(bin_block,"wb+");
+			fclose(f_block);
+			free(bin_block);
+			free(nroBloque);
+		}
+		}else{
+			free(bin_block);
+			fclose(f_block);
+		}
+
+		log_info(event_logger,"Creado los bloques .bin");
 	//----------------------
 		paths_estructuras[METADATA] = dir_metadata;
 		paths_estructuras[FILES] = dir_files;

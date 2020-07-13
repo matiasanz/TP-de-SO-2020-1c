@@ -17,4 +17,5 @@ pthread_t hilo_consolidacion_colas;
 int frecuencia_consolidacion_colas;
 
 void inicializar_hilo_consolidacion_colas();
+
 #endif /* SRC_HILOS_HILO_CONSOLIDACION_COLAS_H_ */

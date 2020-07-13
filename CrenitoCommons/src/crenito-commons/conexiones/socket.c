@@ -184,7 +184,6 @@ int static error_recibir(int recv_status) {
 
 void static manejar_error_socket(int socket, char* operacion) {
 
-	log_warning(event_logger,
-			"Error al realizar la operación %s, socket: %d", operacion, socket);
+	log_warning_socket(socket, operacion);
 	close(socket);
 }

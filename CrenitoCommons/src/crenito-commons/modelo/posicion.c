@@ -39,25 +39,22 @@ char* posicion_list_to_string(t_list* posiciones) {
 
 	char *string = string_new();
 
-	string_append_with_format(&string, " posiciones: %d",
-			list_size(posiciones));
+	string_append_with_format(&string, " posiciones: %d", list_size(posiciones));
 
-	if(!list_is_empty(posiciones)){
+	if (list_is_empty(posiciones)) return string;
 
-		string_append_with_format(&string, " -->",
-					list_size(posiciones));
+	string_append_with_format(&string, " -->", list_size(posiciones));
 
-		for (int i = 0; i < list_size(posiciones); ++i) {
-			t_posicion* posicion = list_get(posiciones, i);
-			string_append_posicion(&string, *posicion);
-		}
-
+	void append_posicion(t_posicion* posicion){
+		string_append_posicion(&string, *posicion);
 	}
+
+	list_iterate(posiciones, (void*) append_posicion);
 
 	return string;
 }
 
-void string_append_posicion_list(char** string, t_list* posiciones){
+void string_append_posicion_list(char** string, t_list* posiciones) {
 
 	char* string_pos_list = posicion_list_to_string(posiciones);
 	string_append_with_format(string, string_pos_list);

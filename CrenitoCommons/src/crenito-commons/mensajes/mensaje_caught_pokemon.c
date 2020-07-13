@@ -93,8 +93,7 @@ t_mensaje_caught_pokemon* mensaje_caught_pokemon_restaurar_desde_cache(void* cac
 void mensaje_caught_pokemon_log(t_log* un_logger, t_mensaje_caught_pokemon* caught_pokemon) {
 
 	char* to_string = mensaje_caught_pokemon_to_string(caught_pokemon);
-	log_info(un_logger, to_string);
-	free(to_string);
+	log_info_and_destroy(un_logger, to_string);
 }
 
 char* mensaje_caught_pokemon_to_string(t_mensaje_caught_pokemon* caught_pokemon) {
