@@ -54,8 +54,9 @@ void inicializar_config() {
 void inicializar_logs() {
 
 	char* ruta = config_get_string_value(config, "LOGGER");
-	logger = log_create(ruta, BROKER_STRING, 1, LOG_LEVEL_INFO);
-	event_logger = log_create("./log/broker_event.log", "BROKER_EVENT", 1, LOG_LEVEL_INFO);
+	MOSTRAR_LOGS = config_get_int_value(config, "MOSTRAR_LOGS");
+	logger = log_create(ruta, BROKER_STRING, MOSTRAR_LOGS, LOG_LEVEL_INFO);
+	event_logger = log_create("./log/broker_event.log", "BROKER_EVENT", MOSTRAR_LOGS, LOG_LEVEL_INFO);
 }
 
 void atender_cliente(int* socket) {

@@ -7,6 +7,7 @@
 
 pthread_t hilo_receptor_mensajes;
 int socket_servidor;
+bool MOSTRAR_LOGS;
 
 void atender_cliente(int* socket);
 void inicializar();
