@@ -69,13 +69,14 @@ void team_inicializar(int cantidad, char**argumentos){
 	sleep(1); //
 
 	inicializar_hilos_entrenadores();
+	config_destroy(config);
 }
 
 int team_exit(){
 
 	log_info(logger, "\n\n                              Fin del proceso Team\n"
 						      "****************************************************************************");
-	finalizar_logs_y_config();
+	finalizar_logs();
 	finalizar_estadisticas();
 	listas_destroy();
 	finalizar_hilos();
@@ -121,8 +122,7 @@ void inicializar_config(char* NombreEquipo){
     free(CONFIG_PATH);
 }
 
-void finalizar_logs_y_config(){
-	config_destroy(config);
+void finalizar_logs(){
 	log_destroy(logger);
 	log_destroy(event_logger);
 }
@@ -282,8 +282,11 @@ void inicializar_conexiones() {
 
 	TIEMPO_RECONEXION = config_get_int_value(config, "TIEMPO_RECONEXION");
 
-	conexion_broker = conexion_server_crear(config_get_string_value(config, "IP_BROKER")
-										  , config_get_string_value(config, "PUERTO_BROKER")
+	char*IP_BROKER = config_get_string_value(config, "IP_BROKER");
+	char*PUERTO_BROKER = config_get_string_value(config, "PUERTO_BROKER");
+
+	conexion_broker = conexion_server_crear(string_duplicate(IP_BROKER)
+										  , string_duplicate(PUERTO_BROKER)
 										  );
 
 	pthread_mutex_init(&mutex_subscripcion, NULL);

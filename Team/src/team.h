@@ -3,7 +3,7 @@
 
 #include <pthread.h>
 #include "dominio/header_global_team.h"
-#include "dominio/team_logs.h"
+#include "utils/team_logs.h"
 
 #define CARPETA_CONFIG "config/"
 
@@ -14,7 +14,7 @@ int team_exit();
 //funciones auxiliares
 void inicializar_config(char* NombreEquipo);
 void inicializar_logs();
-void finalizar_logs_y_config();
+void finalizar_logs();
 
 void inicializar_listas();
 void listas_destroy();
