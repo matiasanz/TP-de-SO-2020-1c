@@ -49,9 +49,8 @@ void inicializar_conexiones() {
 }
 
 void inicializar_logs() {
-	MOSTRAR_LOGS = config_get_int_value(config, "MOSTRAR_LOGS");
-	logger = log_create("./log/gamecard.log", GAMECARD_STRING, 1,LOG_LEVEL_INFO);
-	event_logger = log_create("./log/gamecard_event.log", "GAME_CARD_EVENT", 1, LOG_LEVEL_INFO);
+	logger = get_log_oficial(GAMECARD_STRING);//log_create("./log/gamecard.log", GAMECARD_STRING, mostrar_logs(),LOG_LEVEL_INFO);
+	event_logger = get_log_event("GAMECARD_EVENT");
 }
 
 //**********************

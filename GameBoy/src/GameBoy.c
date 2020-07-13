@@ -45,13 +45,12 @@ void inicializar() {
 
 void inicializar_logs() {
 
-	logger = log_create("./log/gameboy.log", GAMEBOY_STRING, MOSTRAR_LOGS, LOG_LEVEL_INFO);
-	event_logger = log_create("./log/gameboy_event.log", "GAMEBOY_EVENT", MOSTRAR_LOGS, LOG_LEVEL_INFO);
+	logger = get_log_oficial(GAMEBOY_STRING);
+	event_logger = get_log_event("GAMEBOY_EVENT");
 }
 
 void inicializar_config() {
 	config = config_create("./config/gameboy.config");
-	MOSTRAR_LOGS = config_get_int_value(config, "MOSTRAR_LOGS");
 }
 
 void finalizar_gameboy(int ESTADO_FINALIZACION){

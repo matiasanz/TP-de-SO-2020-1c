@@ -28,6 +28,39 @@ char* get_nombre_cola(t_id_cola id_cola) {
 	}
 }
 
+bool mostrar_logs(){
+	char*MOSTRAR_LOGS = "MOSTRAR_LOGS";
+	return config_has_property(config, MOSTRAR_LOGS)
+			&& config_get_int_value(config, MOSTRAR_LOGS);
+} //si no lo valido y nos olvidamos de ponerlo, tira seg fault
+
+char* get_log_path(char* TOKEN){
+	return string_from_format("log/%s", config_get_string_value(config, TOKEN));
+}
+
+t_log* log_crear(char* PROCESO, char* FILENAME){
+
+	char* LOG_PATH = get_log_path(FILENAME);
+	t_log* log = log_create(LOG_PATH, PROCESO, mostrar_logs(), LOG_LEVEL_INFO);
+
+	if(!log){
+		FILE* f=fopen(LOG_PATH, "w+b");
+		fclose(f);
+		log = log_create(LOG_PATH, PROCESO, mostrar_logs(), LOG_LEVEL_INFO);
+	}
+
+	free(LOG_PATH);
+	return log;
+}
+
+t_log* get_log_oficial(char* PROCESO){
+	return log_crear(PROCESO, LOG_TOKEN);
+}
+
+t_log* get_log_event(char* PROCESO){
+	return log_crear(PROCESO, EVENT_TOKEN);
+}
+
 void string_append_separador(char** string, char* texto) {
 
 	char* string_separador = get_separador_string(texto);

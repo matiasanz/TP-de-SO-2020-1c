@@ -12,8 +12,6 @@
 #include "planificacion/planificacion.h"
 #include "header_global_team.h"
 
-	bool MOSTRAR_LOGS;
-
 	pthread_mutex_t Mutex_AndoLoggeando;
 	pthread_mutex_t Mutex_AndoLoggeandoEventos;
 

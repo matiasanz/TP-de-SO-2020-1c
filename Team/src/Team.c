@@ -95,10 +95,11 @@ void validar_lectura(void*lectura, char* MENSAJE_EXCEPCION){
 
 //Logs y configs
 void inicializar_logs(char*NombreEquipo){
-	MOSTRAR_LOGS = config_get_int_value(config, "MOSTRAR_LOGS");
+	logger = get_log_oficial(TEAM_STRING);//log_crear("TEAM", "LOG_FILE");
+	validar_lectura(logger, "No se encontro el archivo logger");
 
-	logger       = log_crear("TEAM_EVENT", "LOG_EVENT_FILE");//log_crear_oficial(NombreEquipo);
-	event_logger = log_crear("TEAM_EVENT", "LOG_EVENT_FILE");//log_crear_event(NombreEquipo);
+	event_logger = get_log_event("TEAM_EVENT");//log_crear("TEAM_EVENT", "LOG_EVENT_FILE");
+	validar_lectura(event_logger, "No se encontro el archivo event_logger");
 }
 
 char*team_get_config_path(char*NombreEquipo){

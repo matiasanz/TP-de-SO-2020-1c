@@ -53,12 +53,8 @@ void inicializar_config() {
 }
 
 void inicializar_logs() {
-
-	char* ruta = config_get_string_value(config, "LOGGER");
-	MOSTRAR_LOGS = config_get_int_value(config, "MOSTRAR_LOGS");
-	logger = log_create(ruta, BROKER_STRING, MOSTRAR_LOGS, LOG_LEVEL_INFO);
-	event_logger = log_create("./log/broker_event.log", "BROKER_EVENT", MOSTRAR_LOGS, LOG_LEVEL_INFO);
-	dump_logger = log_create("./log/dump_cache.log", "DUMP_CACHE_LOGGER", MOSTRAR_LOGS, LOG_LEVEL_INFO);
+	logger = get_log_oficial(BROKER_STRING);
+	event_logger = get_log_event("BROKER_EVENT");
 }
 
 void atender_cliente(int* socket) {

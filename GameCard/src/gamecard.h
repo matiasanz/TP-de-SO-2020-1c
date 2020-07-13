@@ -26,7 +26,6 @@ typedef enum{METADATA,FILES,BLOCKS} e_key_path_estructura;
 t_config* config_metadata;
 t_config* config_metadata_directorio_files;
 
-bool MOSTRAR_LOGS;
 int tiempo_de_reintento_operacion;
 int tiempo_retardo_operacion;
 char* punto_montaje_tallgrass;

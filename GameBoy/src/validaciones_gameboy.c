@@ -29,7 +29,7 @@ void validar_mensaje(char* mensaje) {
 void validar_cantidad_minima_argumentos(int cantidadRecibida, int cantidadMinima, char* paraQue){
 	if(cantidadRecibida < cantidadMinima){
 		log_error(event_logger, "Se ingresaron %d argumentos y el %s utiliza al menos %d", cantidadRecibida, paraQue, cantidadMinima);
-		if(MOSTRAR_LOGS) puts("(i) Para mas informacion hacer <cat comandos>\n");
+		if(mostrar_logs()) puts("(i) Para mas informacion hacer <cat comandos>\n");
 		finalizar_gameboy(EXIT_FAILURE);
 	}
 }
