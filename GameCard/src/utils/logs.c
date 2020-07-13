@@ -37,3 +37,29 @@ void log_enunciado_intento_fallido_de_new_pokemon(t_mensaje_new_pokemon* mensaje
 							,mensajeNew->cantidad);
 	pthread_mutex_unlock(&mutexLogger);
 }
+
+//***************************************************************************
+void log_event_mensaje_appeared_enviado(t_mensaje_appeared_catch_pokemon* mensaje){
+	char*posicion=posicion_to_string(mensaje->pokemon.posicion);
+
+	pthread_mutex_lock(&mutexEventLogger);
+	log_info(log_mensajes, ">> Appeared %s %s", mensaje->pokemon.especie, posicion);
+	pthread_mutex_unlock(&mutexEventLogger);
+
+	free(posicion);
+}
+
+void log_event_mensaje_caught_enviado(t_mensaje_caught_pokemon* mensaje, char*especie){
+	pthread_mutex_lock(&mutexEventLogger);
+	log_info(log_mensajes, ">> CAUGHT %s %s", (mensaje->atrapado? "OK": "FAIL"), especie);
+	pthread_mutex_unlock(&mutexEventLogger);
+}
+
+void log_event_mensaje_localized_enviado(t_mensaje_localized_pokemon* mensaje){
+	char*posiciones = posicion_list_to_string(mensaje->posiciones);
+	pthread_mutex_lock(&mutexEventLogger);
+	log_info(log_mensajes, ">> LOCALIZED %s %s", mensaje->especie, posiciones);
+	pthread_mutex_unlock(&mutexEventLogger);
+
+	free(posiciones);
+}

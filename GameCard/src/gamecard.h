@@ -26,6 +26,8 @@ typedef enum{METADATA,FILES,BLOCKS} e_key_path_estructura;
 
 //---variables Globales-----------
 
+t_log* log_mensajes;//provisorio
+
 t_config* config_metadata;
 t_config* config_metadata_directorio_files;
 

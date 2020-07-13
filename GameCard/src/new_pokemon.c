@@ -14,17 +14,17 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* mensajeNew){
 
 	pthread_mutex_t* mutexPokemon = pokemon_get_mutex(especie);
 
-	pthread_mutex_lock(mutexPokemon); //TODO ver por que lo bloquea varias veces
+	pthread_mutex_lock(mutexPokemon);
 	t_config* config_metadata_pokemon = config_create(dir_metadata);
 
 	if(!archivo_existe(config_metadata_pokemon)){
 		config_metadata_pokemon = metadata_default(especie, dir_metadata);
 	}
-	pthread_mutex_unlock(mutexPokemon);
+	pthread_mutex_unlock(mutexPokemon); //?
 
 	free(dir_metadata);
 
-	pthread_mutex_lock(mutexPokemon);
+	pthread_mutex_lock(mutexPokemon); //?
 	if(archivo_abierto(config_metadata_pokemon)){ //Si no esta abierto, la misma funcion lo abre
 		pthread_mutex_unlock(mutexPokemon);
 
@@ -243,20 +243,21 @@ void agregar_nueva_linea(t_config* config_metadata_pokemon, char**bloquesDelPoke
 
 					int cantBloquesNecesarios=bloquesNecesarios(tailLineaRecortada,config_get_int_value(config_metadata,"BLOCK_SIZE"));
 
-					for(int y=0;y<cantBloquesNecesarios;y++){
+					int i;
+					for(i=0; i<cantBloquesNecesarios; i++){
 
 						pthread_mutex_lock(&mutBitarray);
 						int nrobloque=bloque_disponible(bitmap,config_get_int_value(config_metadata,"BLOCKS"));
 						bitarray_set_bit(bitmap,nrobloque);
 						pthread_mutex_unlock(&mutBitarray);
 
-						char* bin_block = string_from_format("%s%u%s", paths_estructuras[BLOCKS], nrobloque, ".bin");
+						char* bin_block = string_from_format("%s%u.bin", paths_estructuras[BLOCKS], nrobloque);
 
-						if(cantBloquesNecesarios==(y+1)){
+						if(cantBloquesNecesarios==(i+1)){
 							//esto seria el ultimo bloque necesario
 
 							char* ultimoAguardar=string_new();
-							char* stringFinal=string_substring_from(tailLineaRecortada,y*config_get_int_value(config_metadata,"BLOCK_SIZE"));
+							char* stringFinal=string_substring_from(tailLineaRecortada,i*config_get_int_value(config_metadata,"BLOCK_SIZE"));
 
 							string_append(&ultimoAguardar,stringFinal);
 							int longitud=string_length(ultimoAguardar);
@@ -268,7 +269,7 @@ void agregar_nueva_linea(t_config* config_metadata_pokemon, char**bloquesDelPoke
 						}else{
 
 							char* cadenaAguardar=string_new();
-							char* stringRecorte=string_substring(tailLineaRecortada,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE"));
+							char* stringRecorte=string_substring(tailLineaRecortada,i*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE"));
 							string_append(&cadenaAguardar,stringRecorte);
 							int longitud=string_length(cadenaAguardar);
 							guardarLinea(bin_block,cadenaAguardar,longitud);

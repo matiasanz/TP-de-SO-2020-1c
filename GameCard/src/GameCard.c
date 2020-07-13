@@ -36,6 +36,7 @@ void inicializar_logs() {
 
 	logger = log_create("./log/gamecard.log", GAMECARD_STRING, 1,LOG_LEVEL_INFO);
 	event_logger = log_create("./log/gamecard_event.log", "GAME_CARD_EVENT", 1, LOG_LEVEL_INFO);
+	log_mensajes = log_create("./log/mensajes_enviados.log", "GAME_CARD_EVENT", 1, LOG_LEVEL_INFO);
 }
 
 void inicializar_conexiones() {

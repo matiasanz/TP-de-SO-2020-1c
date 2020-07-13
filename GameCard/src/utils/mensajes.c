@@ -14,6 +14,8 @@ void gamecard_enviar_localized(t_mensaje_get_pokemon* mensajeGet, t_list*posicio
 
 	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
 
+	log_event_mensaje_localized_enviado(mensajeAEnviar);
+
 	pthread_mutex_lock(&envioPaquete);
 	int resultadoEnvio = enviar(conexion_broker,paqueteAEnviar);
 	pthread_mutex_unlock(&envioPaquete);
@@ -34,6 +36,9 @@ void gamecard_enviar_appeared(t_mensaje_new_pokemon* mensajeNew){
 	t_paquete_header header=paquete_header_crear(MENSAJE,GAMECARD,APPEARED_POKEMON, id_proceso);
 	t_buffer* bufferDepaquete=mensaje_appeared_catch_pokemon_serializar(mensajeAEnviar);
 	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
+
+
+	log_event_mensaje_appeared_enviado(mensajeAEnviar);
 
 	pthread_mutex_lock(&envioPaquete);
 	int resultadoEnvio = enviar(conexion_broker, paqueteAEnviar);
@@ -56,6 +61,7 @@ void gamecard_enviar_caught(t_mensaje_catch_pokemon* mensajeCatch, bool atrapado
 	t_buffer* bufferDepaquete=mensaje_caught_pokemon_serializar(mensajeAEnviar);
 	t_paquete* paqueteAEnviar=paquete_crear(header,bufferDepaquete);
 
+	log_event_mensaje_caught_enviado(mensajeAEnviar, mensajeCatch->pokemon.especie);
 
 	pthread_mutex_lock(&envioPaquete);
 	int resultadoEnvio = enviar(conexion_broker,paqueteAEnviar);
@@ -65,6 +71,7 @@ void gamecard_enviar_caught(t_mensaje_catch_pokemon* mensajeCatch, bool atrapado
 		//TODO repetido
 		log_warning(logger,"NO se puede realizar la conexion con el BROKER");
 	}
+
 
 	paquete_destruir(paqueteAEnviar);
 	mensaje_caught_pokemon_destruir(mensajeAEnviar);
