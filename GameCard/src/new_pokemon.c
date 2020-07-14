@@ -6,39 +6,32 @@ char*posicion_dar_formato(t_posicion posicion){
 	return string_from_format("%u-%u", posicion.pos_x, posicion.pos_y);
 }
 
+void cerrar_archivo(t_config* metadata, char*metadata_bin){
+	config_set_value("OPEN", "N");
+	config_save_in_file(metadata, metadata_bin);
+}
+
 void gamecard_New_Pokemon(t_mensaje_new_pokemon* mensajeNew){
 
 	char* especie = mensajeNew->pokemon.especie;
+	pthread_mutex_t* mutexPokemon = pokemon_get_mutex(especie);
 
 	char* dir_metadata = pokemon_find_metadata(especie);
-
-	pthread_mutex_t* mutexPokemon = pokemon_get_mutex(especie);
 
 	pthread_mutex_lock(mutexPokemon);
 	t_config* config_metadata_pokemon = config_create(dir_metadata);
 
 	if(!archivo_existe(config_metadata_pokemon)){
-		config_metadata_pokemon = metadata_default(especie, dir_metadata);
+		config_metadata_pokemon = metadata_create_default(especie, dir_metadata);
 	}
-	pthread_mutex_unlock(mutexPokemon); //?
 
-	free(dir_metadata);
-
-	pthread_mutex_lock(mutexPokemon); //?
-	if(archivo_abierto(config_metadata_pokemon)){ //Si no esta abierto, la misma funcion lo abre
+	while(archivo_abierto(config_metadata_pokemon)){ //Si no esta abierto, la misma funcion lo abre
 		pthread_mutex_unlock(mutexPokemon);
-
-		config_destroy(config_metadata_pokemon);
 
 		log_enunciado_intento_interrumpido_de_new_pokemon(mensajeNew);
 
-		//abro otro hilo con un sleep que volvera a atender al Mensaje
-		pthread_t hiloReintento;
-		pthread_create(&hiloReintento, NULL,(void*) gamecard_New_Pokemon_Reintento, mensajeNew);
-		pthread_detach(hiloReintento);
-
-		//y finalizo este hilo
-		return;
+		sleep(TIEMPO_REINTENTO_OPERACION);
+		pthread_mutex_lock(mutexPokemon);
 	}
 
 	char** bloquesDelPokemon=config_get_array_value(config_metadata_pokemon,"BLOCKS");
@@ -63,6 +56,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* mensajeNew){
 
 	log_enunciado_pokemon_guardado(mensajeNew);
 
+	free(dir_metadata);
 	//creacion de  paquete appeared pokemon y envio a Broker
 	gamecard_enviar_appeared(mensajeNew);
 	//------------------------
@@ -527,7 +521,7 @@ char* pokemon_find_metadata(char*especie){
 	return metadata;
 }
 
-t_config* metadata_default(char*especie, char*dir_metadata){
+t_config* metadata_create_default(char*especie, char*dir_metadata){
 
 	char*dir_carpeta = pokemon_find_carpeta(especie);
 

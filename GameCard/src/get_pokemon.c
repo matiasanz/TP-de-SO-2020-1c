@@ -15,7 +15,7 @@ void gamecard_procesar_Get_Pokemon(t_mensaje_get_pokemon* mensajeGet){
 	free(bin_metadata);
 
 	while(acceso_fallido(posicionesEncontradas)){
-		sleep(tiempo_de_reintento_operacion);
+		sleep(TIEMPO_REINTENTO_OPERACION);
 		posicionesEncontradas = localizar_pokemon(mensajeGet, bin_metadata);
 	}
 
@@ -85,10 +85,25 @@ void validar_linea(char*lineaDelPokemon){
 	}
 }
 
+
+t_config* pokemon_get_metadata(char* especie){
+
+	char* bin_metadata=pokemon_find_metadata(especie);
+
+	pthread_mutex_t* mutexPokemon = pokemon_get_mutex(especie);
+	pthread_mutex_lock(mutexPokemon);
+	t_config* config_metadata_pokemon = config_create(bin_metadata);
+	pthread_mutex_unlock(mutexPokemon);
+
+	free(bin_metadata);
+
+	return config_metadata_pokemon;
+}
+
 //Retorna las posiciones del pokemon o NULL si no se concreto la operacion
 t_list* localizar_pokemon(t_mensaje_get_pokemon* mensajeGet, char*bin_metadata){
 
-	t_config* config_metadata_pokemon =config_create(bin_metadata);
+	t_config* config_metadata_pokemon = pokemon_get_metadata(mensajeGet->especie);
 
 	//Valido si no existe el archivo metadata
 	if(!archivo_existe(config_metadata_pokemon)){
