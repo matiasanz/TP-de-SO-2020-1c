@@ -102,6 +102,16 @@ void team_loggear_resultados(){
 
 //**************************************************************
 
+void log_event_inicio_proceso(char*NombreEquipo){
+	log_info(event_logger, "\n\n*************************************************************************\n"
+         		     "                        Inicio del proceso Team %s\n\n", NombreEquipo);
+}
+
+void log_event_fin_del_proceso(){
+	log_info(logger, "\n\n                              Fin del proceso Team\n"
+						      "****************************************************************************");
+}
+
 void log_event_localized_repetido(especie_pokemon especie){ //TODO localized to string
 	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
 	log_info(event_logger, "\n********* MENSAJE DESCARTADO ********\n"
@@ -206,4 +216,12 @@ void log_event_captura_desconocida(t_mensaje_caught_pokemon*mensaje){
 
 void log_event_busco_especie_en_mapa(pokemon* unPokemon, pokemon*pokemonCatcheado){
 	printf("%s esta en mapa si: %s == %s\n", pokemonCatcheado->especie, unPokemon->especie, pokemonCatcheado->especie);
+}
+
+void log_event_entrenador_por_ejecutar(entrenador*proximoEntrenador){
+	printf("signal(entrenador %d)\n", proximoEntrenador->id);
+}
+
+void log_event_entrenador_termino_de_ejecutar(entrenador*unEntrenador){
+	puts("*************************************** termino de ejecutar");
 }

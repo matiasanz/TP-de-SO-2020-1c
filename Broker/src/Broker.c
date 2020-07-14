@@ -58,7 +58,6 @@ void inicializar_logs() {
 	logger = get_log_oficial(BROKER_STRING);
 	event_logger = get_log_event("BROKER_EVENT");
 	dump_logger = log_crear("DUMP_CACHE_LOGGER", "DUMP_CACHE_LOGGER");
-	log_info(dump_logger, "Log de prueba");
 }
 
 void atender_cliente(int* socket) {

@@ -3,7 +3,7 @@
 #include "../dominio/header_global_team.h"
 
 void team_procesar_pokemones(){
-	while(PROCESO_ACTIVO){
+	while(espero_mensajes()){
 
 		sem_wait(&HayEntrenadoresDisponibles);
 		pokemon*unPokemon = pokemones_esperar_y_leer();
@@ -16,27 +16,7 @@ void team_procesar_pokemones(){
 		}
 
 		else{
-
-			if(pokemon_en_tramite(unPokemon)){
-				pthread_mutex_unlock(&mutexRecursosDisponibles);
-
-
-
-				pthread_mutex_lock(&mutexRepuestos);
-				list_add(mapaRequeridos, unPokemon);
-				log_event_pokemon_mapeado(unPokemon->especie);
-				pthread_mutex_unlock(&mutexRepuestos);
-			}
-
-			else{
-				log_event_loggear_situacion_actual(objetivosGlobales, inventariosGlobales);
-				pthread_mutex_unlock(&mutexRecursosDisponibles);
-
-				log_event_loggear_pokemon_descartado(unPokemon->especie);
-
-				pokemon_destroy_hard(unPokemon);
-			}
-
+			procesar_no_requerido(unPokemon);
 			sem_post(&HayEntrenadoresDisponibles);
 		}
 	}
@@ -108,4 +88,24 @@ numero objetivos_cantidad_requerida_de(especie_pokemon unaEspecie){
 	numero instanciasEnMapa = recursos_cantidad_de_instancias_de(recursosEnMapa, unaEspecie);
 
 	return instanciasBrutas - instanciasEnMapa;
+}
+
+void procesar_no_requerido(pokemon* unPokemon){
+	if(pokemon_en_tramite(unPokemon)){
+		pthread_mutex_unlock(&mutexRecursosDisponibles);
+
+		pthread_mutex_lock(&mutexRepuestos);
+		list_add(mapaRequeridos, unPokemon);
+		log_event_pokemon_mapeado(unPokemon->especie);
+		pthread_mutex_unlock(&mutexRepuestos);
+	}
+
+	else{
+		log_event_loggear_situacion_actual(objetivosGlobales, inventariosGlobales);
+		pthread_mutex_unlock(&mutexRecursosDisponibles);
+
+		log_event_loggear_pokemon_descartado(unPokemon->especie);
+
+		pokemon_destroy_hard(unPokemon);
+	}
 }

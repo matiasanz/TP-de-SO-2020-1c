@@ -55,8 +55,6 @@ char*estadoFromEnum(t_estado unEstado){
 }
 
 void entrenador_destroy(entrenador* destruido){
-	recursos_destroy(destruido->objetivos);
-	recursos_destroy(destruido->pokemonesCazados);
 	free(destruido);
 }
 

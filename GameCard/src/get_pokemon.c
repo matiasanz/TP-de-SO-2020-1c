@@ -20,7 +20,7 @@ void log_enunciado_posiciones_encontradas(char*especie, t_list*posiciones){
 }
 
 bool acceso_fallido(t_list* posiciones){
-	return !posiciones;
+	return !posiciones; //Si no pudo realizar la operacion retorna NULL
 }
 
 void gamecard_procesar_Get_Pokemon(t_mensaje_get_pokemon* mensajeGet){
@@ -33,7 +33,6 @@ void gamecard_procesar_Get_Pokemon(t_mensaje_get_pokemon* mensajeGet){
 	free(bin_metadata);
 
 	if(acceso_fallido(posicionesEncontradas)){
-		puts("no pude acceder");
 
 		pthread_t hiloReintentoDeOperacion;
 		pthread_create(&hiloReintentoDeOperacion, NULL,(void*) gamecard_Get_Pokemon_reintento, mensajeGet);
