@@ -7,7 +7,7 @@ char*posicion_dar_formato(t_posicion posicion){
 }
 
 void cerrar_archivo(t_config* metadata, char*metadata_bin){
-	config_set_value("OPEN", "N");
+	config_set_value(metadata,"OPEN", "N");
 	config_save_in_file(metadata, metadata_bin);
 }
 
@@ -31,7 +31,13 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* mensajeNew){
 		log_enunciado_intento_interrumpido_de_new_pokemon(mensajeNew);
 
 		sleep(TIEMPO_REINTENTO_OPERACION);
+
 		pthread_mutex_lock(mutexPokemon);
+
+		//si no lo pongo queda en un bucle, porque no se estaria obteniendo
+		//el valor mas actual de OPEN, del archivo metadata del pokemon
+		config_destroy(config_metadata_pokemon);
+		config_metadata_pokemon = config_create(dir_metadata);
 	}
 
 	char** bloquesDelPokemon=config_get_array_value(config_metadata_pokemon,"BLOCKS");

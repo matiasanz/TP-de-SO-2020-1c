@@ -119,6 +119,14 @@ t_list* localizar_pokemon(t_mensaje_get_pokemon* mensajeGet, char*bin_metadata){
 
 	pthread_mutex_lock(mutexMetadataPokemon);
 
+
+	//agrego este destroy y create del metadata del pokemon,
+	//porque talvez este hilo esperaba en el mutex y puede que algun catch
+	//termino antes y hay menos bloques ocupados por el pokemon,
+	//tendriamos informacion desactualizada en el config_metadata_pokemon
+	config_destroy(config_metadata_pokemon);
+	config_metadata_pokemon = config_create(bin_metadata);
+
 	//------Ver si el archivo esta abierto------------
 	if(archivo_abierto(config_metadata_pokemon)){
 		pthread_mutex_unlock(mutexMetadataPokemon);

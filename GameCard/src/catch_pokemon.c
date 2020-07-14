@@ -51,6 +51,15 @@ t_resultado_captura pokemon_intento_de_captura(t_pokemon pokemon){
 	pthread_mutex_t* mutexPokemon = pokemon_get_mutex(pokemon.especie);
 	pthread_mutex_lock(mutexPokemon);
 
+	//agrego este destroy y create del metadata del pokemon,
+	//porque antes del mutex podrian llegar dos mensajes al mismo tiempo con
+	//el valor de Open=N, pero el primero que entre lo modificara
+	//y el segundo tendra un valor viejo
+	config_destroy(config_metadata_pokemon);
+	char* bin_metadata=pokemon_find_metadata(pokemon.especie);
+	config_metadata_pokemon = config_create(bin_metadata);
+	free(bin_metadata);
+
 	if(archivo_abierto(config_metadata_pokemon)){
 	//------Ver si el archivo esta abierto------------
 		//abro otro hilo con un sleep que volvera a atender al Mensaje
@@ -156,7 +165,7 @@ t_resultado_captura pokemon_intento_de_captura(t_pokemon pokemon){
 				}
 			}
 
-			//limpieza de bitarray i de los bloques sobrantes
+			//limpieza de bitarray y de los bloques sobrantes
 			for(int j=cantBloquesNecesarios;j<cant_elemetos_array(bloquesDelPokemon);j++){
 				pthread_mutex_lock(&mutBitarray);
 				int nrobloque=atoi(bloquesDelPokemon[j]);
