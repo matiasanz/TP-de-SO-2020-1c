@@ -78,4 +78,14 @@ char* contenidoDeBloques(char** bloques);
 void sobrescribirLineas(char* path,char* nuevalinea,int len);
 char* contenido_de_Bloques_con_mmap(char** bloques);
 
+//Mensaje get
+char* pokemon_find_metadata(char*especie);
+t_list*localizar_pokemon(t_mensaje_get_pokemon*, char* PATH_METADATA);
+void gamecard_responder_localized(t_mensaje_get_pokemon* mensajeGet, t_list*posiciones);
+void simular_acceso_a_disco();
+bool archivo_existe(t_config* metadata);
+bool archivo_abierto(t_config* config_metadata_pokemon);
+t_list* leer_posiciones_de_disco(t_config* config_metadata_pokemon);
+t_list* localizar_pokemon(t_mensaje_get_pokemon* mensajeGet, char*bin_metadata);
+
 #endif /* SRC_GAMECARD_H_ */
