@@ -1,4 +1,5 @@
-#include "team_logs.h"
+#include "../utils/team_logs.h"
+
 #include "../team.h"
 
 void log_enunciado_entrenador_creado(entrenador* unEntrenador){

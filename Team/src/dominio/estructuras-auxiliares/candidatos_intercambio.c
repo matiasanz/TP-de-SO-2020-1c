@@ -1,6 +1,6 @@
 #include "../../dominio/estructuras-auxiliares/candidatos_intercambio.h"
 
-#include "../../dominio/team_logs.h"
+#include "../../utils/team_logs.h"
 
 //******************************************************
 

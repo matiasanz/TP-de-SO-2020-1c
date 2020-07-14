@@ -10,7 +10,7 @@
 
 #include <crenito-commons/conexiones/conexiones.h>
 #include <stdbool.h>
-#include "../listas/boolean_semaphore.h"
+#include "listas/boolean_semaphore.h"
 #include "../suscripciones/hilo_appeared_pokemon.h"
 #include "../suscripciones/hilo_caught_pokemon.h"
 #include "../suscripciones/hilo_gameboy.h"

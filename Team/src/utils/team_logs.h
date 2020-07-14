@@ -5,12 +5,12 @@
 #include <commons/config.h>
 
 #include "../utils/mensajes.h"
-#include "estructuras-auxiliares/candidatos_intercambio.h"
-#include "estructuras-auxiliares/captura_pendiente.h"
-#include "estructuras-auxiliares/lector_config.h"
-#include "estructuras-principales/pokemon.h"
-#include "planificacion/planificacion.h"
-#include "header_global_team.h"
+#include "../dominio/estructuras-auxiliares/candidatos_intercambio.h"
+#include "../dominio/estructuras-auxiliares/captura_pendiente.h"
+#include "../dominio/estructuras-auxiliares/lector_config.h"
+#include "../dominio/estructuras-principales/pokemon.h"
+#include "../dominio/planificacion/planificacion.h"
+#include "../dominio/header_global_team.h"
 
 	pthread_mutex_t Mutex_AndoLoggeando;
 	pthread_mutex_t Mutex_AndoLoggeandoEventos;
