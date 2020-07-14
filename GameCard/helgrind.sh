@@ -1,1 +1,0 @@
-valgrind -v --tool=helgrind ./GameCard

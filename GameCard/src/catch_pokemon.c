@@ -5,15 +5,6 @@ typedef enum {FAIL, OK, INTENTO_INTERRUMPIDO} t_resultado_captura;
 //void gamecard_Catch_Pokemon_ReIntento(t_mensaje_appeared_catch_pokemon*);
 t_resultado_captura pokemon_intento_de_captura(t_pokemon);
 
-void log_enunciado_intento_interrumpido_de_catch(t_pokemon pokemon){
-	pthread_mutex_lock(&mutexLogger);
-	log_error(logger,"El archivo pokemon esta abierto, esta operacion se reintentara luego: Catch_Pokemon ::%s ::pos (%i,%i)"
-												,pokemon.especie
-												,pokemon.posicion.pos_x
-												,pokemon.posicion.pos_y);
-	pthread_mutex_unlock(&mutexLogger);
-}
-
 t_resultado_captura gamecard_Catch_Pokemon_ReIntento(t_pokemon unPokemon){
 	sleep(TIEMPO_REINTENTO_OPERACION);
 	return pokemon_intento_de_captura(unPokemon);
@@ -22,7 +13,6 @@ t_resultado_captura gamecard_Catch_Pokemon_ReIntento(t_pokemon unPokemon){
 bool intento_interrumpido(int resultado){
 	return resultado == INTENTO_INTERRUMPIDO;
 }
-
 
 void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* mensajeCatch){
 
@@ -41,11 +31,10 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* mensajeCatch){
 	mensaje_appeared_catch_pokemon_destruir(mensajeCatch);
 }
 
+//Revisa cada bloque del pokemon, si esta en la posicion x-y=cantidad, decrementa la cantidad y retorna OK
 t_resultado_captura pokemon_intento_de_captura(t_pokemon pokemon){
 
 	char* bin_metadata = pokemon_find_metadata(pokemon.especie);
-
-		FILE* f_metadata = fopen(bin_metadata, "r+b");
 
 		t_config* config_metadata_pokemon = config_create(bin_metadata);
 
@@ -56,113 +45,42 @@ t_resultado_captura pokemon_intento_de_captura(t_pokemon pokemon){
 		//retardo para simular acceso a disco
 		simular_acceso_a_disco();
 
-
-		pthread_mutex_lock(&mutexLogger);
-		log_error(logger,"No existe el Pokemon: %s", pokemon.especie);
-		pthread_mutex_unlock(&mutexLogger);
+		log_enunciado_pokemon_no_existe(pokemon);
 
 		return FAIL;
 	}
 
+	log_event_pokemon_existe(pokemon);
 
-	pthread_mutex_lock(&mutexEventLogger);
-	log_info(event_logger,"Si existe el Pokemon: %s", pokemon.especie);
-	pthread_mutex_unlock(&mutexEventLogger);
-	//como existe el archivo, debo usar fclose, en caso contrario, no.
-	fclose(f_metadata);
+	pthread_mutex_t* mutexPokemon = pokemon_get_mutex(pokemon.especie);
 
-	pthread_mutex_lock(&mutDiccionarioSemaforos);
-	//este if es para cuando ya existe el pokemon en disco, pero no su mutex
-	if(!dictionary_has_key(semaforosDePokemons,pokemon.especie)){
+	pthread_mutex_lock(mutexPokemon);
 
-		pthread_mutex_t* mutexMetadataPokemon=malloc(sizeof(pthread_mutex_t));
-		pthread_mutex_init(mutexMetadataPokemon, NULL);
-		dictionary_put(semaforosDePokemons,pokemon.especie,mutexMetadataPokemon);
-
-	}
-	pthread_mutex_unlock(&mutDiccionarioSemaforos);
-
-	pthread_mutex_lock(&mutDiccionarioSemaforos);
-
-	pthread_mutex_t* pokeMut1=dictionary_get(semaforosDePokemons,pokemon.especie);
-
-	pthread_mutex_unlock(&mutDiccionarioSemaforos);
-
-	//pthread_mutex_lock(dictionary_get(semaforosDePokemons,pokemon.especie));
-
-	pthread_mutex_lock(pokeMut1);
-	char* estadoArchivo=config_get_string_value(config_metadata_pokemon,"OPEN");
-	bool abierto=true;
-	if(strcmp(estadoArchivo,"N")==0){
-		config_set_value(config_metadata_pokemon,"OPEN","Y");
-		config_save(config_metadata_pokemon);
-		abierto=false;
-	}
-	pthread_mutex_lock(&mutDiccionarioSemaforos);
-
-	pthread_mutex_t* pokeMut2=dictionary_get(semaforosDePokemons,pokemon.especie);
-
-	pthread_mutex_unlock(&mutDiccionarioSemaforos);
-
-	pthread_mutex_unlock(pokeMut2);
-	//pthread_mutex_unlock(dictionary_get(semaforosDePokemons,pokemon.especie));
-
-
+	if(archivo_abierto(config_metadata_pokemon)){
 	//------Ver si el archivo esta abierto------------
-	if(abierto){
 		//abro otro hilo con un sleep que volvera a atender al Mensaje
 		//en lugar de esto, el mismo hilo vuelve a intentar
 
 		config_destroy(config_metadata_pokemon);
+		pthread_mutex_unlock(mutexPokemon);
 
 		log_enunciado_intento_interrumpido_de_catch(pokemon);
-
-//				pthread_t unHilo;
-//				pthread_create(&unHilo, NULL,(void*) gamecard_Catch_Pokemon_ReIntento, mensajeCatch);
-//				pthread_detach(unHilo);
-//
 
 		//y finalizo este hilo
 		return INTENTO_INTERRUMPIDO;
 	}
 
-	//----------------------
-	pthread_mutex_lock(&mutDiccionarioSemaforos);
-
-	pthread_mutex_t* pokeMutAux1=dictionary_get(semaforosDePokemons,pokemon.especie);
-
-	pthread_mutex_unlock(&mutDiccionarioSemaforos);
-
-	pthread_mutex_lock(pokeMutAux1);
-	//------------aqui marca condicion de carrera, aunque no deberia--------------
 	char** bloquesDelPokemon=config_get_array_value(config_metadata_pokemon,"BLOCKS");
-
-	pthread_mutex_lock(&mutDiccionarioSemaforos);
-
-	pthread_mutex_t* pokeMutAux2=dictionary_get(semaforosDePokemons,pokemon.especie);
-
-	pthread_mutex_unlock(&mutDiccionarioSemaforos);
-
-	pthread_mutex_unlock(pokeMutAux2);
+	pthread_mutex_unlock(mutexPokemon);
 
 
 	//--------comenzar a operar el pokemon-------
 
-	char* cadenaABuscar=string_new();
-	char* stringPosX=string_itoa(pokemon.posicion.pos_x);
-	char* stringPosY=string_itoa(pokemon.posicion.pos_y);
-
-	string_append(&cadenaABuscar,stringPosX);
-	string_append(&cadenaABuscar,"-");
-	string_append(&cadenaABuscar,stringPosY);
+	char* cadenaABuscar = posicion_dar_formato(pokemon.posicion);
 
 	t_resultado_captura atrapado;
 
 	if(contienePosicionEnBloques(cadenaABuscar,bloquesDelPokemon)){
-		//rama el pokemon posee la posicion recibida
-
-		char* listaBloques=string_new();
-		int size;
 
 		//modificacion de cantidad de pokemon en posicion existente
 
@@ -171,9 +89,12 @@ t_resultado_captura pokemon_intento_de_captura(t_pokemon pokemon){
 		char** lineasDelPokemon=string_split(contenidoBloques,"\n");
 
 		//adapto el string de posicion, para facilitarme la busqueda con el "="
-		char* stringPosAdaptado=string_new();
-		string_append(&stringPosAdaptado,cadenaABuscar);
-		string_append(&stringPosAdaptado,"=");
+		char* stringPosAdaptado = string_from_format("%s=", cadenaABuscar);
+
+		free(cadenaABuscar);
+
+		char* listaBloques=string_new();
+				int size;
 
 		char* contenidoActualizadoDeBloques=string_new();
 
@@ -181,34 +102,35 @@ t_resultado_captura pokemon_intento_de_captura(t_pokemon pokemon){
 			//este if es para verificar que no este algo distinto al formato "x-y=cant"
 			if(string_contains(lineasDelPokemon[i],"-") && string_contains(lineasDelPokemon[i],"=")){
 			//aqui veo si es, el que hay que modificar
-			if(string_starts_with(lineasDelPokemon[i],stringPosAdaptado)){
+				if(string_starts_with(lineasDelPokemon[i],stringPosAdaptado)){
 
-				atrapado=OK;
+					atrapado=OK;
 
-				char** posYCant=string_split(lineasDelPokemon[i],"=");
+					char** posYCant=string_split(lineasDelPokemon[i],"=");
 
-				int cantActual=atoi(posYCant[1]);
+					int cantActual=atoi(posYCant[1]);
 
-				//hago la resta, porque atrapo al pokemon, hay 1 menos en esa posicion
-				int cantidadFinal=cantActual - 1;
-				if(cantidadFinal>0){
-				char* stringCantidadFinal=string_itoa(cantidadFinal);
-				string_append(&contenidoActualizadoDeBloques,posYCant[0]);
-				string_append(&contenidoActualizadoDeBloques,"=");
-				string_append(&contenidoActualizadoDeBloques,stringCantidadFinal);
-				string_append(&contenidoActualizadoDeBloques,"\n");
-				free(stringCantidadFinal);
+					//hago la resta, porque atrapo al pokemon, hay 1 menos en esa posicion
+					int cantidadFinal=cantActual - 1;
+					if(cantidadFinal>0){
+						char* stringCantidadFinal=string_itoa(cantidadFinal);
+						string_append(&contenidoActualizadoDeBloques,posYCant[0]);
+						string_append(&contenidoActualizadoDeBloques,"=");
+						string_append(&contenidoActualizadoDeBloques,stringCantidadFinal);
+						string_append(&contenidoActualizadoDeBloques,"\n");
+						free(stringCantidadFinal);
+					}
+
+					string_array_liberar(posYCant);
+
+				}else{
+
+					string_append(&contenidoActualizadoDeBloques,lineasDelPokemon[i]);
+					string_append(&contenidoActualizadoDeBloques,"\n");
+
 				}
-
-				string_array_liberar(posYCant);
-
-			}else{
-
-			string_append(&contenidoActualizadoDeBloques,lineasDelPokemon[i]);
-			string_append(&contenidoActualizadoDeBloques,"\n");
-
 			}
-			}
+
 			free(lineasDelPokemon[i]);
 		}
 
@@ -239,7 +161,7 @@ t_resultado_captura pokemon_intento_de_captura(t_pokemon pokemon){
 				}
 			}
 
-			//limpieza de bitarray y de los bloques sobrantes
+			//limpieza de bitarray i de los bloques sobrantes
 			for(int j=cantBloquesNecesarios;j<cant_elemetos_array(bloquesDelPokemon);j++){
 				pthread_mutex_lock(&mutBitarray);
 				int nrobloque=atoi(bloquesDelPokemon[j]);
@@ -258,19 +180,20 @@ t_resultado_captura pokemon_intento_de_captura(t_pokemon pokemon){
 
 			char** arrayBloqueActualizado=string_split(nroDebloquesActualizado,",");
 
-			for(int y=0;y<cantBloquesNecesarios;y++){
+			int i;
+			for(i=0;i<cantBloquesNecesarios;i++){
 
 				char* bin_block = string_new();
 				string_append(&bin_block,paths_estructuras[BLOCKS]);
-				string_append(&bin_block,arrayBloqueActualizado[y]);
+				string_append(&bin_block,arrayBloqueActualizado[i]);
 				string_append(&bin_block,".bin");
 
 
-				if(cantBloquesNecesarios==(y+1)){
+				if(cantBloquesNecesarios==(i+1)){
 					//esto seria el ultimo bloque necesario
 
 					char* ultimoAguardar=string_new();
-					char* stringFinal=string_substring_from(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"));
+					char* stringFinal=string_substring_from(contenidoActualizadoDeBloques,i*config_get_int_value(config_metadata,"BLOCK_SIZE"));
 
 					string_append(&ultimoAguardar,stringFinal);
 					int longitud=string_length(ultimoAguardar);
@@ -280,7 +203,7 @@ t_resultado_captura pokemon_intento_de_captura(t_pokemon pokemon){
 				}else{
 
 					char* cadenaAguardar=string_new();
-					char* stringRecorte=string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE"));
+					char* stringRecorte=string_substring(contenidoActualizadoDeBloques,i*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE"));
 					string_append(&cadenaAguardar,stringRecorte);
 					int longitud=string_length(cadenaAguardar);
 					sobrescribirLineas(bin_block,cadenaAguardar,longitud);
@@ -307,28 +230,29 @@ t_resultado_captura pokemon_intento_de_captura(t_pokemon pokemon){
 
 			//con los bloques asignados que tiene el pokemon bastan
 
-			for(int y=0;y<cantBloquesNecesarios;y++){
+			int i;
+			for(i=0;i<cantBloquesNecesarios;i++){
 
 				char* bin_block = string_new();
 				string_append(&bin_block,paths_estructuras[BLOCKS]);
-				string_append(&bin_block,bloquesDelPokemon[y]);
+				string_append(&bin_block,bloquesDelPokemon[i]);
 				string_append(&bin_block,".bin");
 
 
-				if(cantBloquesNecesarios==(y+1)){
+				if(cantBloquesNecesarios==(i+1)){
 					//esto seria el ultimo bloque necesario
 
 					char* ultimoAguardar=string_new();
 
-					char* stringFinal=string_substring_from(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"));
+					char* stringFinal=string_substring_from(contenidoActualizadoDeBloques,i*config_get_int_value(config_metadata,"BLOCK_SIZE"));
 
 					//primer Alternativa
 					string_append(&ultimoAguardar,stringFinal);
 					int longitud=string_length(ultimoAguardar);
 
 					//segunda alternativa
-					//int longitud=string_length(contenidoActualizadoDeBloques)-(y*config_get_int_value(config_metadata,"BLOCK_SIZE"));
-					//string_append(&ultimoAguardar,string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),longitud));
+					//int longitud=string_length(contenidoActualizadoDeBloques)-(i*config_get_int_value(config_metadata,"BLOCK_SIZE"));
+					//string_append(&ultimoAguardar,string_substring(contenidoActualizadoDeBloques,i*config_get_int_value(config_metadata,"BLOCK_SIZE"),longitud));
 
 					sobrescribirLineas(bin_block,ultimoAguardar,longitud);
 					free(ultimoAguardar);
@@ -336,7 +260,7 @@ t_resultado_captura pokemon_intento_de_captura(t_pokemon pokemon){
 				}else{
 
 					char* cadenaAguardar=string_new();
-					char* stringRecorte=string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE"));
+					char* stringRecorte=string_substring(contenidoActualizadoDeBloques,i*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE"));
 
 					string_append(&cadenaAguardar,stringRecorte);
 					int longitud=string_length(cadenaAguardar);
@@ -362,38 +286,19 @@ t_resultado_captura pokemon_intento_de_captura(t_pokemon pokemon){
 		//retardo para simular acceso a disco
 		simular_acceso_a_disco();
 
-		pthread_mutex_lock(&mutDiccionarioSemaforos);
-
-		pthread_mutex_t* pokeMut3=dictionary_get(semaforosDePokemons,pokemon.especie);
-
-		pthread_mutex_unlock(&mutDiccionarioSemaforos);
-
-		//pthread_mutex_lock(dictionary_get(semaforosDePokemons,pokemon.especie));
-		pthread_mutex_lock(pokeMut3);
+		pthread_mutex_lock(mutexPokemon);
 
 		config_set_value(config_metadata_pokemon,"BLOCKS",listaBloques);
 		config_set_value(config_metadata_pokemon,"SIZE",stringSize);
 		config_set_value(config_metadata_pokemon,"OPEN","N");
 		config_save(config_metadata_pokemon);
 
-
-		pthread_mutex_lock(&mutDiccionarioSemaforos);
-
-		pthread_mutex_t* pokeMut4=dictionary_get(semaforosDePokemons,pokemon.especie);
-
-		pthread_mutex_unlock(&mutDiccionarioSemaforos);
-
-		pthread_mutex_unlock(pokeMut4);
-
-		//pthread_mutex_unlock(dictionary_get(semaforosDePokemons,pokemon.especie));
+		pthread_mutex_unlock(mutexPokemon);
 
 		free(listaBloques);
 		free(stringSize);
 
-		pthread_mutex_lock(&mutexLogger);
-		log_info(logger,"Un %s fue atrapado en la posicion: (%i,%i)",pokemon.especie,pokemon.posicion.pos_x,pokemon.posicion.pos_y);
-		pthread_mutex_unlock(&mutexLogger);
-
+		log_enunciado_pokemon_atrapado(pokemon);
 
 	}else{
 		//rama en donde la posicion recibida no se encuentra el pokemon
@@ -402,40 +307,15 @@ t_resultado_captura pokemon_intento_de_captura(t_pokemon pokemon){
 		//retardo para simular acceso a disco
 		simular_acceso_a_disco();
 
-
-		pthread_mutex_lock(&mutDiccionarioSemaforos);
-
-		pthread_mutex_t* pokeMut5=dictionary_get(semaforosDePokemons,pokemon.especie);
-
-		pthread_mutex_unlock(&mutDiccionarioSemaforos);
-
 		//pthread_mutex_lock(dictionary_get(semaforosDePokemons,pokemon.especie));
-		pthread_mutex_lock(pokeMut5);
-
+		pthread_mutex_lock(mutexPokemon);
 		config_set_value(config_metadata_pokemon,"OPEN","N");
 		config_save(config_metadata_pokemon);
+		pthread_mutex_unlock(mutexPokemon);
 
-
-		pthread_mutex_lock(&mutDiccionarioSemaforos);
-
-		pthread_mutex_t* pokeMut6=dictionary_get(semaforosDePokemons,pokemon.especie);
-
-		pthread_mutex_unlock(&mutDiccionarioSemaforos);
-
-
-		pthread_mutex_unlock(pokeMut6);
-
-		//pthread_mutex_unlock(dictionary_get(semaforosDePokemons,pokemon.especie));
-
-
-		pthread_mutex_lock(&mutexLogger);
-		log_error(logger,"No se encuentra la posicion: (%i,%i), para el Pokemon: %s",pokemon.posicion.pos_x,pokemon.posicion.pos_y,pokemon.especie);
-		pthread_mutex_unlock(&mutexLogger);
+		log_enunciado_posicion_no_encontrada(pokemon);
 	}
 
-	free(cadenaABuscar);
-	free(stringPosX);
-	free(stringPosY);
 	string_array_liberar(bloquesDelPokemon);
 	config_destroy(config_metadata_pokemon);
 

@@ -30,7 +30,7 @@ void gamecard_New_Pokemon(t_mensaje_new_pokemon* mensajeNew){
 
 		config_destroy(config_metadata_pokemon);
 
-		log_enunciado_intento_fallido_de_new_pokemon(mensajeNew);
+		log_enunciado_intento_interrumpido_de_new_pokemon(mensajeNew);
 
 		//abro otro hilo con un sleep que volvera a atender al Mensaje
 		pthread_t hiloReintento;

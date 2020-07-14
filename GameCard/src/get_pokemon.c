@@ -20,7 +20,6 @@ void gamecard_procesar_Get_Pokemon(t_mensaje_get_pokemon* mensajeGet){
 	free(bin_metadata);
 
 	if(acceso_fallido(posicionesEncontradas)){
-		puts("no pude acceder");
 
 		pthread_t hiloReintentoDeOperacion;
 		pthread_create(&hiloReintentoDeOperacion, NULL,(void*) gamecard_Get_Pokemon_reintento, mensajeGet);
@@ -121,7 +120,7 @@ t_list* localizar_pokemon(t_mensaje_get_pokemon* mensajeGet, char*bin_metadata){
 		config_destroy(config_metadata_pokemon);
 
 //Log enunciado
-		log_enunciado_fallo_intento_localizar(mensajeGet);
+		log_enunciado_intento_interrumpido_de_get(mensajeGet);
 
 
 		//y finalizo este hilo

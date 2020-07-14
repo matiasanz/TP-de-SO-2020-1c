@@ -14,13 +14,13 @@ int main(void) {
 
 	inicializar();
 
-	sem_wait(&objetivos_gamecard);
+	sem_wait(&FIN_DEL_PROCESO_GAMECARD);
 	return EXIT_SUCCESS;
 }
 
 void inicializar(void) {
 
-	sem_init(&objetivos_gamecard, 0, 0); //TODO, en este momento el main no esta haciendo nada
+	sem_init(&FIN_DEL_PROCESO_GAMECARD, 0, 0); //TODO, en este momento el main no esta haciendo nada
 
 	inicializar_config();
 	inicializar_logs();

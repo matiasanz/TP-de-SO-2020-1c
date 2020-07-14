@@ -15,8 +15,9 @@
 #include "../hilos/hilo_new_pokemon.h"
 
 typedef t_mensaje_appeared_catch_pokemon t_mensaje_catch_pokemon;
+typedef t_mensaje_appeared_catch_pokemon t_mensaje_appeared_pokemon;
 
-sem_t objetivos_gamecard; //TODO
+sem_t FIN_DEL_PROCESO_GAMECARD;
 
 void mensaje_recibido(t_id_cola id_cola, void* msj);
 
