@@ -1,11 +1,6 @@
 # include "gamecard.h"
 # include "mensajesGamecard.h"
 
-void gamecard_Get_Pokemon_reintento(t_mensaje_get_pokemon* unMsjGetPoke){
-	sleep(TIEMPO_REINTENTO_OPERACION);
-	gamecard_procesar_Get_Pokemon(unMsjGetPoke);
-}
-
 bool acceso_fallido(t_list* posiciones){
 	return !posiciones;
 }
@@ -19,14 +14,9 @@ void gamecard_procesar_Get_Pokemon(t_mensaje_get_pokemon* mensajeGet){
 	t_list* posicionesEncontradas = localizar_pokemon(mensajeGet, bin_metadata);
 	free(bin_metadata);
 
-	if(acceso_fallido(posicionesEncontradas)){
-
-		pthread_t hiloReintentoDeOperacion;
-		pthread_create(&hiloReintentoDeOperacion, NULL,(void*) gamecard_Get_Pokemon_reintento, mensajeGet);
-		pthread_detach(hiloReintentoDeOperacion);
-
-		list_destroy(posicionesEncontradas);
-		return;
+	while(acceso_fallido(posicionesEncontradas)){
+		sleep(tiempo_de_reintento_operacion);
+		posicionesEncontradas = localizar_pokemon(mensajeGet, bin_metadata);
 	}
 
 	log_enunciado_posiciones_encontradas(especie, posicionesEncontradas);
@@ -116,7 +106,7 @@ t_list* localizar_pokemon(t_mensaje_get_pokemon* mensajeGet, char*bin_metadata){
 
 	//------Ver si el archivo esta abierto------------
 	if(archivo_abierto(config_metadata_pokemon)){
-
+		pthread_mutex_unlock(mutexMetadataPokemon);
 		config_destroy(config_metadata_pokemon);
 
 //Log enunciado
