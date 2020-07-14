@@ -156,7 +156,6 @@ t_list* localizar_pokemon(t_mensaje_get_pokemon* mensajeGet, char*bin_metadata){
 		return NULL;
 	}
 
-	pthread_mutex_unlock(mutexMetadataPokemon);
 	//--------comenzar a operar el pokemon-------
 
 	t_list* listaDePosiciones = leer_posiciones_de_disco(config_metadata_pokemon);
