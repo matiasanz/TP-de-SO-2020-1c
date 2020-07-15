@@ -18,7 +18,8 @@ void log_enunciado_intento_interrumpido_de_new_pokemon(t_mensaje_new_pokemon* me
 char*pokemon_find_carpeta(char*especie);
 void gamecard_New_Pokemon_Reintento(t_mensaje_new_pokemon* unMsjNewPoke);
 void agregar_nueva_linea(t_config* config_metadata_pokemon, char**bloquesDelPokemon, t_mensaje_new_pokemon* mensajeNew);
-
+void alcanzanLosBloquesParaGuardar(char** bloquesDelPokemon,int cantBloquesNecesarios,char* contenidoActualizadoDeBloques);
+char* faltanBloquesParaGuardar(char** bloquesDelPokemon,int cantBloquesNecesarios,char* contenidoActualizadoDeBloques);
 //***********************************************************************************
 
 //Auxiliares

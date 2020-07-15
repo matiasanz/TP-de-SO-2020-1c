@@ -84,7 +84,7 @@ void agregar_nueva_linea(t_config* config_metadata_pokemon, char**bloquesDelPoke
 		uint32_t BLOCK_SIZE = config_metadata_get_block_size();
 		int cantBloquesNecesarios = bloquesNecesarios(nuevalinea, BLOCK_SIZE);
 
-		int size; //de la nueva linea; TODO
+		int size; //de la nueva linea;
 
 		char* listaBloques=string_from_format("[");
 
@@ -130,31 +130,8 @@ void agregar_nueva_linea(t_config* config_metadata_pokemon, char**bloquesDelPoke
 		}
 
 
-
-		/*
-
-		//el bitarray cuenta desde 0
-		pthread_mutex_lock(&mutBitarray);
-		int nrobloque=bloque_disponible(bitmap,config_get_int_value(config_metadata,"BLOCKS"));
-		bitarray_set_bit(bitmap,nrobloque);
-		pthread_mutex_unlock(&mutBitarray);
-
-		char* bin_block = string_new();
-		string_append(&bin_block,paths_estructuras[BLOCKS]);
-		string_append(&bin_block,string_itoa(nrobloque));
-		string_append(&bin_block,".bin");
-
-
-		guardarLinea(bin_block,nuevalinea,longitud);
-
-		char* listaBloques=string_new();
-		string_append(&listaBloques,"[");
-		string_append(&listaBloques,string_itoa(nrobloque));
-		string_append(&listaBloques,"]");*/
-
 		string_append(&listaBloques,"]");
 		size = string_length(nuevalinea);
-;
 		char* stringSize=string_itoa(size);
 
 		//retardo para simular acceso a disco
@@ -325,7 +302,7 @@ void agregar_nueva_linea(t_config* config_metadata_pokemon, char**bloquesDelPoke
 
 }
 
-//TODO reducir y ver si se pueden sacar argumentos
+
 void actualizar_datos(char* cadenaABuscar, char**bloquesDelPokemon, t_config*config_metadata_pokemon, t_mensaje_new_pokemon* mensajeNew){
 
 	//rama el pokemon posee la posicion recibida
@@ -357,124 +334,24 @@ void actualizar_datos(char* cadenaABuscar, char**bloquesDelPokemon, t_config*con
 			int size;
 
 			if(cantBloquesNecesarios>cant_elemetos_array(bloquesDelPokemon)){
-				//caso en el que necesito mas bloques de los que tenia
-				int cantBloquesFaltantes=cantBloquesNecesarios-cant_elemetos_array(bloquesDelPokemon);
+			//caso en el que necesito mas bloques de los que tenia
 
-				char* nroDebloquesActualizado=string_new();
-
-				for(int x=0;x<cant_elemetos_array(bloquesDelPokemon);x++){
-					string_append(&nroDebloquesActualizado,bloquesDelPokemon[x]);
-					string_append(&nroDebloquesActualizado,",");
-				}
-
-				for(int b=0;b<cantBloquesFaltantes;b++){
-				pthread_mutex_lock(&mutBitarray);
-				int nrobloque=bloque_disponible(bitmap,config_get_int_value(config_metadata,"BLOCKS"));
-				bitarray_set_bit(bitmap,nrobloque);
-				pthread_mutex_unlock(&mutBitarray);
-
-
-				char* stringNroBloque=string_itoa(nrobloque);
-					if(cantBloquesFaltantes==(b+1)){
-						string_append(&nroDebloquesActualizado,stringNroBloque);
-					}else{
-						string_append(&nroDebloquesActualizado,stringNroBloque);
-						string_append(&nroDebloquesActualizado,",");
-					}
-
-				free(stringNroBloque);
-				}
-
-				char** arrayBloqueActualizado=string_split(nroDebloquesActualizado,",");
-
-
-				for(int y=0;y<cantBloquesNecesarios;y++){
-
-				char* bin_block = string_new();
-				string_append(&bin_block,paths_estructuras[BLOCKS]);
-				string_append(&bin_block,arrayBloqueActualizado[y]);
-				string_append(&bin_block,".bin");
-
-
-				if(cantBloquesNecesarios==(y+1)){
-					//esto seria el ultimo bloque necesario
-
-					char* ultimoAguardar=string_new();
-					char* stringFinal=string_substring_from(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"));
-
-					string_append(&ultimoAguardar,stringFinal);
-					int longitud=string_length(ultimoAguardar);
-					sobrescribirLineas(bin_block,ultimoAguardar,longitud);
-					free(ultimoAguardar);
-					free(stringFinal);
-				}else{
-
-					char* cadenaAguardar=string_new();
-					char* stringRecorte=string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE"));
-					string_append(&cadenaAguardar,stringRecorte);
-					int longitud=string_length(cadenaAguardar);
-					sobrescribirLineas(bin_block,cadenaAguardar,longitud);
-
-					free(cadenaAguardar);
-					free(stringRecorte);
-				}
-
-				free(bin_block);
-			}
+			char* nroDebloquesActualizado=faltanBloquesParaGuardar(bloquesDelPokemon,cantBloquesNecesarios,contenidoActualizadoDeBloques);
 
 			size=string_length(contenidoActualizadoDeBloques);
 
 
 			string_append_with_format(&listaBloques,"%s%s%s","[",nroDebloquesActualizado,"]");
 
-			string_array_liberar(arrayBloqueActualizado);
 			free(nroDebloquesActualizado);
 
 			}else{
 				//con los bloques asignados que tiene el pokemon bastan
 
-				for(int y=0;y<cantBloquesNecesarios;y++){
-
-					char* bin_block = string_new();
-					string_append(&bin_block,paths_estructuras[BLOCKS]);
-					string_append(&bin_block,bloquesDelPokemon[y]);
-					string_append(&bin_block,".bin");
-
-
-					if(cantBloquesNecesarios==(y+1)){
-						//esto seria el ultimo bloque necesario
-
-						char* ultimoAguardar=string_new();
-						char* stringFinal=string_substring_from(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"));
-						//primer Alternativa
-						string_append(&ultimoAguardar,stringFinal);
-						int longitud=string_length(ultimoAguardar);
-
-						//segunda alternativa
-						//int longitud=string_length(contenidoActualizadoDeBloques)-(y*config_get_int_value(config_metadata,"BLOCK_SIZE"));
-						//string_append(&ultimoAguardar,string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),longitud));
-
-						sobrescribirLineas(bin_block,ultimoAguardar,longitud);
-						free(ultimoAguardar);
-						free(stringFinal);
-					}else{
-
-						char* cadenaAguardar=string_new();
-						char* stringRecorte=string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE"));
-						string_append(&cadenaAguardar,stringRecorte);
-						int longitud=string_length(cadenaAguardar);
-						sobrescribirLineas(bin_block,cadenaAguardar,longitud);
-
-						free(cadenaAguardar);
-						free(stringRecorte);
-					}
-
-					free(bin_block);
-				}
+				alcanzanLosBloquesParaGuardar(bloquesDelPokemon,cantBloquesNecesarios,contenidoActualizadoDeBloques);
 
 				size=string_length(contenidoActualizadoDeBloques);
 				string_append(&listaBloques,config_get_string_value(config_metadata_pokemon,"BLOCKS"));
-
 
 			}
 
@@ -586,4 +463,120 @@ char* get_contenido_actualizado(char**lineasDelPokemon, char*stringPosAdaptado, 
 	}
 
 	return contenidoActualizadoDeBloques;
+}
+void alcanzanLosBloquesParaGuardar(char** bloquesDelPokemon,int cantBloquesNecesarios,char* contenidoActualizadoDeBloques){
+
+
+	//con los bloques asignados que tiene el pokemon bastan
+
+	for(int y=0;y<cantBloquesNecesarios;y++){
+
+		char* bin_block = string_new();
+		string_append(&bin_block,paths_estructuras[BLOCKS]);
+		string_append(&bin_block,bloquesDelPokemon[y]);
+		string_append(&bin_block,".bin");
+
+
+		if(cantBloquesNecesarios==(y+1)){
+			//esto seria el ultimo bloque necesario
+
+			char* ultimoAguardar=string_new();
+			char* stringFinal=string_substring_from(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"));
+			//primer Alternativa
+			string_append(&ultimoAguardar,stringFinal);
+			int longitud=string_length(ultimoAguardar);
+
+			//segunda alternativa
+			//int longitud=string_length(contenidoActualizadoDeBloques)-(y*config_get_int_value(config_metadata,"BLOCK_SIZE"));
+			//string_append(&ultimoAguardar,string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),longitud));
+
+			sobrescribirLineas(bin_block,ultimoAguardar,longitud);
+			free(ultimoAguardar);
+			free(stringFinal);
+		}else{
+
+			char* cadenaAguardar=string_new();
+			char* stringRecorte=string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE"));
+			string_append(&cadenaAguardar,stringRecorte);
+			int longitud=string_length(cadenaAguardar);
+			sobrescribirLineas(bin_block,cadenaAguardar,longitud);
+
+			free(cadenaAguardar);
+			free(stringRecorte);
+		}
+
+		free(bin_block);
+	}
+
+
+}
+char* faltanBloquesParaGuardar(char** bloquesDelPokemon,int cantBloquesNecesarios,char* contenidoActualizadoDeBloques){
+	//caso en el que necesito mas bloques de los que tenia
+		int cantBloquesFaltantes=cantBloquesNecesarios-cant_elemetos_array(bloquesDelPokemon);
+
+		char* nroDebloquesActualizado=string_new();
+
+		for(int x=0;x<cant_elemetos_array(bloquesDelPokemon);x++){
+			string_append(&nroDebloquesActualizado,bloquesDelPokemon[x]);
+			string_append(&nroDebloquesActualizado,",");
+		}
+		//buscando bloques libres en bitmap, segun cuantos falte
+		for(int b=0;b<cantBloquesFaltantes;b++){
+
+		pthread_mutex_lock(&mutBitarray);
+		int nrobloque=bloque_disponible(bitmap,config_get_int_value(config_metadata,"BLOCKS"));
+		bitarray_set_bit(bitmap,nrobloque);
+		pthread_mutex_unlock(&mutBitarray);
+
+
+		char* stringNroBloque=string_itoa(nrobloque);
+			if(cantBloquesFaltantes==(b+1)){
+				string_append(&nroDebloquesActualizado,stringNroBloque);
+			}else{
+				string_append(&nroDebloquesActualizado,stringNroBloque);
+				string_append(&nroDebloquesActualizado,",");
+			}
+
+		free(stringNroBloque);
+		}
+
+		char** arrayBloqueActualizado=string_split(nroDebloquesActualizado,",");
+
+
+				for(int y=0;y<cantBloquesNecesarios;y++){
+
+				char* bin_block = string_new();
+				string_append(&bin_block,paths_estructuras[BLOCKS]);
+				string_append(&bin_block,arrayBloqueActualizado[y]);
+				string_append(&bin_block,".bin");
+
+
+				if(cantBloquesNecesarios==(y+1)){
+					//esto seria el ultimo bloque necesario
+
+					char* ultimoAguardar=string_new();
+					char* stringFinal=string_substring_from(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"));
+
+					string_append(&ultimoAguardar,stringFinal);
+					int longitud=string_length(ultimoAguardar);
+					sobrescribirLineas(bin_block,ultimoAguardar,longitud);
+					free(ultimoAguardar);
+					free(stringFinal);
+				}else{
+
+					char* cadenaAguardar=string_new();
+					char* stringRecorte=string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE"));
+					string_append(&cadenaAguardar,stringRecorte);
+					int longitud=string_length(cadenaAguardar);
+					sobrescribirLineas(bin_block,cadenaAguardar,longitud);
+
+					free(cadenaAguardar);
+					free(stringRecorte);
+				}
+
+				free(bin_block);
+			}
+
+		string_array_liberar(arrayBloqueActualizado);
+		return nroDebloquesActualizado;
 }
