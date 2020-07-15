@@ -336,7 +336,7 @@ void actualizar_datos(char* cadenaABuscar, char**bloquesDelPokemon, t_config*con
 
 				char* contenidoBloques=contenido_de_Bloques_con_mmap(bloquesDelPokemon);
 
-				log_info(event_logger,"contenido bloques:: %s",contenidoBloques); //TODO antes estaba comentado
+				//log_info(event_logger,"contenido bloques:: %s",contenidoBloques); //TODO antes estaba comentado,(es solo para verificar, que estoy leyendo bien el contendido de los bloques)
 
 				char** lineasDelPokemon=string_split(contenidoBloques,"\n");
 
@@ -519,9 +519,9 @@ char*pokemon_find_carpeta(char*especie){
 char* pokemon_find_metadata(char*especie){
 
 	char*carpeta = pokemon_find_carpeta(especie);
-	printf("carpeta: %s\n", carpeta);
+	//printf("carpeta: %s\n", carpeta);
 	char*metadata = string_from_format("%s/Metadata.bin", carpeta);
-	printf("Metadata: %s\n", metadata);
+	//printf("Metadata: %s\n", metadata);
 	free(carpeta);
 
 	return metadata;

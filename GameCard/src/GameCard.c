@@ -109,11 +109,18 @@ void crearEstructuras(){
 		if((f_metadata=fopen(bin_metadata,"r"))==NULL){ //si no existe el archivo metadata
 			log_info(event_logger,"[ERROR FATAL] FILESYSTEM NO ENCONTRADO (se creara uno nuevo)");
 			f_metadata=fopen(bin_metadata,"wb+");
+
+
+			char* DEFAULT_BLOCK_SIZE=config_get_string_value(config,"DEFAULT_BLOCK_SIZE");
+			char* DEFAULT_BLOCKS=config_get_string_value(config,"DEFAULT_BLOCKS");
+			char* DEFAULT_MAGIC_NUMBER=config_get_string_value(config,"DEFAULT_MAGIC_NUMBER");
+
+
 			config_metadata=config_create(bin_metadata);
 
-			config_set_value(config_metadata,"BLOCK_SIZE","64");
-			config_set_value(config_metadata,"BLOCKS","5192");
-			config_set_value(config_metadata,"MAGIC_NUMBER","TALL_GRASS");
+			config_set_value(config_metadata,"BLOCK_SIZE",DEFAULT_BLOCK_SIZE);
+			config_set_value(config_metadata,"BLOCKS",DEFAULT_BLOCKS);
+			config_set_value(config_metadata,"MAGIC_NUMBER",DEFAULT_MAGIC_NUMBER);
 			config_save(config_metadata);
 		}else
 			config_metadata=config_create(bin_metadata);
