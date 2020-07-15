@@ -7,11 +7,11 @@
 
 #include "mensaje_cache_metadata.h"
 
-t_mensaje_cache_metadata* mensaje_metadata_crear(uint32_t id_correlativo) {
+t_mensaje_cache_metadata* mensaje_metadata_crear() {
 
 	t_mensaje_cache_metadata* metadata = malloc(sizeof(t_mensaje_cache_metadata));
 
-	metadata->id_correlativo = id_correlativo;
+	metadata->id_correlativo = 0;
 	metadata->suscriptores_confirmados = list_create();
 	metadata->suscriptores_enviados = list_create();
 	metadata->suscriptores_fallidos = list_create();

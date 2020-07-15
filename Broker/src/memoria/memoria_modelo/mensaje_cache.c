@@ -12,7 +12,7 @@ static void mensaje_cache_agregar_suscriptor_confirmado(t_mensaje_cache* msj, t_
 static void mensaje_cache_agregar_suscriptor_fallido(t_mensaje_cache* msj, t_suscriptor* suscriptor, uint32_t id_mensaje);
 static void eliminar_suscriptor_fallido(t_mensaje_cache* msj, t_suscriptor* suscriptor, uint32_t id_mensaje);
 
-t_mensaje_cache* mensaje_cache_crear(t_mensaje_header msj_header) {
+t_mensaje_cache* mensaje_cache_crear() {
 
 	t_mensaje_cache* mensaje_cache = malloc(sizeof(t_mensaje_cache));
 
@@ -22,7 +22,7 @@ t_mensaje_cache* mensaje_cache_crear(t_mensaje_header msj_header) {
 	pthread_mutex_init(&mensaje_cache->mutex_suscriptores_confirmados, NULL);
 	pthread_mutex_init(&mensaje_cache->mutex_suscriptores_fallidos, NULL);
 
-	mensaje_cache->metadata = mensaje_metadata_crear(msj_header.id_correlativo);
+	mensaje_cache->metadata = mensaje_metadata_crear();
 
 	return mensaje_cache;
 }
@@ -160,4 +160,8 @@ void eliminar_suscriptor_fallido(t_mensaje_cache* msj, t_suscriptor* suscriptor_
 		log_event_reenvio_exitoso(suscriptor_encontrado, id_mensaje);
 		suscriptor_destruir(suscriptor_encontrado);
 	}
+}
+
+void mensaje_cache_set_id_correlativo(t_mensaje_cache* msj, uint32_t id_correlativo) {
+	mensaje_cache_metadata_set_id_correlativo(msj -> metadata, id_correlativo);
 }

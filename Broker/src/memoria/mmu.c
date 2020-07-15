@@ -35,7 +35,7 @@ void inicializar_memoria() {
 
 t_mensaje_cache* guardar_en_memoria(void* msj_recibido, t_id_cola id_cola, t_mensaje_header msj_header) {
 
-	t_mensaje_cache* msj_cache = mensaje_cache_crear(msj_header);
+	t_mensaje_cache* msj_cache = mensaje_cache_crear();
 	void* contenido_mensaje = compactar_contenido_mensaje(msj_recibido, msj_cache->metadata, id_cola);
 
 	pthread_mutex_lock(&mutex_acceso_memoria);

@@ -20,7 +20,7 @@ typedef struct {
 	pthread_mutex_t mutex_suscriptores_fallidos;
 } t_mensaje_cache;
 
-t_mensaje_cache* mensaje_cache_crear(t_mensaje_header msj_header);
+t_mensaje_cache* mensaje_cache_crear();
 void mensaje_cache_eliminar_de_cola_y_liberar_particion(t_mensaje_cache* msj);
 void mensaje_cache_eliminar_de_cola(t_mensaje_cache* msj);
 t_mensaje_header mensaje_header_restaurar_desde_cache(t_mensaje_cache* msj);
@@ -38,5 +38,6 @@ void mensaje_cache_set_ack(t_mensaje_cache* msj, t_suscriptor* suscriptor, int a
 
 t_suscriptor* mensaje_cache_get_primer_sucriptor_fallido(t_mensaje_cache* msj);
 bool mensaje_cache_pendiente_confirmacion(t_mensaje_cache* msj, t_suscriptor* suscriptor_buscado);
+void mensaje_cache_set_id_correlativo(t_mensaje_cache* msj, uint32_t id_correlativo);
 
 #endif /* SRC_MEMORIA_MEMORIA_MODELO_MENSAJE_CACHE_H_ */

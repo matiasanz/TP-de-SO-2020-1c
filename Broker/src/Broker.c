@@ -12,6 +12,8 @@ int main(void) {
 		int *socket_cliente = malloc(sizeof(int));
 		*socket_cliente = socket_aceptar_conexion(socket_servidor);
 
+		//Debug
+		//atender_cliente(socket_cliente);
 		pthread_create(&hilo_receptor_mensajes, NULL, (void*) atender_cliente, socket_cliente);
 		pthread_detach(hilo_receptor_mensajes);
 	}

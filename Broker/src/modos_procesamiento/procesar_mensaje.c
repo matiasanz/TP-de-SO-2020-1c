@@ -21,7 +21,8 @@ void procesar_mensaje(int* socket, t_paquete_header pqt_header) {
 	void* msj_deserializado = deserializar_y_asignar_ids(msj_recibido, msj_header, pqt_header.id_cola);
 
 	t_mensaje_cache* msj_cache = guardar_en_memoria(msj_recibido, pqt_header.id_cola, *msj_header);
-
+	mensaje_cache_set_id_correlativo(msj_cache, msj_header -> id_correlativo);
+	
 	//Debug
 	//enviar_id_mensaje(enviar_id_mensaje_args_crear(msj_header -> id, socket, pqt_header));
 	crear_hilo_y_enviar_id_univoco(msj_header -> id, socket, pqt_header);
