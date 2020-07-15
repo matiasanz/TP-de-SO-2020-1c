@@ -335,7 +335,7 @@ void actualizar_datos(char* cadenaABuscar, char**bloquesDelPokemon, t_config*con
 
 			if(cantBloquesNecesarios>cant_elemetos_array(bloquesDelPokemon)){
 			//caso en el que necesito mas bloques de los que tenia
-
+				//guardo y devuelvo los bloques que ocupa,ejem ("1,2,4,6")
 			char* nroDebloquesActualizado=faltanBloquesParaGuardar(bloquesDelPokemon,cantBloquesNecesarios,contenidoActualizadoDeBloques);
 
 			size=string_length(contenidoActualizadoDeBloques);
@@ -542,40 +542,8 @@ char* faltanBloquesParaGuardar(char** bloquesDelPokemon,int cantBloquesNecesario
 
 		char** arrayBloqueActualizado=string_split(nroDebloquesActualizado,",");
 
-
-				for(int y=0;y<cantBloquesNecesarios;y++){
-
-				char* bin_block = string_new();
-				string_append(&bin_block,paths_estructuras[BLOCKS]);
-				string_append(&bin_block,arrayBloqueActualizado[y]);
-				string_append(&bin_block,".bin");
-
-
-				if(cantBloquesNecesarios==(y+1)){
-					//esto seria el ultimo bloque necesario
-
-					char* ultimoAguardar=string_new();
-					char* stringFinal=string_substring_from(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"));
-
-					string_append(&ultimoAguardar,stringFinal);
-					int longitud=string_length(ultimoAguardar);
-					sobrescribirLineas(bin_block,ultimoAguardar,longitud);
-					free(ultimoAguardar);
-					free(stringFinal);
-				}else{
-
-					char* cadenaAguardar=string_new();
-					char* stringRecorte=string_substring(contenidoActualizadoDeBloques,y*config_get_int_value(config_metadata,"BLOCK_SIZE"),config_get_int_value(config_metadata,"BLOCK_SIZE"));
-					string_append(&cadenaAguardar,stringRecorte);
-					int longitud=string_length(cadenaAguardar);
-					sobrescribirLineas(bin_block,cadenaAguardar,longitud);
-
-					free(cadenaAguardar);
-					free(stringRecorte);
-				}
-
-				free(bin_block);
-			}
+		//como ya se me asignaron mas bloques, uso esta funcion
+		alcanzanLosBloquesParaGuardar(arrayBloqueActualizado,cantBloquesNecesarios,contenidoActualizadoDeBloques);
 
 		string_array_liberar(arrayBloqueActualizado);
 		return nroDebloquesActualizado;
