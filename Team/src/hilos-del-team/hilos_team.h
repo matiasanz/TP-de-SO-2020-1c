@@ -46,6 +46,7 @@ void team_hilo_entrenador();
 //Hilo que se encarga de planificar los hilos entrenadores
 void team_planificar();
 void ejecutar_entrenador(entrenador*);
+void desalojar_entrenador(entrenador*);
 
 //Hilo que se encarga de recibir los mensajes
 void gamecard_simulator();

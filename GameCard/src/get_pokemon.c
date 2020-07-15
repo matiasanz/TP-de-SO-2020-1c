@@ -1,15 +1,8 @@
 # include "gamecard.h"
-
-void log_enunciado_posiciones_encontradas(char*especie, t_list*posiciones){
-	char* posicionesString=posicion_list_to_string(posiciones);
-	pthread_mutex_lock(&mutexLogger);
-	log_info(logger,"Mensaje:%s, se localizaron %u posiciones para %s,->>>: %s",GET_POKEMON_STRING,list_size(posiciones),especie,posicionesString);
-	pthread_mutex_unlock(&mutexLogger);
-	free(posicionesString);
-}
+# include "mensajesGamecard.h"
 
 bool acceso_fallido(t_list* posiciones){
-	return !posiciones; //Si no pudo realizar la operacion retorna NULL
+	return !posiciones;
 }
 
 void gamecard_procesar_Get_Pokemon(t_mensaje_get_pokemon* mensajeGet){
@@ -19,17 +12,16 @@ void gamecard_procesar_Get_Pokemon(t_mensaje_get_pokemon* mensajeGet){
 	char* bin_metadata = pokemon_find_metadata(especie);
 
 	t_list* posicionesEncontradas = localizar_pokemon(mensajeGet, bin_metadata);
+	free(bin_metadata);
 
 	while(acceso_fallido(posicionesEncontradas)){
-		sleep(tiempo_de_reintento_operacion);
+		sleep(TIEMPO_REINTENTO_OPERACION);
 		posicionesEncontradas = localizar_pokemon(mensajeGet, bin_metadata);
 	}
 
-	free(bin_metadata);
-
 	log_enunciado_posiciones_encontradas(especie, posicionesEncontradas);
 
-	gamecard_responder_localized(mensajeGet, posicionesEncontradas); //creacion del paquete localized_pokemon y envio a Broker
+	gamecard_enviar_localized(mensajeGet, posicionesEncontradas); //creacion del paquete localized_pokemon y envio a Broker
 
 	mensaje_get_pokemon_destruir(mensajeGet);
 	list_destroy(posicionesEncontradas);
@@ -40,38 +32,9 @@ void gamecard_procesar_Get_Pokemon(t_mensaje_get_pokemon* mensajeGet){
 
 //************************************************************************************
 
-//Retorna el path teorico del metadata de la especie
-char* pokemon_find_metadata(char*especie){
-	return string_from_format("%s%s%s", paths_estructuras[FILES], especie, "/Metadata.bin");
-}
-
-//Crea el mensaje localized con las posiciones y lo envia al broker
-void gamecard_responder_localized(t_mensaje_get_pokemon* mensajeGet, t_list*posiciones){
-
-	t_mensaje_localized_pokemon* mensajeAEnviar = mensaje_localized_pokemon_crear(mensajeGet->especie
-			  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  , posiciones);
-
-	mensaje_localized_pokemon_set_id_correlativo(mensajeAEnviar ,mensaje_get_pokemon_get_id(mensajeGet));
-
-	t_buffer* bufferDepaquete=mensaje_localized_pokemon_serializar(mensajeAEnviar);
-
-	t_paquete* paqueteAEnviar=paquete_crear(MENSAJE,LOCALIZED_POKEMON,bufferDepaquete);
-
-	pthread_mutex_lock(&envioPaquete);
-	int resultadoEnvio = enviar(conexion_broker,paqueteAEnviar);
-	pthread_mutex_unlock(&envioPaquete);
-
-	if(error_conexion(resultadoEnvio)){
-		//repetido TODO
-		log_warning(logger,"NO se pudo realizar la conexion con el BROKER");
-	}
-
-	mensaje_localized_pokemon_destruir(mensajeAEnviar);
-	paquete_destruir(paqueteAEnviar);
-}
 
 void simular_acceso_a_disco(){
-	sleep(tiempo_retardo_operacion);
+	sleep(TIEMPO_RETARDO_OPERACION);
 }
 
 //retorna el mutex correspondiente a la especie ingresada. Si no lo encuentra, lo crea y lo agrega
@@ -122,10 +85,25 @@ void validar_linea(char*lineaDelPokemon){
 	}
 }
 
+
+t_config* pokemon_get_metadata(char* especie){
+
+	char* bin_metadata=pokemon_find_metadata(especie);
+
+	pthread_mutex_t* mutexPokemon = pokemon_get_mutex(especie);
+	pthread_mutex_lock(mutexPokemon);
+	t_config* config_metadata_pokemon = config_create(bin_metadata);
+	pthread_mutex_unlock(mutexPokemon);
+
+	free(bin_metadata);
+
+	return config_metadata_pokemon;
+}
+
 //Retorna las posiciones del pokemon o NULL si no se concreto la operacion
 t_list* localizar_pokemon(t_mensaje_get_pokemon* mensajeGet, char*bin_metadata){
 
-	t_config* config_metadata_pokemon =config_create(bin_metadata);
+	t_config* config_metadata_pokemon = pokemon_get_metadata(mensajeGet->especie);
 
 	//Valido si no existe el archivo metadata
 	if(!archivo_existe(config_metadata_pokemon)){
@@ -141,16 +119,22 @@ t_list* localizar_pokemon(t_mensaje_get_pokemon* mensajeGet, char*bin_metadata){
 
 	pthread_mutex_lock(mutexMetadataPokemon);
 
+
+	//agrego este destroy y create del metadata del pokemon,
+	//porque talvez este hilo esperaba en el mutex y puede que algun catch
+	//termino antes y hay menos bloques ocupados por el pokemon,
+	//tendriamos informacion desactualizada en el config_metadata_pokemon
+	config_destroy(config_metadata_pokemon);
+	config_metadata_pokemon = config_create(bin_metadata);
+
 	//------Ver si el archivo esta abierto------------
 	if(archivo_abierto(config_metadata_pokemon)){
 		pthread_mutex_unlock(mutexMetadataPokemon);
-
 		config_destroy(config_metadata_pokemon);
 
 //Log enunciado
-		pthread_mutex_lock(&mutexLogger);
-		log_error(logger,"El archivo pokemon esta abierto, la operacion GET_POKEMON %s se reintentara luego",mensajeGet->especie);
-		pthread_mutex_unlock(&mutexLogger);
+		log_enunciado_intento_interrumpido_de_get(mensajeGet);
+
 
 		//y finalizo este hilo
 		return NULL;
@@ -165,7 +149,6 @@ t_list* localizar_pokemon(t_mensaje_get_pokemon* mensajeGet, char*bin_metadata){
 	pthread_mutex_unlock(mutexMetadataPokemon);
 
 	config_destroy(config_metadata_pokemon);
-
 
 	return listaDePosiciones;
 }
@@ -202,8 +185,8 @@ t_list* leer_posiciones_de_disco(t_config* config_metadata_pokemon){
 
 			list_add(listaDePosiciones,unaPosicion);
 
-			split_liberar(posicionString);
-			split_liberar(posicionYcantidad);
+			string_array_liberar(posicionString);
+			string_array_liberar(posicionYcantidad);
 
 			free(lineasDelPokemon[i]);
 		}
@@ -213,7 +196,7 @@ t_list* leer_posiciones_de_disco(t_config* config_metadata_pokemon){
 		free(contenidoBloques);
 	}
 
-	split_liberar(bloquesDelPokemon);
+	string_array_liberar(bloquesDelPokemon);
 
 	return listaDePosiciones;
 }

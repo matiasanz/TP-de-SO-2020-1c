@@ -8,10 +8,7 @@ void team_planificar(){
 
 		entrenador* proximoEntrenador = proximo_a_ejecutar_segun_criterio(entrenadoresReady);
 
-		if(!proximoEntrenador){
-			log_error(event_logger, "Se intento leer un entrenador nulo");
-			exit(1);
-		}
+		validar_entrenador(proximoEntrenador);
 
 		log_event_entrenador_por_ejecutar(proximoEntrenador);
 		ejecutar_entrenador(proximoEntrenador);
@@ -29,10 +26,7 @@ void ejecutar_entrenador(entrenador* unEntrenador){
 	for(tiempo=0; !entrenador_termino_de_ejecutar(unEntrenador); tiempo+=RETARDO_CICLO_CPU){
 
 		if(criterio_de_desalojo(unEntrenador, tiempo)){
-
-			entrenador_pasar_a(unEntrenador, READY, "Ha sido desalojado por algoritmo de planificacion"); //abstraer a desalojar()
-			cr_list_add_and_signal(entrenadoresReady, unEntrenador);
-
+			desalojar_entrenador(unEntrenador);
 			break;
 		}
 
@@ -45,4 +39,11 @@ void ejecutar_entrenador(entrenador* unEntrenador){
 
 	actualizar_datos_del_entrenador(unEntrenador, tiempo);
 
+}
+
+void desalojar_entrenador(entrenador* unEntrenador){
+	char*motivo = string_from_format("Ha sido desalojado por %s", MOTIVO_DESALOJO);
+	entrenador_pasar_a(unEntrenador, READY, motivo);
+	cr_list_add_and_signal(entrenadoresReady, unEntrenador);
+	free(motivo);
 }
