@@ -37,9 +37,11 @@ char* mensaje_get_pokemon_to_string(t_mensaje_get_pokemon* get_pokemon);
 // Getters
 uint32_t mensaje_get_pokemon_get_id(t_mensaje_get_pokemon* msj);
 uint32_t mensaje_get_pokemon_get_id_correlativo(t_mensaje_get_pokemon* msj);
+t_mensaje_header mensaje_get_pokemon_get_header(t_mensaje_get_pokemon* msj);
 
 // Setters
 void mensaje_get_pokemon_set_id(t_mensaje_get_pokemon* msj, uint32_t id);
 void mensaje_get_pokemon_set_id_correlativo(t_mensaje_get_pokemon* msj, uint32_t id_correlativo);
+void mensaje_get_pokemon_set_header(t_mensaje_get_pokemon* msj, t_mensaje_header header);
 
 #endif /* SRC_CRENITO_COMMONS_MENSAJES_MENSAJE_GET_POKEMON_H_ */

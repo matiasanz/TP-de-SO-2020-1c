@@ -23,7 +23,7 @@
 #include<commons/string.h>
 #include <commons/collections/dictionary.h>
 
-#define ERROR_SOCKET -1
+#define ERROR_CONEXION -1
 
 #define LOG_HEADER_MENSAJE_RECIBIDO "MENSAJE RECIBIDO"
 
@@ -66,7 +66,7 @@ char* get_nombre_cola(t_id_cola id_cola);
 /* Funcion booleana que determina si los logs se muestran por pantalla
  * a partir del config.
  * Retorna true si el config contiene un token MOSTRAR_LOGS=1
- * En caso de no encontrarlo, por defecto devuelve false*/
+ * En caso de no encontrarlo, por defecto retorna true*/
 bool mostrar_logs();
 
 /* Crea un logger con la direccion que le indica el config,
@@ -98,5 +98,6 @@ void log_suscripcion(t_id_cola id_cola); //2. Suscripción a una cola de mensaje
 
 // Logs Errores
 void log_warning_socket(int socket, char* operacion);
-void log_error_cola(int id_cola);
+void log_warning_cola(int id_cola, char* funcion);
+
 #endif /* UTILS_H_ */

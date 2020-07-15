@@ -20,6 +20,9 @@
 	t_log* log_crear_oficial(char*nombreEquipo);
 	t_log* log_crear_event(char*nombreEquipo);
 
+//
+	void log_event(char*cadena, ...);
+
 //Logs del enunciado
 	void log_enunciado_entrenador_creado(entrenador*); //Seria el estado NEW
 	void log_enunciado_cambio_de_cola(entrenador*, t_estado actual, t_estado final, const char* motivo);
@@ -66,12 +69,18 @@
 	void log_event_captura_desconocida(t_mensaje_caught_pokemon*);
 
 	//ENTRENADOR
+	void log_event_entrenador_creado(entrenador*);
 	void log_event_de_donde_partio(entrenador*);
 	void log_event_cpu_otorgado();
 	void log_event_cpu_consumido();
+	void log_event_situacion_del_entrenador(entrenador*);
 
 	//PLANIFICADOR
 	void log_event_entrenador_por_ejecutar(entrenador*proximoEntrenador);
 	void log_event_entrenador_termino_de_ejecutar(entrenador*unEntrenador);
+
+	//Validaciones
+	void validar_pokemon(pokemon*, t_id idEntrenador);
+	void validar_entrenador(entrenador*unEntrenador);
 
 #endif

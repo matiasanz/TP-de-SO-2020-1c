@@ -23,16 +23,16 @@ char* get_nombre_cola(t_id_cola id_cola) {
 	case LOCALIZED_POKEMON:
 		return LOCALIZED_POKEMON_STRING;
 	default:
-		log_error_cola(id_cola);
+		log_warning_cola(id_cola, "get_nombre_cola");
 		return NULL;
 	}
 }
 
 bool mostrar_logs(){
 	char*MOSTRAR_LOGS = "MOSTRAR_LOGS";
-	return config_has_property(config, MOSTRAR_LOGS)
-			&& config_get_int_value(config, MOSTRAR_LOGS);
-} //si no lo valido y nos olvidamos de ponerlo, tira seg fault
+	return !config_has_property(config, MOSTRAR_LOGS)
+			|| config_get_int_value(config, MOSTRAR_LOGS);
+}
 
 char* get_log_path(char* TOKEN){
 	return string_from_format("log/%s", config_get_string_value(config, TOKEN));
@@ -42,12 +42,6 @@ t_log* log_crear(char* PROCESO, char* FILENAME){
 
 	char* LOG_PATH = get_log_path(FILENAME);
 	t_log* log = log_create(LOG_PATH, PROCESO, mostrar_logs(), LOG_LEVEL_INFO);
-
-	if(!log){
-		FILE* f=fopen(LOG_PATH, "w+b");
-		fclose(f);
-		log = log_create(LOG_PATH, PROCESO, mostrar_logs(), LOG_LEVEL_INFO);
-	}
 
 	free(LOG_PATH);
 	return log;
@@ -74,7 +68,7 @@ char* get_separador_string(char* texto) {
 }
 
 int error_conexion(int indicador_conexion) {
-	return indicador_conexion == ERROR_SOCKET;
+	return indicador_conexion == ERROR_CONEXION;
 }
 
 int conexion_exitosa(int indicador_conexion) {
@@ -121,7 +115,55 @@ void log_warning_socket(int socket, char* operacion) {
 	log_warning(event_logger, "Error al realizar la operación %s, socket: %d", operacion, socket);
 }
 
-void log_error_cola(int id_cola) {
-	log_error(event_logger, "No existe la cola: %d. Finalizando hilo", id_cola);
+void log_warning_cola(int id_cola, char* funcion) {
+	log_warning(event_logger, "No existe la cola: %d. Funcion: %s. Finalizando hilo", id_cola, funcion);
 	pthread_exit(NULL);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//************************** Helgrind
+
+
+
+
+
+
+
+
+
+
+
+//void log_inicio_proceso_reconexion(t_id_cola id_cola, int segundos) {
+//}
+//
+//void log_resultado_proceso_reconexion(t_id_cola id_cola, char* resultado) {
+//}
+//
+//void log_suscripcion(t_id_cola id_cola) {
+//}
+//
+//void log_warning_socket(int socket, char* operacion) {
+//}
+//
+//void log_error_cola(int id_cola, char* funcion) {
+//}

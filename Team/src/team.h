@@ -4,6 +4,7 @@
 #include <pthread.h>
 #include "dominio/header_global_team.h"
 #include "utils/team_logs.h"
+#include "utils/mensajes-utils.h"
 
 #define CARPETA_CONFIG "config/"
 

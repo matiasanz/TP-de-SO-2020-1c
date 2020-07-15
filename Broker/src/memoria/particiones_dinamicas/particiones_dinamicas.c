@@ -198,16 +198,16 @@ static void liberar_victima(bool (*algoritmo_victima)(t_particion*, t_particion*
 	int index_victima = 0;
 	t_link_element* item = particiones->head;
 
-//Busca indice de la primer particion ocupada
+	//Busca indice de la primer particion ocupada
 	while (item != NULL && particion_esta_libre(item->data)) {
 		item = item->next;
 		index_victima += 1;
 	}
 
-//Si todas las particiones están vacias, no tiene sentido buscar víctima
+	//Si todas las particiones están vacias, no tiene sentido buscar víctima
 	if (item == NULL) return;
 
-//Se inicializa la victima con la primer particion ocupada encontrada
+	//Se inicializa la victima con la primer particion ocupada encontrada
 	t_particion* victima = list_get(particiones, index_victima);
 
 	/*Recorre la lista y si aparece un mejor candidato a liberar
@@ -222,14 +222,19 @@ static void liberar_victima(bool (*algoritmo_victima)(t_particion*, t_particion*
 		}
 	}
 
-	log_eliminacion_particion(logger, victima);
-	cola_buscar_y_eliminar_mensaje(particion_get_id_mensaje(victima), particion_get_id_cola(victima));
+	log_eliminacion_particion(victima);
+
+	pthread_mutex_lock(&mutex_escritura_eliminacion_memoria);
+
+	cola_safe_buscar_y_eliminar_mensaje(particion_get_id_mensaje(victima), particion_get_id_cola(victima));
 	consolidar(victima, index_victima);
+	
+	pthread_mutex_unlock(&mutex_escritura_eliminacion_memoria);
 }
 
 static void consolidar(t_particion* victima, int index_victima) {
 
-// Completa las variables anterior/sgte solo si existen particiones anteriores o siguientes
+	// Completa las variables anterior/sgte solo si existen particiones anteriores o siguientes
 	t_particion* anterior = index_victima > 0 ? list_get(particiones, index_victima - 1) : NULL;
 	t_particion* sgte = index_victima <= list_size(particiones) ? list_get(particiones, index_victima + 1) : NULL;
 

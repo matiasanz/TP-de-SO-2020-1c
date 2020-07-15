@@ -116,8 +116,8 @@ uint32_t mensaje_caught_pokemon_get_id(t_mensaje_caught_pokemon* msj) {
 	return msj->mensaje_header.id;
 }
 
-uint32_t mensaje_caught_pokemon_get_id_correlativo(t_mensaje_caught_pokemon* msj) {
-	return msj->mensaje_header.id_correlativo;
+t_mensaje_header mensaje_caught_pokemon_get_header(t_mensaje_caught_pokemon* msj) {
+	return msj ->mensaje_header;
 }
 
 //Setters
@@ -125,6 +125,15 @@ void mensaje_caught_pokemon_set_id(t_mensaje_caught_pokemon* msj, uint32_t id) {
 	msj->mensaje_header.id = id;
 }
 
+uint32_t mensaje_caught_pokemon_get_id_correlativo(t_mensaje_caught_pokemon* msj) {
+	return msj->mensaje_header.id_correlativo;
+}
+
+
 void mensaje_caught_pokemon_set_id_correlativo(t_mensaje_caught_pokemon* msj, uint32_t id_correlativo) {
 	msj->mensaje_header.id_correlativo = id_correlativo;
+}
+
+void mensaje_caught_pokemon_set_header(t_mensaje_caught_pokemon* msj, t_mensaje_header header) {
+	msj->mensaje_header = header;
 }

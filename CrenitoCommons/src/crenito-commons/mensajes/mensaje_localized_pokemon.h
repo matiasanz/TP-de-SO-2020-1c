@@ -42,9 +42,11 @@ char* mensaje_localized_pokemon_to_string(t_mensaje_localized_pokemon* localized
 // Getters
 uint32_t mensaje_localized_pokemon_get_id(t_mensaje_localized_pokemon* msj);
 uint32_t mensaje_localized_pokemon_get_id_correlativo(t_mensaje_localized_pokemon* msj);
+t_mensaje_header mensaje_localized_pokemon_get_header(t_mensaje_localized_pokemon* msj);
 
 // Setters
 void mensaje_localized_pokemon_set_id(t_mensaje_localized_pokemon* msj, uint32_t id);
 void mensaje_localized_pokemon_set_id_correlativo(t_mensaje_localized_pokemon* msj, uint32_t id_correlativo);
+void mensaje_localized_pokemon_set_header(t_mensaje_localized_pokemon* msj, t_mensaje_header header);
 
 #endif /* SRC_CRENITO_COMMONS_MENSAJES_MENSAJE_LOCALIZED_POKEMON_H_ */

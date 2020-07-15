@@ -38,3 +38,72 @@ void string_append_timestamp(char** string) {
 	string_append_with_format(string, "\n");
 }
 
+t_mensaje_header mensaje_get_header(void* mensaje, t_id_cola id_cola) {
+
+	switch (id_cola) {
+	case NEW_POKEMON:
+		return mensaje_new_pokemon_get_header(mensaje);
+	case APPEARED_POKEMON:
+		return mensaje_appeared_catch_pokemon_get_header(mensaje);
+	case CATCH_POKEMON:
+		return mensaje_appeared_catch_pokemon_get_header(mensaje);
+	case CAUGHT_POKEMON:
+		return mensaje_caught_pokemon_get_header(mensaje);
+	case GET_POKEMON:
+		return mensaje_get_pokemon_get_header(mensaje);
+	case LOCALIZED_POKEMON:
+		return mensaje_localized_pokemon_get_header(mensaje);
+	default:
+		log_warning_cola(id_cola, "mensaje_get_header");
+		t_mensaje_header header;
+		return header;
+	}
+}
+
+void mensaje_set_header(void* mensaje, t_mensaje_header header, t_id_cola id_cola) {
+
+	switch (id_cola) {
+	case NEW_POKEMON:
+		mensaje_new_pokemon_set_header(mensaje, header);
+		break;
+	case APPEARED_POKEMON:
+	case CATCH_POKEMON:
+		mensaje_appeared_catch_pokemon_set_header(mensaje, header);
+		break;
+	case CAUGHT_POKEMON:
+		mensaje_caught_pokemon_set_header(mensaje, header);
+		break;
+	case GET_POKEMON:
+		mensaje_get_pokemon_set_header(mensaje, header);
+		break;
+	case LOCALIZED_POKEMON:
+		mensaje_localized_pokemon_set_header(mensaje, header);
+		break;
+	default:
+		log_warning_cola(id_cola, "mensaje_get_header");
+	}
+}
+
+void mensaje_destruir(void* deserializado, t_id_cola id_cola) {
+
+	switch (id_cola) {
+	case NEW_POKEMON:
+		mensaje_new_pokemon_destruir(deserializado);
+		break;
+	case APPEARED_POKEMON:
+	case CATCH_POKEMON:
+		mensaje_appeared_catch_pokemon_destruir(deserializado);
+		break;
+	case CAUGHT_POKEMON:
+		mensaje_caught_pokemon_destruir(deserializado);
+		break;
+	case GET_POKEMON:
+		mensaje_get_pokemon_destruir(deserializado);
+		break;
+	case LOCALIZED_POKEMON:
+		mensaje_localized_pokemon_destruir(deserializado);
+		break;
+	default:
+		log_warning_cola(id_cola, "mensaje_destruir");
+	}
+}

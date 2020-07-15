@@ -8,8 +8,8 @@
 #ifndef SRC_MEMORIA_PARTICIONES_DINAMICAS_PARTICIONES_DINAMICAS_H_
 #define SRC_MEMORIA_PARTICIONES_DINAMICAS_PARTICIONES_DINAMICAS_H_
 
-#include "../particion.h"
-#include "../memoria_utils.h"
+#include "../memoria_utils/memoria_utils.h"
+#include "../memoria_modelo/particion.h"
 #include "../../colas.h"
 #include "../../utils/broker_log.h"
 

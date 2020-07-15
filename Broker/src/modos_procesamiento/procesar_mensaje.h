@@ -12,6 +12,6 @@
 #include "../memoria/mmu.h"
 #include "../hilos/hilo_envio_mensajes.h"
 // Punto de entrada para cuando se detecta que un proceso envia un mensaje
-void procesar_mensaje(int socket, t_paquete_header header);
+void procesar_mensaje(int* socket, t_paquete_header header);
 
 #endif /* SRC_MODOS_PROCESAMIENTO_PROCESAR_MENSAJE_H_ */

@@ -3,6 +3,7 @@
 
 #include <signal.h>
 #include "hilos/hilo_consolidacion_colas.h"
+#include "memoria/memoria_utils/memoria_dump.h"
 #include "modos_procesamiento/procesar_mensaje.h"
 #include "modos_procesamiento/procesar_suscripcion.h"
 #include "utils/broker_log.h"
