@@ -8,16 +8,15 @@
 #include "procesar_suscripcion.h"
 
 //Funciones privadas
-static t_suscriptor* suscribir_proceso(int socket, int id_proceso, t_cola_container* container);
+static t_suscriptor* suscribir_proceso(int socket, t_proceso proceso, t_cola_container* container);
 static void enviar_mensajes_cacheados(t_cola_container* container, t_suscriptor* suscriptor);
 
 void procesar_suscripcion(int* socket, t_paquete_header header) {
 
 	t_cola_container* container = get_cola(header.id_cola);
-	t_suscriptor* suscriptor = suscribir_proceso(*socket, proceso_get_id(header.proceso), container);
+	t_suscriptor* suscriptor = suscribir_proceso(*socket, paquete_header_get_proceso(header), container);
 
 	uint32_t id_suscriptor = suscriptor->id_proceso;
-	log_nuevo_suscriptor(header);
 
 	socket_send(*socket, &id_suscriptor, sizeof(id_suscriptor));
 
@@ -28,15 +27,16 @@ void procesar_suscripcion(int* socket, t_paquete_header header) {
 	free(socket);
 }
 
-static t_suscriptor* suscribir_proceso(int socket, int id_proceso, t_cola_container* container) {
+static t_suscriptor* suscribir_proceso(int socket, t_proceso proceso, t_cola_container* container) {
 
 	pthread_mutex_lock(&container->mutex_suscriptores);
 
-	t_suscriptor* suscriptor = cola_buscar_suscriptor(id_proceso, socket, container);
+	t_suscriptor* suscriptor = cola_buscar_suscriptor(proceso_get_id(proceso), socket, container);
 
 	if (!suscriptor_existe(suscriptor)) {
-		suscriptor = suscriptor_crear(socket, id_proceso);
+		suscriptor = suscriptor_crear(socket, proceso_get_id(proceso));
 		list_add(container->suscriptores, suscriptor);
+		log_nuevo_suscriptor(proceso, cola_get_id(container));
 	} else {
 		suscriptor_set_socket(suscriptor, socket);
 	}

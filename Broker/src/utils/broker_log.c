@@ -10,12 +10,12 @@ void log_conexion_proceso(t_proceso proceso) {
 	log_proceso(logger, LOG_HEADER_CONEXION_PROCESO, proceso);
 }
 
-void log_nuevo_suscriptor(t_paquete_header paquete_header) {
+void log_nuevo_suscriptor(t_proceso proceso, t_id_cola id_cola) {
 
 	char *header_string = string_new();
-	string_append_with_format(&header_string, LOG_HEADER_NUEVO_SUSCRIPTOR, get_nombre_cola(paquete_header.id_cola));
+	string_append_with_format(&header_string, LOG_HEADER_NUEVO_SUSCRIPTOR, get_nombre_cola(id_cola));
 
-	log_proceso(logger, header_string, paquete_header_get_proceso(paquete_header));
+	log_proceso(logger, header_string, proceso);
 	free(header_string);
 }
 
@@ -23,7 +23,7 @@ void log_mensaje_recibido(void* msj_recibido, t_id_cola id_cola) {
 
 	switch (id_cola) {
 	case NEW_POKEMON:
-		mensaje_new_pokemon_log(logger, msj_recibido);
+	mensaje_new_pokemon_log(logger, msj_recibido);
 		break;
 	case APPEARED_POKEMON:
 		mensaje_appeared_catch_pokemon_log(logger, msj_recibido, APPEARED_POKEMON_STRING);
@@ -187,7 +187,7 @@ static void string_append_contenido_envio_mensaje(char** string, char* header_st
 //void log_conexion_proceso(t_proceso proceso) {
 //}
 //
-//void log_nuevo_suscriptor(t_paquete_header paquete_header) {
+//void log_nuevo_suscriptor(t_proceso proceso, t_id_cola id_cola) {
 //}
 //
 //void log_mensaje_recibido(void* msj_recibido, t_id_cola id_cola){
