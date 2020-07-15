@@ -9,9 +9,10 @@ int main(void) {
 
 	while (true) {
 
-		int socket_cliente = socket_aceptar_conexion(socket_servidor);
+		int *socket_cliente = malloc(sizeof(int));
+		*socket_cliente = socket_aceptar_conexion(socket_servidor);
 
-		pthread_create(&hilo_receptor_mensajes, NULL, (void*) atender_cliente, &socket_cliente);
+		pthread_create(&hilo_receptor_mensajes, NULL, (void*) atender_cliente, socket_cliente);
 		pthread_detach(hilo_receptor_mensajes);
 	}
 
@@ -23,12 +24,14 @@ void inicializar_colas() {
 	id_univoco = 0;
 	pthread_mutex_init(&mutex_id_univoco, NULL);
 
-	cola_new_pokemon = cola_crear();
-	cola_appeared_pokemon = cola_crear();
-	cola_catch_pokemon = cola_crear();
-	cola_caught_pokemon = cola_crear();
-	cola_get_pokemon = cola_crear();
-	cola_localized_pokemon = cola_crear();
+	id_colas = list_create();
+
+	cola_new_pokemon = cola_crear(NEW_POKEMON);
+	cola_appeared_pokemon = cola_crear(APPEARED_POKEMON);
+	cola_catch_pokemon = cola_crear(CATCH_POKEMON);
+	cola_caught_pokemon = cola_crear(CAUGHT_POKEMON);
+	cola_get_pokemon = cola_crear(GET_POKEMON);
+	cola_localized_pokemon = cola_crear(LOCALIZED_POKEMON);
 }
 
 void inicializar_hilos() {
@@ -67,15 +70,15 @@ void atender_cliente(int* socket) {
 
 	switch (header.codigo_operacion) {
 	case MENSAJE: {
-		procesar_mensaje(*socket, header);
+		procesar_mensaje(socket, header);
 		break;
 	}
 	case SUSCRIPCION: {
-		procesar_suscripcion(*socket, header);
+		procesar_suscripcion(socket, header);
 		break;
 	}
 	default:
-		log_error_atender_cliente(*socket, header);
+		log_error_atender_cliente(socket, header);
 	}
 }
 

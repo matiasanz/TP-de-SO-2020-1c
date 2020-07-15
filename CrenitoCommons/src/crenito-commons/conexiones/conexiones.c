@@ -29,7 +29,7 @@ int enviar(t_conexion_server* server, t_paquete* pqt) {
 	int socket = socket_crear_client(server->ip, server->puerto);
 
 	if (error_conexion(socket)) {
-		return ERROR_SOCKET;
+		return ERROR_CONEXION;
 	}
 
 	int id_mensaje = enviar_paquete(pqt, socket);
@@ -107,14 +107,14 @@ int recibir(int socket, void (*callback)(t_id_cola, void*)) {
 	t_paquete_header header = socket_recibir_header(socket);
 
 	if (error_conexion(header.codigo_operacion)) {
-		return ERROR_SOCKET;
+		return ERROR_CONEXION;
 	}
 
 	int size = 0;
 	void* msj = socket_recibir_mensaje(socket, &size);
 
 	if (error_conexion(size)) {
-		return ERROR_SOCKET;
+		return ERROR_CONEXION;
 	}
 
 	uint32_t ACK = 1;
@@ -127,7 +127,7 @@ int recibir(int socket, void (*callback)(t_id_cola, void*)) {
 
 static int reconectar(t_conexion_server* server, t_conexion_cliente* cliente) {
 
-	if (!debe_reconectar(cliente)) return ERROR_SOCKET;
+	if (!debe_reconectar(cliente)) return ERROR_CONEXION;
 	int un_socket = 0;
 
 	do {

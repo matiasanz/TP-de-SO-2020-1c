@@ -38,10 +38,11 @@ char* mensaje_new_pokemon_to_string(t_mensaje_new_pokemon* new_pokemon);
 // Getters
 uint32_t mensaje_new_pokemon_get_id(t_mensaje_new_pokemon* msj);
 uint32_t mensaje_new_pokemon_get_id_correlativo(t_mensaje_new_pokemon* msj);
+t_mensaje_header mensaje_new_pokemon_get_header(t_mensaje_new_pokemon* msj);
 
 // Setters
 void mensaje_new_pokemon_set_id(t_mensaje_new_pokemon* msj, uint32_t id);
 void mensaje_new_pokemon_set_id_correlativo(t_mensaje_new_pokemon* msj, uint32_t id_correlativo);
-
+void mensaje_new_pokemon_set_header(t_mensaje_new_pokemon* msj, t_mensaje_header header);
 
 #endif /* SRC_CRENITO_COMMONS_MENSAJES_MENSAJE_NEW_POKEMON_H_ */

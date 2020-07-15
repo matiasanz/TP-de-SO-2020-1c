@@ -47,9 +47,7 @@ void particion_liberar(t_particion* particion) {
 
 	gettimeofday(&particion->creacion, NULL);
 	particion->en_uso = false;
-	particion->id_cola = -1;
 	particion->ultimo_acceso = particion->creacion;
-	particion->id_mensaje = 0;
 }
 
 bool particion_tiene_tamanio_suficiente(t_particion* particion, uint32_t tamanio_contenido) {
@@ -211,18 +209,15 @@ void particion_set_uso(t_particion* particion) {
 }
 
 void particion_actualizar_fecha_ultimo_acceso(t_particion* particion) {
-
-	pthread_mutex_lock(&mutex_acceso_memoria);
 	gettimeofday(&particion->ultimo_acceso, NULL);
-	pthread_mutex_unlock(&mutex_acceso_memoria);
 }
 
 void particion_set_id_cola(t_particion* particion, t_id_cola id_cola) {
 	particion->id_cola = id_cola;
 }
 
-void particion_set_id_mensaje(t_particion* particion) {
-	particion->id_mensaje = generar_id_univoco();
+void particion_set_id_mensaje(t_particion* particion, uint32_t id_mensaje) {
+	particion->id_mensaje = id_mensaje;
 }
 
 static t_particion* particion_inicializar(uint32_t tamanio, uint32_t inicio) {
@@ -232,6 +227,8 @@ static t_particion* particion_inicializar(uint32_t tamanio, uint32_t inicio) {
 	particion_liberar(particion);
 	particion->base = inicio;
 	particion->limite = inicio + tamanio - 1;
+	particion->id_cola = -1;
+	particion->id_mensaje = 0;
 
 	return particion;
 }

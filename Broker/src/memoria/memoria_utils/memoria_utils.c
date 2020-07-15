@@ -19,7 +19,7 @@ void memoria_reset_tamanio_disponible_sin_particionar(uint32_t nuevo_tamanio) {
 	tamanio_sin_particionar = nuevo_tamanio;
 }
 
-uint32_t calcular_tamanio_minimo_particion(uint32_t tamanio_contenido) {
+uint32_t calcular_tamanio_particion(uint32_t tamanio_contenido) {
 	return max(tamanio_minimo_particion, tamanio_contenido);
 }
 

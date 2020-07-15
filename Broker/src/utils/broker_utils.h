@@ -17,5 +17,8 @@ uint32_t generar_id_univoco();
 //timeval utils
 long get_fecha_en_microsegundos(struct timeval fecha);
 void string_append_timestamp(char** string);
+t_mensaje_header mensaje_get_header(void* mensaje, t_id_cola id_cola);
+void mensaje_destruir(void* deserializado, t_id_cola id_cola);
+void mensaje_set_header(void* mensaje, t_mensaje_header header, t_id_cola id_cola);
 
 #endif /* SRC_UTILS_BROKER_UTILS_H_ */

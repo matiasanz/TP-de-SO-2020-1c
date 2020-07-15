@@ -79,7 +79,7 @@ void* deserializar(void* msj, t_id_cola id_cola) {
 	case LOCALIZED_POKEMON:
 		return mensaje_localized_pokemon_deserializar(msj);
 	default:
-		log_error_cola(id_cola);
+		log_warning_cola(id_cola, "deserializar");
 		return NULL;
 	}
 }
@@ -99,7 +99,7 @@ t_buffer* serializar(void* msj, t_id_cola id_cola) {
 	case LOCALIZED_POKEMON:
 		return mensaje_localized_pokemon_serializar(msj);
 	default:
-		log_error_cola(id_cola);
+		log_warning_cola(id_cola, "serializar");
 		return NULL;
 	}
 }

@@ -21,6 +21,10 @@ t_suscriptor* suscriptor_duplicar(t_suscriptor* suscriptor) {
 	return suscriptor_crear(suscriptor -> socket, suscriptor ->id_proceso);
 }
 
+bool suscriptor_existe(t_suscriptor* suscriptor) {
+	return suscriptor != NULL;
+}
+
 void suscriptor_destruir(t_suscriptor* suscriptor) {
 	free(suscriptor);
 }

@@ -5,11 +5,11 @@
  *      Author: utnso
  */
 
-#ifndef SRC_MEMORIA_PARTICION_H_
-#define SRC_MEMORIA_PARTICION_H_
+#ifndef SRC_MEMORIA_MEMORIA_MODELO_PARTICION_H_
+#define SRC_MEMORIA_MEMORIA_MODELO_PARTICION_H_
 
-#include "memoria_utils.h"
 #include <crenito-commons/utils.h>
+#include "../memoria_utils/memoria_utils.h"
 
 typedef struct {
 	uint32_t id_mensaje;
@@ -65,6 +65,6 @@ void* particion_get_direccion_limite_absoluta(t_particion* particion);
 void particion_set_uso(t_particion* particion);
 void particion_actualizar_fecha_ultimo_acceso(t_particion* particion);
 void particion_set_id_cola(t_particion* particion, t_id_cola id_cola);
-void particion_set_id_mensaje(t_particion* particion);
+void particion_set_id_mensaje(t_particion* particion, uint32_t id_mensaje);
 
-#endif /* SRC_MEMORIA_PARTICION_H_ */
+#endif /* SRC_MEMORIA_MEMORIA_MODELO_PARTICION_H_ */

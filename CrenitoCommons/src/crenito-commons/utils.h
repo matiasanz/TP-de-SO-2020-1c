@@ -23,7 +23,7 @@
 #include<commons/string.h>
 #include <commons/collections/dictionary.h>
 
-#define ERROR_SOCKET -1
+#define ERROR_CONEXION -1
 
 #define LOG_HEADER_MENSAJE_RECIBIDO "MENSAJE RECIBIDO"
 
@@ -83,5 +83,6 @@ void log_suscripcion(t_id_cola id_cola); //2. Suscripción a una cola de mensaje
 
 // Logs Errores
 void log_warning_socket(int socket, char* operacion);
-void log_error_cola(int id_cola);
+void log_warning_cola(int id_cola, char* funcion);
+
 #endif /* UTILS_H_ */

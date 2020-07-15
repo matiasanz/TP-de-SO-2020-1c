@@ -22,6 +22,8 @@ t_suscriptor* suscriptor_crear(int socket, uint32_t id_subscriptor);
 t_suscriptor* suscriptor_duplicar(t_suscriptor* subscriptor);
 void suscriptor_destruir(t_suscriptor* subscriptor);
 
+bool suscriptor_existe(t_suscriptor* suscriptor);
+
 uint32_t suscriptor_get_id_proceso(t_suscriptor* suscriptor);
 int suscriptor_get_socket(t_suscriptor* suscriptor);
 

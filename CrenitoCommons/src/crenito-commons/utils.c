@@ -23,7 +23,7 @@ char* get_nombre_cola(t_id_cola id_cola) {
 	case LOCALIZED_POKEMON:
 		return LOCALIZED_POKEMON_STRING;
 	default:
-		log_error_cola(id_cola);
+		log_warning_cola(id_cola, "get_nombre_cola");
 		return NULL;
 	}
 }
@@ -41,7 +41,7 @@ char* get_separador_string(char* texto) {
 }
 
 int error_conexion(int indicador_conexion) {
-	return indicador_conexion == ERROR_SOCKET;
+	return indicador_conexion == ERROR_CONEXION;
 }
 
 int conexion_exitosa(int indicador_conexion) {
@@ -88,7 +88,55 @@ void log_warning_socket(int socket, char* operacion) {
 	log_warning(event_logger, "Error al realizar la operación %s, socket: %d", operacion, socket);
 }
 
-void log_error_cola(int id_cola) {
-	log_error(event_logger, "No existe la cola: %d. Finalizando hilo", id_cola);
+void log_warning_cola(int id_cola, char* funcion) {
+	log_warning(event_logger, "No existe la cola: %d. Funcion: %s. Finalizando hilo", id_cola, funcion);
 	pthread_exit(NULL);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//************************** Helgrind
+
+
+
+
+
+
+
+
+
+
+
+//void log_inicio_proceso_reconexion(t_id_cola id_cola, int segundos) {
+//}
+//
+//void log_resultado_proceso_reconexion(t_id_cola id_cola, char* resultado) {
+//}
+//
+//void log_suscripcion(t_id_cola id_cola) {
+//}
+//
+//void log_warning_socket(int socket, char* operacion) {
+//}
+//
+//void log_error_cola(int id_cola, char* funcion) {
+//}

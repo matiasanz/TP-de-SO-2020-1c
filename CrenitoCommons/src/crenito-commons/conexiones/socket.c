@@ -15,7 +15,7 @@ int socket_bind(int socket, struct addrinfo* info) {
 
 	if (error_conexion(bind(socket, info->ai_addr, info->ai_addrlen))) {
 		manejar_error_socket(socket, "bind");
-		return ERROR_SOCKET;
+		return ERROR_CONEXION;
 	}
 
 	return socket;
@@ -23,12 +23,13 @@ int socket_bind(int socket, struct addrinfo* info) {
 
 int socket_connect(int socket, struct addrinfo* info) {
 
-	if (error_conexion(connect(socket, info->ai_addr, info->ai_addrlen))) {
-		manejar_error_socket(socket, "connect");
-		socket = ERROR_SOCKET;
-	}
-
+	int estado_conexion = connect(socket, info->ai_addr, info->ai_addrlen);
 	freeaddrinfo(info);
+
+	if (error_conexion(estado_conexion)) {
+		manejar_error_socket(socket, "connect");
+		return ERROR_CONEXION;
+	}
 
 	return socket;
 }
@@ -42,7 +43,7 @@ int socket_create(struct addrinfo* info) {
 		manejar_error_socket(un_socket, "create");
 	}
 
-	//Validar esto con ayudantes. Hay que confirgurarlo bloqueante o no?
+	//TODO: Validar esto con ayudantes. Hay que confirgurarlo bloqueante o no?
 	int yes = 1;
 	if (error_conexion(setsockopt(un_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)))) {
 		manejar_error_socket(un_socket, "setsockopt");
@@ -81,7 +82,7 @@ int socket_crear_listener(char* ip, char* puerto) {
 
 	if(error_conexion(socket_bind(socket, servinfo))) {
 		freeaddrinfo(servinfo);
-		return ERROR_SOCKET;
+		return ERROR_CONEXION;
 	}
 	socket_listen(socket);
 
@@ -94,7 +95,7 @@ int socket_send(int socket, void* mensaje, int bytes) {
 
 	if (error_conexion(send(socket, mensaje, bytes, MSG_WAITALL))) {
 		manejar_error_socket(socket, "send");
-		return ERROR_SOCKET;
+		return ERROR_CONEXION;
 	}
 
 	return EXIT_SUCCESS;
@@ -114,7 +115,7 @@ int socket_crear_client(char* ip, char* puerto) {
 	int socket = socket_create(servinfo);
 
 	if (error_conexion(socket_connect(socket, servinfo))) {
-		return ERROR_SOCKET;
+		return ERROR_CONEXION;
 	}
 
 	return socket;
@@ -130,7 +131,7 @@ int socket_aceptar_conexion(int socket_servidor) {
 
 	if (error_conexion(socket)) {
 		manejar_error_socket(socket, "accept");
-		socket = ERROR_SOCKET;
+		return ERROR_CONEXION;
 	}
 
 	return socket;
@@ -142,7 +143,7 @@ int socket_recibir_int(int socket_cliente) {
 
 	if (error_recibir(recv(socket_cliente, &entero, sizeof(int), MSG_WAITALL))) {
 		manejar_error_socket(socket_cliente, "recv");
-		entero = ERROR_SOCKET;
+		entero = ERROR_CONEXION;
 	}
 
 	return entero;
@@ -154,7 +155,7 @@ void* socket_recibir_mensaje(int socket_cliente, int *size) {
 
 	if (error_conexion(*size)) {
 		manejar_error_socket(socket_cliente, "recv");
-		*size = ERROR_SOCKET;
+		*size = ERROR_CONEXION;
 		return NULL;
 	}
 
@@ -162,7 +163,7 @@ void* socket_recibir_mensaje(int socket_cliente, int *size) {
 
 	if (error_recibir(recv(socket_cliente, msj, *size, MSG_WAITALL))) {
 		manejar_error_socket(socket_cliente, "recv");
-		*size = ERROR_SOCKET;
+		*size = ERROR_CONEXION;
 		return NULL;
 	}
 
@@ -175,7 +176,7 @@ t_paquete_header socket_recibir_header(int socket_cliente) {
 
 	if (error_recibir(recv(socket_cliente, &header, sizeof(t_paquete_header), MSG_WAITALL))) {
 		manejar_error_socket(socket_cliente, "recv");
-		header.codigo_operacion = ERROR_SOCKET;
+		header.codigo_operacion = ERROR_CONEXION;
 	}
 
 	return header;
