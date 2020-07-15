@@ -43,12 +43,6 @@ t_log* log_crear(char* PROCESO, char* FILENAME){
 	char* LOG_PATH = get_log_path(FILENAME);
 	t_log* log = log_create(LOG_PATH, PROCESO, mostrar_logs(), LOG_LEVEL_INFO);
 
-	if(!log){
-		FILE* f=fopen(LOG_PATH, "w+b");
-		fclose(f);
-		log = log_create(LOG_PATH, PROCESO, mostrar_logs(), LOG_LEVEL_INFO);
-	}
-
 	free(LOG_PATH);
 	return log;
 }
