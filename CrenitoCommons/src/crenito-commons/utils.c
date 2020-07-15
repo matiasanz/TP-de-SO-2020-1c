@@ -171,5 +171,5 @@ void log_warning_cola(int id_cola, char* funcion) {
 //void log_warning_socket(int socket, char* operacion) {
 //}
 //
-//void log_error_cola(int id_cola, char* funcion) {
+//void log_warning_cola(int id_cola, char* funcion) {
 //}
