@@ -79,19 +79,29 @@ bool recursos_hay_recursos(matriz_recursos recursos){
 	return !recursos_matriz_nula(recursos);
 }
 
-void recursos_mostrar(matriz_recursos recursos){
+char* recursos_to_string(matriz_recursos recursos){
+	char*recursos_string = string_new();
 
 	if(recursos_hay_recursos(recursos)){
-		void mostrar(especie_pokemon unaEspecie, void*cantidadDeInstancias){
-			printf(" (%s, %d)", unaEspecie, *((numero*)cantidadDeInstancias));
+		void concatenar(especie_pokemon unaEspecie, void*cantidadDeInstancias){
+			string_append_with_format(&recursos_string, " (%s, %d)", unaEspecie, *((numero*)cantidadDeInstancias));
 		}
 
-		dictionary_iterator(recursos, &mostrar);
+		dictionary_iterator(recursos, &concatenar);
 	}
 
 	else{
-		printf(" NO HAY RECURSOS ");
+		string_append(&recursos_string, " NO HAY RECURSOS ");
 	}
+
+	return recursos_string;
+}
+
+//Dejo comentado para que no se muestre en entrega
+void recursos_mostrar(matriz_recursos recursos){
+	char* recursosString = recursos_to_string(recursos);
+	puts(recursosString);
+	free(recursosString);
 }
 
 bool recursos_matriz_nula(matriz_recursos recursos){

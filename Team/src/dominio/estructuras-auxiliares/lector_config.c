@@ -1,5 +1,6 @@
 #include "lector_config.h"
 #include <commons/string.h>
+#include "../../utils/team_logs.h"
 
 entrenadores entrenadores_cargar(){
 	entrenadores miEquipo = entrenadores_create();
@@ -15,14 +16,9 @@ entrenadores entrenadores_cargar(){
 
 		entrenador* unEntrenador = entrenador_ptr_crear(i, stringsDeInventarios[i], stringsDeObjetivos[i], *posicion);
 
+		log_event_entrenador_creado(unEntrenador);
+
 		list_add(miEquipo, unEntrenador);
-
-		printf("Se agrego un entrenador en [%u %u] con objetivos:", unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
-		recursos_mostrar(unEntrenador->objetivos);
-
-		printf(" e inventario:");
-		recursos_mostrar(unEntrenador->pokemonesCazados);
-		printf("\n");
 
 		free(posicion);
 	}

@@ -89,20 +89,10 @@ int team_exit(){
 
 /***********************************Funciones auxiliares *************************************/
 
-void validar_lectura(void*lectura, char* MENSAJE_EXCEPCION){
-	if(!lectura){
-		error_show(MENSAJE_EXCEPCION);
-		exit(1);
-	}
-}
-
 //Logs y configs
 void inicializar_logs(char*NombreEquipo){
-	logger = get_log_oficial(TEAM_STRING);//log_crear("TEAM", "LOG_FILE");
-	validar_lectura(logger, "No se encontro el archivo logger");
-
-	event_logger = get_log_event("TEAM_EVENT");//log_crear("TEAM_EVENT", "LOG_EVENT_FILE");
-	validar_lectura(event_logger, "No se encontro el archivo event_logger");
+	logger = get_log_oficial(TEAM_STRING);
+	event_logger = get_log_event("TEAM_EVENT");
 }
 
 char*team_get_config_path(char*NombreEquipo){

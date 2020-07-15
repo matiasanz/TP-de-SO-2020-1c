@@ -21,6 +21,8 @@ typedef union{
 	datos_sjf sjf;
 } datos_algoritmo;
 
+char* MOTIVO_DESALOJO;
+
 //Inicializar
 	void cargar_algoritmo_planificacion();
 	void inicializar_fifo();

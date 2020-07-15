@@ -34,6 +34,9 @@ typedef especie_pokemon recurso;
 // "R1|R2|R2|R3|R3|R3" --> {(R1,1), (R2,2), (R3,3)}
 	matriz_recursos recursos_from_string(char*cadena);
 
+// Retorna una cadena de caracteres de la forma " (R1,n1) (R2,n2)
+	char* recursos_to_string(matriz_recursos);
+
 // Muestra los recursos junto con su cantidad
 	void recursos_mostrar(matriz_recursos);
 

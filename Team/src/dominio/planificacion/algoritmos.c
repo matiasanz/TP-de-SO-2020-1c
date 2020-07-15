@@ -80,6 +80,7 @@ void inicializar_rr(numero QUANTUM){
 	proximo_a_ejecutar_segun_criterio = proximo_segun_rr;
 	criterio_de_desalojo = desalojo_en_RR;
 	actualizar_datos_del_entrenador = no_operation;
+	MOTIVO_DESALOJO = "fin de QUANTUM";
 }
 
 entrenador*proximo_segun_rr(cola_entrenadores colaReady){
@@ -105,6 +106,7 @@ void inicializar_sjf(double alfa, numero estimacionInicial, numero cantidadDePro
 	}
 
 	proximo_a_ejecutar_segun_criterio = proximo_segun_sjf;
+	MOTIVO_DESALOJO = "estimacion mayor a la de otro entrenador";
 }
 
 //Proximo a planificar

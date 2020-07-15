@@ -33,10 +33,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 
 				pokemon*pokemonCatcheado = entrenador_get_proxima_presa(unEntrenador);
 
-				if(!pokemonCatcheado){
-					error_show("El entrenador N°%u intento capturar un pokemon nulo\n", pid);
-					exit(1);
-				}
+				validar_pokemon(pokemonCatcheado, pid);
 
 				entrenador_capturar(unEntrenador, pokemonCatcheado);
 
@@ -226,11 +223,11 @@ bool entrenador_verificar_objetivos(entrenador*unEntrenador){
 
 	bool cumplioObjetivos = entrenador_cumplio_sus_objetivos(unEntrenador);
 
-	printf("Objetivos: "); recursos_mostrar(unEntrenador->objetivos);puts("");
-	printf("Inventario: "); recursos_mostrar(unEntrenador->pokemonesCazados);puts("");
+	log_event_situacion_del_entrenador(unEntrenador);
 
 	if(cumplioObjetivos){
 		entrenador_finalizar(unEntrenador);
+		PROCESOS_SIN_FINALIZAR--;
 	}
 
 	else{
@@ -245,7 +242,6 @@ bool entrenador_verificar_objetivos(entrenador*unEntrenador){
 
 void entrenador_finalizar(entrenador*unEntrenador){
 	entrenador_pasar_a(unEntrenador, EXIT, "Ya logro cumplir sus objetivos");
-	PROCESOS_SIN_FINALIZAR--;
 	entrenador_liberar_recursos(unEntrenador);
 }
 
