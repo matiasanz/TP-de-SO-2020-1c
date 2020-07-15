@@ -13,6 +13,7 @@
 #include<unistd.h>
 #include<netdb.h>
 #include "paquete.h"
+#include "../crenito-commons_log.h"
 
 typedef enum {
 	CLIENTE,

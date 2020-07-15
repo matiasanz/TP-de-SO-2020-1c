@@ -30,6 +30,7 @@
 #include "../../Team/src/suscripciones/hilo_localized_pokemon.h"
 #include "../src/crenito-commons/modelo/proceso.h"
 #include "../src/crenito-commons/utils.h"
+#include "../src/crenito-commons/crenito-commons_log.h"
 
 void inicializar_logs();
 

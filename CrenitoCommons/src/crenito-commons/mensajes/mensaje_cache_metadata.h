@@ -8,6 +8,7 @@
 #ifndef SRC_CRENITO_COMMONS_MENSAJES_MENSAJE_CACHE_METADATA_H_
 #define SRC_CRENITO_COMMONS_MENSAJES_MENSAJE_CACHE_METADATA_H_
 
+#include "../crenito-commons_log.h"
 #include "../utils.h"
 #include "mensaje_header.h"
 #include "../modelo/suscriptor.h"

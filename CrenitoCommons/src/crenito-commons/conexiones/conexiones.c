@@ -71,9 +71,9 @@ static int handshake(int socket, void* pqt, int size) {
 
 static int crear_paquete_suscripcion_y_realizar_handshake(int un_socket, t_id_cola id_cola) {
 
-	if (proceso_debe_informar_suscripcion())
-		log_suscripcion(id_cola);
+	log_suscripcion(id_cola);
 	t_paquete_header pqt = paquete_header_crear(SUSCRIPCION, id_cola);
+
 	return handshake(un_socket, &pqt, sizeof(t_paquete_header));
 }
 
@@ -134,7 +134,7 @@ static int reconectar(t_conexion_server* server, t_conexion_cliente* cliente) {
 		log_inicio_proceso_reconexion(cliente->id_cola, cliente ->segundos_reconexion);
 		sleep(cliente ->segundos_reconexion);
 		un_socket = socket_crear_client(server->ip, server->puerto);
-		log_resultado_proceso_reconexion(cliente->id_cola, error_conexion(un_socket) ? "Fallido" : "Exitoso");
+		log_resultado_proceso_reconexion(cliente->id_cola, un_socket);
 
 	} while (error_conexion(un_socket));
 

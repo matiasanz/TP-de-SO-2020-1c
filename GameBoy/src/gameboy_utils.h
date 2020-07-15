@@ -12,5 +12,6 @@
 #include "gameboy_logs.h"
 
 t_id_cola get_id_mensaje(char* mensaje);
+t_tipo_proceso proceso_obtener_tipo_segun_nombre(char* proceso_string);
 
 #endif /* SRC_GAMEBOY_UTILS_H_ */
