@@ -48,13 +48,12 @@ static t_suscriptor* suscribir_proceso(int socket, int id_proceso, t_cola_contai
 
 static void enviar_mensajes_cacheados(t_cola_container* container, t_suscriptor* suscriptor) {
 
-	//TODO: filtrar mensajes que no hayan sido enviados al suscriptor
-	bool mensajes_en_uso(t_mensaje_cache* msj) {
-		return particion_esta_ocupada(msj->particion);
+	bool mensajes_pendientes_confirmacion(t_mensaje_cache* msj) {
+		return particion_esta_ocupada(msj->particion) && mensaje_cache_pendiente_confirmacion(msj, suscriptor);
 	}
 
 	pthread_mutex_lock(&container->mutex_mensajes);
-	t_list* a_enviar = list_filter(container->cola, (void*) mensajes_en_uso);
+	t_list* a_enviar = list_filter(container->cola, (void*) mensajes_pendientes_confirmacion);
 	pthread_mutex_unlock(&container->mutex_mensajes);
 
 	void enviar(t_mensaje_cache* msj) {

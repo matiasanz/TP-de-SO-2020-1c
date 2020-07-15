@@ -124,8 +124,23 @@ t_suscriptor* mensaje_cache_get_primer_sucriptor_fallido(t_mensaje_cache* msj) {
 	t_suscriptor* suscriptor;
 
 	pthread_mutex_lock(&msj->mutex_suscriptores_fallidos);
-	suscriptor = list_remove(msj ->metadata ->suscriptores_fallidos, 0);
+    suscriptor = list_remove(msj ->metadata ->suscriptores_fallidos, 0);
 	pthread_mutex_unlock(&msj->mutex_suscriptores_fallidos);
 
 	return suscriptor;
+}
+
+bool mensaje_cache_pendiente_confirmacion(t_mensaje_cache* msj, t_suscriptor* suscriptor_buscado) {
+
+	bool buscar_por_id_proceso(t_suscriptor* suscriptor_confirmado) {
+		return suscriptor_get_id_proceso(suscriptor_confirmado) == suscriptor_get_id_proceso(suscriptor_buscado);
+	}
+
+	t_suscriptor* suscriptor_encontrado;
+
+	pthread_mutex_lock(&msj->mutex_suscriptores_confirmados);
+	suscriptor_encontrado = list_find(msj->metadata->suscriptores_confirmados, (void*)buscar_por_id_proceso);
+	pthread_mutex_unlock(&msj->mutex_suscriptores_confirmados);
+
+	return NULL == suscriptor_encontrado;
 }

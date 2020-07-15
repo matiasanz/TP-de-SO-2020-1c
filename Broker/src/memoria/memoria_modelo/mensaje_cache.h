@@ -38,5 +38,6 @@ int mensaje_cache_get_cantidad_suscriptores_fallidos(t_mensaje_cache* msj);
 void mensaje_cache_set_ack(t_mensaje_cache* msj, t_suscriptor* suscriptor, uint32_t ack, uint32_t id_mensaje);
 
 t_suscriptor* mensaje_cache_get_primer_sucriptor_fallido(t_mensaje_cache* msj);
+bool mensaje_cache_pendiente_confirmacion(t_mensaje_cache* msj, t_suscriptor* suscriptor_buscado);
 
 #endif /* SRC_MEMORIA_MEMORIA_MODELO_MENSAJE_CACHE_H_ */
