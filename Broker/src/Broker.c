@@ -55,12 +55,12 @@ void inicializar_config() {
 	config = config_create("./config/broker.config");
 }
 
-void inicializar_logs() {
+t_log* log_crear(char*proposito, char*TOKEN);
 
-	char* ruta = config_get_string_value(config, "LOGGER");
-	logger = log_create(ruta, BROKER_STRING, 1, LOG_LEVEL_INFO);
-	event_logger = log_create("./log/broker_event.log", "BROKER_EVENT", 1, LOG_LEVEL_INFO);
-	dump_logger = log_create("./log/dump_cache.log", "DUMP_CACHE_LOGGER", false, LOG_LEVEL_INFO);
+void inicializar_logs() {
+	logger = get_log_oficial(BROKER_STRING);
+	event_logger = get_log_event("BROKER_EVENT");
+	dump_logger = log_crear("DUMP_CACHE_LOGGER", "DUMP_CACHE_LOGGER");
 }
 
 void atender_cliente(int* socket) {

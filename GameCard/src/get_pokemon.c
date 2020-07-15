@@ -1,16 +1,5 @@
 # include "gamecard.h"
 
-//*********************** HEADER ****************************************************
-char* pokemon_find_metadata(char*especie);
-t_list*localizar_pokemon(t_mensaje_get_pokemon*, char* PATH_METADATA);
-void gamecard_responder_localized(t_mensaje_get_pokemon* mensajeGet, t_list*posiciones);
-void simular_acceso_a_disco();
-bool archivo_existe(t_config* metadata);
-bool archivo_abierto(t_config* config_metadata_pokemon);
-t_list* leer_posiciones_de_disco(t_config* config_metadata_pokemon);
-t_list* localizar_pokemon(t_mensaje_get_pokemon* mensajeGet, char*bin_metadata);
-//***********************************************************************************
-
 void log_enunciado_posiciones_encontradas(char*especie, t_list*posiciones){
 	char* posicionesString=posicion_list_to_string(posiciones);
 	pthread_mutex_lock(&mutexLogger);
@@ -20,7 +9,7 @@ void log_enunciado_posiciones_encontradas(char*especie, t_list*posiciones){
 }
 
 bool acceso_fallido(t_list* posiciones){
-	return !posiciones;
+	return !posiciones; //Si no pudo realizar la operacion retorna NULL
 }
 
 void gamecard_procesar_Get_Pokemon(t_mensaje_get_pokemon* mensajeGet){
@@ -30,18 +19,13 @@ void gamecard_procesar_Get_Pokemon(t_mensaje_get_pokemon* mensajeGet){
 	char* bin_metadata = pokemon_find_metadata(especie);
 
 	t_list* posicionesEncontradas = localizar_pokemon(mensajeGet, bin_metadata);
-	free(bin_metadata);
 
-	if(acceso_fallido(posicionesEncontradas)){
-		puts("no pude acceder");
-
-		pthread_t hiloReintentoDeOperacion;
-		pthread_create(&hiloReintentoDeOperacion, NULL,(void*) gamecard_Get_Pokemon_reintento, mensajeGet);
-		pthread_detach(hiloReintentoDeOperacion);
-
-		list_destroy(posicionesEncontradas);
-		return;
+	while(acceso_fallido(posicionesEncontradas)){
+		sleep(tiempo_de_reintento_operacion);
+		posicionesEncontradas = localizar_pokemon(mensajeGet, bin_metadata);
 	}
+
+	free(bin_metadata);
 
 	log_enunciado_posiciones_encontradas(especie, posicionesEncontradas);
 
@@ -159,6 +143,7 @@ t_list* localizar_pokemon(t_mensaje_get_pokemon* mensajeGet, char*bin_metadata){
 
 	//------Ver si el archivo esta abierto------------
 	if(archivo_abierto(config_metadata_pokemon)){
+		pthread_mutex_unlock(mutexMetadataPokemon);
 
 		config_destroy(config_metadata_pokemon);
 
@@ -175,12 +160,12 @@ t_list* localizar_pokemon(t_mensaje_get_pokemon* mensajeGet, char*bin_metadata){
 
 	t_list* listaDePosiciones = leer_posiciones_de_disco(config_metadata_pokemon);
 
-	pthread_mutex_lock(mutexMetadataPokemon);
 	config_set_value(config_metadata_pokemon,"OPEN","N");
 	config_save(config_metadata_pokemon);
 	pthread_mutex_unlock(mutexMetadataPokemon);
 
 	config_destroy(config_metadata_pokemon);
+
 
 	return listaDePosiciones;
 }

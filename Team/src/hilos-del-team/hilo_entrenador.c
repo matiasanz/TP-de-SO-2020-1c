@@ -88,8 +88,6 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 void inicializar_hilos_entrenadores(){
 	cantidadDeEntrenadores = list_size(equipo);
 
-	hilosEntrenadores = malloc(sizeof(pthread_t)*cantidadDeEntrenadores);
-
 	EjecutarEntrenador      = malloc(sizeof(sem_t)          *cantidadDeEntrenadores);
 	mutexEstadoEntrenador   = malloc(sizeof(pthread_mutex_t)*cantidadDeEntrenadores);
 	mutexPosicionEntrenador = malloc(sizeof(pthread_mutex_t)*cantidadDeEntrenadores);
@@ -111,8 +109,6 @@ void inicializar_hilos_entrenadores(){
 void finalizar_hilos_entrenadores(){
 	int i=0;
 	for(i=0; i<cantidadDeEntrenadores; i++){
-//		pthread_join(hilosEntrenadores[i], NULL);
-//		sem_destroy(&EjecutarEntrenador[i]);
 		pthread_mutex_destroy(&mutexPosicionEntrenador[i]);
 		pthread_mutex_destroy(&mutexEstadoEntrenador[i]);
 	}
@@ -234,11 +230,7 @@ bool entrenador_verificar_objetivos(entrenador*unEntrenador){
 	printf("Inventario: "); recursos_mostrar(unEntrenador->pokemonesCazados);puts("");
 
 	if(cumplioObjetivos){
-
-		entrenador_pasar_a(unEntrenador, EXIT, "Ya logro cumplir sus objetivos");
-
-		PROCESOS_SIN_FINALIZAR--;
-
+		entrenador_finalizar(unEntrenador);
 	}
 
 	else{
@@ -249,4 +241,15 @@ bool entrenador_verificar_objetivos(entrenador*unEntrenador){
 
 	sem_post(&EquipoNoPuedaCazarMas);
 	return cumplioObjetivos;
+}
+
+void entrenador_finalizar(entrenador*unEntrenador){
+	entrenador_pasar_a(unEntrenador, EXIT, "Ya logro cumplir sus objetivos");
+	PROCESOS_SIN_FINALIZAR--;
+	entrenador_liberar_recursos(unEntrenador);
+}
+
+void entrenador_liberar_recursos(entrenador*unEntrenador){
+	recursos_destroy(unEntrenador->objetivos);
+	recursos_destroy(unEntrenador->pokemonesCazados);
 }

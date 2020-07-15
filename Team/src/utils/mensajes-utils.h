@@ -10,7 +10,7 @@
 
 #include <crenito-commons/conexiones/conexiones.h>
 #include <stdbool.h>
-#include "../listas/boolean_semaphore.h"
+#include "listas/boolean_semaphore.h"
 #include "../suscripciones/hilo_appeared_pokemon.h"
 #include "../suscripciones/hilo_caught_pokemon.h"
 #include "../suscripciones/hilo_gameboy.h"
@@ -19,6 +19,10 @@
 //bool ESPERO_MENSAJES;
 
 boolean_sem_t BOOLSEM_EsperoMensajes;
+
+sem_t finDeSuscripcion;
+
+bool espero_mensajes();
 
 void dejar_de_recibir();
 

@@ -36,7 +36,7 @@ captura_pendiente* pendientes_remove_by_id(capturas_pendientes mensajesPendiente
 		return ((captura_pendiente*)unPendiente)->id == idRespuesta && !((captura_pendiente*)unPendiente)->respondido;
 	}
 
-	captura_pendiente*esePendiente = cr_list_remove_by_condition(mensajesPendientes,  &cmp_pendiente_id);
+	captura_pendiente*esePendiente = cr_list_silent_remove_by_condition(mensajesPendientes,  &cmp_pendiente_id);
 
 	if(esePendiente) esePendiente->respondido = true;
 
@@ -50,7 +50,7 @@ captura_pendiente*pendientes_pendiente_del_entrenador(capturas_pendientes mensaj
 		return ((captura_pendiente*) unPendiente)->cazador->id == idEntrenador;
 	}
 
-	return cr_list_remove_by_condition(mensajesPendientes, &esElEntrenador);
+	return cr_list_silent_remove_by_condition(mensajesPendientes, &esElEntrenador);
 }
 
 

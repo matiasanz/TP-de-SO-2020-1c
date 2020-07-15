@@ -1,4 +1,4 @@
-#include "../../listas/cr_list.h"
+#include "../../utils/listas/cr_list.h"
 #include "../../team.h"
 
 //Inicializar

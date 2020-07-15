@@ -25,6 +25,7 @@ void inicializar(void) {
 	inicializar_config();
 	inicializar_logs();
 	crearEstructuras();
+	proceso_inicializar(GAMECARD);
 	inicializar_conexiones();
 }
 
@@ -49,12 +50,10 @@ void inicializar_conexiones() {
 }
 
 void inicializar_logs() {
-
-	logger = log_create("./log/gamecard.log", GAMECARD_STRING, 1,LOG_LEVEL_INFO);
-	event_logger = log_create("./log/gamecard_event.log", "GAME_CARD_EVENT", 1, LOG_LEVEL_INFO);
+	logger = get_log_oficial(GAMECARD_STRING);//log_create("./log/gamecard.log", GAMECARD_STRING, mostrar_logs(),LOG_LEVEL_INFO);
+	event_logger = get_log_event("GAMECARD_EVENT");
 }
 
-//**********************
 void inicializar_semaforos(){
 	pthread_mutex_init(&mutBitarray, NULL);
 	pthread_mutex_init(&mutDiccionarioSemaforos, NULL);
@@ -65,138 +64,6 @@ void inicializar_semaforos(){
 
 	semaforosDePokemons=dictionary_create();
 }
-
-//Crear directorios
-void crear_metadata(char**dir_metadata){
-	*dir_metadata = string_from_format("%s%s", punto_montaje_tallgrass, "Metadata/");
-	mkdir(*dir_metadata,0777);
-	log_info(event_logger,"Creada carpeta Metadata");
-}
-
-void crear_carpeta_files(char** dir_files){
-	*dir_files = string_from_format("%s%s", punto_montaje_tallgrass, "Files/");
-	mkdir(*dir_files,0777);
-	log_info(event_logger,"Creada carpeta Files");
-}
-
-void crear_carpeta_blocks(char** dir_blocks){
-	*dir_blocks = string_from_format("%s%s", punto_montaje_tallgrass, "Blocks/");
-	mkdir(*dir_blocks,0777);
-	log_info(event_logger,"Creada carpeta Blocks");
-}
-
-void crear_directorios(char** dir_metadata, char** dir_files, char** dir_blocks){
-
-	crear_metadata(dir_metadata);
-	crear_carpeta_files(dir_files);
-	crear_carpeta_blocks(dir_blocks);
-
-}
-
-void leer_metadata(char**dir_metadata, char**bin_metadata, FILE**f_metadata){
-
-	//-----Creacion del Metadata, si es que no existe
-	string_append(bin_metadata,*dir_metadata);
-	string_append(bin_metadata,"Metadata.bin"); //Va en la funcion de abajo TODO
-
-	*f_metadata=fopen(*bin_metadata,"r");
-
-	if(*f_metadata==NULL){ //si no existe el archivo metadata
-		log_info(event_logger,"[ERROR FATAL] FILESYSTEM NO ENCONTRADO (se creara uno nuevo)");
-		*f_metadata=fopen(*bin_metadata,"wb+");
-		config_metadata=config_create(*bin_metadata);
-		config_set_value(config_metadata,"BLOCK_SIZE","64");
-		config_set_value(config_metadata,"BLOCKS","5192");
-		config_set_value(config_metadata,"MAGIC_NUMBER","TALL_GRASS");
-		config_save(config_metadata);
-	}
-
-	else {
-		config_metadata=config_create(*bin_metadata);
-	}
-
-	fclose(*f_metadata);
-	log_info(event_logger,"Creado archivo Metadata.bin");
-}
-
-void crear_bit_map(char** bin_bitmap, char**dir_metadata){
-
-	bool esNuevoBitmap=false;
-
-	string_append_with_format(bin_bitmap,"%s%s", *dir_metadata, "Bitmap.bin");
-
-//	printf("dir bitmap: %s", *bin_bitmap);
-
-	f_bitmap =fopen(*bin_bitmap,"rb+");
-
-	// si no existe archivo bitmap
-	if(f_bitmap==NULL){
-		f_bitmap=fopen(*bin_bitmap,"wb+");
-
-		size_t tamanioBloque = tope(config_get_int_value(config_metadata,"BLOCKS"),8);
-		char* bitarray_temp=malloc(tamanioBloque);
-		fwrite((void*)bitarray_temp,tamanioBloque,1,f_bitmap);
-		fflush(f_bitmap);
-		free(bitarray_temp);
-		esNuevoBitmap=true;
-
-	}
-
-	fseek(f_bitmap, 0, SEEK_END);
-	int file_size = ftell(f_bitmap);
-	fseek(f_bitmap, 0, SEEK_SET);
-
-	char* bitarray_str=(char*)mmap(NULL,file_size,PROT_READ | PROT_WRITE | PROT_EXEC,MAP_SHARED,fileno(f_bitmap),0);
-
-	if(bitarray_str == (char*) -1) {
-			log_error(logger, "Fallo el mmap");
-	}
-
-	fread((void*) bitarray_str, sizeof(char), file_size, f_bitmap);
-	bitmap = bitarray_create_with_mode(bitarray_str, file_size, MSB_FIRST);
-
-	//seteo de bitmap
-	if(esNuevoBitmap){
-		for(int i=0;i<config_get_int_value(config_metadata,"BLOCKS");i++){
-			bitarray_clean_bit(bitmap,i);
-		}
-	}
-
-	log_info(logger, "Creado el archivo Bitmap.bin");
-}
-
-void crear_bloques(char** bin_block, char*dir_blocks){
-	string_append_with_format(bin_block, "%s%s", dir_blocks, "/0.bin");
-
-	FILE* f_block = fopen(*bin_block,"r");
-
-	if(f_block==NULL){
-		free(*bin_block);
-
-		int i, tamanioBloques = config_get_int_value(config_metadata,"BLOCKS");
-		for(i=0; i<tamanioBloques; i++){
-
-			*bin_block = string_new();
-			char* nroBloque=string_itoa(i);
-
-			string_append_with_format(bin_block, "%s%s", dir_blocks, nroBloque, ".bin");
-
-			f_block=fopen(*bin_block,"wb+");
-
-			fclose(f_block);
-			free(*bin_block);
-			free(nroBloque);
-		}
-
-	}else{
-		free(*bin_block);
-		fclose(f_block);
-	}
-
-	log_info(event_logger,"Creado los bloques .bin");
-}
-
-//**********************
 
 void crearEstructuras(){
 

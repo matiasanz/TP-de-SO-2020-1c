@@ -41,6 +41,9 @@
 #define TEAM_STRING "TEAM"
 #define SUSCRIPTOR_STRING "SUSCRIPTOR"
 
+#define LOG_TOKEN "LOG_FILE"
+#define EVENT_TOKEN "EVENT_FILE"
+
 t_config* config;
 
 //Logger para uso exclusivo de informacion pedida por el tp
@@ -59,6 +62,18 @@ typedef enum {
 
 // dado un id de mensaje/nombre de cola el mismo representado por un string
 char* get_nombre_cola(t_id_cola id_cola);
+
+/* Funcion booleana que determina si los logs se muestran por pantalla
+ * a partir del config.
+ * Retorna true si el config contiene un token MOSTRAR_LOGS=1
+ * En caso de no encontrarlo, por defecto devuelve false*/
+bool mostrar_logs();
+
+/* Crea un logger con la direccion que le indica el config,
+ * quien a su vez le indica si debe mostrar los logs por pantalla.
+ * Level info, con el nombre del proceso*/
+t_log* get_log_oficial(char* PROCESO);
+t_log* get_log_event(char* PROCESO);
 
 void string_append_separador(char** string, char* texto);
 char* get_separador_string(char* texto);

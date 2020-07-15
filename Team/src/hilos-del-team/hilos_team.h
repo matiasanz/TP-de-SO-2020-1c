@@ -10,7 +10,6 @@
 #define PROCESO_ACTIVO 1
 
 //Hilos
-pthread_t* hilosEntrenadores;
 pthread_t hiloReceptorDeMensajes;
 pthread_t hiloPlanificador;
 pthread_t hiloMensajesAppeard;
@@ -25,7 +24,6 @@ sem_t EquipoNoPuedaCazarMas;
 sem_t FinDeCiclo_CPU;
 sem_t HayEntrenadoresDisponibles;
 sem_t finDeIntercambio;
-sem_t FinDePlanificacion;
 
 pthread_mutex_t mutexHistorialEspecies;
 pthread_mutex_t mutexEntrenadores;
@@ -47,6 +45,7 @@ void team_hilo_entrenador();
 
 //Hilo que se encarga de planificar los hilos entrenadores
 void team_planificar();
+void ejecutar_entrenador(entrenador*);
 
 //Hilo que se encarga de recibir los mensajes
 void gamecard_simulator();
@@ -61,20 +60,22 @@ void inicializar_hilos_entrenadores();
 void finalizar_hilos_entrenadores();
 
 //Entrenadores
-void entrenador_despertar(entrenador*unEntrenador, char* motivo);
+void entrenador_despertar(entrenador*, char* motivo);
 void entrenadores_despertar_por_llegada_de(entrenadores, pokemon*);
 void entrenador_dormir_hasta_llegada_de_pokemon(entrenador*);
-bool entrenador_dormido_hasta_llegada_de_pokemon(entrenador*unEntrenador);
-bool entrenador_verificar_objetivos(entrenador*unEntrenador);
-void entrenador_dar_un_paso_hacia(entrenador*unEntrenador, t_posicion posicionFinal);
+bool entrenador_dormido_hasta_llegada_de_pokemon(entrenador*);
+bool entrenador_verificar_objetivos(entrenador*);
+void entrenador_dar_un_paso_hacia(entrenador*, t_posicion);
 void desplazar_unidimensional(coordenada* posicionInicial, coordenada posicionFinal);
-
+void entrenador_liberar_recursos(entrenador*);
+void entrenador_finalizar(entrenador*);
 //Pokemones
 void registrar_pokemon(pokemon*);
 void registrar_en_cada_posicion(especie_pokemon, posiciones);
 bool pokemon_es_requerido(pokemon unPokemon);
 bool pokemon_en_tramite(pokemon*unPokemon);
 pokemon* pokemones_esperar_y_leer();
+void procesar_no_requerido(pokemon* unPokemon);
 
 //Objetivos
 numero objetivos_cantidad_bruta_requerida_de(especie_pokemon);

@@ -19,14 +19,15 @@ void localized_pokemon_recibido(t_mensaje_localized_pokemon* localized_pokemon) 
 		log_enunciado_llegada_de_mensaje_localized(localized_pokemon);
 
 		mensaje_localized_pokemon_procesar(localized_pokemon);
-
-//		cr_list_add_and_signal(mensajesLOCALIZED, localized_pokemon);
-		//TODO probar si asi recibe bien los mensajes del gamecard y de ser asi traer lo del otro archivo
 	}
 
 	else{
 		log_event_localized_descartado_por_id(localized_pokemon);
 		mensaje_localized_pokemon_destruir(localized_pokemon);
+	}
+
+	if(!pedidos_pendientes()){
+		borrar_historial();
 	}
 }
 
@@ -142,4 +143,10 @@ bool id_responde_a_mi_pedido(t_id idCorrelativo){
 	if(idGet) free(idGet);
 
 	return idGet;
+}
+
+void borrar_historial(){
+	pthread_mutex_lock(&mutexHistorialEspecies);
+	list_clean_and_destroy_elements(historialDePokemones, free);
+	pthread_mutex_unlock(&mutexHistorialEspecies);
 }

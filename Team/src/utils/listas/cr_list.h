@@ -40,6 +40,9 @@ void cr_list_add_first_and_signal(cr_list*, void *element);
 //Agrega un elemento en una posicion y hace signal
 void cr_list_add_index_and_signal(cr_list*, int index, void *element);
 
+//Agrega un elemento sin avisar al semaforo contador
+int cr_list_silent_add(cr_list*unaLista, void* element);
+
 //Agrega todos los elementos de una lista y hace tal cantidad de signals
 void cr_list_add_all_from_list_and_signal(cr_list*, t_list* other);
 
@@ -62,7 +65,7 @@ cr_list* cr_list_filter(cr_list*, bool(*condition)(void*));
 void* cr_list_get_by_condition(cr_list* unaLista, bool(*closure)(void*));
 
 //Remueve al primer elemento de la lista que cumpla la condicion y lo elimina
-void* cr_list_remove_by_condition(cr_list* unaLista, bool(*condicion)(void*));
+void* cr_list_silent_remove_by_condition(cr_list* unaLista, bool(*condicion)(void*));
 
 //Remueve todos los elementos de la lista y los retorna en una lista nueva
 t_list* cr_list_remove_all(cr_list*);

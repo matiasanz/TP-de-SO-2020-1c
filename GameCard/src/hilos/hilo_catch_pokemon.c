@@ -19,9 +19,9 @@ void suscribir_y_escuchar_cola_catch_pokemon(void (*callback)(t_id_cola, void*))
 }
 
 void catch_pokemon_recibido(t_mensaje_appeared_catch_pokemon* catch_pokemon) {
+	mensaje_appeared_catch_pokemon_log(logger, catch_pokemon, CATCH_POKEMON_STRING);
+
 	pthread_t unHilo;
 	pthread_create(&unHilo, NULL, (void*) gamecard_Catch_Pokemon, catch_pokemon);
 	pthread_detach(unHilo);
-	//	no borrar
-	mensaje_appeared_catch_pokemon_log(logger, catch_pokemon, CATCH_POKEMON_STRING);
 }
