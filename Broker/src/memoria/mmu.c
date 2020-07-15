@@ -116,6 +116,7 @@ static t_particion* obtener_particion_libre(int tamanio_contenido) {
 
 static t_particion* asignar_particion(int tamanio_contenido, t_id_cola id_cola, uint32_t id_mensaje) {
 
+	cantidad_busquedas_fallidas = 0;
 	int tamanio_particion = calcular_tamanio_particion(tamanio_contenido);
 	t_particion* particion = obtener_particion_libre(tamanio_particion);
 

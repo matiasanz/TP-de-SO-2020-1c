@@ -32,7 +32,6 @@ void inicializar_particiones_dinamicas() {
 
 	frecuencia_compactacion = config_get_int_value(config, "FRECUENCIA_COMPACTACION");
 	particiones = list_create();
-	cantidad_busquedas_fallidas = 0;
 }
 
 t_particion* pd_obtener_particion_libre_best_fit(int tamanio_contenido, int* offset) {
