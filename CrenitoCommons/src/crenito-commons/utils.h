@@ -83,21 +83,4 @@ int error_conexion(int indicador_conexion);
 
 t_id_cola get_id_mensaje(char* mensaje);
 
-void log_debug_and_destroy(t_log* un_logger, char* string);
-void log_info_and_destroy(t_log* un_logger, char* string);
-void log_warning_and_destroy(t_log* un_logger, char* string);
-
-// Logs Obligatorios
-//Team
-//TODO: mover logs obligatorios a un archivo aparte y pasarle un t_conexion_cliente
-void log_inicio_proceso_reconexion(t_id_cola id_cola, int segundos);  //10. Inicio de proceso de reintento de comunicación con el Broker.
-void log_resultado_proceso_reconexion(t_id_cola id_cola, char* resultado); //11. Resultado de proceso de reintento de comunicación con el Broker.
-
-//GameBoy
-void log_suscripcion(t_id_cola id_cola); //2. Suscripción a una cola de mensajes.
-
-// Logs Errores
-void log_warning_socket(int socket, char* operacion);
-void log_warning_cola(int id_cola, char* funcion);
-
 #endif /* UTILS_H_ */

@@ -23,11 +23,13 @@ char* get_nombre_cola(t_id_cola id_cola) {
 	case LOCALIZED_POKEMON:
 		return LOCALIZED_POKEMON_STRING;
 	default:
-		log_warning_cola(id_cola, "get_nombre_cola");
+		log_warning(event_logger, "No existe la cola: %d. Funcion: %s. Finalizando hilo", id_cola, "get_nombre_cola");
+		pthread_exit(NULL);
 		return NULL;
 	}
 }
 
+//TODO mover el bool a proceso.c y la parte de configuracion de lgs a log.c
 bool mostrar_logs(){
 	char*MOSTRAR_LOGS = "MOSTRAR_LOGS";
 	return !config_has_property(config, MOSTRAR_LOGS)
@@ -74,96 +76,3 @@ int error_conexion(int indicador_conexion) {
 int conexion_exitosa(int indicador_conexion) {
 	return !error_conexion(indicador_conexion);
 }
-
-void log_debug_and_destroy(t_log* un_logger, char* string) {
-
-	log_debug(un_logger, string);
-	free(string);
-}
-
-void log_info_and_destroy(t_log* un_logger, char* string) {
-
-	log_info(un_logger, string);
-	free(string);
-}
-
-void log_warning_and_destroy(t_log* un_logger, char* string) {
-
-	log_warning(un_logger, string);
-	free(string);
-}
-
-//Logs Obligatorios
-//Team
-void log_inicio_proceso_reconexion(t_id_cola id_cola, int segundos) {
-	log_info(logger, "Inicio reintento de conexión cola %s. Se intentará conectar en %d segundos",
-			get_nombre_cola(id_cola), segundos);
-}
-
-void log_resultado_proceso_reconexion(t_id_cola id_cola, char* resultado) {
-	log_info(logger, "Resultado del reintento de conexión cola %s: %s \n", get_nombre_cola(id_cola), resultado);
-}
-
-//GameBoy
-//TODO mover todos los logs a un archivo aparte y preguntar acá adentro si debe loggearse
-void log_suscripcion(t_id_cola id_cola) {
-	log_info(logger, "El Proceso %s se suscribió a la cola %s", GAMEBOY_STRING, get_nombre_cola(id_cola));
-}
-
-//Logs Errores
-void log_warning_socket(int socket, char* operacion) {
-	log_warning(event_logger, "Error al realizar la operación %s, socket: %d", operacion, socket);
-}
-
-void log_warning_cola(int id_cola, char* funcion) {
-	log_warning(event_logger, "No existe la cola: %d. Funcion: %s. Finalizando hilo", id_cola, funcion);
-	pthread_exit(NULL);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//************************** Helgrind
-
-
-
-
-
-
-
-
-
-
-
-//void log_inicio_proceso_reconexion(t_id_cola id_cola, int segundos) {
-//}
-//
-//void log_resultado_proceso_reconexion(t_id_cola id_cola, char* resultado) {
-//}
-//
-//void log_suscripcion(t_id_cola id_cola) {
-//}
-//
-//void log_warning_socket(int socket, char* operacion) {
-//}
-//
-//void log_error_cola(int id_cola, char* funcion) {
-//}

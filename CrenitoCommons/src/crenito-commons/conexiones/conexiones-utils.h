@@ -8,17 +8,19 @@
 #ifndef SRC_CRENITO_COMMONS_CONEXIONES_CONEXIONES_UTILS_H_
 #define SRC_CRENITO_COMMONS_CONEXIONES_CONEXIONES_UTILS_H_
 
-#include "paquete.h"
-#include "socket.h"
-
 //Mensajes
 #include "../mensajes/mensaje_new_pokemon.h"
 #include "../mensajes/mensaje_localized_pokemon.h"
 #include "../mensajes/mensaje_get_pokemon.h"
 #include "../mensajes/mensaje_appeared_catch_pokemon.h"
 #include "../mensajes/mensaje_caught_pokemon.h"
+
+#include "paquete.h"
+#include "socket.h"
 #include "../modelo/suscriptor.h"
 #include "../modelo/proceso.h"
+#include "../crenito-commons_log.h"
+
 /* 
  * Contiene la información necesaria para poder enviarle mensajes 
  * a un proceso servidor.

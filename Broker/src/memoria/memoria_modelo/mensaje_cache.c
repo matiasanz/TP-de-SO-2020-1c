@@ -10,6 +10,7 @@
 static void mensaje_cache_agregar_suscriptor_enviado(t_mensaje_cache* msj, t_suscriptor* suscriptor, uint32_t id_mensaje);
 static void mensaje_cache_agregar_suscriptor_confirmado(t_mensaje_cache* msj, t_suscriptor* suscriptor, uint32_t id_mensaje);
 static void mensaje_cache_agregar_suscriptor_fallido(t_mensaje_cache* msj, t_suscriptor* suscriptor, uint32_t id_mensaje);
+static void eliminar_suscriptor_fallido(t_mensaje_cache* msj, t_suscriptor* suscriptor, uint32_t id_mensaje);
 
 t_mensaje_cache* mensaje_cache_crear(t_mensaje_header msj_header) {
 
@@ -51,10 +52,6 @@ uint32_t mensaje_cache_get_id_correlativo(t_mensaje_cache* msj) {
 	return msj->metadata->id_correlativo;
 }
 
-t_id_cola mensaje_cache_get_id_cola(t_mensaje_cache* msj) {
-	return particion_get_id_cola(msj->particion);
-}
-
 uint32_t mensaje_cache_get_tamanio_contenido(t_mensaje_cache* msj) {
 	return msj->metadata->tamanio_contenido;
 }
@@ -79,6 +76,8 @@ static void mensaje_cache_agregar_suscriptor_confirmado(t_mensaje_cache* msj, t_
 	pthread_mutex_unlock(&msj->mutex_suscriptores_confirmados);
 
 	log_confirmacion_mensaje_suscriptor(id_mensaje, suscriptor_get_id_proceso(suscriptor));
+
+	eliminar_suscriptor_fallido(msj, suscriptor, id_mensaje);
 }
 
 static void mensaje_cache_agregar_suscriptor_fallido(t_mensaje_cache* msj, t_suscriptor* suscriptor, uint32_t id_mensaje) {
@@ -108,7 +107,7 @@ int mensaje_cache_get_cantidad_suscriptores_fallidos(t_mensaje_cache* msj) {
 	return cantidad_suscriptores_fallidos;
 }
 
-void mensaje_cache_set_ack(t_mensaje_cache* msj, t_suscriptor* suscriptor, uint32_t ack, uint32_t id_mensaje) {
+void mensaje_cache_set_ack(t_mensaje_cache* msj, t_suscriptor* suscriptor, int ack, uint32_t id_mensaje) {
 
 	mensaje_cache_agregar_suscriptor_enviado(msj, suscriptor, id_mensaje);
 
@@ -124,8 +123,41 @@ t_suscriptor* mensaje_cache_get_primer_sucriptor_fallido(t_mensaje_cache* msj) {
 	t_suscriptor* suscriptor;
 
 	pthread_mutex_lock(&msj->mutex_suscriptores_fallidos);
-	suscriptor = list_remove(msj ->metadata ->suscriptores_fallidos, 0);
+    suscriptor = list_remove(msj ->metadata ->suscriptores_fallidos, 0);
 	pthread_mutex_unlock(&msj->mutex_suscriptores_fallidos);
 
 	return suscriptor;
+}
+
+bool mensaje_cache_pendiente_confirmacion(t_mensaje_cache* msj, t_suscriptor* suscriptor_buscado) {
+
+	bool buscar_por_id_proceso(t_suscriptor* suscriptor_confirmado) {
+		return suscriptor_equals(suscriptor_confirmado, suscriptor_buscado);
+	}
+
+	t_suscriptor* suscriptor_encontrado;
+
+	pthread_mutex_lock(&msj->mutex_suscriptores_confirmados);
+	suscriptor_encontrado = list_find(msj->metadata->suscriptores_confirmados, (void*)buscar_por_id_proceso);
+	pthread_mutex_unlock(&msj->mutex_suscriptores_confirmados);
+
+	return !suscriptor_existe(suscriptor_encontrado);
+}
+
+void eliminar_suscriptor_fallido(t_mensaje_cache* msj, t_suscriptor* suscriptor_a_remover, uint32_t id_mensaje) {
+
+	bool buscar_por_id_proceso(t_suscriptor* suscriptor_fallido) {
+			return suscriptor_equals(suscriptor_fallido, suscriptor_a_remover);
+		}
+
+	t_suscriptor* suscriptor_encontrado;
+
+	pthread_mutex_lock(&msj->mutex_suscriptores_fallidos);
+	suscriptor_encontrado = list_remove_by_condition(msj->metadata->suscriptores_fallidos, (void*)buscar_por_id_proceso);
+	pthread_mutex_unlock(&msj->mutex_suscriptores_fallidos);
+
+	if(suscriptor_existe(suscriptor_encontrado)) {
+		log_event_reenvio_exitoso(suscriptor_encontrado, id_mensaje);
+		suscriptor_destruir(suscriptor_encontrado);
+	}
 }

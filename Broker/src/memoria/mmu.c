@@ -60,7 +60,7 @@ void* restaurar_mensaje_desde_cache(t_mensaje_cache* msj, t_mensaje_header* head
 	*header = mensaje_header_restaurar_desde_cache(msj);
 	void* contenido_cache = obtener_contenido_cache(msj);
 
-	switch (mensaje_cache_get_id_cola(msj)) {
+	switch (particion_get_id_cola(msj -> particion)) {
 	case NEW_POKEMON:
 		return mensaje_new_pokemon_restaurar_desde_cache(contenido_cache, *header);
 	case APPEARED_POKEMON:
@@ -73,7 +73,7 @@ void* restaurar_mensaje_desde_cache(t_mensaje_cache* msj, t_mensaje_header* head
 	case LOCALIZED_POKEMON:
 		return mensaje_localized_pokemon_restaurar_desde_cache(contenido_cache, *header);
 	default:
-		log_warning_cola(mensaje_cache_get_id_cola(msj), "restaurar_mensaje_desde_cache");
+		log_warning_cola(particion_get_id_cola(msj -> particion), "restaurar_mensaje_desde_cache");
 		return NULL;
 	}
 }
@@ -136,9 +136,10 @@ static t_particion* asignar_particion(int tamanio_contenido, t_id_cola id_cola, 
 		}
 	}
 
-	pthread_mutex_lock(&mutex_escritura_eliminacion_memoria);
 	particion_set_id_cola(particion, id_cola);
 	particion_set_uso(particion);
+
+	pthread_mutex_lock(&mutex_escritura_eliminacion_memoria);
 	particion_set_id_mensaje(particion, id_mensaje);
 	pthread_mutex_unlock(&mutex_escritura_eliminacion_memoria);
 

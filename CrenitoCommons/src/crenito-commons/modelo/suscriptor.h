@@ -23,6 +23,7 @@ t_suscriptor* suscriptor_duplicar(t_suscriptor* subscriptor);
 void suscriptor_destruir(t_suscriptor* subscriptor);
 
 bool suscriptor_existe(t_suscriptor* suscriptor);
+bool suscriptor_equals(t_suscriptor* un_suscriptor, t_suscriptor* otro_suscriptor);
 
 uint32_t suscriptor_get_id_proceso(t_suscriptor* suscriptor);
 int suscriptor_get_socket(t_suscriptor* suscriptor);
