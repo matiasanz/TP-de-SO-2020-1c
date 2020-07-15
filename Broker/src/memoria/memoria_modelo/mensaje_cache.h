@@ -27,7 +27,6 @@ t_mensaje_header mensaje_header_restaurar_desde_cache(t_mensaje_cache* msj);
 
 uint32_t mensaje_cache_get_id(t_mensaje_cache* msj);
 uint32_t mensaje_cache_get_id_correlativo(t_mensaje_cache* msj);
-t_id_cola mensaje_cache_get_id_cola(t_mensaje_cache* msj);
 uint32_t mensaje_cache_get_tamanio_contenido(t_mensaje_cache* msj);
 
 void mensaje_cache_set_particion(t_mensaje_cache* msj, t_particion* particion);

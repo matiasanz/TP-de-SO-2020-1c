@@ -52,10 +52,6 @@ uint32_t mensaje_cache_get_id_correlativo(t_mensaje_cache* msj) {
 	return msj->metadata->id_correlativo;
 }
 
-t_id_cola mensaje_cache_get_id_cola(t_mensaje_cache* msj) {
-	return particion_get_id_cola(msj->particion);
-}
-
 uint32_t mensaje_cache_get_tamanio_contenido(t_mensaje_cache* msj) {
 	return msj->metadata->tamanio_contenido;
 }
