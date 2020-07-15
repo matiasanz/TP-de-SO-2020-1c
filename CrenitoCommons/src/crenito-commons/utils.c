@@ -30,9 +30,9 @@ char* get_nombre_cola(t_id_cola id_cola) {
 
 bool mostrar_logs(){
 	char*MOSTRAR_LOGS = "MOSTRAR_LOGS";
-	return config_has_property(config, MOSTRAR_LOGS)
-			&& config_get_int_value(config, MOSTRAR_LOGS);
-} //si no lo valido y nos olvidamos de ponerlo, tira seg fault
+	return !config_has_property(config, MOSTRAR_LOGS)
+			|| config_get_int_value(config, MOSTRAR_LOGS);
+}
 
 char* get_log_path(char* TOKEN){
 	return string_from_format("log/%s", config_get_string_value(config, TOKEN));
