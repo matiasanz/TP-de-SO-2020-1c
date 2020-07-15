@@ -25,6 +25,10 @@ bool suscriptor_existe(t_suscriptor* suscriptor) {
 	return suscriptor != NULL;
 }
 
+bool suscriptor_equals(t_suscriptor* un_suscriptor, t_suscriptor* otro_suscriptor){
+	return suscriptor_get_id_proceso(un_suscriptor) == suscriptor_get_id_proceso(otro_suscriptor);
+}
+
 void suscriptor_destruir(t_suscriptor* suscriptor) {
 	free(suscriptor);
 }

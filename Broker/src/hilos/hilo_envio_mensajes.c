@@ -34,7 +34,7 @@ void crear_hilo_y_enviar_mensaje_a_suscriptor(t_mensaje_cache* msj, t_suscriptor
 void enviar_mensaje_a_suscriptor(t_mensaje_cache* mensaje_cache, t_suscriptor* suscriptor, t_mensaje_header* msj_header, void* mensaje_deserializado, t_id_cola id_cola) {
 
 	t_paquete* pqt = paquete_crear(MENSAJE, id_cola, serializar(mensaje_deserializado, id_cola));
-	uint32_t ack = enviar_paquete(pqt, suscriptor_get_socket(suscriptor));
+	int ack = enviar_paquete(pqt, suscriptor_get_socket(suscriptor));
 	mensaje_cache_set_ack(mensaje_cache, suscriptor, ack, msj_header -> id);
 
 	paquete_destruir(pqt);

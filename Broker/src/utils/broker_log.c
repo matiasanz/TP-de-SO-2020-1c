@@ -103,6 +103,10 @@ void log_event_inicio_proceso() {
 	log_info(event_logger, "%s iniciado exitosamente \n", BROKER_STRING);
 }
 
+void log_event_reenvio_exitoso(t_suscriptor* un_suscriptor, uint32_t id_mensaje) {
+	log_info(event_logger, "reenvio exitoso de mensaje %d al suscriptor %d", id_mensaje, suscriptor_get_id_proceso(un_suscriptor));
+}
+
 //Logs Errores
 void log_error_atender_cliente(int* socket, t_paquete_header header) {
 
@@ -214,6 +218,9 @@ static void string_append_contenido_envio_mensaje(char** string, char* header_st
 //void log_event_memoria_cola_eliminacion(uint32_t id_mensaje, t_id_cola id_cola) {
 //}
 //void log_event_inicio_proceso() {
+//}
+//
+//void log_event_reenvio_exitoso(t_suscriptor* un_suscriptor, uint32_t id_mensaje) {
 //}
 //
 //void log_error_atender_cliente(int* socket, t_paquete_header header) {

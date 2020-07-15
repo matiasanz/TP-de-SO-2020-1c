@@ -35,6 +35,7 @@ void log_event_inicio_consolidacion_colas(t_id_cola id_cola, int cantidad_mensaj
 void log_event_consolidacion_cola_eliminacion(uint32_t id_mensaje, t_id_cola id_cola);
 void log_event_memoria_cola_eliminacion(uint32_t id_mensaje, t_id_cola id_cola);
 void log_event_inicio_proceso();
+void log_event_reenvio_exitoso(t_suscriptor* un_suscriptor, uint32_t id_mensaje);
 
 // Logs Errores
 void log_error_atender_cliente(int* socket, t_paquete_header header);
