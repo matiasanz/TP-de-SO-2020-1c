@@ -8,11 +8,11 @@
 #include "mmu.h"
 
 //Funciones Privadas
-static void* obtener_contenido_cache(t_mensaje_cache* mensaje_cache);
 static t_particion* obtener_particion_libre(int tamanio_contenido);
 static bool debe_ejecutarse_compactacion();
 static t_particion* asignar_particion(int tamanio_contenido, t_id_cola id_cola, uint32_t id_mensaje);
-static void copiar_contenido_en_memoria_principal(void* contenido, t_particion* particion);
+static void escribir_memoria_principal(void* contenido, t_particion* particion);
+static void* leer_memoria_principal(t_particion* particion);
 
 void inicializar_memoria() {
 
@@ -41,7 +41,7 @@ t_mensaje_cache* guardar_en_memoria(void* msj_recibido, t_id_cola id_cola, t_men
 	pthread_mutex_lock(&mutex_acceso_memoria);
 
 	t_particion* particion = asignar_particion(mensaje_cache_get_tamanio_contenido(msj_cache), id_cola, msj_header.id);
-	copiar_contenido_en_memoria_principal(contenido_mensaje, particion);
+	escribir_memoria_principal(contenido_mensaje, particion);
 
 	mensaje_cache_set_particion(msj_cache, particion);
 	log_almacenamiento_mensaje_en_memoria(particion);
@@ -58,7 +58,7 @@ t_mensaje_cache* guardar_en_memoria(void* msj_recibido, t_id_cola id_cola, t_men
 void* restaurar_mensaje_desde_cache(t_mensaje_cache* msj, t_mensaje_header* header) {
 
 	*header = mensaje_header_restaurar_desde_cache(msj);
-	void* contenido_cache = obtener_contenido_cache(msj);
+	void* contenido_cache = leer_memoria_principal(msj -> particion);
 
 	switch (particion_get_id_cola(msj -> particion)) {
 	case NEW_POKEMON:
@@ -146,16 +146,17 @@ static t_particion* asignar_particion(int tamanio_contenido, t_id_cola id_cola, 
 	return particion;
 }
 
-static void copiar_contenido_en_memoria_principal(void* contenido, t_particion* particion) {
+static void escribir_memoria_principal(void* contenido, t_particion* particion) {
 	memcpy(particion_get_direccion_base_absoluta(particion), contenido, particion_get_tamanio(particion));
 }
 
-static void* obtener_contenido_cache(t_mensaje_cache* mensaje_cache) {
+static void* leer_memoria_principal(t_particion* particion) {
 
-	int tamanio_contenido = mensaje_cache_get_tamanio_contenido(mensaje_cache);
+	int tamanio_contenido = particion_get_tamanio(particion);
 	void* contenido = malloc(tamanio_contenido);
 
-	memcpy(contenido, particion_get_direccion_base_absoluta(mensaje_cache->particion), tamanio_contenido);
+	memcpy(contenido, particion_get_direccion_base_absoluta(particion), tamanio_contenido);
+	particion_actualizar_fecha_ultimo_acceso(particion);
 
 	return contenido;
 

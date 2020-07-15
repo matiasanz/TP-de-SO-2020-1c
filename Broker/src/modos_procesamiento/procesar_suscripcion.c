@@ -57,7 +57,6 @@ static void enviar_mensajes_cacheados(t_cola_container* container, t_suscriptor*
 	pthread_mutex_unlock(&container->mutex_mensajes);
 
 	void enviar(t_mensaje_cache* msj) {
-		particion_actualizar_fecha_ultimo_acceso(msj->particion);
 		//TODO: ver si se puede usar un hilo
 		restaurar_y_enviar_mensaje_a_suscriptor(msj, suscriptor, cola_get_id(container));
 	}
