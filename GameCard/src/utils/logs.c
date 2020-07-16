@@ -71,6 +71,27 @@ void log_enunciado_pokemon_atrapado(t_pokemon pokemon){
 	pthread_mutex_unlock(&mutexLogger);
 }
 
+void log_asignacion_bloque_nuevo(int nroBloque,char* especie){
+	pthread_mutex_lock(&mutexLogger);
+	log_info(logger,"Se asigno el bloque: %i, al pokemon: %s",nroBloque,especie);
+	pthread_mutex_unlock(&mutexLogger);
+}
+void log_liberacion_de_bloque(int nroBloque){
+	pthread_mutex_lock(&mutexLogger);
+	log_info(logger,"Se libero el bloque: %i",nroBloque);
+	pthread_mutex_unlock(&mutexLogger);
+}
+//esto seria cuando un pokemon tiene una sola posicion con cantidad=1,
+//y llegue un catch para esta posicion, como no ocupa mas bloques,
+//podria eliminarse el metadata del pokemon, pero esto podria causar problemas
+//con otros hilos asi que solo se pondra al metadata del pokemon
+//con Bloks=[] y Size=0, permitido por ayudantes e issue 1819 del foro
+void log_archivo_pokemon_se_vacio(char* especie){
+	pthread_mutex_lock(&mutexLogger);
+	log_info(logger,"El archivo pokemon: %s, libero todos sus bloques",especie);
+	pthread_mutex_unlock(&mutexLogger);
+}
+
 //***************************************************************************
 void log_event_mensaje_appeared_enviado(t_mensaje_appeared_catch_pokemon* mensaje){
 	char*posicion=posicion_to_string(mensaje->pokemon.posicion);

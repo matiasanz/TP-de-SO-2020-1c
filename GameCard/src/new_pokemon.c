@@ -94,6 +94,9 @@ void agregar_nueva_linea(t_config* config_metadata_pokemon, char**bloquesDelPoke
 			uint32_t CANTIDAD_BLOQUES = config_metadata_get_blocks();
 			int nrobloque=bloque_disponible(bitmap,CANTIDAD_BLOQUES);
 			bitarray_set_bit(bitmap,nrobloque);
+
+			log_asignacion_bloque_nuevo(nrobloque,mensajeNew->pokemon.especie);
+
 			pthread_mutex_unlock(&mutBitarray);
 
 			char* bin_block = string_from_format("%s%u.bin", paths_estructuras[BLOCKS],nrobloque);
@@ -226,6 +229,9 @@ void agregar_nueva_linea(t_config* config_metadata_pokemon, char**bloquesDelPoke
 						pthread_mutex_lock(&mutBitarray);
 						int nrobloque=bloque_disponible(bitmap,config_get_int_value(config_metadata,"BLOCKS"));
 						bitarray_set_bit(bitmap,nrobloque);
+
+						log_asignacion_bloque_nuevo(nrobloque,mensajeNew->pokemon.especie);
+
 						pthread_mutex_unlock(&mutBitarray);
 
 						char* bin_block = string_from_format("%s%u.bin", paths_estructuras[BLOCKS], nrobloque);
@@ -336,7 +342,7 @@ void actualizar_datos(char* cadenaABuscar, char**bloquesDelPokemon, t_config*con
 			if(cantBloquesNecesarios>cant_elemetos_array(bloquesDelPokemon)){
 			//caso en el que necesito mas bloques de los que tenia
 				//guardo y devuelvo los bloques que ocupa,ejem ("1,2,4,6")
-			char* nroDebloquesActualizado=faltanBloquesParaGuardar(bloquesDelPokemon,cantBloquesNecesarios,contenidoActualizadoDeBloques);
+			char* nroDebloquesActualizado=faltanBloquesParaGuardar(bloquesDelPokemon,cantBloquesNecesarios,contenidoActualizadoDeBloques,mensajeNew->pokemon.especie);
 
 			size=string_length(contenidoActualizadoDeBloques);
 
@@ -510,7 +516,7 @@ void alcanzanLosBloquesParaGuardar(char** bloquesDelPokemon,int cantBloquesNeces
 
 
 }
-char* faltanBloquesParaGuardar(char** bloquesDelPokemon,int cantBloquesNecesarios,char* contenidoActualizadoDeBloques){
+char* faltanBloquesParaGuardar(char** bloquesDelPokemon,int cantBloquesNecesarios,char* contenidoActualizadoDeBloques,char* especie){
 	//caso en el que necesito mas bloques de los que tenia
 		int cantBloquesFaltantes=cantBloquesNecesarios-cant_elemetos_array(bloquesDelPokemon);
 
@@ -526,6 +532,8 @@ char* faltanBloquesParaGuardar(char** bloquesDelPokemon,int cantBloquesNecesario
 		pthread_mutex_lock(&mutBitarray);
 		int nrobloque=bloque_disponible(bitmap,config_get_int_value(config_metadata,"BLOCKS"));
 		bitarray_set_bit(bitmap,nrobloque);
+
+		log_asignacion_bloque_nuevo(nrobloque,especie);
 		pthread_mutex_unlock(&mutBitarray);
 
 
