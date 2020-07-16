@@ -179,6 +179,9 @@ t_resultado_captura pokemon_intento_de_captura(t_pokemon pokemon){
 				string_append(&clean_block,".bin");
 				sobrescribirLineas(clean_block,"",0);
 				free(clean_block);
+
+				log_liberacion_de_bloque(nrobloque);
+
 				pthread_mutex_unlock(&mutBitarray);
 			}
 
@@ -303,6 +306,10 @@ t_resultado_captura pokemon_intento_de_captura(t_pokemon pokemon){
 		free(stringSize);
 
 		log_enunciado_pokemon_atrapado(pokemon);
+
+		if(size==0)
+			log_archivo_pokemon_se_vacio(pokemon.especie);
+
 
 	}else{
 		//rama en donde la posicion recibida no se encuentra el pokemon
