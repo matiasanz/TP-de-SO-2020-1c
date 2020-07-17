@@ -8,8 +8,6 @@
 #include "mmu.h"
 
 //Funciones Privadas
-static t_particion* obtener_particion_libre(int tamanio_contenido);
-static bool debe_ejecutarse_compactacion();
 static t_particion* asignar_particion(int tamanio_contenido, t_id_cola id_cola, uint32_t id_mensaje);
 static void escribir_memoria_principal(void* contenido, t_particion* particion);
 static void* leer_memoria_principal(t_particion* particion);
@@ -98,22 +96,6 @@ void* compactar_contenido_mensaje(void* msj_recibido, t_mensaje_cache_metadata* 
 	}
 }
 
-static t_particion* obtener_particion_libre(int tamanio_contenido) {
-
-	int offset = 0;
-	t_particion* particion = algoritmo_particion_libre(tamanio_contenido, &offset);
-
-	if (particion_encontrada(particion))
-		return particion;
-
-	if (hay_espacio_contiguo_diponible(tamanio_contenido)) {
-		return particion_crear_y_ocupar(tamanio_contenido, offset);
-	}
-
-	cantidad_busquedas_fallidas += 1;
-	return NULL;
-}
-
 static t_particion* asignar_particion(int tamanio_contenido, t_id_cola id_cola, uint32_t id_mensaje) {
 
 	cantidad_busquedas_fallidas = 0;
@@ -137,6 +119,10 @@ static t_particion* asignar_particion(int tamanio_contenido, t_id_cola id_cola, 
 		}
 	}
 
+	//Ver este if
+	if (!esquema_de_memoria_particiones_dinamicas()) {
+		memoria_actualizar_tamanio_disponible_sin_particionar(tamanio_particion);
+	}
 	particion_set_id_cola(particion, id_cola);
 	particion_set_uso(particion);
 
@@ -163,13 +149,4 @@ static void* leer_memoria_principal(t_particion* particion) {
 
 }
 
-static bool debe_ejecutarse_compactacion() {
 
-	if (!esquema_de_memoria_particiones_dinamicas())
-		return false;
-
-	if (frecuencia_compactacion == -1)
-		return !hay_particiones_ocupadas();
-
-	return frecuencia_compactacion <= cantidad_busquedas_fallidas;
-}

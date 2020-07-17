@@ -25,6 +25,7 @@ typedef struct {
 t_particion* particion_crear_y_ocupar(uint32_t tamanio, uint32_t inicio);
 t_particion* particion_crear_libre(uint32_t tamanio, uint32_t inicio, uint32_t index);
 t_particion* particion_crear_dummy(uint32_t tamanio, uint32_t inicio);
+t_particion* particion_inicializar(uint32_t tamanio, uint32_t inicio);
 
 void particion_destruir(t_particion* particion);
 void particion_liberar(t_particion* particion);

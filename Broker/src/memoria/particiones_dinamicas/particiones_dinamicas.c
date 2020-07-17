@@ -16,22 +16,42 @@ static int pd_obtener_tamanio_espacio_de_memoria_libre(t_particion* ultima_parti
 
 //TODO: validar valores de configuracion y lanzar error si correspone
 void inicializar_particiones_dinamicas() {
+
+	particiones = list_create();
+	frecuencia_compactacion = config_get_int_value(config, "FRECUENCIA_COMPACTACION");
 	//"FF" o "BF"
 	char* algoritmo_libres = config_get_string_value(config, "ALGORITMO_PARTICION_LIBRE");
 
 	algoritmo_particion_libre =
 			string_equals_ignore_case(algoritmo_libres, "BF") ?
-					(void*) pd_obtener_particion_libre_best_fit : (void*) pd_obtener_particion_libre_first_fit;
+					(void*) pd_obtener_particion_libre_best_fit :
+					(void*) pd_obtener_particion_libre_first_fit_y_asignar_tamanio_exacto;
 
 	//"FIFO" o "LRU"
 	char* algoritmo_reemplazo_string = config_get_string_value(config, "ALGORITMO_REEMPLAZO");
 
 	algoritmo_reemplazo =
 			string_equals_ignore_case(algoritmo_reemplazo_string, "FIFO") ?
-					(void*) pd_liberar_victima_fifo : (void*) pd_liberar_victima_lru;
+					(void*) pd_liberar_victima_fifo : 
+					(void*) pd_liberar_victima_lru;
 
-	frecuencia_compactacion = config_get_int_value(config, "FRECUENCIA_COMPACTACION");
-	particiones = list_create();
+	obtener_particion_libre = (void*) pd_obtener_particion_libre;
+}
+
+t_particion* pd_obtener_particion_libre(int tamanio_contenido) {
+
+	int offset = 0;
+	t_particion* particion = algoritmo_particion_libre(tamanio_contenido, &offset);
+
+	if (particion_encontrada(particion))
+		return particion;
+
+	if (hay_espacio_contiguo_diponible(tamanio_contenido)) {
+		return particion_crear_y_ocupar(tamanio_contenido, offset);
+	}
+
+	cantidad_busquedas_fallidas += 1;
+	return NULL;
 }
 
 t_particion* pd_obtener_particion_libre_best_fit(int tamanio_contenido, int* offset) {
@@ -63,24 +83,33 @@ t_particion* pd_obtener_particion_libre_best_fit(int tamanio_contenido, int* off
 	return particion_con_tamanio_exacto(particion, tamanio_contenido, index_candidato);
 }
 
-t_particion* pd_obtener_particion_libre_first_fit(int tamanio_contenido, int* offset) {
+t_particion* obtener_particion_libre_first_fit(t_list* unas_particiones, int tamanio_contenido, int* offset, int*index_candidato) {
 
 	t_particion* particion = NULL;
-	uint32_t index_candidato = 0;
 
 	/*Busca la primer particion libre con tamaño suficiente dado el
 	 / tamaño del contenido que recibe por parámetro*/
-	for (int i = 0; i < list_size(particiones); ++i) {
+	for (int i = 0; i < list_size(unas_particiones); ++i) {
 
-		t_particion* candidato = list_get(particiones, i);
+		t_particion* candidato = list_get(unas_particiones, i);
 		if (particion_tiene_tamanio_suficiente(candidato, tamanio_contenido)) {
 			particion = candidato;
-			index_candidato = i;
+			*index_candidato = i;
 			break;
 		}
 
 		*offset += particion_get_tamanio(candidato);
 	}
+
+	return particion;
+
+}
+
+t_particion* pd_obtener_particion_libre_first_fit_y_asignar_tamanio_exacto(int tamanio_contenido, int* offset) {
+
+	int index_candidato = 0;
+	t_particion* particion = obtener_particion_libre_first_fit(particiones, tamanio_contenido, offset,
+			&index_candidato);
 
 	if (!particion_encontrada(particion))
 		return NULL;
@@ -171,6 +200,17 @@ void reubicar_particiones_y_compactar_contenido(uint32_t tamanio_ocupado) {
 	free(buffer);
 }
 
+bool debe_ejecutarse_compactacion() {
+
+	if (!esquema_de_memoria_particiones_dinamicas())
+		return false;
+
+	if (frecuencia_compactacion == -1)
+		return !hay_particiones_ocupadas();
+
+	return frecuencia_compactacion <= cantidad_busquedas_fallidas;
+}
+
 t_list* pd_obtener_particiones_dump() {
 
 	t_list* particiones_dump = list_duplicate(particiones);
@@ -192,42 +232,48 @@ t_list* pd_obtener_particiones_dump() {
 	return particiones_dump;
 }
 
-static void liberar_victima(bool (*algoritmo_victima)(t_particion*, t_particion*)) {
+t_particion* obtener_victima(bool (*algoritmo_victima)(t_particion*, t_particion*), int* index_victima, t_list* unas_particiones) {
 
-	int index_victima = 0;
-	t_link_element* item = particiones->head;
+	t_link_element* item = unas_particiones->head;
 
 	//Busca indice de la primer particion ocupada
 	while (item != NULL && particion_esta_libre(item->data)) {
 		item = item->next;
-		index_victima += 1;
+		*index_victima += 1;
 	}
 
 	//Si todas las particiones están vacias, no tiene sentido buscar víctima
-	if (item == NULL) return;
+	if (item == NULL) return NULL;
 
 	//Se inicializa la victima con la primer particion ocupada encontrada
-	t_particion* victima = list_get(particiones, index_victima);
+	t_particion* victima = list_get(unas_particiones, *index_victima);
 
 	/*Recorre la lista y si aparece un mejor candidato a liberar
 	 *segun el algoritmo de reemplazo, pisa la victima */
-	for (int i = index_victima; i < list_size(particiones); ++i) {
+	for (int i = *index_victima; i < list_size(unas_particiones); ++i) {
 
-		t_particion* candidato = list_get(particiones, i);
+		t_particion* candidato = list_get(unas_particiones, i);
 
 		if (algoritmo_victima(victima, candidato)) {
 			victima = candidato;
-			index_victima = i;
+			*index_victima = i;
 		}
 	}
 
 	log_eliminacion_particion(victima);
 
+	return victima;
+}
+
+static void liberar_victima(bool (*algoritmo_victima)(t_particion*, t_particion*)) {
+
+	int index_victima = 0;
+	t_particion* victima = obtener_victima((void*)algoritmo_victima, &index_victima, particiones);
 	pthread_mutex_lock(&mutex_escritura_eliminacion_memoria);
 
 	cola_safe_buscar_y_eliminar_mensaje(particion_get_id_mensaje(victima), particion_get_id_cola(victima));
 	consolidar(victima, index_victima);
-	
+
 	pthread_mutex_unlock(&mutex_escritura_eliminacion_memoria);
 }
 

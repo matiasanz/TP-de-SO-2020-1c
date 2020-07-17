@@ -107,3 +107,33 @@ void mensaje_destruir(void* deserializado, t_id_cola id_cola) {
 		log_warning_cola(id_cola, "mensaje_destruir");
 	}
 }
+
+uint32_t siguiente_potencia_de_dos(uint32_t un_numero) {
+
+	int i = 0;
+	for (--un_numero; un_numero > 0; un_numero >>= 1) {
+		i++;
+	}
+	return 1 << i;
+}
+
+uint32_t logaritmo_base_dos(uint32_t un_numero) {
+
+	uint32_t valor;
+	for (valor = 0; un_numero > 1; valor++, un_numero >>= 1);
+
+	return valor;
+}
+
+uint32_t calcular_base_dos(uint32_t un_exponente) {
+
+	uint32_t i = 0;
+	uint32_t base = 1;
+
+	while (i < un_exponente) {
+		base = base * 2;
+		i++;
+	}
+
+	return base;
+}

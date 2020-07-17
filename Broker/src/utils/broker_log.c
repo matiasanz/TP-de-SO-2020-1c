@@ -23,7 +23,7 @@ void log_mensaje_recibido(void* msj_recibido, t_id_cola id_cola) {
 
 	switch (id_cola) {
 	case NEW_POKEMON:
-	mensaje_new_pokemon_log(logger, msj_recibido);
+		mensaje_new_pokemon_log(logger, msj_recibido);
 		break;
 	case APPEARED_POKEMON:
 		mensaje_appeared_catch_pokemon_log(logger, msj_recibido, APPEARED_POKEMON_STRING);
@@ -79,6 +79,16 @@ void log_ejecucion_compactacion() {
 	log_info(logger, get_separador_string(LOG_HEADER_COMPACTACION));
 }
 
+void log_asociacion_de_bloques(void* inicio_bloque, void* inicio_buddy) {
+	char *string = string_new();
+	string_append_separador(&string, LOG_HEADER_ASOCIACION);
+	string_append_with_format(&string, " Bloques asociados: ");
+	//Debug
+	//string_append_with_format(&string, " %ju con %ju \n", (uintmax_t) (inicio_bloque - memoria_principal),(uintmax_t) (inicio_buddy - memoria_principal));
+	string_append_with_format(&string, " %06p con %06p \n", inicio_bloque, inicio_buddy);
+	log_info_and_destroy(logger, string);
+}
+
 //Logs adicionales
 void log_event_inicio_consolidacion_colas(t_id_cola id_cola, int cantidad_mensajes) {
 	log_info(event_logger, "Inicio consolidacion cola %s, cantidad de mensajes: %d \n", get_nombre_cola(id_cola),
@@ -94,9 +104,8 @@ void log_event_memoria_cola_eliminacion(uint32_t id_mensaje, t_id_cola id_cola) 
 	log_eliminacion_mensaje("Memoria liberacion:", id_mensaje, id_cola);
 }
 
-static void log_eliminacion_mensaje(char* header, uint32_t id_mensaje, t_id_cola id_cola){
-	log_info(event_logger, "%s %s, mensaje id eliminado: %d \n", header, get_nombre_cola(id_cola),
-				id_mensaje);
+static void log_eliminacion_mensaje(char* header, uint32_t id_mensaje, t_id_cola id_cola) {
+	log_info(event_logger, "%s %s, mensaje id eliminado: %d \n", header, get_nombre_cola(id_cola), id_mensaje);
 }
 
 void log_event_inicio_proceso() {
@@ -138,8 +147,9 @@ void log_warning_envio_mensaje(uint32_t id_mensaje, uint32_t id_suscriptor) {
 }
 
 void log_warning_enviar_id_mensaje(uint32_t id_mensaje, t_proceso proceso) {
-	log_warning(event_logger, "Se produjo un error al enviar el id de mensaje: %d al proceso %s con id_proceso: \n",
-			id_mensaje, proceso_get_nombre(proceso), proceso_get_id(proceso));
+	log_warning(event_logger, 
+			"Se produjo un error al enviar el id de mensaje: %d al proceso %s con id_proceso: \n", id_mensaje,
+			proceso_get_nombre(proceso), proceso_get_id(proceso));
 }
 
 // Funciones Privadas
@@ -209,6 +219,9 @@ static void string_append_contenido_envio_mensaje(char** string, char* header_st
 //void log_ejecucion_compactacion() {
 //}
 //
+//void log_asociacion_de_bloques(void* inicio_bloque, void* inicio_buddy)() {
+//
+//}
 //void log_event_inicio_consolidacion_colas(t_id_cola id_cola, int cantidad_mensajes) {
 //}
 //

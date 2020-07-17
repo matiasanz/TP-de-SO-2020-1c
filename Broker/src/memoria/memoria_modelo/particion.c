@@ -8,8 +8,6 @@
 #include "particion.h"
 
 //Funciones Privadas
-static t_particion* particion_inicializar(uint32_t tamanio, uint32_t inicio);
-
 t_particion* particion_crear_y_ocupar(uint32_t tamanio, uint32_t inicio) {
 
 	t_particion* particion = particion_inicializar(tamanio, inicio);
@@ -220,7 +218,7 @@ void particion_set_id_mensaje(t_particion* particion, uint32_t id_mensaje) {
 	particion->id_mensaje = id_mensaje;
 }
 
-static t_particion* particion_inicializar(uint32_t tamanio, uint32_t inicio) {
+t_particion* particion_inicializar(uint32_t tamanio, uint32_t inicio) {
 
 	t_particion* particion = malloc(sizeof(t_particion));
 

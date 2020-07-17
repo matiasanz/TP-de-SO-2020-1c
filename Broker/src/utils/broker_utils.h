@@ -21,4 +21,9 @@ t_mensaje_header mensaje_get_header(void* mensaje, t_id_cola id_cola);
 void mensaje_destruir(void* deserializado, t_id_cola id_cola);
 void mensaje_set_header(void* mensaje, t_mensaje_header header, t_id_cola id_cola);
 
+//math utils
+uint32_t siguiente_potencia_de_dos(uint32_t un_numero);
+uint32_t logaritmo_base_dos(uint32_t un_numero);
+uint32_t calcular_base_dos(uint32_t un_numero);
+
 #endif /* SRC_UTILS_BROKER_UTILS_H_ */

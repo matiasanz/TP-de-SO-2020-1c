@@ -26,8 +26,13 @@ void* (*algoritmo_particion_libre)(int, int*);
 // PARTICIONES o BUDDY SYSTEM
 char* algoritmo_memoria;
 
+void* (*obtener_particion_libre)(int);
+
 //Particiones dinámicas
 t_list* particiones;
+
+//Buddy System
+t_dictionary* bloques;
 
 #define max(a,b) ((a) >= (b) ? (a) : (b))
 
