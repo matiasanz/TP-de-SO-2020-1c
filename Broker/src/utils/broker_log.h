@@ -20,6 +20,7 @@
 #define LOG_HEADER_CONFIRMACION_MSJ_SUSCRIPTOR "ACK RECIBIDO EXITOSAMENTE"
 #define LOG_HEADER_WARNING_MSJ_SUSCRIPTOR "ERROR AL RECIBIR ACK"
 #define LOG_HEADER_ASOCIACION "ALGORITMO DE ASOCIACIÓN DE BLOQUES EJECUTADO"
+#define LOG_EJECUCION_DUMP "EJECUCION DEL DUMP DE CACHE"
 
 // Logs obligatorios
 void log_conexion_proceso(t_proceso proceso); // 1. Conexión de un proceso al broker.
@@ -31,6 +32,8 @@ void log_almacenamiento_mensaje_en_memoria(t_particion* particion); // 6. Almace
 void log_eliminacion_particion(t_particion* particion); // 7. Eliminado de una partición de memoria (indicado la posición de inicio de la misma).
 void log_ejecucion_compactacion(); // 8_a. Ejecución de compactación (para particiones dinámicas)
 void log_asociacion_de_bloques(void* inicio_bloque, void* inicio_buddy); //8_b asociación de bloques (para buddy system).
+void log_ejecucion_dump(); //9. Ejecución de Dump de cache (solo informar que se solicitó el mismo).
+
 // Logs adicionales
 void log_event_inicio_consolidacion_colas(t_id_cola id_cola, int cantidad_mensajes);
 void log_event_consolidacion_cola_eliminacion(uint32_t id_mensaje, t_id_cola id_cola);

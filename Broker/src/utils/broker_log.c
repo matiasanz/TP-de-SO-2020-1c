@@ -89,6 +89,12 @@ void log_asociacion_de_bloques(void* inicio_bloque, void* inicio_buddy) {
 	log_info_and_destroy(logger, string);
 }
 
+void log_ejecucion_dump() {
+	//TODO ver codigo duplicado esto puede ser una funcion que reciba el header por parametro
+	char *string = string_new();
+	string_append_separador(&string, LOG_EJECUCION_DUMP);
+	log_info_and_destroy(logger, string);
+}
 //Logs adicionales
 void log_event_inicio_consolidacion_colas(t_id_cola id_cola, int cantidad_mensajes) {
 	log_info(event_logger, "Inicio consolidacion cola %s, cantidad de mensajes: %d \n", get_nombre_cola(id_cola),
@@ -225,6 +231,8 @@ static void string_append_contenido_envio_mensaje(char** string, char* header_st
 //void log_event_inicio_consolidacion_colas(t_id_cola id_cola, int cantidad_mensajes) {
 //}
 //
+//void log_ejecucion_dump() {
+//}
 //void log_event_consolidacion_cola_eliminacion(uint32_t id_mensaje, t_id_cola id_cola) {
 //}
 //

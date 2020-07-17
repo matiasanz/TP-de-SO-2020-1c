@@ -15,9 +15,11 @@ void log_dump_cache(int signum) {
 
 	char* string = get_dump_cache_string();
 	log_info_and_destroy(dump_logger, string);
+	log_ejecucion_dump();
 }
 
 static t_list* obtener_particiones_dump() {
+	//TODO: ver este if
 	return esquema_de_memoria_particiones_dinamicas() ?
 			pd_obtener_particiones_dump() : bs_obtner_particiones_dump();
 }
