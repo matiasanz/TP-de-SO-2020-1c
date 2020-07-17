@@ -9,6 +9,7 @@
  */
 
 #include "gamecard.h"
+static void _mkpath(char* file_path);
 
 int main(void) {
 
@@ -84,7 +85,8 @@ void crearEstructuras(){
 
 		bool esNuevoBitmap=false;
 
-		mkdir(PUNTO_MONTAJE_TALLGRASS,0777);
+		//mkdir(PUNTO_MONTAJE_TALLGRASS,0777);
+		_mkpath(PUNTO_MONTAJE_TALLGRASS);
 
 		//-------Crecion de Directorios
 		string_append(&dir_metadata,PUNTO_MONTAJE_TALLGRASS);
@@ -238,4 +240,21 @@ int cant_elemetos_array(char** array){
 	}
 
 	return i;
+}
+
+static void _mkpath(char* file_path) {
+
+	char** arrayDeCarpetas=string_split(file_path,"/");
+	char* pathTemp=string_new();
+	string_append(&pathTemp,"/");
+
+	int i;
+	for (i=0; arrayDeCarpetas[i] != NULL; i++) {
+		string_append(&pathTemp,arrayDeCarpetas[i]);
+		string_append(&pathTemp,"/");
+		mkdir(pathTemp, 0777);
+
+	}
+	free(pathTemp);
+	string_array_liberar(arrayDeCarpetas);
 }
