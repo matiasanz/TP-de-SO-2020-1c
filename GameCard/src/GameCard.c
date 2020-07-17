@@ -9,6 +9,7 @@
  */
 
 #include "gamecard.h"
+static void _mkpath(char* file_path);
 
 int main(void) {
 
@@ -84,7 +85,8 @@ void crearEstructuras(){
 
 		bool esNuevoBitmap=false;
 
-		mkdir(PUNTO_MONTAJE_TALLGRASS,0777);
+		//mkdir(PUNTO_MONTAJE_TALLGRASS,0777);
+		_mkpath(PUNTO_MONTAJE_TALLGRASS);
 
 		//-------Crecion de Directorios
 		string_append(&dir_metadata,PUNTO_MONTAJE_TALLGRASS);
@@ -109,11 +111,18 @@ void crearEstructuras(){
 		if((f_metadata=fopen(bin_metadata,"r"))==NULL){ //si no existe el archivo metadata
 			log_info(event_logger,"[ERROR FATAL] FILESYSTEM NO ENCONTRADO (se creara uno nuevo)");
 			f_metadata=fopen(bin_metadata,"wb+");
+
+
+			char* DEFAULT_BLOCK_SIZE=config_get_string_value(config,"DEFAULT_BLOCK_SIZE");
+			char* DEFAULT_BLOCKS=config_get_string_value(config,"DEFAULT_BLOCKS");
+			char* DEFAULT_MAGIC_NUMBER=config_get_string_value(config,"DEFAULT_MAGIC_NUMBER");
+
+
 			config_metadata=config_create(bin_metadata);
 
-			config_set_value(config_metadata,"BLOCK_SIZE","64");
-			config_set_value(config_metadata,"BLOCKS","5192");
-			config_set_value(config_metadata,"MAGIC_NUMBER","TALL_GRASS");
+			config_set_value(config_metadata,"BLOCK_SIZE",DEFAULT_BLOCK_SIZE);
+			config_set_value(config_metadata,"BLOCKS",DEFAULT_BLOCKS);
+			config_set_value(config_metadata,"MAGIC_NUMBER",DEFAULT_MAGIC_NUMBER);
 			config_save(config_metadata);
 		}else
 			config_metadata=config_create(bin_metadata);
@@ -231,4 +240,21 @@ int cant_elemetos_array(char** array){
 	}
 
 	return i;
+}
+
+static void _mkpath(char* file_path) {
+
+	char** arrayDeCarpetas=string_split(file_path,"/");
+	char* pathTemp=string_new();
+	string_append(&pathTemp,"/");
+
+	int i;
+	for (i=0; arrayDeCarpetas[i] != NULL; i++) {
+		string_append(&pathTemp,arrayDeCarpetas[i]);
+		string_append(&pathTemp,"/");
+		mkdir(pathTemp, 0777);
+
+	}
+	free(pathTemp);
+	string_array_liberar(arrayDeCarpetas);
 }

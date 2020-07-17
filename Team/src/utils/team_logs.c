@@ -102,7 +102,7 @@ void log_event_inicio_proceso(char*NombreEquipo){
 }
 
 void log_event_fin_del_proceso(){
-	log_info(logger, "\n\n                              Fin del proceso Team\n"
+	log_info(event_logger, "\n\n                              Fin del proceso Team\n"
 						      "****************************************************************************");
 }
 
