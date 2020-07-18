@@ -57,7 +57,7 @@ void inicializar_fifo(){
 	ALGORITMO_PLANIFICACION = FIFO;
 	proximo_a_ejecutar_segun_criterio = proximo_segun_fifo;
 	criterio_de_desalojo = sin_desalojo;
-	actualizar_datos_del_entrenador = no_operation;
+	actualizar_datos_del_entrenador = (void*) no_operation;
 }
 
 //Proximo a planificar
@@ -79,7 +79,7 @@ void inicializar_rr(numero QUANTUM){
 	DATOS_ALGORITMO.QUANTUM=config_get_int_value(config,"QUANTUM");
 	proximo_a_ejecutar_segun_criterio = proximo_segun_rr;
 	criterio_de_desalojo = desalojo_en_RR;
-	actualizar_datos_del_entrenador = no_operation;
+	actualizar_datos_del_entrenador = (void*) no_operation;
 	MOTIVO_DESALOJO = "fin de QUANTUM";
 }
 
@@ -114,28 +114,42 @@ entrenador*proximo_segun_sjf(cola_entrenadores colaReady){
 	return cola_entrenador_con_menor_estimacion(entrenadoresReady);
 }
 
+numero entrenador_estimacion(entrenador*unEntrenador){
+	return DATOS_ALGORITMO.sjf.estimaciones[unEntrenador->id];
+}
+
+numero entrenador_tiempo_restante(entrenador*unEntrenador, numero tiempoEnEjecucion){
+	numero tiempoRestante = entrenador_estimacion(unEntrenador) - tiempoEnEjecucion;
+	return ((int)tiempoRestante) > 0? tiempoRestante: 0;
+}
+
 //Desalojo
 bool desalojo_en_sjf_cd(entrenador*unEntrenador, numero tiempoQueLlevaEjecutando){
 
 	bool menorEstimacionQueTodos(void*otro){
-		return DATOS_ALGORITMO.sjf.estimaciones[((entrenador*)otro)->id] > tiempoQueLlevaEjecutando;
+		return  entrenador_tiempo_restante(unEntrenador, tiempoQueLlevaEjecutando) <= entrenador_estimacion(otro);
 	}
 
 	return !cr_list_all(entrenadoresReady, menorEstimacionQueTodos);
 }
 
-void actualizar_datos_sjf(entrenador*unEntrenador, numero tiempoUltimaEjecucion){
+void actualizar_datos_sjf(entrenador*unEntrenador, numero tiempoUltimaEjecucion, bool desalojo){
 	numero pid = unEntrenador->id;
 	numero alfa = DATOS_ALGORITMO.sjf.alfa;
 	numero* estimacion  = &DATOS_ALGORITMO.sjf.estimaciones[pid];
 	numero estimacionAnterior = *estimacion;
 
-	*estimacion = alfa*tiempoUltimaEjecucion + (1-alfa)*estimacionAnterior;
+	*estimacion = desalojo? entrenador_tiempo_restante(unEntrenador, tiempoUltimaEjecucion)
+			     : alfa*tiempoUltimaEjecucion + (1-alfa)*estimacionAnterior;
 }
 
 //******************************* Funciones Auxiliares ********************************
 numero estimacion_del_entrenador(entrenador*unEntrenador){
 	return DATOS_ALGORITMO.sjf.estimaciones[unEntrenador->id];
+}
+
+void log_event_comparacion_de_estimaciones(entrenador* unEntrenador, entrenador* otro){
+//	printf("\n Comparo %d <= %d\n", estimacion_del_entrenador(unEntrenador), estimacion_del_entrenador(otro));
 }
 
 entrenador*cola_entrenador_con_menor_estimacion(cola_entrenadores colaReady){
@@ -147,7 +161,8 @@ entrenador*cola_entrenador_con_menor_estimacion(cola_entrenadores colaReady){
 			return otro;
 		}
 
-		printf("\n Debo desalojar si %d <= %d\n", estimacion_del_entrenador(unEntrenador), estimacion_del_entrenador(otro));
+		log_event_comparacion_de_estimaciones(unEntrenador, otro);
+
 		return estimacion_del_entrenador(unEntrenador) <= estimacion_del_entrenador(otro)? unEntrenador: otro;
 	}
 

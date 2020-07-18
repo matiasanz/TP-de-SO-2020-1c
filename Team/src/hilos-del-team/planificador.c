@@ -23,9 +23,11 @@ void ejecutar_entrenador(entrenador* unEntrenador){
 	numero tiempo;
 	entrenador_pasar_a(unEntrenador, EXECUTE, "Es su turno de ejecutar");
 
+	bool desalojo=false;
 	for(tiempo=0; !entrenador_termino_de_ejecutar(unEntrenador); tiempo+=RETARDO_CICLO_CPU){
 
 		if(criterio_de_desalojo(unEntrenador, tiempo)){
+			desalojo=true;
 			desalojar_entrenador(unEntrenador);
 			break;
 		}
@@ -37,7 +39,7 @@ void ejecutar_entrenador(entrenador* unEntrenador){
 		log_event_cpu_consumido();
 	}
 
-	actualizar_datos_del_entrenador(unEntrenador, tiempo);
+	actualizar_datos_del_entrenador(unEntrenador, tiempo, desalojo);
 
 }
 

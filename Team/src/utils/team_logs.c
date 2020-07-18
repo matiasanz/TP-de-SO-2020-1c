@@ -119,7 +119,7 @@ void log_event_loggear_situacion_actual(matriz_recursos objetivos, matriz_recurs
 	char*inventarioString = recursos_to_string(inventarios);
 
 	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-	log_info(event_logger, "************** SITUACION ACTUAL ********************\n"
+	log_info(event_logger, "\n************** SITUACION ACTUAL ********************\n"
 		" Objetivos: %s\n"
 		" Inventario:%s", objetivosString, inventarioString);
 	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
@@ -130,9 +130,9 @@ void log_event_loggear_situacion_actual(matriz_recursos objetivos, matriz_recurs
 }
 
 void log_event_pokemon_mapeado(char* especie){
-	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-	log_info(event_logger, "****** Agrego repuesto -> %s\n\n", especie);
-	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+//	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
+//	log_info(event_logger, "****** Agrego repuesto -> %s\n\n", especie);
+//	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 }
 
 void log_event_loggear_pokemon_descartado(char* especie){
@@ -184,8 +184,8 @@ void log_event_mensaje_get_enviado(t_mensaje_get_pokemon* mensaje, t_id id){
 //	char* mensajeGet = mensaje_get_pokemon_to_string(mensaje);
 	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
 	log_info(event_logger, "\n*********** MENSAJE ENVIADO ***********\n"
-				"Tipo: GET\n"
-				"Especie: %s\n"
+				"Tipo: GET \n"
+				"Especie: %s \n"
 				"Id: %u\n\n", mensaje->especie, id);
 	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 
@@ -208,10 +208,10 @@ void log_event_mensaje_catch_enviado(t_mensaje_appeared_catch_pokemon* mensaje, 
 	char*posicion = posicion_to_string(mensaje->pokemon.posicion);
 	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
 	log_info(event_logger, "\n*********** MENSAJE ENVIADO ***********\n"
-			    "Tipo: CATCH"
+			    "Tipo: CATCH\n"
 			    "Especie: %s\n"
 			    "Posicion: %s\n"
-			    "ID: %u", mensaje->pokemon.especie, posicion, id);
+			    "ID: %u\n\n", mensaje->pokemon.especie, posicion, id);
 	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 
 	free(posicion);
@@ -226,7 +226,7 @@ void log_event_captura_desconocida(t_mensaje_caught_pokemon*mensaje){
 
 	t_id idCaptura = mensaje_caught_pokemon_get_id_correlativo(mensaje);
 	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-	log_info(event_logger, "Se recibio el resultado de una captura id %u desconocida\n", idCaptura);
+	log_warning(event_logger, "Se recibio el resultado de una captura id %u desconocida\n", idCaptura);
 	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 
 }
@@ -236,10 +236,9 @@ void log_event_busco_especie_en_mapa(pokemon* unPokemon, pokemon*pokemonCatchead
 }
 
 void log_event_entrenador_por_ejecutar(entrenador*proximoEntrenador){
-	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-	log_info(event_logger, "signal(entrenador %u)\n", proximoEntrenador->id);
-	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
-
+//	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
+//	log_info(event_logger, "signal(entrenador %u)\n", proximoEntrenador->id);
+//	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
 }
 
 void log_event_entrenador_termino_de_ejecutar(entrenador*unEntrenador){
@@ -259,16 +258,16 @@ void log_event_entrenador_creado(entrenador*unEntrenador){
 }
 
 void log_event_situacion_del_entrenador(entrenador* unEntrenador){
-	char* objetivosString = recursos_to_string(unEntrenador->objetivos);
-	char* inventarioString = recursos_to_string(unEntrenador->pokemonesCazados);
-
-	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-	log_info(event_logger, " Objetivos: %s\n Inventarios: %s\n\n", objetivosString, inventarioString);
-	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
-
-
-	free(objetivosString);
-	free(inventarioString);
+//	char* objetivosString = recursos_to_string(unEntrenador->objetivos);
+//	char* inventarioString = recursos_to_string(unEntrenador->pokemonesCazados);
+//
+//	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
+//	log_info(event_logger, " Objetivos: %s\n Inventarios: %s\n\n", objetivosString, inventarioString);
+//	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+//
+//
+//	free(objetivosString);
+//	free(inventarioString);
 }
 
 //***********************************************************************

@@ -32,7 +32,7 @@ char* MOTIVO_DESALOJO;
   //Planificacion
 	entrenador* (*proximo_a_ejecutar_segun_criterio)(cola_entrenadores);
 	bool (*criterio_de_desalojo)(entrenador*, numero);
-	void (*actualizar_datos_del_entrenador)(entrenador*unEntrenador, numero tiempo);
+	void (*actualizar_datos_del_entrenador)(entrenador*unEntrenador, numero tiempo, bool desalojo);
 
   //Proximo
 	entrenador*proximo_segun_fifo(cola_entrenadores);
@@ -45,7 +45,7 @@ char* MOTIVO_DESALOJO;
 	bool desalojo_en_sjf_cd(entrenador*unEntrenador, numero tiempoQueLlevaEjecutando);
 
   //Actualizar datos
-	void actualizar_datos_sjf(entrenador*unEntrenador, numero tiempoUltimaEjecucion);
+	void actualizar_datos_sjf(entrenador*unEntrenador, numero tiempoUltimaEjecucion, bool desalojo);
 
   //Finalizar
 	void finalizar_sjf();
