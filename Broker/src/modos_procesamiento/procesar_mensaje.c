@@ -24,14 +24,16 @@ void procesar_mensaje(int* socket, t_paquete_header pqt_header) {
 	mensaje_cache_set_id_correlativo(msj_cache, msj_header -> id_correlativo);
 	
 	//Debug
-	//enviar_id_mensaje(enviar_id_mensaje_args_crear(msj_header -> id, socket, pqt_header));
+    //enviar_id_mensaje(enviar_id_mensaje_args_crear(msj_header -> id, socket, pqt_header));
 	crear_hilo_y_enviar_id_univoco(msj_header -> id, socket, pqt_header);
 
 	t_cola_container* container = get_cola(pqt_header.id_cola);
 
 	encolar_mensaje(container, msj_cache);
 
+	pthread_mutex_lock(&mutex_acceso_memoria);
 	replicar_mensaje(container, msj_cache, msj_header, msj_deserializado);
+	pthread_mutex_unlock(&mutex_acceso_memoria);
 }
 
 static void replicar_mensaje(t_cola_container* container, t_mensaje_cache* mensaje_cache, t_mensaje_header* msj_header, void* msj_deserializado) {
@@ -42,9 +44,9 @@ static void replicar_mensaje(t_cola_container* container, t_mensaje_cache* mensa
 
 	void replicar(t_suscriptor* suscriptor) {
 		//TODO Verificar si al reenviar deberia actualizar LRU
-		crear_hilo_y_enviar_mensaje_a_suscriptor(mensaje_cache, suscriptor, msj_header, msj_deserializado, cola_get_id(container));
+        //crear_hilo_y_enviar_mensaje_a_suscriptor(mensaje_cache, suscriptor, msj_header, msj_deserializado, cola_get_id(container));
 		//Debug
-		//enviar_mensaje_a_suscriptor(mensaje_cache, suscriptor_duplicar(suscriptor), msj_header, msj_deserializado, cola_get_, id(container));
+        enviar_mensaje_a_suscriptor(mensaje_cache, suscriptor_duplicar(suscriptor), msj_header, msj_deserializado, cola_get_id(container));
 		//mensaje_destruir(msj_deserializado, cola_get_id(container));
 
 	}
