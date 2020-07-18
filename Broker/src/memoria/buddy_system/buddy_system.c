@@ -166,7 +166,7 @@ static void consolidar(t_bloque* bloque) {
 	bloque_liberar(bloque);
 	t_bloque* buddy = bloque_get_buddy(bloque);
 
-	if (!bloque_esta_libre(buddy) || bloque_es_raiz(bloque))
+	if (bloque == NULL || !bloque_esta_libre(buddy) || bloque_es_raiz(bloque))
 		return;
 
 	bloque_y_buddy_liberar_y_destruir(bloque, buddy);

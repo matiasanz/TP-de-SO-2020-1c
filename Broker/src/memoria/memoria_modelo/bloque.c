@@ -190,7 +190,7 @@ void bloque_set_uso(t_bloque* bloque) {
 		//TODO: craer funcion buddy_esta_libre
 		t_bloque* buddy = bloque_get_buddy(bloque);
 
-		if (bloque_esta_libre(buddy)) return;
+		if (buddy != NULL && bloque_esta_libre(buddy)) return;
 	}
 
 	bloque_set_uso(padre);
