@@ -3,7 +3,6 @@
 *.cproject
 *.project
 /.settings/
-**/*.sh
 # Binarios
 GameBoy
 gameboy
