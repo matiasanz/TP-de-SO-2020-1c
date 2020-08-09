@@ -9,7 +9,7 @@
  
 - Broker->GameCard:
 
-./gameboy BROKER NEW_POKEMON [POKEMON] [X] [Y] [ID]
+./gameboy BROKER NEW_POKEMON [POKEMON] [X] [Y] [CANTIDAD]
 ./gameboy BROKER GET_POKEMON [POKEMON] [X] [Y] [ID]
 
 - Broker->Team:

@@ -1,22 +1,10 @@
 #include "mensajesGamecard.h"
 
-bool acceso_fallido(t_list* posiciones){
-	return !posiciones;
-}
-
-t_list* reintentar_localizar_pokemon(char* especie){
-	sleep(TIEMPO_REINTENTO_OPERACION);
-	return localizar_pokemon(especie);
-}
-
 void gamecard_procesar_Get_Pokemon(t_mensaje_get_pokemon* mensajeGet){
 
 	char*especie = mensajeGet->especie;
 
-	char* bin_metadata = pokemon_find_metadata(especie);
-
 	t_list* posicionesEncontradas = localizar_pokemon(especie);
-	free(bin_metadata);
 
 	while(acceso_fallido(posicionesEncontradas)){
 		log_enunciado_intento_interrumpido_de_get(mensajeGet);
@@ -34,6 +22,14 @@ void gamecard_procesar_Get_Pokemon(t_mensaje_get_pokemon* mensajeGet){
 
 //************************************************************************************
 
+bool acceso_fallido(t_list* posiciones){
+	return !posiciones;
+}
+
+t_list* reintentar_localizar_pokemon(char* especie){
+	sleep(TIEMPO_REINTENTO_OPERACION);
+	return localizar_pokemon(especie);
+}
 
 void simular_acceso_a_disco(){
 	sleep(TIEMPO_RETARDO_OPERACION);
