@@ -1,8 +1,12 @@
-# include "gamecard.h"
-# include "mensajesGamecard.h"
+#include "mensajesGamecard.h"
 
 bool acceso_fallido(t_list* posiciones){
 	return !posiciones;
+}
+
+t_list* reintentar_localizar_pokemon(char* especie){
+	sleep(TIEMPO_REINTENTO_OPERACION);
+	return localizar_pokemon(especie);
 }
 
 void gamecard_procesar_Get_Pokemon(t_mensaje_get_pokemon* mensajeGet){
@@ -11,12 +15,12 @@ void gamecard_procesar_Get_Pokemon(t_mensaje_get_pokemon* mensajeGet){
 
 	char* bin_metadata = pokemon_find_metadata(especie);
 
-	t_list* posicionesEncontradas = localizar_pokemon(mensajeGet, bin_metadata);
+	t_list* posicionesEncontradas = localizar_pokemon(especie);
 	free(bin_metadata);
 
 	while(acceso_fallido(posicionesEncontradas)){
-		sleep(TIEMPO_REINTENTO_OPERACION);
-		posicionesEncontradas = localizar_pokemon(mensajeGet, bin_metadata);
+		log_enunciado_intento_interrumpido_de_get(mensajeGet);
+		posicionesEncontradas = reintentar_localizar_pokemon(especie);
 	}
 
 	log_enunciado_posiciones_encontradas(especie, posicionesEncontradas);
@@ -24,10 +28,8 @@ void gamecard_procesar_Get_Pokemon(t_mensaje_get_pokemon* mensajeGet){
 	gamecard_enviar_localized(mensajeGet, posicionesEncontradas); //creacion del paquete localized_pokemon y envio a Broker
 
 	mensaje_get_pokemon_destruir(mensajeGet);
+
 	list_destroy(posicionesEncontradas);
-		//si uso list_destroy_and_destroy_elements(listaDePosiciones, (void*) posicion_destruir)
-		//me dice en valgrind, free invalidos, puede que las posiciones
-		//hayan sido libereadas en el mensaje_localized_pokemon_destruir() <-- Confirmo.
 }
 
 //************************************************************************************
@@ -90,10 +92,10 @@ t_config* pokemon_get_metadata(char* especie){
 
 	char* bin_metadata=pokemon_find_metadata(especie);
 
-	pthread_mutex_t* mutexPokemon = pokemon_get_mutex(especie);
-	pthread_mutex_lock(mutexPokemon);
+//	pthread_mutex_t* mutexPokemon = pokemon_get_mutex(especie);
+//	pthread_mutex_lock(mutexPokemon);
 	t_config* config_metadata_pokemon = config_create(bin_metadata);
-	pthread_mutex_unlock(mutexPokemon);
+//	pthread_mutex_unlock(mutexPokemon);
 
 	free(bin_metadata);
 
@@ -101,9 +103,9 @@ t_config* pokemon_get_metadata(char* especie){
 }
 
 //Retorna las posiciones del pokemon o NULL si no se concreto la operacion
-t_list* localizar_pokemon(t_mensaje_get_pokemon* mensajeGet, char*bin_metadata){
+t_list* localizar_pokemon(char* especie){
 
-	t_config* config_metadata_pokemon = pokemon_get_metadata(mensajeGet->especie);
+	t_config* config_metadata_pokemon = pokemon_get_metadata(especie);
 
 	//Valido si no existe el archivo metadata
 	if(!archivo_existe(config_metadata_pokemon)){
@@ -115,7 +117,7 @@ t_list* localizar_pokemon(t_mensaje_get_pokemon* mensajeGet, char*bin_metadata){
 
 //Si existe
 
-	pthread_mutex_t* mutexMetadataPokemon = pokemon_get_mutex(mensajeGet->especie);
+	pthread_mutex_t* mutexMetadataPokemon = pokemon_get_mutex(especie);
 
 	pthread_mutex_lock(mutexMetadataPokemon);
 
@@ -125,16 +127,12 @@ t_list* localizar_pokemon(t_mensaje_get_pokemon* mensajeGet, char*bin_metadata){
 	//termino antes y hay menos bloques ocupados por el pokemon,
 	//tendriamos informacion desactualizada en el config_metadata_pokemon
 	config_destroy(config_metadata_pokemon);
-	config_metadata_pokemon = config_create(bin_metadata);
+	config_metadata_pokemon = pokemon_get_metadata(especie);
 
 	//------Ver si el archivo esta abierto------------
 	if(archivo_abierto(config_metadata_pokemon)){
 		pthread_mutex_unlock(mutexMetadataPokemon);
 		config_destroy(config_metadata_pokemon);
-
-//Log enunciado
-		log_enunciado_intento_interrumpido_de_get(mensajeGet);
-
 
 		//y finalizo este hilo
 		return NULL;

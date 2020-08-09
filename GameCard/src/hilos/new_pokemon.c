@@ -1,6 +1,4 @@
-#include "gamecard.h"
 #include "mensajesGamecard.h"
-#include <crenito-commons/mensajes/mensaje_new_pokemon.h>
 
 char*posicion_dar_formato(t_posicion posicion){
 	return string_from_format("%u-%u", posicion.pos_x, posicion.pos_y);

@@ -17,13 +17,13 @@
 #include <crenito-commons/mensajes/mensaje_caught_pokemon.h>
 #include <commons/collections/list.h>
 #include "../src/crenito-commons/conexiones/conexiones.h"
-#include "../../GameCard/src/hilos/hilo_catch_pokemon.h"
-#include "../../GameCard/src/hilos/hilo_get_pokemon.h"
-#include "../../GameCard/src/hilos/hilo_new_pokemon.h"
-#include "../../GameCard/src/hilos/hilo_gameboy.h"
+#include "../../GameCard/src/suscripciones/hilo_get_pokemon.h"
+#include "../../GameCard/src/suscripciones/hilo_new_pokemon.h"
+#include "../../GameCard/src/suscripciones/hilo_gameboy.h"
 #include "../src/crenito-commons/conexiones/paquete.h"
 #include <cspecs/cspec.h>
 
+#include "../../GameCard/src/suscripciones/hilo_catch_pokemon.h"
 #include "../../Team/src/suscripciones/hilo_appeared_pokemon.h"
 #include "../../Team/src/suscripciones/hilo_caught_pokemon.h"
 #include "../../Team/src/suscripciones/hilo_gameboy.h"

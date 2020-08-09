@@ -1,4 +1,3 @@
-#include "gamecard.h"
 #include "mensajesGamecard.h"
 
 typedef enum {FAIL, OK, INTENTO_INTERRUMPIDO} t_resultado_captura;
@@ -34,7 +33,10 @@ void gamecard_Catch_Pokemon(t_mensaje_appeared_catch_pokemon* mensajeCatch){
 //Revisa cada bloque del pokemon, si esta en la posicion x-y=cantidad, decrementa la cantidad y retorna OK
 t_resultado_captura pokemon_intento_de_captura(t_pokemon pokemon){
 
+	pthread_mutex_t* mutexPokemon = pokemon_get_mutex(pokemon.especie);
+	pthread_mutex_lock(mutexPokemon);
 	t_config* config_metadata_pokemon = pokemon_get_metadata(pokemon.especie);
+	pthread_mutex_unlock(mutexPokemon);
 
 	if(!archivo_existe(config_metadata_pokemon)){ //si no existe el archivo metadata
 
@@ -48,7 +50,6 @@ t_resultado_captura pokemon_intento_de_captura(t_pokemon pokemon){
 
 	log_event_pokemon_existe(pokemon);
 
-	pthread_mutex_t* mutexPokemon = pokemon_get_mutex(pokemon.especie);
 	pthread_mutex_lock(mutexPokemon);
 
 	//agrego este destroy y create del metadata del pokemon,

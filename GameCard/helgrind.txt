@@ -1,1 +1,0 @@
-valgrind -v --tool=helgrind --sim-hints=no-nptl-pthread-stackcache ./GameCard

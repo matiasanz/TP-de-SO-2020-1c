@@ -9,10 +9,11 @@
 #define SRC_UTILS_MENSAJES_UTILS_H_
 
 #include <crenito-commons/conexiones/conexiones.h>
-#include "../hilos/hilo_catch_pokemon.h"
-#include "../hilos/hilo_gameboy.h"
-#include "../hilos/hilo_get_pokemon.h"
-#include "../hilos/hilo_new_pokemon.h"
+
+#include "../suscripciones/hilo_catch_pokemon.h"
+#include "../suscripciones/hilo_gameboy.h"
+#include "../suscripciones/hilo_get_pokemon.h"
+#include "../suscripciones/hilo_new_pokemon.h"
 
 typedef t_mensaje_appeared_catch_pokemon t_mensaje_catch_pokemon;
 typedef t_mensaje_appeared_catch_pokemon t_mensaje_appeared_pokemon;

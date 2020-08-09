@@ -1,14 +1,14 @@
 # ifndef _MENSAJES_GAMECARD_
 # define _MENSAJES_GAMECARD_ //nombre provisorio
 
-#include "gamecard.h"
+#include <crenito-commons/mensajes/mensaje_new_pokemon.h>
+#include "../gamecard.h"
 
 //GET
-t_list*localizar_pokemon(t_mensaje_get_pokemon*, char* PATH_METADATA); //retorna las posiciones del pokemoon
 bool archivo_existe(t_config* metadata);
 bool archivo_abierto(t_config* config_metadata_pokemon);
 t_list* leer_posiciones_de_disco(t_config* config_metadata_pokemon);
-t_list* localizar_pokemon(t_mensaje_get_pokemon* mensajeGet, char*bin_metadata);
+t_list*localizar_pokemon(char* especie); //retorna las posiciones del pokemoon
 
 //NEW
 void actualizar_datos(char* cadenaABuscar, char**bloquesDelPokemon, t_config*config_metadata_pokemon, t_mensaje_new_pokemon* mensajeNew);
