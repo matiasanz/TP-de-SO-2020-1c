@@ -15,6 +15,18 @@ typedef struct{
 	double alfa;
 } datos_sjf;
 
+////TAD HRRN
+//typedef struct{
+//	numero* espera;
+//	datos_sjf estimador;
+//} datos_hrrn;
+//
+////TAD VRR
+//typedef struct{
+//	numero* QUANTUM;
+//	cola_entrenadores entrenadoresReadyPlus;
+//} datos_vrr;
+
 //TAD DATOS ALGORITMO
 typedef union{
 	numero QUANTUM;
