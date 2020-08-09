@@ -1,5 +1,5 @@
-#include "gameboy.h"
 #include "validaciones_gameboy.h"
+#include "../gameboy.h"
 
 void validar_proceso(char* proceso) {
 

@@ -8,8 +8,8 @@
 #ifndef SRC_MODO_SUSCRIPTOR_H_
 #define SRC_MODO_SUSCRIPTOR_H_
 
-#include "validaciones_gameboy.h"
 #include <crenito-commons/conexiones/conexiones.h>
+#include "../utils/validaciones_gameboy.h"
 
 pthread_t hilo_suscriptor;
 

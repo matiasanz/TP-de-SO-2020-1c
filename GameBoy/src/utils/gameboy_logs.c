@@ -1,4 +1,4 @@
-#include "gameboy.h"
+#include "../gameboy.h"
 
 // Si se quieren comentar o agregar nuevos logs, canalizar en este archivo, no modificar en el codigo.
 // Aplica para puts y printf
