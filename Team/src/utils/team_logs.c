@@ -270,6 +270,16 @@ void log_event_situacion_del_entrenador(entrenador* unEntrenador){
 //	free(inventarioString);
 }
 
+void log_event_datos_sjf(double alfa, numero estimacionInicial){
+	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
+	log_info(event_logger, "\n\nLei alfa %f y estimacion inicial %d\n\n", alfa, estimacionInicial);
+	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+}
+
+void log_event_comparacion_de_estimaciones(entrenador* unEntrenador, entrenador* otro){
+//	printf("\n Comparo %d <= %d\n", entrenador_estimacion(unEntrenador), estimacion_del_entrenador(otro));
+}
+
 //***********************************************************************
 
 void validar_pokemon(pokemon*pokemonCatcheado, t_id pid){

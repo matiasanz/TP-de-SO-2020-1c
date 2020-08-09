@@ -43,8 +43,6 @@ void Catch(entrenador*unEntrenador, pokemon* pokemonCatcheado) {
 	pthread_t hilo_catch_sender;
 	pthread_create(&hilo_catch_sender, NULL, (void*) team_enviar_mensaje_catch, captura);
 	pthread_detach(hilo_catch_sender);
-
-	sem_post(&FinDeCiclo_CPU);
 }
 
 //****************************************************************************************************

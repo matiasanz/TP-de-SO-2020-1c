@@ -24,7 +24,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 
 				Catch(unEntrenador, unPokemon);
 
-				//Al hacer catch, el entrenador consume 1 ciclo de CPU y queda dormido hasta que llegue el resultado
+				sem_post(&FinDeCiclo_CPU);
 
 				break;
 			}
@@ -114,7 +114,7 @@ void finalizar_hilos_entrenadores(){
 /*************************************** Funciones Auxiliares ************************************************/
 
 bool cambio_de_contexto(t_estado inicial, t_estado final){
-	return final==EXECUTE;
+	return inicial==EXECUTE || final==EXECUTE;
 }
 
 //Cambia de estado al entrenador y lo loggea

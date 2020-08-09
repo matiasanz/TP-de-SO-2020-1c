@@ -1,45 +1,52 @@
 #include "../../utils/listas/cr_list.h"
 #include "../../team.h"
+#include "../../utils/team_logs.h"
+
+t_algoritmo_planificacion config_get_algoritmo(t_config* archivoConfig){
+	char*algoritmoLeido = config_get_string_value(config,"ALGORITMO_PLANIFICACION");
+	return string_equals_ignore_case(algoritmoLeido, "FIFO")? FIFO
+		 : string_equals_ignore_case(algoritmoLeido, "RR")? ROUND_ROBBIN
+	     : string_equals_ignore_case(algoritmoLeido, "SJF_SD")? SJF_SD
+	     : string_equals_ignore_case(algoritmoLeido, "SJF_CD")? SJF_CD
+	     : -1;
+}
 
 //Inicializar
 void cargar_algoritmo_planificacion(){
 
 	PROCESOS_SIN_FINALIZAR = cantidadDeEntrenadores;
-
 	RETARDO_CICLO_CPU = config_get_int_value(config, "RETARDO_CICLO_CPU");
-	char*algoritmoLeido = config_get_string_value(config,"ALGORITMO_PLANIFICACION");
+	ALGORITMO_PLANIFICACION = config_get_algoritmo(config);
 
-	if(string_equals_ignore_case(algoritmoLeido, "FIFO")){
-		inicializar_fifo();
-	}
+	switch(ALGORITMO_PLANIFICACION){
 
-	else if(string_equals_ignore_case(algoritmoLeido, "RR")){
-		numero QUANTUM = config_get_int_value(config, "QUANTUM");
-
-		inicializar_rr(QUANTUM);
-	}
-
-	else{
-		double ALFA = config_get_double_value(config, "ALFA");
-
-		numero ESTIMACION_INICIAL = config_get_int_value(config, "ESTIMACION_INICIAL");
-
-		pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
-		log_info(event_logger, "Lei estimacion inicial %d", ESTIMACION_INICIAL);
-		pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
-
-		inicializar_sjf(ALFA, ESTIMACION_INICIAL, cantidadDeEntrenadores); //Ver cuando tiene valor
-
-		actualizar_datos_del_entrenador = actualizar_datos_sjf;
-
-		if(string_equals_ignore_case(algoritmoLeido, "SJF_CD")){
-			criterio_de_desalojo = desalojo_en_sjf_cd;
-		}
-		else if(string_equals_ignore_case(algoritmoLeido, "SJF_SD")){
-			criterio_de_desalojo = sin_desalojo;
+		case FIFO: {
+			inicializar_fifo();
+			break;
 		}
 
-		else{
+		case ROUND_ROBBIN : {
+			numero quantum = config_get_int_value(config, "QUANTUM");
+			inicializar_rr(quantum);
+			break;
+		}
+
+		case SJF_SD:
+		case SJF_CD: {
+
+			double alfa = config_get_double_value(config, "ALFA");
+			numero estimacionInicial = config_get_int_value(config, "ESTIMACION_INICIAL");
+
+			log_event_datos_sjf(alfa, estimacionInicial);
+
+			inicializar_sjf(alfa, estimacionInicial, cantidadDeEntrenadores); //Ver cuando tiene valor
+
+			criterio_de_desalojo = (ALGORITMO_PLANIFICACION == SJF_CD)? desalojo_en_sjf_cd: sin_desalojo;
+
+			break;
+		}
+
+		default: {
 			pthread_mutex_lock(&Mutex_AndoLoggeando);
 			log_error(logger, "Se ha leido un algoritmo de planificacion desconocido");
 			pthread_mutex_unlock(&Mutex_AndoLoggeando);
@@ -77,10 +84,11 @@ bool sin_desalojo(){ //aplica tambien a sjf s/d
 void inicializar_rr(numero QUANTUM){
 	ALGORITMO_PLANIFICACION = ROUND_ROBBIN;
 	DATOS_ALGORITMO.QUANTUM=config_get_int_value(config,"QUANTUM");
-	proximo_a_ejecutar_segun_criterio = proximo_segun_rr;
-	criterio_de_desalojo = desalojo_en_RR;
-	actualizar_datos_del_entrenador = (void*) no_operation;
 	MOTIVO_DESALOJO = "fin de QUANTUM";
+
+	proximo_a_ejecutar_segun_criterio = proximo_segun_rr;
+	criterio_de_desalojo = desalojo_en_rr;
+	actualizar_datos_del_entrenador = (void*) no_operation;
 }
 
 entrenador*proximo_segun_rr(cola_entrenadores colaReady){
@@ -88,8 +96,8 @@ entrenador*proximo_segun_rr(cola_entrenadores colaReady){
 }
 
 //Desalojo
-bool desalojo_en_RR(entrenador*unEntrenador, numero tiempo){
-	return (tiempo/RETARDO_CICLO_CPU) > DATOS_ALGORITMO.QUANTUM && !cr_list_is_empty(entrenadoresReady);
+bool desalojo_en_rr(entrenador*unEntrenador, numero tiempo){
+	return (tiempo/RETARDO_CICLO_CPU) > DATOS_ALGORITMO.QUANTUM;
 }
 
 //************************************************************************************
@@ -99,28 +107,23 @@ bool desalojo_en_RR(entrenador*unEntrenador, numero tiempo){
 void inicializar_sjf(double alfa, numero estimacionInicial, numero cantidadDeProcesos){
 	DATOS_ALGORITMO.sjf.alfa = alfa;
 	DATOS_ALGORITMO.sjf.estimaciones = malloc(sizeof(numero)*cantidadDeProcesos);
+	DATOS_ALGORITMO.sjf.tiempoRafagaActual = malloc(sizeof(numero)*cantidadDeProcesos);
 
 	int i=0;
 	for(i=0; i<cantidadDeProcesos; i++){
 		DATOS_ALGORITMO.sjf.estimaciones[i] = estimacionInicial;
+		DATOS_ALGORITMO.sjf.tiempoRafagaActual[i] = 0;
 	}
 
 	proximo_a_ejecutar_segun_criterio = proximo_segun_sjf;
+	actualizar_datos_del_entrenador = actualizar_datos_sjf;
+
 	MOTIVO_DESALOJO = "estimacion mayor a la de otro entrenador";
 }
 
 //Proximo a planificar
 entrenador*proximo_segun_sjf(cola_entrenadores colaReady){
 	return cola_entrenador_con_menor_estimacion(entrenadoresReady);
-}
-
-numero entrenador_estimacion(entrenador*unEntrenador){
-	return DATOS_ALGORITMO.sjf.estimaciones[unEntrenador->id];
-}
-
-numero entrenador_tiempo_restante(entrenador*unEntrenador, numero tiempoEnEjecucion){
-	numero tiempoRestante = entrenador_estimacion(unEntrenador) - tiempoEnEjecucion;
-	return ((int)tiempoRestante) > 0? tiempoRestante: 0;
 }
 
 //Desalojo
@@ -133,23 +136,45 @@ bool desalojo_en_sjf_cd(entrenador*unEntrenador, numero tiempoQueLlevaEjecutando
 	return !cr_list_all(entrenadoresReady, menorEstimacionQueTodos);
 }
 
-void actualizar_datos_sjf(entrenador*unEntrenador, numero tiempoUltimaEjecucion, bool desalojo){
+void actualizar_datos_sjf(entrenador*unEntrenador, numero tiempoUltimaEjecucion, bool finDeRafaga){
 	numero pid = unEntrenador->id;
-	numero alfa = DATOS_ALGORITMO.sjf.alfa;
 	numero* estimacion  = &DATOS_ALGORITMO.sjf.estimaciones[pid];
-	numero estimacionAnterior = *estimacion;
+	numero* tiempo = &DATOS_ALGORITMO.sjf.tiempoRafagaActual[pid];
 
-	*estimacion = desalojo? entrenador_tiempo_restante(unEntrenador, tiempoUltimaEjecucion)
-			     : alfa*tiempoUltimaEjecucion + (1-alfa)*estimacionAnterior;
+	*tiempo += tiempoUltimaEjecucion;
+
+	if(finDeRafaga){
+		numero estimacionAnterior = *estimacion;
+		numero alfa = DATOS_ALGORITMO.sjf.alfa;
+
+		*estimacion = alfa*(*tiempo) + (1-alfa)*estimacionAnterior;
+		*tiempo = 0;
+	}
+
+	else{
+		*estimacion = entrenador_tiempo_restante(unEntrenador, tiempoUltimaEjecucion);
+	}
 }
 
 //******************************* Funciones Auxiliares ********************************
-numero estimacion_del_entrenador(entrenador*unEntrenador){
+numero entrenador_tiempo_rafaga_estimado(entrenador*unEntrenador){
 	return DATOS_ALGORITMO.sjf.estimaciones[unEntrenador->id];
 }
 
-void log_event_comparacion_de_estimaciones(entrenador* unEntrenador, entrenador* otro){
-//	printf("\n Comparo %d <= %d\n", estimacion_del_entrenador(unEntrenador), estimacion_del_entrenador(otro));
+numero entrenador_tiempo_rafaga_cumplido(entrenador*unEntrenador){
+	return DATOS_ALGORITMO.sjf.tiempoRafagaActual[unEntrenador->id];
+}
+
+numero entrenador_estimacion(entrenador*unEntrenador){
+	numero estimadoRafaga     = entrenador_tiempo_rafaga_estimado(unEntrenador);
+	numero tiempoRafagaActual = entrenador_tiempo_rafaga_cumplido(unEntrenador);
+
+	return estimadoRafaga - tiempoRafagaActual;
+}
+
+numero entrenador_tiempo_restante(entrenador*unEntrenador, numero tiempoEnEjecucion){
+	numero tiempoRestante = entrenador_estimacion(unEntrenador) - tiempoEnEjecucion;
+	return ((int)tiempoRestante) > 0? tiempoRestante: 0;
 }
 
 entrenador*cola_entrenador_con_menor_estimacion(cola_entrenadores colaReady){
@@ -163,7 +188,7 @@ entrenador*cola_entrenador_con_menor_estimacion(cola_entrenadores colaReady){
 
 		log_event_comparacion_de_estimaciones(unEntrenador, otro);
 
-		return estimacion_del_entrenador(unEntrenador) <= estimacion_del_entrenador(otro)? unEntrenador: otro;
+		return entrenador_estimacion(unEntrenador) <= entrenador_estimacion(otro)? unEntrenador: otro;
 	}
 
 	pthread_mutex_lock(&colaReady->mutex);

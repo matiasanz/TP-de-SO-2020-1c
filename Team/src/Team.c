@@ -80,9 +80,9 @@ int team_exit(){
 	log_event_fin_del_proceso();
 	finalizar_logs();
 	finalizar_estadisticas();
-	listas_destroy();
-	finalizar_hilos();
-	finalizar_semaforos();
+//	listas_destroy();
+//	finalizar_hilos();
+//	finalizar_semaforos();
 
 	return EXIT_SUCCESS;
 }

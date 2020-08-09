@@ -79,6 +79,10 @@
 	void log_event_entrenador_por_ejecutar(entrenador*proximoEntrenador);
 	void log_event_entrenador_termino_de_ejecutar(entrenador*unEntrenador);
 
+	//ALGORITMOS
+	void log_event_datos_sjf(double alfa, numero estimacionInicial);
+	void log_event_comparacion_de_estimaciones(entrenador* unEntrenador, entrenador* otro);
+
 	//Validaciones
 	void validar_pokemon(pokemon*, t_id idEntrenador);
 	void validar_entrenador(entrenador*unEntrenador);

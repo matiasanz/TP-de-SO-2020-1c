@@ -39,7 +39,7 @@ void ejecutar_entrenador(entrenador* unEntrenador){
 		log_event_cpu_consumido();
 	}
 
-	actualizar_datos_del_entrenador(unEntrenador, tiempo, desalojo);
+	actualizar_datos_del_entrenador(unEntrenador, tiempo, !desalojo);
 
 }
 

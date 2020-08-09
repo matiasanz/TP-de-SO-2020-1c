@@ -10,7 +10,7 @@ typedef enum {FIFO, ROUND_ROBBIN, SJF_CD, SJF_SD} t_algoritmo_planificacion;
 
 //TAD SJF
 typedef struct{
-//	numero* tiempo;
+	numero* tiempoRafagaActual;
 	numero* estimaciones;
 	double alfa;
 } datos_sjf;
@@ -41,7 +41,7 @@ char* MOTIVO_DESALOJO;
 
   //Desalojo
 	bool sin_desalojo();
-	bool desalojo_en_RR(entrenador*, numero tiempo);
+	bool desalojo_en_rr(entrenador*, numero tiempo);
 	bool desalojo_en_sjf_cd(entrenador*unEntrenador, numero tiempoQueLlevaEjecutando);
 
   //Actualizar datos
@@ -51,15 +51,21 @@ char* MOTIVO_DESALOJO;
 	void finalizar_sjf();
 
 //**************************************** Manejo de CPU ****************************************
-	//Consumir CPU
+  //Consumir CPU
 	void consumir_ciclo_cpu();
 	void entrenador_consumir_N_cpu(entrenador*, numero);
 	void entrenador_esperar_y_consumir_cpu(entrenador*);
 
-//Auxiliares
+//**************************************** Auxiliares *******************************************
 	void no_operation();
-	numero estimacion_del_entrenador(entrenador*);
-	entrenador*cola_entrenador_con_menor_estimacion(cola_entrenadores);
-	bool entrenador_termino_de_ejecutar(entrenador*unEntrenador);
 
-	#endif
+
+	numero entrenador_rafaga_estimada(entrenador*);
+	entrenador*cola_entrenador_con_menor_estimacion(cola_entrenadores);
+	bool entrenador_termino_de_ejecutar(entrenador*);
+	numero entrenador_tiempo_rafaga_estimado(entrenador*);
+	numero entrenador_tiempo_rafaga_cumplido(entrenador*);
+	numero entrenador_estimacion(entrenador*);
+	numero entrenador_tiempo_restante(entrenador*, numero tiempoEnEjecucion);
+
+#endif
