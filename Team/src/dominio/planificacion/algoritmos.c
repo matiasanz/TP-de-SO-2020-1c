@@ -118,7 +118,7 @@ bool desalojo_en_rr(entrenador*unEntrenador, numero tiempo){
 
 //Inicializar
 void inicializar_sjf(double alfa, numero estimacionInicial, numero cantidadDeProcesos){
-	DATOS_ALGORITMO.sjf = estimador_create(alfa, estimacionInicial, cantidadDeProcesos);
+	DATOS_ALGORITMO.estimador = estimador_create(alfa, estimacionInicial, cantidadDeProcesos);
 
 	proximo_a_ejecutar_segun_criterio = proximo_segun_sjf;
 	actualizar_datos_del_entrenador = actualizar_datos_sjf;
@@ -135,27 +135,26 @@ entrenador*proximo_segun_sjf(cola_entrenadores colaReady){
 bool desalojo_en_sjf_cd(entrenador*unEntrenador, numero tiempoQueLlevaEjecutando){
 
 	bool menorEstimacionQueElEntrenador(void*otro){
-		t_estimador estimador = DATOS_ALGORITMO.sjf;
-		return  entrenador_tiempo_restante(unEntrenador, tiempoQueLlevaEjecutando, estimador) > entrenador_estimacion(otro, estimador);
+		return  entrenador_tiempo_restante(unEntrenador, tiempoQueLlevaEjecutando) > entrenador_estimacion(otro);
 	}
 
 	return cr_list_any(entrenadoresReady, menorEstimacionQueElEntrenador);
 }
 
 void actualizar_datos_sjf(entrenador*unEntrenador, numero tiempoUltimaEjecucion, bool finDeRafaga){
-	actualizar_estimador(&DATOS_ALGORITMO.sjf, unEntrenador, tiempoUltimaEjecucion, finDeRafaga);
+	actualizar_estimador(DATOS_ALGORITMO.estimador, unEntrenador, tiempoUltimaEjecucion, finDeRafaga);
 }
 
 //***********************************************************************************
 //HRRN
 void inicializar_hrrn(double alfa, numero cantidadDeProcesos, numero estimacionInicial){
 
-	DATOS_ALGORITMO.hrrn.estimador = estimador_create(alfa, cantidadDeProcesos, estimacionInicial);
-	DATOS_ALGORITMO.hrrn.espera = malloc(sizeof(numero)*cantidadDeProcesos);
+	DATOS_ALGORITMO.estimador = estimador_create(alfa, cantidadDeProcesos, estimacionInicial);
+	DATOS_ALGORITMO.espera = malloc(sizeof(numero)*cantidadDeProcesos);
 
 	int i;
 	for(i=0; i<cantidadDeEntrenadores; i++){
-		DATOS_ALGORITMO.hrrn.espera[i]=0;
+		DATOS_ALGORITMO.espera[i]=0;
 	}
 
 	proximo_a_ejecutar_segun_criterio = proximo_segun_hrrn;
@@ -168,10 +167,10 @@ entrenador* proximo_segun_hrrn(cola_entrenadores colaReady){
 }
 
 void actualizar_datos_hrrn(entrenador*unEntrenador, numero tiempoUltimaEjecucion, bool finDeRafaga){
-	actualizar_estimador(&DATOS_ALGORITMO.hrrn.estimador, unEntrenador, tiempoUltimaEjecucion, finDeRafaga);
+	actualizar_datos_sjf(unEntrenador, tiempoUltimaEjecucion, finDeRafaga);
 
 	void incrementar_espera(void* entrenadorEsperando){
-		numero* espera = entrenador_get_espera(entrenadorEsperando, DATOS_ALGORITMO.hrrn);
+		numero* espera = entrenador_get_espera(entrenadorEsperando);
 		(*espera)+=tiempoUltimaEjecucion;
 	}
 
@@ -181,17 +180,13 @@ void actualizar_datos_hrrn(entrenador*unEntrenador, numero tiempoUltimaEjecucion
 //************************************************************************************
 //VRR
 void inicializar_vrr(numero quantum, numero cantidadDeProcesos){
-	datos_vrr vrr = (datos_vrr){
-		quantum,
-		malloc(sizeof(numero)*cantidadDeProcesos)
-	};
+	DATOS_ALGORITMO.QUANTUM = quantum;
+	DATOS_ALGORITMO.quantumConsumido = malloc(sizeof(numero)*cantidadDeProcesos);
 
 	int i;
 	for(i=0; i<cantidadDeProcesos; i++){
-		vrr.quantumConsumido[i]=0;
+		DATOS_ALGORITMO.quantumConsumido[i]=0;
 	}
-
-	DATOS_ALGORITMO.vrr = vrr;
 
 	proximo_a_ejecutar_segun_criterio = proximo_segun_vrr;
 	criterio_de_desalojo = desalojo_en_vrr;
@@ -211,13 +206,13 @@ entrenador* proximo_segun_vrr(cola_entrenadores colaReady){
 
 bool desalojo_en_vrr(entrenador*unEntrenador, numero tiempoQueLlevaEjecutando){
 	numero quantumConsumido = entrenador_virtual_quantum_por_ejecutar(unEntrenador, tiempoQueLlevaEjecutando);
-	return DATOS_ALGORITMO.vrr.QUANTUM < quantumConsumido;
+	return DATOS_ALGORITMO.QUANTUM < quantumConsumido;
 }
 
 void actualizar_datos_vrr(entrenador*unEntrenador, numero tiempoUltimaEjecucion, bool finDeRafaga){
 
-	numero maxQuantum = DATOS_ALGORITMO.vrr.QUANTUM;
-	numero* quantumAcumulado = &DATOS_ALGORITMO.vrr.quantumConsumido[unEntrenador->id];
+	numero maxQuantum = DATOS_ALGORITMO.QUANTUM;
+	numero* quantumAcumulado = &DATOS_ALGORITMO.quantumConsumido[unEntrenador->id];
 		  * quantumAcumulado = entrenador_virtual_quantum_por_ejecutar(unEntrenador, tiempoUltimaEjecucion);
 
 	if(*quantumAcumulado == maxQuantum){
@@ -244,67 +239,66 @@ t_estimador estimador_create(double alfa, numero cantidadDeProcesos, numero esti
 	return estimador;
 }
 
-numero entrenador_tiempo_rafaga_estimado(entrenador*unEntrenador, t_estimador sjf){
-	return sjf.estimaciones[unEntrenador->id];
+numero entrenador_tiempo_rafaga_estimado(entrenador*unEntrenador, t_estimador estimador){
+	return estimador.estimaciones[unEntrenador->id];
 }
 
-numero entrenador_tiempo_rafaga_cumplido(entrenador*unEntrenador, t_estimador sjf){
-	return sjf.tiempoRafagaActual[unEntrenador->id];
+numero entrenador_tiempo_rafaga_cumplido(entrenador*unEntrenador, t_estimador estimador){
+	return estimador.tiempoRafagaActual[unEntrenador->id];
 }
 
-numero entrenador_estimacion(entrenador*unEntrenador, t_estimador sjf){
-	numero estimadoRafaga     = entrenador_tiempo_rafaga_estimado(unEntrenador, sjf);
-	numero tiempoRafagaActual = entrenador_tiempo_rafaga_cumplido(unEntrenador, sjf);
+numero entrenador_estimacion(entrenador*unEntrenador){
+	numero estimadoRafaga     = entrenador_tiempo_rafaga_estimado(unEntrenador, DATOS_ALGORITMO.estimador);
+	numero tiempoRafagaActual = entrenador_tiempo_rafaga_cumplido(unEntrenador, DATOS_ALGORITMO.estimador);
 
 	return estimadoRafaga - tiempoRafagaActual;
 }
 
-numero entrenador_tiempo_restante(entrenador*unEntrenador, numero tiempoEnEjecucion, t_estimador sjf){
-	numero tiempoRestante = entrenador_estimacion(unEntrenador, sjf) - tiempoEnEjecucion;
+numero entrenador_tiempo_restante(entrenador*unEntrenador, numero tiempoEnEjecucion){
+	numero tiempoRestante = entrenador_estimacion(unEntrenador) - tiempoEnEjecucion;
 	return ((int)tiempoRestante) > 0? tiempoRestante: 0;
 }
 
-void actualizar_estimador(t_estimador* estimador, entrenador* unEntrenador, numero tiempoUltimaEjecucion, bool finDeRafaga){
+void actualizar_estimador(t_estimador estimador, entrenador* unEntrenador, numero tiempoUltimaEjecucion, bool finDeRafaga){
 	numero pid = unEntrenador->id;
-	numero* estimacion  = &estimador->estimaciones[pid];
-	numero* tiempo      = &estimador->tiempoRafagaActual[pid];
+	numero* estimacion  = &estimador.estimaciones[pid];
+	numero* tiempo      = &estimador.tiempoRafagaActual[pid];
 
 	*tiempo += tiempoUltimaEjecucion;
 
 	if(finDeRafaga){
 		numero estimacionAnterior = *estimacion;
-		double alfa = estimador->alfa;
+		double alfa = estimador.alfa;
 
 		*estimacion = alfa*(*tiempo) + (1-alfa)*estimacionAnterior;
 		*tiempo = 0;
 	}
 
 	else{
-		*estimacion = entrenador_tiempo_restante(unEntrenador, tiempoUltimaEjecucion, *estimador);
+		*estimacion = entrenador_tiempo_restante(unEntrenador, tiempoUltimaEjecucion);
 	}
 }
 
 
 //*****************************
 // TAD HRRN
-numero* entrenador_get_espera(entrenador*unEntrenador, datos_hrrn hrrn){
-	return &hrrn.espera[unEntrenador->id];
+numero* entrenador_get_espera(entrenador*unEntrenador){
+	return &DATOS_ALGORITMO.espera[unEntrenador->id];
 }
 
-numero entrenador_response_ratio(entrenador*unEntrenador, datos_hrrn hrrn){
-	numero* espera = entrenador_get_espera(unEntrenador, hrrn);
-	numero tiempoRestante = entrenador_estimacion(unEntrenador, hrrn.estimador);
+numero entrenador_response_ratio(entrenador*unEntrenador){
+	numero* espera = entrenador_get_espera(unEntrenador);
+	numero tiempoRestante = entrenador_estimacion(unEntrenador);
 	return (*espera + tiempoRestante)/tiempoRestante;
 }
 
 entrenador*entrenador_con_menor_estimacion(entrenador*unEntrenador, entrenador*otro){
-	t_estimador estimador = DATOS_ALGORITMO.sjf;
 	log_event_comparacion_de_estimaciones(unEntrenador, otro);
-	return entrenador_estimacion(unEntrenador, estimador) <= entrenador_estimacion(otro, estimador)? unEntrenador: otro;
+	return entrenador_estimacion(unEntrenador) <= entrenador_estimacion(otro)? unEntrenador: otro;
 }
 
 entrenador* entrenador_con_menor_response_ratio(entrenador* unEntrenador, entrenador* otroEntrenador){
-	return entrenador_response_ratio(unEntrenador, DATOS_ALGORITMO.hrrn) <= entrenador_response_ratio(otroEntrenador, DATOS_ALGORITMO.hrrn)? unEntrenador: otroEntrenador;
+	return entrenador_response_ratio(unEntrenador) <= entrenador_response_ratio(otroEntrenador)? unEntrenador: otroEntrenador;
 }
 
 entrenador* cola_mejor_entrenador(cola_entrenadores colaReady, entrenador*(*comparador)(entrenador*, entrenador*)){
@@ -332,7 +326,7 @@ entrenador*cola_entrenador_con_menor_response_ratio(cola_entrenadores colaReady)
 
 // VRR
 numero entrenador_virtual_quantum_consumido(entrenador* unEntrenador){
-	return DATOS_ALGORITMO.vrr.quantumConsumido[unEntrenador->id];
+	return DATOS_ALGORITMO.quantumConsumido[unEntrenador->id];
 }
 
 numero entrenador_virtual_quantum_por_ejecutar(entrenador* unEntrenador, numero tiempo){

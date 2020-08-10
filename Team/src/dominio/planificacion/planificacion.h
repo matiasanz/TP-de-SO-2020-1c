@@ -7,31 +7,19 @@
 
 typedef enum {FIFO, ROUND_ROBBIN, SJF_CD, SJF_SD, HRRN, VIRTUAL_ROUND_ROBBIN} t_algoritmo_planificacion;
 
-//TAD SJF
+//TAD Estimador
 typedef struct{
 	numero* tiempoRafagaActual;
 	numero* estimaciones;
 	double alfa;
 } t_estimador;
 
-//TAD HRRN
-typedef struct{
-	numero* espera;
-	t_estimador estimador;
-} datos_hrrn;
-
-//TAD VRR
-typedef struct{
-	numero QUANTUM;
-	numero* quantumConsumido;
-} datos_vrr;
-
 //TAD DATOS ALGORITMO
-typedef union{
-	numero QUANTUM;
-	t_estimador sjf;
-	datos_hrrn hrrn;
-	datos_vrr vrr;
+typedef struct{
+	numero QUANTUM; 		  // RR y VRR
+	t_estimador estimador;    // SJF y HRRN
+	numero* espera; 	      // HRRN
+	numero* quantumConsumido; //VRR
 } datos_algoritmo;
 
 char* MOTIVO_DESALOJO;
@@ -84,16 +72,16 @@ char* MOTIVO_DESALOJO;
 
 //SJF
 	t_estimador estimador_create(double alfa, numero cantidadDeProcesos, numero estimacionInicial);
-	void actualizar_estimador(t_estimador* estimador, entrenador* unEntrenador, numero tiempoUltimaEjecucion, bool finDeRafaga);
+	void actualizar_estimador(t_estimador estimador, entrenador* unEntrenador, numero tiempoUltimaEjecucion, bool finDeRafaga);
 	numero entrenador_tiempo_rafaga_estimado(entrenador*, t_estimador);
 	numero entrenador_tiempo_rafaga_cumplido(entrenador*, t_estimador);
-	numero entrenador_estimacion(entrenador*, t_estimador);
-	numero entrenador_tiempo_restante(entrenador*, numero tiempoEnEjecucion, t_estimador);
+	numero entrenador_estimacion(entrenador*);
+	numero entrenador_tiempo_restante(entrenador*, numero tiempoEnEjecucion);
 	entrenador*cola_entrenador_con_menor_estimacion(cola_entrenadores);
 	numero entrenador_rafaga_estimada(entrenador*, t_estimador);
 
 //HRRN
-	numero* entrenador_get_espera(entrenador*unEntrenador, datos_hrrn hrrn);
+	numero* entrenador_get_espera(entrenador*unEntrenador);
 	entrenador* entrenador_con_menor_response_ratio(entrenador* unEntrenador, entrenador* otroEntrenador);
 	entrenador*cola_entrenador_con_menor_response_ratio(cola_entrenadores colaReady);
 
