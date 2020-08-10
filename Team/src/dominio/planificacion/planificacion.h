@@ -82,8 +82,8 @@ char* MOTIVO_DESALOJO;
 
 //HRRN
 	numero* entrenador_get_espera(entrenador*unEntrenador);
-	entrenador* entrenador_con_menor_response_ratio(entrenador* unEntrenador, entrenador* otroEntrenador);
-	entrenador*cola_entrenador_con_menor_response_ratio(cola_entrenadores colaReady);
+	entrenador* entrenador_con_mayor_response_ratio(entrenador* unEntrenador, entrenador* otroEntrenador);
+	entrenador*cola_entrenador_con_mayor_response_ratio(cola_entrenadores colaReady);
 
 //VRR
 	numero entrenador_virtual_quantum_consumido(entrenador* unEntrenador);

@@ -163,7 +163,7 @@ void inicializar_hrrn(double alfa, numero cantidadDeProcesos, numero estimacionI
 }
 
 entrenador* proximo_segun_hrrn(cola_entrenadores colaReady){
-	return cola_entrenador_con_menor_response_ratio(colaReady);
+	return cola_entrenador_con_mayor_response_ratio(colaReady);
 }
 
 void actualizar_datos_hrrn(entrenador*unEntrenador, numero tiempoUltimaEjecucion, bool finDeRafaga){
@@ -298,8 +298,8 @@ entrenador*entrenador_con_menor_estimacion(entrenador*unEntrenador, entrenador*o
 	return entrenador_estimacion(unEntrenador) <= entrenador_estimacion(otro)? unEntrenador: otro;
 }
 
-entrenador* entrenador_con_menor_response_ratio(entrenador* unEntrenador, entrenador* otroEntrenador){
-	return entrenador_response_ratio(unEntrenador) <= entrenador_response_ratio(otroEntrenador)? unEntrenador: otroEntrenador;
+entrenador* entrenador_con_mayor_response_ratio(entrenador* unEntrenador, entrenador* otroEntrenador){
+	return entrenador_response_ratio(unEntrenador) >= entrenador_response_ratio(otroEntrenador)? unEntrenador: otroEntrenador;
 }
 
 entrenador* cola_mejor_entrenador(cola_entrenadores colaReady, entrenador*(*comparador)(entrenador*, entrenador*)){
@@ -321,8 +321,8 @@ entrenador*cola_entrenador_con_menor_estimacion(cola_entrenadores colaReady){
 	return cola_mejor_entrenador(colaReady, &entrenador_con_menor_estimacion);
 }
 
-entrenador*cola_entrenador_con_menor_response_ratio(cola_entrenadores colaReady){
-	return cola_mejor_entrenador(colaReady, &entrenador_con_menor_response_ratio);
+entrenador*cola_entrenador_con_mayor_response_ratio(cola_entrenadores colaReady){
+	return cola_mejor_entrenador(colaReady, &entrenador_con_mayor_response_ratio);
 }
 
 // VRR
