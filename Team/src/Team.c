@@ -10,9 +10,9 @@
 #include "team.h"
 #include "hilos-del-team/hilos_team.h"
 //#include "tests/tests_team.o"
-
-
-
+numero entrenador_response_ratio(entrenador*, datos_hrrn);
+numero entrenador_tiempo_rafaga_cumplido(entrenador*, datos_sjf);
+numero entrenador_tiempo_rafaga_estimado(entrenador*,datos_sjf);
 int main(int cantidad, char**argumentos ) {
 
 	team_inicializar(cantidad, argumentos);
