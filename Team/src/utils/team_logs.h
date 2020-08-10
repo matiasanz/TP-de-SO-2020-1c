@@ -82,6 +82,7 @@
 	//ALGORITMOS
 	void log_event_datos_sjf(double alfa, numero estimacionInicial);
 	void log_event_comparacion_de_estimaciones(entrenador* unEntrenador, entrenador* otro);
+	void log_event_comparacion_quantum(numero quantumMax, numero quantumConsumido);
 
 	//Validaciones
 	void validar_pokemon(pokemon*, t_id idEntrenador);

@@ -206,7 +206,8 @@ entrenador* proximo_segun_vrr(cola_entrenadores colaReady){
 
 bool desalojo_en_vrr(entrenador*unEntrenador, numero tiempoQueLlevaEjecutando){
 	numero quantumConsumido = entrenador_virtual_quantum_por_ejecutar(unEntrenador, tiempoQueLlevaEjecutando);
-	return DATOS_ALGORITMO.QUANTUM < quantumConsumido;
+	log_event_comparacion_quantum(DATOS_ALGORITMO.QUANTUM, quantumConsumido);
+	return DATOS_ALGORITMO.QUANTUM == quantumConsumido;
 }
 
 void actualizar_datos_vrr(entrenador*unEntrenador, numero tiempoUltimaEjecucion, bool finDeRafaga){

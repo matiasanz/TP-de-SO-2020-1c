@@ -280,6 +280,10 @@ void log_event_comparacion_de_estimaciones(entrenador* unEntrenador, entrenador*
 //	printf("\n Comparo %d <= %d\n", entrenador_estimacion(unEntrenador), estimacion_del_entrenador(otro));
 }
 
+void log_event_comparacion_quantum(numero quantumMax, numero quantumConsumido){
+//	printf(">> max %u == %u consumido\n", quantumMax , quantumConsumido);
+}
+
 //***********************************************************************
 
 void validar_pokemon(pokemon*pokemonCatcheado, t_id pid){
