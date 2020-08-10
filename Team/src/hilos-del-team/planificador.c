@@ -27,7 +27,7 @@ void ejecutar_entrenador(entrenador* unEntrenador){
 	for(tiempo=0; !entrenador_termino_de_ejecutar(unEntrenador); tiempo+=RETARDO_CICLO_CPU){
 
 		if(criterio_de_desalojo(unEntrenador, tiempo)){
-			desalojo=true;
+			desalojo=true; tiempo-=RETARDO_CICLO_CPU;
 			desalojar_entrenador(unEntrenador);
 			break;
 		}

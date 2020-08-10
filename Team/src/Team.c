@@ -11,8 +11,8 @@
 #include "hilos-del-team/hilos_team.h"
 //#include "tests/tests_team.o"
 numero entrenador_response_ratio(entrenador*, datos_hrrn);
-numero entrenador_tiempo_rafaga_cumplido(entrenador*, datos_sjf);
-numero entrenador_tiempo_rafaga_estimado(entrenador*,datos_sjf);
+numero entrenador_tiempo_rafaga_cumplido(entrenador*, t_estimador);
+numero entrenador_tiempo_rafaga_estimado(entrenador*,t_estimador);
 int main(int cantidad, char**argumentos ) {
 
 	team_inicializar(cantidad, argumentos);
@@ -165,7 +165,7 @@ char*num_array_to_string(numero*arreglo, int length){
 
 //Listas
 void inicializar_listas() {
-	equipo = entrenadores_cargar();
+	equipo = config_get_equipo();
 	objetivosGlobales   = entrenadores_objetivos_globales(equipo);
 	inventariosGlobales = entrenadores_inventarios_globales(equipo);
 	recursosEnMapa      = recursos_create();
@@ -256,10 +256,10 @@ void finalizar_semaforos(){
 //Conexiones
 void inicializar_conexiones() {
 
-	TIEMPO_RECONEXION = config_get_int_value(config, "TIEMPO_RECONEXION");
+	TIEMPO_RECONEXION = config_get_tiempo_reconexion();
 
-	char*IP_BROKER = config_get_string_value(config, "IP_BROKER");
-	char*PUERTO_BROKER = config_get_string_value(config, "PUERTO_BROKER");
+	char*IP_BROKER = config_get_ip_broker();
+	char*PUERTO_BROKER = config_get_puerto_broker();
 
 	conexion_broker = conexion_server_crear(string_duplicate(IP_BROKER)
 										  , string_duplicate(PUERTO_BROKER)

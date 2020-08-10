@@ -2,7 +2,39 @@
 #include <commons/string.h>
 #include "../../utils/team_logs.h"
 
-entrenadores entrenadores_cargar(){
+//Varios
+numero config_get_quantum(){
+	return config_get_int_value(config, "QUANTUM");
+}
+
+numero config_get_retardo_ciclo_cpu(){
+	return config_get_int_value(config, "RETARDO_CICLO_CPU");
+}
+
+double config_get_alfa(){
+	return config_get_double_value(config, "ALFA");
+}
+
+numero config_get_estimacion_inicial(){
+	return config_get_int_value(config, "ESTIMACION_INICIAL");
+}
+
+numero config_get_tiempo_reconexion(){
+	return config_get_int_value(config, "TIEMPO_RECONEXION");
+}
+
+char* config_get_ip_broker(){
+	return config_get_string_value(config, "IP_BROKER");
+}
+
+char* config_get_puerto_broker(){
+	return config_get_string_value(config, "PUERTO_BROKER");
+}
+
+//**************************************************************************
+//Entrenadores
+
+entrenadores config_get_equipo(){
 	entrenadores miEquipo = entrenadores_create();
 
 	t_list*posiciones = config_get_posiciones();

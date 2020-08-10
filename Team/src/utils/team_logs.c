@@ -296,6 +296,15 @@ void validar_entrenador(entrenador*unEntrenador){
 	}
 }
 
+//***********************************************************************
+
+void throw_new_algoritmo_desconocido_exception(){
+	pthread_mutex_lock(&Mutex_AndoLoggeandoEventos);
+	log_error(event_logger, "Se ha leido un algoritmo de planificacion desconocido");
+	pthread_mutex_unlock(&Mutex_AndoLoggeandoEventos);
+	exit(1);
+}
+
 //*******************************************************************************
 
 // Idea descartada por memory leaks
