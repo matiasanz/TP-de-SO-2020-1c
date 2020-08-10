@@ -199,14 +199,6 @@ void inicializar_vrr(numero quantum, numero cantidadDeProcesos){
 	actualizar_datos_del_entrenador = actualizar_datos_vrr;
 }
 
-bool entrenador_ready_plus(entrenador* unEntrenador){
-	return entrenador_virtual_quantum_consumido(unEntrenador);
-}
-
-entrenador* cola_get_proximo_en_ready_plus(cola_entrenadores colaReady){
-	return list_remove_by_condition(colaReady->lista, (bool(*)(void*)) &entrenador_ready_plus);
-}
-
 entrenador* proximo_segun_vrr(cola_entrenadores colaReady){
 	sem_wait(&colaReady->hayMas);
 	pthread_mutex_lock(&colaReady->mutex);
@@ -232,16 +224,6 @@ void actualizar_datos_vrr(entrenador*unEntrenador, numero tiempoUltimaEjecucion,
 		*quantumAcumulado = 0;
 	}
 }
-
-//Auxiliares
-numero entrenador_virtual_quantum_consumido(entrenador* unEntrenador){
-	return DATOS_ALGORITMO.vrr.quantumConsumido[unEntrenador->id];
-}
-
-numero entrenador_virtual_quantum_por_ejecutar(entrenador* unEntrenador, numero tiempo){
-	return entrenador_virtual_quantum_consumido(unEntrenador) + tiempo/RETARDO_CICLO_CPU;
-}
-
 
 //******************************* Funciones Auxiliares ********************************
 
@@ -348,6 +330,24 @@ entrenador*cola_entrenador_con_menor_response_ratio(cola_entrenadores colaReady)
 	return cola_mejor_entrenador(colaReady, &entrenador_con_menor_response_ratio);
 }
 
+// VRR
+numero entrenador_virtual_quantum_consumido(entrenador* unEntrenador){
+	return DATOS_ALGORITMO.vrr.quantumConsumido[unEntrenador->id];
+}
+
+numero entrenador_virtual_quantum_por_ejecutar(entrenador* unEntrenador, numero tiempo){
+	return entrenador_virtual_quantum_consumido(unEntrenador) + tiempo/RETARDO_CICLO_CPU;
+}
+
+bool entrenador_ready_plus(entrenador* unEntrenador){
+	return entrenador_virtual_quantum_consumido(unEntrenador);
+}
+
+entrenador* cola_get_proximo_en_ready_plus(cola_entrenadores colaReady){
+	return list_remove_by_condition(colaReady->lista, (bool(*)(void*)) &entrenador_ready_plus);
+}
+
+//General
 void no_operation(){
 	//No hace nada
 }
