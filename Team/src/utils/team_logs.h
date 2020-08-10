@@ -87,4 +87,7 @@
 	void validar_pokemon(pokemon*, t_id idEntrenador);
 	void validar_entrenador(entrenador*unEntrenador);
 
+	//Excepciones
+	void throw_new_algoritmo_desconocido_exception();
+
 #endif
