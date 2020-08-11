@@ -1,6 +1,5 @@
-#include "../../dominio/estructuras-auxiliares/candidatos_intercambio.h"
-
 #include "../../utils/team_logs.h"
+#include "candidatos_intercambio.h"
 
 //******************************************************
 
@@ -14,6 +13,10 @@ void candidato_destroy(candidato_intercambio* elemento){
 	recursos_destroy(elemento->necesidad);
 	recursos_destroy(elemento->sobrantes);
 	free(elemento);
+}
+
+void candidato_desplazarse_hacia_el_otro(candidato_intercambio*unCandidato, candidato_intercambio*haciaQuien){
+	entrenador_desplazarse_hacia(unCandidato->interesado, haciaQuien->interesado->posicion);
 }
 
 bool candidato_puede_intercambiar_con(candidato_intercambio*unEntrenador, candidato_intercambio*otro){
@@ -51,6 +54,18 @@ void candidato_intercambiar_con(candidato_intercambio* self, candidato_intercamb
 
 	candidato_actualizar_matrices_por_intercambio(self, teDoyEste, aCambioDeEste);
 	candidato_actualizar_matrices_por_intercambio(parejaDeIntercambio, aCambioDeEste, teDoyEste);
+}
+
+void candidato_concretar_intercambio(candidato_intercambio* self, candidato_intercambio* parejaDeIntercambio){
+	int ciclosPorIntercambio = 5;
+	int cpuRestantes = ciclosPorIntercambio - 1;
+
+	do{
+		sem_post(&FinDeCiclo_CPU);
+		entrenador_consumir_N_cpu(self->interesado, cpuRestantes);
+		candidato_intercambiar_con(self, parejaDeIntercambio);
+		cpuRestantes=ciclosPorIntercambio;
+	} while(candidato_puede_intercambiar_con(self, parejaDeIntercambio));
 }
 
 //****************************************************************************************

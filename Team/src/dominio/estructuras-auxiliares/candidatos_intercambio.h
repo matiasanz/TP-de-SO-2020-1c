@@ -26,6 +26,9 @@ void candidato_desplazarse_hacia_el_otro(candidato_intercambio* self, candidato_
 //Ambos intercambian pokemones, si tiene uno que le sirve al otro le da ese y sino el primero que sale
 void candidato_intercambiar_con(candidato_intercambio* self, candidato_intercambio* parejaDeIntercambio);
 
+//Se efectua la cantidad de intercambios que haga falta, consumiendo los ciclos correspondientes
+void candidato_concretar_intercambio(candidato_intercambio* self, candidato_intercambio* parejaDeIntercambio);
+
 //Destructor
 void candidato_destroy(candidato_intercambio*);
 

@@ -175,6 +175,7 @@ void actualizar_datos_hrrn(entrenador*unEntrenador, numero tiempoUltimaEjecucion
 	}
 
 	cr_list_iterate(entrenadoresReady, incrementar_espera);
+	entrenador_reset_espera(unEntrenador);
 }
 
 //************************************************************************************
@@ -282,9 +283,13 @@ void actualizar_estimador(t_estimador estimador, entrenador* unEntrenador, numer
 
 
 //*****************************
-// TAD HRRN
 numero* entrenador_get_espera(entrenador*unEntrenador){
 	return &DATOS_ALGORITMO.espera[unEntrenador->id];
+}
+
+void entrenador_reset_espera(entrenador* unEntrenador){
+	numero* espera = entrenador_get_espera(unEntrenador);
+	*espera = 0;
 }
 
 numero entrenador_response_ratio(entrenador*unEntrenador){

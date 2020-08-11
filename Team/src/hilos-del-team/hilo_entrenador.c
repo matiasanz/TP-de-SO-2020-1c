@@ -2,10 +2,6 @@
 #include "hilos_team.h"
 #include "../team.h"
 
-pokemon* entrenador_get_proxima_presa(entrenador*unEntrenador){
-	return unEntrenador->proximaPresa;
-}
-
 void team_hilo_entrenador(entrenador*unEntrenador){
 	t_id pid = unEntrenador->id;
 
@@ -24,7 +20,7 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 
 				Catch(unEntrenador, unPokemon);
 
-				sem_post(&FinDeCiclo_CPU);
+				fin_de_ciclo_cpu();
 
 				break;
 			}
@@ -38,14 +34,12 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 				entrenador_capturar(unEntrenador, pokemonCatcheado);
 
 				if(entrenador_puede_cazar_mas_pokemones(unEntrenador)){
-					unEntrenador->siguienteTarea = CATCHEAR;
-					entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARED, "Tuvo exito en la captura y todavia puede cazar mas pokemones");
-					sem_post(&HayEntrenadoresDisponibles);
+					entrenador_dormir_hasta_que_aparezcan(unEntrenador);
 				}
 
 				else hiloActivo = !entrenador_verificar_objetivos(unEntrenador);
 
-				sem_post(&FinDeCiclo_CPU);
+				fin_de_ciclo_cpu();
 
 				break;
 			}
@@ -57,18 +51,12 @@ void team_hilo_entrenador(entrenador*unEntrenador){
 
 				candidato_desplazarse_hacia_el_otro(self, parejaDeIntercambio);
 
-				int cpuConsumidosPorIntercambio=1;
-				do{
-					sem_post(&FinDeCiclo_CPU);
-					entrenador_consumir_N_cpu(unEntrenador, 5-cpuConsumidosPorIntercambio);
-					candidato_intercambiar_con(self, parejaDeIntercambio);
-					cpuConsumidosPorIntercambio=0;
-				} while(candidato_puede_intercambiar_con(self, parejaDeIntercambio));
+				candidato_concretar_intercambio(self, parejaDeIntercambio);
 
 				hiloActivo = !entrenador_verificar_objetivos(unEntrenador);
 				entrenador_verificar_objetivos(parejaDeIntercambio->interesado);
 
-				sem_post(&FinDeCiclo_CPU); //Consumi el ultimo ciclo
+				fin_de_ciclo_cpu(); //Consumi el ultimo ciclo
 
 				sem_post(&finDeIntercambio);
 				candidato_destroy(self);
@@ -113,10 +101,6 @@ void finalizar_hilos_entrenadores(){
 
 /*************************************** Funciones Auxiliares ************************************************/
 
-bool cambio_de_contexto(t_estado inicial, t_estado final){
-	return inicial==EXECUTE || final==EXECUTE;
-}
-
 //Cambia de estado al entrenador y lo loggea
 void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const char*motivo){
 	pthread_mutex_lock(&mutexEstadoEntrenador[unEntrenador->id]);
@@ -131,35 +115,7 @@ void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const cha
 	}
 }
 
-//Incrementa sus recursos y lo contabiliza como inventario global
-void entrenador_capturar(entrenador*entrenador, pokemon*victima){
-
-	recursos_agregar_recurso(entrenador->pokemonesCazados, victima->especie);
-
-	t_posicion posicionDelEvento = entrenador->posicion;
-
-	log_enunciado_operacion_de_atrapar(entrenador, victima, posicionDelEvento);
-
-	pokemon_destroy_hard(victima);
-}
-
-//Remueve un entrenador de una lista
-entrenador* entrenadores_remover_del_equipo_a(entrenadores unEquipo, t_id id){
-	bool entrenador_cmpId(entrenador*unEntrenador){
-		return id == unEntrenador->id;
-	}
-
-	pthread_mutex_lock(&mutexEntrenadores);
-	entrenador*removido = list_remove_by_condition(unEquipo, (bool(*)(void*)) &entrenador_cmpId);
-	pthread_mutex_unlock(&mutexEntrenadores);
-
-	return removido;
-}
-
-void candidato_desplazarse_hacia_el_otro(candidato_intercambio*unCandidato, candidato_intercambio*haciaQuien){
-	entrenador_desplazarse_hacia(unCandidato->interesado, haciaQuien->interesado->posicion);
-}
-
+//Desplaza al entrenador de a un paso, consumiendo un ciclo de cpu por cada uno que da
 void entrenador_desplazarse_hacia(entrenador* unEntrenador, t_posicion posicionFinal){
 	log_event_de_donde_partio(unEntrenador);
 
@@ -177,33 +133,8 @@ void entrenador_desplazarse_hacia(entrenador* unEntrenador, t_posicion posicionF
 	}
 }
 
-void desplazar_unidimensional(coordenada* posicionInicial, coordenada posicionFinal){
-	int desplazamiento = (posicionFinal > *posicionInicial) - (posicionFinal < *posicionInicial);
-	*posicionInicial += desplazamiento;
-}
-
-void entrenador_dar_un_paso_hacia(entrenador*unEntrenador, t_posicion posicionFinal){
-
-	t_posicion* posicionActual = &unEntrenador->posicion;
-
-	if(posicionActual->pos_x != posicionFinal.pos_x){
-		desplazar_unidimensional(&posicionActual->pos_x, posicionFinal.pos_x);
-	}
-
-	else{
-		desplazar_unidimensional(&posicionActual->pos_y, posicionFinal.pos_y);
-	}
-
-	log_enunciado_movimiento_de_un_entrenador(unEntrenador);
-
-}
-
-bool entrenador_llego_a(entrenador* unEntrenador, t_posicion posicion){
-	return posicion_cmp(unEntrenador->posicion, posicion);
-}
-
-//Funcion hardcodeada para acelerar pruebas
-void entrenador_teletransportarte_a(entrenador*unEntrenador, t_posicion posicionFinal){
+//	Desplaza un entrenador de una posicion a otra de forma inmediata; Funcion hardcodeada para acelerar pruebas
+void entrenador_teletransportarse_a(entrenador*unEntrenador, t_posicion posicionFinal){
 //	//implementacion anterior, para pruebas rapidas
 	t_posicion posicionActual = unEntrenador->posicion;
 
@@ -214,6 +145,37 @@ void entrenador_teletransportarte_a(entrenador*unEntrenador, t_posicion posicion
 	pthread_mutex_lock(&Mutex_AndoLoggeando);
 	log_info(logger, "El Entrenador N°%u se desplazo desde [%u %u] hasta [%u %u]", unEntrenador->id, posicionActual.pos_x, posicionActual.pos_y, unEntrenador->posicion.pos_x, unEntrenador->posicion.pos_y);
 	pthread_mutex_unlock(&Mutex_AndoLoggeando);
+}
+
+//Incrementa sus recursos y lo contabiliza como inventario global
+void entrenador_capturar(entrenador*entrenador, pokemon*victima){
+
+	recursos_agregar_recurso(entrenador->pokemonesCazados, victima->especie);
+
+	t_posicion posicionDelEvento = entrenador->posicion;
+
+	log_enunciado_operacion_de_atrapar(entrenador, victima, posicionDelEvento);
+
+	pokemon_destroy_hard(victima);
+}
+
+void entrenador_dormir_hasta_que_aparezcan(entrenador* unEntrenador){
+	unEntrenador->siguienteTarea = CATCHEAR;
+	entrenador_pasar_a(unEntrenador, LOCKED_HASTA_APPEARED, "Tuvo exito en la captura y todavia puede cazar mas pokemones");
+	sem_post(&HayEntrenadoresDisponibles);
+}
+
+//Remueve un entrenador de una lista
+entrenador* entrenadores_remover_del_equipo_a(entrenadores unEquipo, t_id id){
+	bool entrenador_cmpId(entrenador*unEntrenador){
+		return id == unEntrenador->id;
+	}
+
+	pthread_mutex_lock(&mutexEntrenadores);
+	entrenador*removido = list_remove_by_condition(unEquipo, (bool(*)(void*)) &entrenador_cmpId);
+	pthread_mutex_unlock(&mutexEntrenadores);
+
+	return removido;
 }
 
 //************************************* Salida ********************************************/
@@ -243,9 +205,4 @@ bool entrenador_verificar_objetivos(entrenador*unEntrenador){
 void entrenador_finalizar(entrenador*unEntrenador){
 	entrenador_pasar_a(unEntrenador, EXIT, "Ya logro cumplir sus objetivos");
 	entrenador_liberar_recursos(unEntrenador);
-}
-
-void entrenador_liberar_recursos(entrenador*unEntrenador){
-	recursos_destroy(unEntrenador->objetivos);
-	recursos_destroy(unEntrenador->pokemonesCazados);
 }

@@ -21,7 +21,7 @@ void log_enunciado_cambio_de_cola(entrenador*unEntrenador, t_estado estadoActual
 					" Estado Inicial: %s\n"
 					" Estado Final: %s\n"
 					" Motivo: %s\n"
-					"", unEntrenador->id, estadoFromEnum(estadoActual),  estadoFromEnum(estadoFinal), motivo);
+					"", unEntrenador->id, estado_to_string(estadoActual),  estado_to_string(estadoFinal), motivo);
 	pthread_mutex_unlock(&Mutex_AndoLoggeando);
 }
 

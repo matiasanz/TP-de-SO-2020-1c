@@ -1,13 +1,13 @@
 # ifndef _TAD_ENTRENADOR_
 # define _TAD_ENTRENADOR_ //PASAR A COMMONS
 
-#include "../estructuras-principales/posicion.h"
-#include "../estructuras-principales/recursos.h"
+#include "posicion.h"
+#include "recursos.h"
 
 typedef enum{NEW,READY,	EXECUTE, LOCKED_HASTA_APPEARED, LOCKED_HASTA_DEADLOCK, LOCKED_HASTA_CAUGHT,	EXIT} t_estado; //VER cuales vale la pena conservar
 typedef enum{CATCHEAR, CAPTURAR, INTERCAMBIAR /*, FINALIZAR*/ } t_tarea;
 
-//TAD Pokemon									 Pasar a commons
+//TAD Pokemon
 typedef struct Pokemon{
 	especie_pokemon especie; //string
 	t_posicion posicion;
@@ -33,9 +33,16 @@ typedef struct pcb_Entrenador{
 //Constructor de entrenador al cual le puedo pasar los recursos como cadenas de caracteres. Ejemplo "Pikachu|Pidgey|Zapato"
 	entrenador*entrenador_ptr_crear(t_id id, char* asignados, char* pedidos, t_posicion);
 
-//	Desplaza un entrenador de una posicion a otra
-//  Definicion en hiloEntrenador
+//Retorna el pokemon que tiene asignado el entrenador
+	pokemon* entrenador_get_proxima_presa(entrenador*);
+
+//	Desplaza un entrenador de una posicion a otra de forma inmediata; Funcion hardcodeada para acelerar pruebas
+	void entrenador_teletransportarse_a(entrenador*unEntrenador, t_posicion posicionFinal);
+
+//  Desplaza un entrenador de a un paso, consumiendo un ciclo de cpu por cada uno
 	void entrenador_desplazarse_hacia(entrenador*, t_posicion);
+	void desplazar_unidimensional(coordenada* posicionInicial, coordenada posicionFinal);
+	void entrenador_dar_un_paso_hacia(entrenador*unEntrenador, t_posicion posicionFinal);
 
 // Retorna true si la posicion del entrenador coincide con la dada
 //  Definicion en hiloEntrenador
@@ -52,13 +59,16 @@ typedef struct pcb_Entrenador{
 	void entrenador_pasar_a(entrenador*unEntrenador, t_estado estadoFinal, const char*motivo);
 
 // Retorna una cadena de caracteres con el estado
-	char*estadoFromEnum(t_estado);
+	char*estado_to_string(t_estado);
 
 // Retorna una matriz con los recursos que capturo y no necesita
 	matriz_recursos entrenador_recursos_sobrantes(entrenador*);
 
 // Retorna una matriz con los objetivos que aun no logro capturar
 	matriz_recursos entrenador_recursos_pedidos(entrenador*);
+
+// Destruye los recursos, que son lo que mas memoria consume
+	void entrenador_liberar_recursos(entrenador*);
 
 //Destructor
 	void entrenador_destroy(entrenador*);

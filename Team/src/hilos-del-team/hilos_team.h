@@ -63,6 +63,7 @@ void finalizar_hilos_entrenadores();
 //Entrenadores
 void entrenador_despertar(entrenador*, char* motivo);
 void entrenadores_despertar_por_llegada_de(entrenadores, pokemon*);
+void entrenador_dormir_hasta_que_aparezcan(entrenador* unEntrenador);
 void entrenador_dormir_hasta_llegada_de_pokemon(entrenador*);
 bool entrenador_dormido_hasta_llegada_de_pokemon(entrenador*);
 bool entrenador_verificar_objetivos(entrenador*);

@@ -2,7 +2,7 @@
 # define _TAD_POKEMON_
 
 //#include <commons/collections/list.h>
-#include "../estructuras-principales/entrenador.h"
+#include "entrenador.h"
 typedef t_list* especies_pokemones;
 
 ////TAD Pokemon									 Pasar a commons

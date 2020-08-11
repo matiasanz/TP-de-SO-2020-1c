@@ -36,6 +36,7 @@ char* MOTIVO_DESALOJO;
 	entrenador* (*proximo_a_ejecutar_segun_criterio)(cola_entrenadores);
 	bool (*criterio_de_desalojo)(entrenador*, numero);
 	void (*actualizar_datos_del_entrenador)(entrenador*unEntrenador, numero tiempo, bool finDeRafaga);
+  //void (*pasar_a_ready)(entrenador*unEntrenador, char*motivo); //Me falto esa. Hubiera estado bueno, pero a diferencia de las anteriores aparece en varios lados
 
   //Proximo
 	entrenador*proximo_segun_fifo(cola_entrenadores);
@@ -63,6 +64,10 @@ char* MOTIVO_DESALOJO;
 	void consumir_ciclo_cpu();
 	void entrenador_consumir_N_cpu(entrenador*, numero);
 	void entrenador_esperar_y_consumir_cpu(entrenador*);
+	void entrenador_otorgar_ciclo_de_cpu(entrenador*);
+	void esperar_fin_de_ciclo_cpu();
+	void fin_de_ciclo_cpu();
+	bool cambio_de_contexto(t_estado inicial, t_estado final);
 
 //**************************************** Auxiliares *******************************************
 
@@ -82,6 +87,7 @@ char* MOTIVO_DESALOJO;
 
 //HRRN
 	numero* entrenador_get_espera(entrenador*unEntrenador);
+	void entrenador_reset_espera(entrenador* unEntrenador);
 	entrenador* entrenador_con_mayor_response_ratio(entrenador* unEntrenador, entrenador* otroEntrenador);
 	entrenador*cola_entrenador_con_mayor_response_ratio(cola_entrenadores colaReady);
 

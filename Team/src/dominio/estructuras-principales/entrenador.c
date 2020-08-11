@@ -1,8 +1,7 @@
-#include "../estructuras-principales/entrenador.h"
-
 #include <commons/string.h>
+#include "entrenador.h"
+#include "pokemon.h"
 
-#include "../estructuras-principales/pokemon.h"
 
 //Constructor Entrenador
 entrenador entrenador_create(t_id id, matriz_recursos pokemonesEnInventario, matriz_recursos objetivos, t_posicion unaPos){
@@ -21,6 +20,36 @@ entrenador*entrenador_ptr_create(t_id id, matriz_recursos pokemonesEnInventario,
 //Constructor de entrenador al cual le puedo pasar las matrices como cadenas de caracteres
 entrenador*entrenador_ptr_crear(t_id id, char* asignados, char* pedidos, t_posicion unaPos){
 	return entrenador_ptr_create(id, recursos_from_string(asignados), recursos_from_string(pedidos), unaPos);
+}
+
+bool entrenador_llego_a(entrenador* unEntrenador, t_posicion posicion){
+	return posicion_cmp(unEntrenador->posicion, posicion);
+}
+
+void desplazar_unidimensional(coordenada* posicionInicial, coordenada posicionFinal){
+	int desplazamiento = (posicionFinal > *posicionInicial) - (posicionFinal < *posicionInicial);
+	*posicionInicial += desplazamiento;
+}
+
+void log_enunciado_movimiento_de_un_entrenador(entrenador*);
+
+void entrenador_dar_un_paso_hacia(entrenador*unEntrenador, t_posicion posicionFinal){
+
+	t_posicion* posicionActual = &unEntrenador->posicion;
+
+	if(posicionActual->pos_x != posicionFinal.pos_x){
+		desplazar_unidimensional(&posicionActual->pos_x, posicionFinal.pos_x);
+	}
+
+	else{
+		desplazar_unidimensional(&posicionActual->pos_y, posicionFinal.pos_y);
+	}
+
+	log_enunciado_movimiento_de_un_entrenador(unEntrenador);
+}
+
+pokemon* entrenador_get_proxima_presa(entrenador*unEntrenador){
+	return unEntrenador->proximaPresa;
 }
 
 matriz_recursos entrenador_objetivos(entrenador*unEntrenador){
@@ -44,7 +73,7 @@ bool entrenador_puede_cazar_mas_pokemones(entrenador* unEntrenador){
 	return recursos_contar(unEntrenador->objetivos) > recursos_contar(unEntrenador->pokemonesCazados);
 }
 
-char*estadoFromEnum(t_estado unEstado){
+char*estado_to_string(t_estado unEstado){
 	switch(unEstado){
 		case NEW:       {return "NEW";}
 		case READY:	    {return "READY";}
@@ -52,6 +81,11 @@ char*estadoFromEnum(t_estado unEstado){
 		case EXECUTE:	{return "EXECUTE";}
 		default:		{return "LOCKED";}
 	}
+}
+
+void entrenador_liberar_recursos(entrenador*unEntrenador){
+	recursos_destroy(unEntrenador->objetivos);
+	recursos_destroy(unEntrenador->pokemonesCazados);
 }
 
 void entrenador_destroy(entrenador* destruido){
@@ -122,7 +156,7 @@ matriz_recursos entrenadores_recursos_sobrantes(entrenadores unEquipo){
 //
 entrenadores entrenadores_en_estado(entrenadores equipo, t_estado unEstado){
 	bool esta_en_estado(void* unEntrenador){
-		puts(estadoFromEnum(((entrenador*)unEntrenador)->estado));
+		puts(estado_to_string(((entrenador*)unEntrenador)->estado));
 		return entrenador_en_estado((entrenador*) unEntrenador, unEstado);
 	}
 

@@ -1,5 +1,5 @@
 
-#include "../suscripciones/hilo_localized_pokemon.h"
+#include "hilo_localized_pokemon.h"
 
 #include "../team.h"
 
@@ -21,10 +21,9 @@ void localized_pokemon_recibido(t_mensaje_localized_pokemon* localized_pokemon) 
 		mensaje_localized_pokemon_procesar(localized_pokemon);
 	}
 
-	else{
-		log_event_localized_descartado_por_id(localized_pokemon);
-		mensaje_localized_pokemon_destruir(localized_pokemon);
-	}
+	else log_event_localized_descartado_por_id(localized_pokemon);
+
+	mensaje_localized_pokemon_destruir(localized_pokemon);
 
 	if(!pedidos_pendientes()){
 		borrar_historial();
@@ -33,17 +32,14 @@ void localized_pokemon_recibido(t_mensaje_localized_pokemon* localized_pokemon) 
 
 void mensaje_localized_pokemon_procesar(t_mensaje_localized_pokemon* pokemonLocalizado){
 
-	if(!especie_recibida_con_anterioridad(pokemonLocalizado->especie, historialDePokemones)){
-		especie_pokemon especie = pokemonLocalizado->especie;
+	especie_pokemon especie = pokemonLocalizado->especie;
+
+	if(!especie_recibida_con_anterioridad(especie, historialDePokemones)){
 		posiciones_ordenar_por_cercania_al_equipo(pokemonLocalizado->posiciones);
 		registrar_en_cada_posicion(especie, pokemonLocalizado->posiciones);
 	}
 
-	else{
-		log_event_localized_repetido(pokemonLocalizado->especie);
-	}
-
-	mensaje_localized_pokemon_destruir(pokemonLocalizado);
+	else log_event_localized_repetido(pokemonLocalizado->especie);
 }
 
 /*************************************** Funciones Auxiliares ************************************************/
